@@ -20,3 +20,7 @@ design to accomodate the older browsers.
 * Arrow functions (Should be safe-ish)
 * Promises (shipping most places)
 * Module loading mechanism?
+
+## Things that seem like niche use-cases, but aren't
+
+* Support for WebWorkers
