@@ -55,3 +55,16 @@ sugar_like.getResidue('y1a').annotate('label',recursive=F);
 // right from the start
 
 ```
+
+
+## Thoughts on immutability and equality
+
+If we've got a couple of thousand sugar objects instantiated, we would 
+like the objects to contain as little information inside them as possible.
+This means we probably don't need to have caching for the instantiation of each of the monosaccharides.. Unless the instantiation is actually an expensive operation. Will be simpler to delegate the responsibility for namespace translation across to a writing module, that can optimise the hell out of the process of writing and looking up namespaces.
+
+Can go even further, and have the name of the monosaccharide a symbol, so that we don't need to store strings in the object, and it's just a reference to another object. Certainly would make the translation process a lot faster.
+
+Start off writing the objects as a simple tree structure, and we can think about moving to using a connection table (or other) if our traversal is way too slow.
+
+We probably want mutability of sequence / structure. How do we ensure that we don't leak monosaccharide objects? WeakMaps for the children?
