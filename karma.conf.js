@@ -22,12 +22,20 @@ module.exports = function(config) {
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['qunit','browserify'],
-    plugins: ['karma-qunit','karma-browserify','karma-phantomjs-launcher','karma-chrome-launcher'],
+
+    plugins: ['karma-qunit','karma-browserify','karma-phantomjs2-launcher','karma-chrome-launcher'],
+
+    browserify : {
+      debug: true,
+      transform : [['babelify', { "presets": ["es2015"] }]]
+    },
 
     // list of files / patterns to load in the browser
+    // Load in our transpiled files first, to make sure
+    // that the polyfills are loaded, ready for the tests.
     files: [
-      'test/**/*.js',
-      'js/glycan.js'
+      'js/**/*.js',
+      'test/**/*.js'
     ],
 
 
@@ -39,8 +47,9 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        '**/test.js' : ['browserify'],
-        '**/test-*.js' : ['browserify']
+        'js/**/*.js' : ['browserify'],
+        'test/**/test.js' : ['browserify'],
+        'test/**/test-*.js' : ['browserify']
     },
 
 
@@ -69,11 +78,11 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['Chrome','PhantomJS2'],
 
     customLaunchers: {
       'PhantomJS_debug': {
-        base: 'PhantomJS',
+        base: 'PhantomJS2',
         options: {
           windowName: 'my-window',
           settings: {
