@@ -13,6 +13,7 @@ let parent_linkage_symbol = Symbol("parent_linkage");
 	rules.
 */
 
+let linkage_map = new WeakMap();
 
 export default class Monosaccharide {
 	constructor(identifier) {
@@ -25,6 +26,10 @@ export default class Monosaccharide {
 		this[identifier_symbol] = identifier;
 	}
 
+	get identifier() {
+		return this[identifier_symbol];
+	}
+
 	// properties:
 	get anomer() {
 		return this[anomer_symbol];
@@ -34,6 +39,7 @@ export default class Monosaccharide {
 		this[anomer_symbol] = anomer;
 	}
 
+	// parent linkage
 	get parent_linkage() {
 		return this[parent_linkage_symbol];
 	}
@@ -51,15 +57,18 @@ export default class Monosaccharide {
 		return this[children_symbol];
 	}
 
-	get identifier() {
-		return this[identifier_symbol];
+	get child_linkages() {
+		return this.children.map(mono => linkage_map.get(mono));
 	}
 
-	// parent linkage
 	// child linkages
 
 	// methods:
 	// add child
+	addChild(linkage,child) {
+		linkage_map.set(child,linkage);
+		this[children_symbol] = (this[children_symbol] || []).concat([child]);
+	}
 	// remove child
 	// cast to sugar (make monosaccharide a sugar/glycan class)
 	// siblings
