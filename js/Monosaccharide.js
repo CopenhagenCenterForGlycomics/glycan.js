@@ -14,7 +14,7 @@ let parent_linkage_symbol = Symbol("parent_linkage");
 */
 
 
-export class Monosaccharide {
+export default class Monosaccharide {
 	constructor(identifier) {
 		if ( ! identifier ) {
 			throw new Error("Missing identifier");
