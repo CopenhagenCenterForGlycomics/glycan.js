@@ -1,10 +1,14 @@
 /*global QUnit*/
 
+import Monosaccharide from "../../js/Monosaccharide";
+
 QUnit.module("Test that we can read in sequences", {
 });
 
 QUnit.test( "Reading in a simple monosaccharide" , function( assert ) {
   var sequence = "GlcNAc";
+  var foo = new Monosaccharide("GlcNAc");
+  foo.anomer = "a";
   assert.ok(false,"Can't read in sequence "+sequence);
 });
 
