@@ -1,6 +1,7 @@
+/*global QUnit*/
 "use strict";
 
-import Monosaccharide from '../../js/Monosaccharide';
+import Monosaccharide from "../../js/Monosaccharide";
 
 QUnit.module("Test that we can load modules", {
 });
