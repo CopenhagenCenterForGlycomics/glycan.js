@@ -23,17 +23,18 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['qunit','browserify'],
 
-    plugins: ['karma-qunit','karma-browserify','karma-phantomjs2-launcher','karma-chrome-launcher'],
+    plugins: ['karma-qunit','karma-browserify','karma-phantomjs-launcher','karma-chrome-launcher'],
 
     browserify : {
       debug: true,
-      transform : [['babelify', { "presets": ["es2015"] }]]
+      transform : [['babelify', { 'presets': ['es2015'] }]]
     },
 
     // list of files / patterns to load in the browser
     // Load in our transpiled files first, to make sure
     // that the polyfills are loaded, ready for the tests.
     files: [
+      'node_modules/babel-polyfill/dist/polyfill.js',
       'js/**/*.js',
       'test/**/*.js'
     ],
@@ -78,11 +79,11 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome','PhantomJS2'],
+    browsers: ['Chrome','PhantomJS'],
 
     customLaunchers: {
       'PhantomJS_debug': {
-        base: 'PhantomJS2',
+        base: 'PhantomJS',
         options: {
           windowName: 'my-window',
           settings: {
