@@ -2,8 +2,9 @@
 
 let anomer_symbol = Symbol("anomer");
 let identifier_symbol = Symbol("identifier");
-let children_symbol = Symbol("children");
 let parent_linkage_symbol = Symbol("parent_linkage");
+let parent_symbol = Symbol("parent");
+
 
 /* 	We basically want a barebones Monosacharide class that uses
 	some common set of identifiers for each of the monosaccharide
@@ -14,6 +15,7 @@ let parent_linkage_symbol = Symbol("parent_linkage");
 */
 
 let linkage_map = new WeakMap();
+let children_map = new WeakMap();
 
 export default class Monosaccharide {
 	constructor(identifier) {
@@ -30,7 +32,6 @@ export default class Monosaccharide {
 		return this[identifier_symbol];
 	}
 
-	// properties:
 	get anomer() {
 		return this[anomer_symbol];
 	}
@@ -50,15 +51,32 @@ export default class Monosaccharide {
 		this[parent_linkage_symbol] = linkage;
 	}
 
+	get parent() {
+		return this[parent_symbol];
+	}
+	// This should be a tristate variable a/b/?
+	set parent(parent) {
+		this[parent_symbol] = parent;
+	}
 
 	// This should spit out an immutable array - force usage of the api
 	// to add/remove children.
 	get children() {
-		return this[children_symbol];
+		return children_map.get(this);
 	}
 
 	get child_linkages() {
-		return this.children.map(mono => linkage_map.get(mono));
+		var results = new Map();
+		this.children.forEach(mono => results.set( linkage_map.get(mono) , mono ) );
+		return results;
+	}
+
+	get siblings() {
+		var self = this;
+		if ( ! this.parent ) {
+			return [];
+		}
+		return this.parent.children.filter(mono => mono !== self);
 	}
 
 	// child linkages
@@ -67,11 +85,32 @@ export default class Monosaccharide {
 	// add child
 	addChild(linkage,child) {
 		linkage_map.set(child,linkage);
-		this[children_symbol] = (this[children_symbol] || []).concat([child]);
+		children_map.set(this, (children_map.get(this) || []).concat(child));
+
+		// Each child references its parent.
+		// When you clear this, you don't
+		// have any strong references to this monosaccharide
+		// and all its kids, so they will get GC'ed
+		child.parent = this;
 	}
+
 	// remove child
+	removeChild(new_linkage) {
+		var self = this;
+
+		var kids = children_map.get(self);
+
+		for (let [linkage,child] of this.child_linkages) {
+			if (new_linkage == linkage) {
+				kids.splice(kids.indexOf(child),1);
+				linkage_map.delete(child);
+			}
+		}
+	}
+
+	childAt(linkage) {
+		return this.child_linkages.get(linkage);
+	}
+
 	// cast to sugar (make monosaccharide a sugar/glycan class)
-	// siblings
-	// children
-	// linkage at position
 }
