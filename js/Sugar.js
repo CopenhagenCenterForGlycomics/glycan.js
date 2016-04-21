@@ -19,6 +19,12 @@ export default class Sugar {
 	// FIXME - linkage + residue path from given residue to root - optional return residues also
 	// FIXME - get path to root
 
+	// FIXME - paths (all paths from leaves to root)
+	paths(root=this.root,start=this.leaves(root)) {
+		let self = this;
+		return [].concat(start).map((leaf) => Array.from(self.residues_to_root(leaf)));
+	}
+
 	leaves(root=this.root) {
 		return this.composition(root).filter( mono => mono.children.length === 0);
 	}
@@ -30,11 +36,6 @@ export default class Sugar {
 		return return_value.reduce( (a,b) => a.concat(b) );
 	}
 
-	// FIXME - paths (all paths from leaves to root)
-	paths(root=this.root) {
-		let self = this;
-		return this.leaves(root).map((leaf) => Array.from(self.residues_to_root(leaf)));
-	}
 
 	// Math functions
 	// FIXME - Compare by block - run the closure across the sugar,
