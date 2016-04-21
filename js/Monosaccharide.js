@@ -62,7 +62,7 @@ export default class Monosaccharide {
 	// This should spit out an immutable array - force usage of the api
 	// to add/remove children.
 	get children() {
-		return children_map.get(this);
+		return children_map.get(this) || [];
 	}
 
 	get child_linkages() {
@@ -107,10 +107,15 @@ export default class Monosaccharide {
 
 		var kids = children_map.get(self);
 
-		for (let [linkage,child] of this.child_linkages) {
+		let remover = (child) => {
+			kids.splice(kids.indexOf(child),1);
+			linkage_map.delete(child);
+			child.parent = null;
+		};
+
+		for (let [linkage,children] of this.child_linkages) {
 			if (new_linkage == linkage) {
-				kids.splice(kids.indexOf(child),1);
-				linkage_map.delete(child);
+				children.forEach(remover);
 			}
 		}
 	}
@@ -121,4 +126,16 @@ export default class Monosaccharide {
 	}
 
 	// cast to sugar (make monosaccharide a sugar/glycan class)
+}
+
+let StrictLinkages = (superclass) => class extends superclass {
+	addChild(linkage,child) {
+		if (this.childAt(linkage)) {
+			this.removeChild(linkage);
+		}
+		return super.addChild(linkage,child);
+	}
+};
+
+export class StrictMonosaccharide extends StrictLinkages(Monosaccharide) {
 }
