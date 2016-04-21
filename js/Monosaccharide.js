@@ -137,5 +137,4 @@ let StrictLinkages = (superclass) => class extends superclass {
 	}
 };
 
-export class StrictMonosaccharide extends StrictLinkages(Monosaccharide) {
-}
+export class StrictMonosaccharide extends StrictLinkages(Monosaccharide) {}
