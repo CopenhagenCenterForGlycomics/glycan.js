@@ -125,6 +125,15 @@ export default class Monosaccharide {
 		return kids ? kids[0] : kids;
 	}
 
+	toString() {
+		return this.identifier;
+	}
+
+	valueOf() {
+		return this.identifier;
+	}
+
+
 	// cast to sugar (make monosaccharide a sugar/glycan class)
 }
 
