@@ -23,6 +23,7 @@ export default class Sugar {
 		return this.composition(root).filter( mono => mono.children.length === 0);
 	}
 
+	// FIXME to use a well defined traversal alogirthm (DFS or BFS)
 	composition(root=this.root) {
 		let self = this;
 		let return_value = [ [root] ].concat(root.children.map(child => self.composition(child)));
