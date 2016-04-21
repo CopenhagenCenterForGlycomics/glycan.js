@@ -67,7 +67,14 @@ export default class Monosaccharide {
 
 	get child_linkages() {
 		var results = new Map();
-		this.children.forEach(mono => results.set( linkage_map.get(mono) , mono ) );
+		this.children.forEach(function(mono) {
+			let kids = results.get( linkage_map.get(mono) );
+			if ( ! kids ) {
+				kids = [];
+				results.set( linkage_map.get(mono), kids );
+			}
+			kids.push(mono);
+		});
 		return results;
 	}
 
@@ -109,7 +116,8 @@ export default class Monosaccharide {
 	}
 
 	childAt(linkage) {
-		return this.child_linkages.get(linkage);
+		var kids = this.child_linkages.get(linkage);
+		return kids ? kids[0] : kids;
 	}
 
 	// cast to sugar (make monosaccharide a sugar/glycan class)
