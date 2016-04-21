@@ -2,7 +2,7 @@
 
 import Monosaccharide, { StrictMonosaccharide } from "../../js/Monosaccharide";
 
-QUnit.module("Test that we can read in sequences", {
+QUnit.module("Test that we can add children to residues", {
 });
 
 QUnit.test( "Adding a child to a Monosaccharide" , function( assert ) {
