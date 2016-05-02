@@ -1,6 +1,11 @@
 /*global QUnit*/
 
 import Monosaccharide from "../../js/Monosaccharide";
+import Sugar from "../../js/Sugar";
+import {Builder} from "../../js/CondensedIupac";
+
+
+class IupacSugar extends Builder(Sugar) {}
 
 QUnit.module("Test that we can read in sequences", {
 });
@@ -13,7 +18,11 @@ QUnit.test( "Reading in a simple monosaccharide" , function( assert ) {
 
 QUnit.test( "Reading in a disaccharide", function( assert ) {
   var sequence = "GlcNAc(b1-4)GlcNAc";
-  assert.ok(false,"Can't read in sequence "+sequence);
+  let sugar = new IupacSugar();
+  let root = sugar.parseSequence(sequence);
+  assert.ok(root.identifier == "GlcNAc","Root is set correctly");
+  assert.ok(root.children.length == 1,"Has the right number of children");
+  assert.ok(root.children[0].identifier == "GlcNAc","Has the right child");  
 });
 
 QUnit.test( "Reading in an incorrect sequence" , function( assert ) {
