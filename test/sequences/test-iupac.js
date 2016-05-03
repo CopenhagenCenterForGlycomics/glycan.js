@@ -29,12 +29,24 @@ QUnit.test( "Reading and writing a disaccharide", function( assert ) {
   var sequence = "GalNAc(b1-4)GlcNAc";
   let sugar = new IupacSugar();
   sugar.sequence = sequence;
-  let regenerated = (sugar.sequence);
+  let regenerated = sugar.sequence;
   assert.ok(sugar.root.identifier == "GlcNAc","Root is set correctly");
   assert.ok(sugar.root.children.length == 1,"Has the right number of children");
   assert.ok(sugar.root.children[0].identifier == "GalNAc","Has the right child");
   assert.ok(regenerated == sequence, "Has the same sequence regenerated");
 });
+
+QUnit.test( "Reading and writing a trisaccharide", function( assert ) {
+  var sequence = "GalNAc(b1-3)[GlcNAc(b1-4)]GlcNAc";
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+  let regenerated = sugar.sequence;
+  assert.ok(sugar.root.identifier == "GlcNAc","Root is set correctly");
+  assert.ok(sugar.root.children.length == 2,"Has the right number of children");
+  assert.ok(sugar.root.children[0].identifier == "GlcNAc","Has the right child");
+  assert.ok(regenerated == "GlcNAc(b1-4)[GalNAc(b1-3)]GlcNAc", "Has the same sequence regenerated");
+});
+
 
 QUnit.test( "Reading and writing a basic mutisugar", function( assert ) {
   var sequence = "GalNAc(b1-4)[Man(b1-4)]GlcNAc";
