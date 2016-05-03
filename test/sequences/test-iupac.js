@@ -2,10 +2,10 @@
 
 import Monosaccharide from "../../js/Monosaccharide";
 import Sugar from "../../js/Sugar";
-import {Builder,Writer} from "../../js/CondensedIupac";
+import {IO as Iupac} from "../../js/CondensedIupac";
 
 
-class IupacSugar extends Builder(Writer(Sugar)) {}
+class IupacSugar extends Iupac(Sugar) {}
 
 QUnit.module("Test that we can read in sequences", {
 });

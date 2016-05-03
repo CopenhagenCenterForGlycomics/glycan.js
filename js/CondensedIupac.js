@@ -128,6 +128,6 @@ let Writer = function(superclass) {
 	};
 };
 
+let IO = (superclass) => Builder(Writer(superclass));
 
-
-export {Builder,Writer};
+export {Builder,Writer,IO};
