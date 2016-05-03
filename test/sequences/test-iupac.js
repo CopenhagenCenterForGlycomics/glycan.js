@@ -70,8 +70,3 @@ QUnit.test( "Reading and writing nested branches", function( assert ) {
   assert.ok(sugar.root.children[0].identifier == "GlcNAc","Has the right child");
   assert.ok(regenerated == sequence, "Has the same sequence regenerated");
 });
-
-QUnit.test( "Reading in an incorrect sequence" , function( assert ) {
-  var sequence = "Shazbut";
-  assert.ok(false,"Can't read in sequence "+sequence);
-});
