@@ -122,7 +122,7 @@ let Writer = function(superclass) {
 	return class extends superclass {
 		writeSequence(start=this.root) {
 			let self = this;
-			let child_sequence = ""+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => self.writeSequence(kid[1])+kid[0]+")" ).reduce( (curr,next) => curr ? curr+"["+next+"]" : next , "" );
+			let child_sequence = ""+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => self.writeSequence(kid[1])+kid[0]+")" ).reverse().reduce( (curr,next) => curr ? curr+"["+next+"]" : next , "" );
 			return child_sequence+write_monosaccharide(start)+write_linkage(start);
 		}
 	};

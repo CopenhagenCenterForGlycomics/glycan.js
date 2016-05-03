@@ -44,7 +44,7 @@ QUnit.test( "Reading and writing a trisaccharide", function( assert ) {
   assert.ok(sugar.root.identifier == "GlcNAc","Root is set correctly");
   assert.ok(sugar.root.children.length == 2,"Has the right number of children");
   assert.ok(sugar.root.children[0].identifier == "GlcNAc","Has the right child");
-  assert.ok(regenerated == "GlcNAc(b1-4)[GalNAc(b1-3)]GlcNAc", "Has the same sequence regenerated");
+  assert.ok(regenerated == sequence, "Has the same sequence regenerated");
 });
 
 
@@ -56,9 +56,20 @@ QUnit.test( "Reading and writing a basic mutisugar", function( assert ) {
   assert.ok(sugar.root.identifier == "GlcNAc","Root is set correctly");
   assert.ok(sugar.root.children.length == 2,"Has the right number of children");
   assert.ok(sugar.root.children[0].identifier == "Man" ,"Has the right child");
-  assert.ok(regenerated == "Man(b1-4)[GalNAc(b1-4)]GlcNAc", "Has the same sequence regenerated");
+  assert.ok(regenerated == sequence, "Has the same sequence regenerated");
 });
 
+
+QUnit.test( "Reading and writing nested branches", function( assert ) {
+  var sequence = "GalNAc(b1-3)[Man(a1-3)[GlcNAc(b1-2)]GlcNAc(b1-4)]GlcNAc";
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+  let regenerated = sugar.sequence;
+  assert.ok(sugar.root.identifier == "GlcNAc","Root is set correctly");
+  assert.ok(sugar.root.children.length == 2,"Has the right number of children");
+  assert.ok(sugar.root.children[0].identifier == "GlcNAc","Has the right child");
+  assert.ok(regenerated == sequence, "Has the same sequence regenerated");
+});
 
 QUnit.test( "Reading in an incorrect sequence" , function( assert ) {
   var sequence = "Shazbut";
