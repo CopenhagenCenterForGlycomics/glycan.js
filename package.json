@@ -15,10 +15,9 @@
     "jshint": "^2.8.0",
     "karma": "^0.12.36",
     "karma-browserify": "^4.4.2",
-    "karma-chrome-launcher": "^0.2.2",
+    "karma-chrome-launcher": "^2.2.0",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-qunit": "^0.1.4",
-    "karma-sauce-launcher": "^0.2.11",
     "phantomjs": "^1.9.17",
     "phantomjs-prebuilt": "^2.1.7",
     "precommit-hook": "^3.0.0",
@@ -27,7 +26,7 @@
     "qunitjs": "^1.18.0"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start --single-run --browsers PhantomJS",
+    "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
     "lint": "jshint .",
     "validate": "npm ls"
   },
