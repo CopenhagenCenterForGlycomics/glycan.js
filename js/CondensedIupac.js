@@ -85,6 +85,12 @@ let Builder = function(superclass) {
 
 	return class extends superclass {
 		parseSequence(sequence) {
+			let comment = "";
+			[sequence,comment]=sequence.split("+");
+			comment = (comment || "").replace(/^"/,"").replace(/"$/,"");
+			if (comment) {
+				this.comment = comment;
+			}
 			let units = sequence.split(/([\[\]])/);
 			let branch_count = units.length;
 			units = [].concat.apply([],units.map(unit => reverse(unit).split(")").filter( (unit) => unit.length ).map(reverse))).reverse();
@@ -128,6 +134,8 @@ let Writer = function(superclass) {
 	};
 };
 
-let IO = (superclass) => Builder(Writer(superclass));
+let anonymous_class = (superclass) => { return class extends superclass {}; };
+
+let IO = (superclass) => Builder(Writer(anonymous_class(superclass)));
 
 export {Builder,Writer,IO};
