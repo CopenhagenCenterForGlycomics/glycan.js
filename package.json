@@ -26,6 +26,7 @@
     "qunitjs": "^1.18.0"
   },
   "scripts": {
+    "jshint-pre-commit" : "./scripts/jshint-pre-commit.sh",
     "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
     "lint": "jshint .",
     "validate": "npm ls"
@@ -37,7 +38,7 @@
   "author": "",
   "license": "TBD",
   "pre-commit": [
-    "lint",
+    "jshint-pre-commit",
     "validate"
   ]
 }
