@@ -120,6 +120,27 @@ export default class Monosaccharide {
 		}
 	}
 
+	replaceChild(child,new_child) {
+		let position = this.linkageOf(child);
+		let parent_pos = child.parent_linkage;
+		let anomer = child.anomer;
+
+		this.removeChild(position);
+		new_child.parent_linkage = parent_pos;
+		new_child.anomer = anomer;
+		this.addChild(position,new_child);
+	}
+
+	linkageOf(child) {
+		let linkages = this.child_linkages.entries();
+		let curr;
+		for (curr of linkages) {
+			if (curr[1].indexOf(child) >= 0) {
+				return curr[0];
+			}
+		}
+	}
+
 	childAt(linkage) {
 		var kids = this.child_linkages.get(linkage);
 		return kids ? kids[0] : kids;

@@ -1,7 +1,7 @@
 
 import Monosaccharide from "./Monosaccharide";
 
-let create_bold_branch, create_bold_tree;
+let follow_bold_branch, create_bold_tree;
 
 let get_monosaccharide = (proto) => {
 	// There should be a per-object
@@ -12,7 +12,7 @@ let get_monosaccharide = (proto) => {
 	return new Monosaccharide(proto);
 };
 
-create_bold_branch = (units) => {
+follow_bold_branch = (units) => {
 	let unit = units.shift();
 	if ( ! unit ) {
 		throw new Error("Empty branch");
@@ -27,7 +27,7 @@ create_bold_tree = ( root, units ) => {
 	while (units.length > 0) {
 		let unit = units.shift();
 		if ( unit == "]" ) {
-			let [child, linkage] = create_bold_branch(units);
+			let [child, linkage] = follow_bold_branch(units);
 			let [anomer,parent_link,,child_link] = (linkage || "").split("");
 			child.anomer = anomer;
 			child.parent_linkage = parseInt(parent_link);
@@ -41,8 +41,43 @@ create_bold_tree = ( root, units ) => {
 			child.anomer = anomer;
 			child.parent_linkage = parseInt(parent_link);
 			root.addChild(parseInt(child_link),child);
+			root = child;
 		}
 	}
+};
+
+let reverse = function(string) {
+	return string.split("").reverse().join("");
+};
+
+let parse_sequence = function(sequence) {
+	let comment = "";
+	[sequence,comment]=sequence.split("+");
+	comment = (comment || "").replace(/^"/,"").replace(/"$/,"");
+
+	if (sequence.match(/[\]\)]$/)) {
+		sequence = `${sequence}Root`;
+	}
+	sequence = sequence+")";
+	let units = sequence.split(/([\[\]])/);
+
+	// Reverse ordering of branches so we see closer residues first
+	units = units.map( unit => unit.split(/\)(?=[A-Za-z])/).reverse().join(")") )
+							 .map( unit => unit.match(/\d$/) ? unit+")" : unit );
+
+	// We wish to split the units by the linkages
+	units = [].concat.apply([],units.map(unit => reverse(unit).split(")").filter( (unit) => unit.length ).map(reverse))).reverse();
+
+	let root = get_monosaccharide( units.shift() );
+	create_bold_tree(root,units);
+
+	this.root = root;
+
+	if (comment) {
+		this.comment = comment;
+	}
+
+	return root;
 };
 
 
@@ -57,9 +92,6 @@ let write_linkage = (mono) => {
 	return "("+ mono.anomer + mono.parent_linkage + "-";
 };
 
-let reverse = function(string) {
-	return string.split("").reverse().join("");
-};
 
 let getPropertyDescriptor = function(object,descriptor) {
 	let retval = null;
@@ -72,7 +104,7 @@ let getPropertyDescriptor = function(object,descriptor) {
 let Builder = function(superclass) {
 	let getter = (getPropertyDescriptor(superclass.prototype, "sequence") || { "get" : null }).get;
 	let setter = function(sequence) {
-		this.root = this.parseSequence(sequence);
+		parse_sequence.call(this,sequence);
 	};
 	let methods = {};
 	if (getter) {
@@ -84,23 +116,6 @@ let Builder = function(superclass) {
 	Object.defineProperty(superclass.prototype, "sequence", methods);
 
 	return class extends superclass {
-		parseSequence(sequence) {
-			let comment = "";
-			[sequence,comment]=sequence.split("+");
-			comment = (comment || "").replace(/^"/,"").replace(/"$/,"");
-			if (comment) {
-				this.comment = comment;
-			}
-			let units = sequence.split(/([\[\]])/);
-			let branch_count = units.length;
-			units = [].concat.apply([],units.map(unit => reverse(unit).split(")").filter( (unit) => unit.length ).map(reverse))).reverse();
-			if (branch_count == 1) {
-				units = units.reverse();
-			}
-			let root = get_monosaccharide( units.shift() );
-			create_bold_tree(root,units);
-			return root;
-		}
 	};
 };
 
