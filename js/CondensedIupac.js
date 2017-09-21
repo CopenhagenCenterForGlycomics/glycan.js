@@ -1,5 +1,5 @@
 
-import Monosaccharide from "./Monosaccharide";
+import Monosaccharide from './Monosaccharide';
 
 let follow_bold_branch, create_bold_tree;
 
@@ -15,9 +15,9 @@ let get_monosaccharide = (proto) => {
 follow_bold_branch = (units) => {
   let unit = units.shift();
   if ( ! unit ) {
-    throw new Error("Empty branch");
+    throw new Error('Empty branch');
   }
-  let [child_root, linkage] = unit.split("(");
+  let [child_root, linkage] = unit.split('(');
   let child = get_monosaccharide(child_root);
   create_bold_tree(child,units);
   return [ child, linkage ];
@@ -26,17 +26,17 @@ follow_bold_branch = (units) => {
 create_bold_tree = ( root, units ) => {
   while (units.length > 0) {
     let unit = units.shift();
-    if ( unit == "]" ) {
+    if ( unit == ']' ) {
       let [child, linkage] = follow_bold_branch(units);
-      let [anomer,parent_link,,child_link] = (linkage || "").split("");
+      let [anomer,parent_link,,child_link] = (linkage || '').split('');
       child.anomer = anomer;
       child.parent_linkage = parseInt(parent_link);
       root.addChild(parseInt(child_link),child);
-    } else if ( unit == "[" ) {
+    } else if ( unit == '[' ) {
       return;
     } else {
-      let [child_root, linkage] = unit.split("(");
-      let [anomer,parent_link,,child_link] = (linkage || "").split("");
+      let [child_root, linkage] = unit.split('(');
+      let [anomer,parent_link,,child_link] = (linkage || '').split('');
       let child = get_monosaccharide(child_root);
       child.anomer = anomer;
       child.parent_linkage = parseInt(parent_link);
@@ -47,26 +47,26 @@ create_bold_tree = ( root, units ) => {
 };
 
 let reverse = function(string) {
-  return string.split("").reverse().join("");
+  return string.split('').reverse().join('');
 };
 
 let parse_sequence = function(sequence) {
-  let comment = "";
-  [sequence,comment]=sequence.split("+");
-  comment = (comment || "").replace(/^"/,"").replace(/"$/,"");
+  let comment = '';
+  [sequence,comment]=sequence.split('+');
+  comment = (comment || '').replace(/^"/,'').replace(/"$/,'');
 
   if (sequence.match(/[\]\)]$/)) {
     sequence = `${sequence}Root`;
   }
-  sequence = sequence+")";
+  sequence = sequence+')';
   let units = sequence.split(/([\[\]])/);
 
   // Reverse ordering of branches so we see closer residues first
-  units = units.map( unit => unit.split(/\)(?=[A-Za-z])/).reverse().join(")") )
-               .map( unit => unit.match(/\d$/) ? unit+")" : unit );
+  units = units.map( unit => unit.split(/\)(?=[A-Za-z])/).reverse().join(')') )
+               .map( unit => unit.match(/\d$/) ? unit+')' : unit );
 
   // We wish to split the units by the linkages
-  units = [].concat.apply([],units.map(unit => reverse(unit).split(")").filter( (unit) => unit.length ).map(reverse))).reverse();
+  units = [].concat.apply([],units.map(unit => reverse(unit).split(')').filter( (unit) => unit.length ).map(reverse))).reverse();
 
   let root = get_monosaccharide( units.shift() );
   create_bold_tree(root,units);
@@ -87,9 +87,9 @@ let write_monosaccharide = (mono) => {
 
 let write_linkage = (mono) => {
   if (! mono.parent ) {
-    return "";
+    return '';
   }
-  return "("+ mono.anomer + mono.parent_linkage + "-";
+  return '('+ mono.anomer + mono.parent_linkage + '-';
 };
 
 
@@ -101,7 +101,7 @@ let link_expander = function(links) {
 
 let write_sequence = function(start=this.root) {
   let self = this;
-  let child_sequence = ""+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+kid[0]+")" ).reverse().reduce( (curr,next) => curr ? curr+"["+next+"]" : next , "" );
+  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+kid[0]+')' ).reverse().reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   return child_sequence+write_monosaccharide(start)+write_linkage(start);
 };
 
@@ -114,7 +114,7 @@ let getPropertyDescriptor = function(object,descriptor) {
 };
 
 let Builder = function(superclass) {
-  let getter = (getPropertyDescriptor(superclass.prototype, "sequence") || { "get" : null }).get;
+  let getter = (getPropertyDescriptor(superclass.prototype, 'sequence') || { 'get' : null }).get;
   let setter = function(sequence) {
     parse_sequence.call(this,sequence);
   };
@@ -125,14 +125,14 @@ let Builder = function(superclass) {
   if (setter) {
     methods.set = setter;
   }
-  Object.defineProperty(superclass.prototype, "sequence", methods);
+  Object.defineProperty(superclass.prototype, 'sequence', methods);
 
   return class extends superclass {
   };
 };
 
 let Writer = function(superclass) {
-  let setter = (getPropertyDescriptor(superclass.prototype, "sequence") || { "set" : null }).set;
+  let setter = (getPropertyDescriptor(superclass.prototype, 'sequence') || { 'set' : null }).set;
   let getter = function() {
     return write_sequence.call(this,this.root);
   };
@@ -145,7 +145,7 @@ let Writer = function(superclass) {
     methods.set = setter;
   }
 
-  Object.defineProperty(superclass.prototype, "sequence", methods);
+  Object.defineProperty(superclass.prototype, 'sequence', methods);
 
   return class extends superclass {
   };

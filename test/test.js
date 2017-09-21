@@ -5,10 +5,10 @@
 
 if (!Function.prototype.bind) {
   Function.prototype.bind = function(oThis) {
-    if (typeof this !== "function") {
+    if (typeof this !== 'function') {
       // closest thing possible to the ECMAScript 5
       // internal IsCallable function
-      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+      throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
     }
 
     var aArgs   = Array.prototype.slice.call(arguments, 1),
@@ -27,17 +27,17 @@ if (!Function.prototype.bind) {
 }
 
 if ( ! window.Promise ) {
-    window.Promise = require("promise-polyfill");
+    window.Promise = require('promise-polyfill');
 }
 
 
 // We probably want to have promises to handle
 // any async stuff
 
-QUnit.test( "Test Promise works" , function( assert ) {
+QUnit.test( 'Test Promise works' , function( assert ) {
   var done = assert.async();
   Promise.resolve(true).then(function() {
-    assert.ok(true, "Can resolve promises");
+    assert.ok(true, 'Can resolve promises');
     done();
   });
 });

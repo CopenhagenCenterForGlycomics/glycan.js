@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-let root_symbol = Symbol("root");
+let root_symbol = Symbol('root');
 
 let getPropertyDescriptor = function(object,descriptor) {
   let retval = null;
@@ -38,15 +38,15 @@ export default class Sugar {
   }
 
   locate_monosaccharide(location) {
-    let [,depth,branch] = location.split("");
+    let [,depth,branch] = location.split('');
     depth = parseInt(depth);
-    branch = branch.charCodeAt(0) - "a".charCodeAt(0);
+    branch = branch.charCodeAt(0) - 'a'.charCodeAt(0);
     let depth_residues = this.paths().map( path => path.reverse()[depth - 1] ).filter( residue => residue );
     let linkage_paths = this.paths(this.root,depth_residues)
                             .map( path => path.filter( res => res.parent )
                                               .map( res => { return { res: res , link: res.parent.linkageOf(res) }; } )
                                 );
-    let linkage_strings = linkage_paths.map( linkages => { return { leaf: linkages[0].res, value: linkages.map( link => link.link ).reverse().join("")  }; } );
+    let linkage_strings = linkage_paths.map( linkages => { return { leaf: linkages[0].res, value: linkages.map( link => link.link ).reverse().join('')  }; } );
     let sorted_linkages = linkage_strings.sort( (a,b) => a.value.localeCompare(b.value) );
     return sorted_linkages[branch].leaf;
   }
@@ -91,8 +91,8 @@ export default class Sugar {
     // to the current class (using an anonymous
     // class to deliver the functionality)
     let base = this;
-    let parser_function = getPropertyDescriptor(sugar, "sequence").set;
-    let writer_function = getPropertyDescriptor(sugar, "sequence").get;
+    let parser_function = getPropertyDescriptor(sugar, 'sequence').set;
+    let writer_function = getPropertyDescriptor(sugar, 'sequence').get;
     return class extends base {
       get sequence() {
         return writer_function.call(this);

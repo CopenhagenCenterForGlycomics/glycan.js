@@ -1,12 +1,12 @@
 /*global QUnit*/
-"use strict";
+'use strict';
 
-import Monosaccharide from "../../js/Monosaccharide";
+import Monosaccharide from '../../js/Monosaccharide';
 
-QUnit.module("Test that we can load modules", {
+QUnit.module('Test that we can load modules', {
 });
 
-QUnit.test( "Loading up a simple class" , function( assert ) {
-  let test = new Monosaccharide("ID");
-  assert.ok(test !== null,"We can load in a module");
+QUnit.test( 'Loading up a simple class' , function( assert ) {
+  let test = new Monosaccharide('ID');
+  assert.ok(test !== null,'We can load in a module');
 });

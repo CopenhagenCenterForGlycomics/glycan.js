@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
-let anomer_symbol = Symbol("anomer");
-let identifier_symbol = Symbol("identifier");
-let parent_linkage_symbol = Symbol("parent_linkage");
-let parent_symbol = Symbol("parent");
+let anomer_symbol = Symbol('anomer');
+let identifier_symbol = Symbol('identifier');
+let parent_linkage_symbol = Symbol('parent_linkage');
+let parent_symbol = Symbol('parent');
 
 
 /*   We basically want a barebones Monosacharide class that uses
   some common set of identifiers for each of the monosaccharide
   units. We can then mixin things like mass and sequence
   translation to edit the actual functionality for the sugar.
-  Can even have a "strict mode" sugar mixin that enforces
+  Can even have a 'strict mode' sugar mixin that enforces
   rules.
 */
 
@@ -20,7 +20,7 @@ let children_map = new WeakMap();
 export default class Monosaccharide {
   constructor(identifier) {
     if ( ! identifier ) {
-      throw new Error("Missing identifier");
+      throw new Error('Missing identifier');
     }
     // Accept any identifier - we can do
     // checking on validity of identifiers
