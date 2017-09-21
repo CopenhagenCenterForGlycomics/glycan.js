@@ -2,6 +2,14 @@
 
 let root_symbol = Symbol("root");
 
+let getPropertyDescriptor = function(object,descriptor) {
+  let retval = null;
+  while (! (retval = Object.getOwnPropertyDescriptor(object,descriptor)) && Object.getPrototypeOf(object) ) {
+    object = Object.getPrototypeOf(object);
+  }
+  return retval;
+};
+
 export default class Sugar {
 	constructor() {
 	}
@@ -75,5 +83,23 @@ export default class Sugar {
 			start = start.parent;
 			yield start;
 		}
+	}
+
+	static CopyIO(sugar) {
+		// We want to copy the IO methods from
+		// the given object, and apply them
+		// to the current class (using an anonymous
+		// class to deliver the functionality)
+		let base = this;
+		let parser_function = getPropertyDescriptor(sugar, "sequence").set;
+		let writer_function = getPropertyDescriptor(sugar, "sequence").get;
+		return class extends base {
+			get sequence() {
+				return writer_function.call(this);
+			}
+			set sequence(sequence) {
+				return parser_function.call(this,sequence);
+			}
+		};
 	}
 }

@@ -93,6 +93,18 @@ let write_linkage = (mono) => {
 };
 
 
+let link_expander = function(links) {
+	let position = links[0];
+	return links[1].map( (mono) => [ position , mono ]);
+};
+
+
+let write_sequence = function(start=this.root) {
+	let self = this;
+	let child_sequence = ""+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+kid[0]+")" ).reverse().reduce( (curr,next) => curr ? curr+"["+next+"]" : next , "" );
+	return child_sequence+write_monosaccharide(start)+write_linkage(start);
+};
+
 let getPropertyDescriptor = function(object,descriptor) {
 	let retval = null;
 	while (! (retval = Object.getOwnPropertyDescriptor(object,descriptor)) && Object.getPrototypeOf(object) ) {
@@ -119,15 +131,10 @@ let Builder = function(superclass) {
 	};
 };
 
-let link_expander = function(links) {
-	let position = links[0];
-	return links[1].map( (mono) => [ position , mono ]);
-};
-
 let Writer = function(superclass) {
 	let setter = (getPropertyDescriptor(superclass.prototype, "sequence") || { "set" : null }).set;
 	let getter = function() {
-		return this.writeSequence(this.root);
+		return write_sequence.call(this,this.root);
 	};
 	let methods = {};
 
@@ -141,11 +148,6 @@ let Writer = function(superclass) {
 	Object.defineProperty(superclass.prototype, "sequence", methods);
 
 	return class extends superclass {
-		writeSequence(start=this.root) {
-			let self = this;
-			let child_sequence = ""+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => self.writeSequence(kid[1])+kid[0]+")" ).reverse().reduce( (curr,next) => curr ? curr+"["+next+"]" : next , "" );
-			return child_sequence+write_monosaccharide(start)+write_linkage(start);
-		}
 	};
 };
 
