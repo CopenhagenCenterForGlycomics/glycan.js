@@ -19,6 +19,19 @@ QUnit.test( 'Read in a simple reaction' , function( assert ) {
   assert.ok(reaction.delta.sequence === delta_sequence, 'Has the same delta sequence');
 });
 
+QUnit.test( 'Throws error when reaction has incorrect location' , function( assert ) {
+  let base_sequence = 'Gal(b1-2)Man(b1-3)[Gal(b1-2)Gal(b1-4)]GlcNAc';
+  let delta_sequence = 'Man(b1-4)';
+  let position = 'y10a';
+  let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
+  let reaction = new IupacReaction();
+  assert.throws( () => {
+    reaction.sequence = sequence;
+  },
+  new Error('Cannot locate attachment point'),
+  'Throws error when location is not possible');
+});
+
 // Reactions should be able to be tested against a Sugar
 // reaction.possible(sugar)
 // reaction.execute(sugar) (in-place modification)

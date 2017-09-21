@@ -4,6 +4,7 @@ import Sugar from './Sugar';
 let comment_symbol = Symbol('comment_string');
 let reaction_sugar = Symbol('reaction_sugar');
 let reaction_position = Symbol('reaction_position');
+let reaction_position_string = Symbol('reaction_position_string');
 
 const validate_location = (sugar,location) => sugar.locate_monosaccharide(location);
 
@@ -41,7 +42,27 @@ let parseReaction = (sugar) => {
   if (!  sugar[ reaction_position ]) {
     throw new Error('Cannot locate attachment point');
   }
+  sugar[  reaction_position_string ] = location;
 };
+
+let test_sugar_substrate = function(sugar) {
+  sugar.clone();
+  // Get paths, skip 'Any' wildcards etc
+};
+
+let execute = function(sugar) {
+  // We should be searching for where this could actually execute
+  let substrate = sugar.locate_monosaccharide(this[ reaction_position_string ]);
+
+  if ( ! substrate ) {
+    throw new Error('Cannot execute reaction');
+  }
+  let addition = this[ reaction_sugar ].clone();
+  for (let kid in addition.root.children) {
+    kid.graft(substrate);
+  }
+};
+
 
 class Reaction extends Sugar {
   set comment(comment) {
@@ -54,6 +75,15 @@ class Reaction extends Sugar {
   get delta() {
     return this[ reaction_sugar ];
   }
+
+  canWorkOn(sugar) {
+    return test_sugar_substrate.call(this,sugar);
+  }
+
+  execute(sugar) {
+    return execute.call(this,sugar);
+  }
+
 }
 
 export default Reaction;

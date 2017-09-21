@@ -45,10 +45,11 @@ export default class Sugar {
     let linkage_paths = this.paths(this.root,depth_residues)
                             .map( path => path.filter( res => res.parent )
                                               .map( res => { return { res: res , link: res.parent.linkageOf(res) }; } )
-                                );
+                                )
+                            .filter( linkages => linkages.length > 0 );
     let linkage_strings = linkage_paths.map( linkages => { return { leaf: linkages[0].res, value: linkages.map( link => link.link ).reverse().join('')  }; } );
     let sorted_linkages = linkage_strings.sort( (a,b) => a.value.localeCompare(b.value) );
-    return sorted_linkages[branch].leaf;
+    return sorted_linkages[branch] ? sorted_linkages[branch].leaf : null;
   }
 
 
@@ -59,6 +60,32 @@ export default class Sugar {
     return return_value.reduce( (a,b) => a.concat(b) );
   }
 
+  clone() {
+    let cloned = new WeakMap();
+    let nodes = this.breadth_first_traversal();
+    for (let node of nodes) {
+      if ( ! cloned.has(node) ) {
+        cloned.set(node,node.clone());
+      }
+      let node_clone = cloned.get(node);
+      if (node.parent) {
+        cloned.get(node.parent).addChild(node.parent.linkageOf(node),node_clone);
+      }
+    }
+    let new_sugar = new this.constructor();
+    new_sugar.root = cloned.get(this.root);
+    return new_sugar;
+  }
+
+  *breadth_first_traversal(start=this.root) {
+    let queue = [];
+    queue.push(start);
+    while (queue.length > 0) {
+      let curr = queue.shift();
+      queue = queue.concat(curr.children);
+      yield curr;
+    }
+  }
 
   // Math functions
   // FIXME - Compare by block - run the closure across the sugar,
@@ -75,7 +102,6 @@ export default class Sugar {
 
   // Traversal methods
   // FIXME - Depth first traversal
-  // FIXME - Breadth first traversal
   // FIXME - Node to root traversal
   *residues_to_root(start=this.root) {
     yield start;

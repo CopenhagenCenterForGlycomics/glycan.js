@@ -154,6 +154,12 @@ export default class Monosaccharide {
     return this.identifier;
   }
 
+  clone() {
+    let result = new this.constructor(this.identifier);
+    result[anomer_symbol] = this[anomer_symbol];
+    result[parent_linkage_symbol] = this[parent_linkage_symbol];
+    return result;
+  }
 
   // cast to sugar (make monosaccharide a sugar/glycan class)
 }
