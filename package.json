@@ -2,12 +2,13 @@
   "name": "glycan.js",
   "version": "0.0.1",
   "description": "A tiny library for drawing glycans",
-  "main": "",
+  "main": "./dist/index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {},
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-polyfill": "^6.7.4",
     "babel-preset-es2015": "^6.3.13",
     "babelify": "^7.2.0",
@@ -26,14 +27,15 @@
     "qunitjs": "^1.18.0"
   },
   "scripts": {
-    "jshint-pre-commit" : "./scripts/jshint-pre-commit.sh",
+    "jshint-pre-commit": "./scripts/jshint-pre-commit.sh",
     "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
+    "build" : "./node_modules/babel-cli/bin/babel.js js -d dist --presets es2015",
     "lint": "jshint .",
     "validate": "npm ls"
   },
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:sib-pig/glycan.js.git"
+    "url": "git@github.com:hirenj/glycan.js.git"
   },
   "author": "",
   "license": "TBD",
