@@ -101,6 +101,9 @@ export default class Monosaccharide {
     // jshint -W027
     throw new Error('We are not setting the true linkage value yet');
 
+    // real_linkage_map.set(child,10*linkage) # if we have real linkage - maybe step vals?
+    // children_map.get(this).map( kid => real_linkage_map.get(kid)).max() + 1
+
     // When we read in the sugar from
     // a sequence, we want to make addChild inaccessible
     // so that we can protect the ordering of the branches
