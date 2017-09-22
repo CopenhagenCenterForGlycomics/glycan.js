@@ -91,6 +91,28 @@ export default class Monosaccharide {
   // methods:
   // add child
   addChild(linkage,child) {
+
+    // We should be setting an effective
+    // linkage for the child when we add
+    // it, so that the child ordering
+    // is given a numerical value
+    // even when the linkage is undefined
+
+    // jshint -W027
+    throw new Error('We are not setting the true linkage value yet');
+
+    // When we read in the sugar from
+    // a sequence, we want to make addChild inaccessible
+    // so that we can protect the ordering of the branches
+    // and we can save some processing (especially since
+    // IUPAC condensed delivers branch ordering as part
+    // of the format).
+
+    // BUT.. when we have a sugar that we are adding to
+    // like when drawing, or programattically building a sugar
+    // we should trigger branch ordering routines that
+    // maintain the true ordering of branches.
+
     linkage_map.set(child,linkage);
     children_map.set(this, (children_map.get(this) || []).concat(child));
 
@@ -99,6 +121,9 @@ export default class Monosaccharide {
     // have any strong references to this monosaccharide
     // and all its kids, so they will get GC'ed
     child.parent = this;
+
+    // jshint +W027
+
   }
 
   // remove child
