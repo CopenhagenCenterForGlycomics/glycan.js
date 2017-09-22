@@ -1,4 +1,5 @@
 'use strict';
+import Monosaccharide from './Monosaccharide';
 
 let root_symbol = Symbol('root');
 
@@ -19,6 +20,10 @@ export default class Sugar {
   }
   get root() {
     return this[root_symbol];
+  }
+
+  static get Monosaccharide() {
+    return Monosaccharide;
   }
 
   // FIXME - Matching residues (given a prototype, which residues match)

@@ -82,3 +82,61 @@ QUnit.test( 'Reading and writing nested branches', function( assert ) {
   assert.ok(sugar.root.children[0].identifier == 'GlcNAc','Has the right child');
   assert.ok(regenerated == sequence, 'Has the same sequence regenerated');
 });
+
+let make_tracking_sugar = (base) => {
+  let tracker = [];
+
+  let tracking_mono = class extends base.Monosaccharide {
+    constructor(identifier) {
+      tracker.push(identifier);
+      return super(identifier);
+    }
+  };
+  let tracking_sugar = class extends base {
+    constructor() {
+      tracker.length = 0;
+      return super();
+    }
+    get tracker() {
+      return tracker;
+    }
+    static get Monosaccharide() {
+      return tracking_mono;
+    }
+  };
+  return tracking_sugar;
+};
+
+let TrackedSugar = make_tracking_sugar(IupacSugar);
+
+QUnit.test( 'Test reading in sequence in depth first order', function( assert ) {
+  let sequence = 'E(b1-3)[D(a1-2)[C(b1-3)]B(b1-4)]A';
+  let sugar = new TrackedSugar();
+  sugar.sequence = sequence;
+  assert.ok(sugar.root.identifier === 'A','Root is set correctly');
+  assert.deepEqual(sugar.tracker, ['A','B','C','D','E'] ,'Tracked residues in the right order');
+
+  sequence = 'F(b1-3)[E(b1-3)[D(a1-2)C(b1-3)]B(b1-4)]A';
+  sugar = new TrackedSugar();
+  sugar.sequence = sequence;
+
+  assert.ok(sugar.root.identifier === 'A','Root is set correctly');
+  assert.deepEqual(sugar.tracker, ['A','B','C','D','E','F'] ,'Tracked residues in the right order');
+
+});
+
+QUnit.test( 'Respect sequence branch ordering', function( assert ) {
+  let sequence = 'E(b1-?)[D(a1-?)[C(b1-?)]B(b1-?)]A';
+  let sugar = new TrackedSugar();
+  sugar.sequence = sequence;
+  assert.ok(sugar.root.identifier === 'A','Root is set correctly');
+  assert.deepEqual(sugar.tracker, ['A','B','C','D','E'] ,'Tracked residues in the right order');
+
+  sequence = 'F(b1-?)[E(b1-?)[D(a1-?)C(b1-?)]B(b1-?)]A';
+  sugar = new TrackedSugar();
+  sugar.sequence = sequence;
+
+  assert.ok(sugar.root.identifier === 'A','Root is set correctly');
+  assert.deepEqual(sugar.tracker, ['A','B','C','D','E','F'] ,'Tracked residues in the right order');
+
+});

@@ -1,33 +1,32 @@
 
-import Monosaccharide from './Monosaccharide';
-
 let follow_bold_branch, create_bold_tree;
 
-let get_monosaccharide = (proto) => {
+let get_monosaccharide = (sugar,proto) => {
   // There should be a per-object
   // and per-class override of the
   // class that we use here to allow
   // for specific functionality
   // for some sugars
-  return new Monosaccharide(proto);
+  let mono_class = sugar.constructor.Monosaccharide;
+  return new mono_class(proto);
 };
 
-follow_bold_branch = (units) => {
+follow_bold_branch = (sugar,units) => {
   let unit = units.shift();
   if ( ! unit ) {
     throw new Error('Empty branch');
   }
   let [child_root, linkage] = unit.split('(');
-  let child = get_monosaccharide(child_root);
-  create_bold_tree(child,units);
+  let child = get_monosaccharide(sugar,child_root);
+  create_bold_tree(sugar,child,units);
   return [ child, linkage ];
 };
 
-create_bold_tree = ( root, units ) => {
+create_bold_tree = ( sugar, root, units ) => {
   while (units.length > 0) {
     let unit = units.shift();
     if ( unit == ']' ) {
-      let [child, linkage] = follow_bold_branch(units);
+      let [child, linkage] = follow_bold_branch(sugar,units);
       let [anomer,parent_link,,child_link] = (linkage || '').split('');
       child.anomer = anomer;
       child.parent_linkage = parseInt(parent_link);
@@ -37,7 +36,7 @@ create_bold_tree = ( root, units ) => {
     } else {
       let [child_root, linkage] = unit.split('(');
       let [anomer,parent_link,,child_link] = (linkage || '').split('');
-      let child = get_monosaccharide(child_root);
+      let child = get_monosaccharide(sugar,child_root);
       child.anomer = anomer;
       child.parent_linkage = parseInt(parent_link);
       root.addChild(parseInt(child_link),child);
@@ -68,8 +67,8 @@ let parse_sequence = function(sequence) {
   // We wish to split the units by the linkages
   units = [].concat.apply([],units.map(unit => reverse(unit).split(')').filter( (unit) => unit.length ).map(reverse))).reverse();
 
-  let root = get_monosaccharide( units.shift() );
-  create_bold_tree(root,units);
+  let root = get_monosaccharide( this, units.shift() );
+  create_bold_tree(this,root,units);
 
   this.root = root;
 
