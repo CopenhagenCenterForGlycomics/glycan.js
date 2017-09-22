@@ -13,11 +13,11 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['qunit','browserify'],
 
-    plugins: ['karma-qunit','karma-browserify','karma-phantomjs-launcher','karma-chrome-launcher'],
+    plugins: ['karma-qunit','karma-browserify','karma-chrome-launcher'],
 
     browserify : {
       debug: true,
-      transform : [['babelify', { 'presets': ['es2015'] }]]
+      transform : [['babelify', { 'presets': [['env', { 'targets' : { 'browsers' : '> 5%'}}]] }]]
     },
 
     // list of files / patterns to load in the browser
@@ -72,17 +72,6 @@ module.exports = function(config) {
     browsers: ['ChromeHeadless','Chrome'],
 
     customLaunchers: {
-      'PhantomJS_debug': {
-        base: 'PhantomJS',
-        options: {
-          windowName: 'my-window',
-          settings: {
-            webSecurityEnabled: false
-          },
-        },
-        flags: ['--load-images=true'],
-        debug: true
-      }
     },
 
     // Continuous Integration mode
