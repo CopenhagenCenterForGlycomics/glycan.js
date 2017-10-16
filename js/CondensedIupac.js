@@ -23,6 +23,9 @@ follow_bold_branch = (sugar,units) => {
 };
 
 create_bold_tree = ( sugar, root, units ) => {
+  let waiting_children = [];
+  let child_adder = (parent,pair) => parent.addChild(pair[0],pair[1]);
+
   while (units.length > 0) {
     let unit = units.shift();
     if ( unit == ']' ) {
@@ -30,8 +33,10 @@ create_bold_tree = ( sugar, root, units ) => {
       let [anomer,parent_link,,child_link] = (linkage || '').split('');
       child.anomer = anomer;
       child.parent_linkage = parseInt(parent_link);
-      root.addChild(parseInt(child_link),child);
+      waiting_children.push([parseInt(child_link),child]);
     } else if ( unit == '[' ) {
+      waiting_children.forEach( child_adder.bind(null,root) );
+      waiting_children.length = 0;
       return;
     } else {
       let [child_root, linkage] = unit.split('(');
@@ -40,6 +45,8 @@ create_bold_tree = ( sugar, root, units ) => {
       child.anomer = anomer;
       child.parent_linkage = parseInt(parent_link);
       root.addChild(parseInt(child_link),child);
+      waiting_children.forEach( child_adder.bind(null,root) );
+      waiting_children.length = 0;
       root = child;
     }
   }
@@ -100,7 +107,7 @@ let link_expander = function(links) {
 
 let write_sequence = function(start=this.root) {
   let self = this;
-  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+kid[0]+')' ).reverse().reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
+  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+kid[0]+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   return child_sequence+write_monosaccharide(start)+write_linkage(start);
 };
 

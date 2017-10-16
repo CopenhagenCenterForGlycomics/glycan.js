@@ -5,6 +5,8 @@ let identifier_symbol = Symbol('identifier');
 let parent_linkage_symbol = Symbol('parent_linkage');
 let parent_symbol = Symbol('parent');
 
+const unknown_count_symbol = Symbol('unknown_count');
+const MAX_KNOWN_LINKAGE = 100;
 
 /*   We basically want a barebones Monosacharide class that uses
   some common set of identifiers for each of the monosaccharide
@@ -68,10 +70,17 @@ export default class Monosaccharide {
   get child_linkages() {
     var results = new Map();
     this.children.forEach(function(mono) {
-      let kids = results.get( linkage_map.get(mono) );
+      let position = linkage_map.get(mono);
+      let real_position = position;
+
+      if (position > MAX_KNOWN_LINKAGE) {
+        real_position = 0;
+      }
+
+      let kids = results.get( real_position );
       if ( ! kids ) {
         kids = [];
-        results.set( linkage_map.get(mono), kids );
+        results.set( real_position, kids );
       }
       kids.push(mono);
     });
@@ -92,17 +101,14 @@ export default class Monosaccharide {
   // add child
   addChild(linkage,child) {
 
-    // We should be setting an effective
-    // linkage for the child when we add
-    // it, so that the child ordering
-    // is given a numerical value
-    // even when the linkage is undefined
+    if (linkage > MAX_KNOWN_LINKAGE) {
+      throw new Error(`Cannot set defined linkage greater than ${MAX_KNOWN_LINKAGE}`);
+    }
 
-    // jshint -W027
-    throw new Error('We are not setting the true linkage value yet');
-
-    // real_linkage_map.set(child,10*linkage) # if we have real linkage - maybe step vals?
-    // children_map.get(this).map( kid => real_linkage_map.get(kid)).max() + 1
+    if (linkage <= 0) {
+      let unknown_count = this[unknown_count_symbol]++;
+      linkage = MAX_KNOWN_LINKAGE+1+unknown_count;
+    }
 
     // When we read in the sugar from
     // a sequence, we want to make addChild inaccessible
@@ -116,8 +122,26 @@ export default class Monosaccharide {
     // we should trigger branch ordering routines that
     // maintain the true ordering of branches.
 
+    let insert_index = 0;
+
+    for (let existing_child of this.children) {
+      if (linkage_map.get(existing_child) <= linkage) {
+        insert_index += 1;
+      } else {
+        break;
+      }
+    }
+
     linkage_map.set(child,linkage);
-    children_map.set(this, (children_map.get(this) || []).concat(child));
+
+
+    // We should insert this child at the correct position in the children
+    // map
+    let current_children = children_map.get(this) || [];
+
+    current_children.splice(insert_index, 0, child);
+
+    children_map.set(this, current_children);
 
     // Each child references its parent.
     // When you clear this, you don't
