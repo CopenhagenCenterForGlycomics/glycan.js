@@ -8,6 +8,15 @@ let get_monosaccharide = (sugar,proto) => {
   // for specific functionality
   // for some sugars
   let mono_class = sugar.constructor.Monosaccharide;
+
+  // If the mono class is an ImmutableMonosaccharide
+  // delete the removeChild method
+  // delete the set parent
+  // delete the set anomer
+  // delete the set parent_linkage
+
+  // move the addChild method into a symbol
+
   return new mono_class(proto);
 };
 
