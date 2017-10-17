@@ -11,6 +11,10 @@ let getPropertyDescriptor = function(object,descriptor) {
   return retval;
 };
 
+let onlyUnique = function(value, index, self) {
+  return self.indexOf(value) === index;
+};
+
 export default class Sugar {
   constructor() {
   }
@@ -43,10 +47,13 @@ export default class Sugar {
   }
 
   locate_monosaccharide(location) {
-    let [,depth,branch] = location.split('');
+    let [,depth,branch] = location.match(/[a-zA-Z]+|[0-9]+/g);
     depth = parseInt(depth);
     branch = branch.charCodeAt(0) - 'a'.charCodeAt(0);
-    let depth_residues = this.paths().map( path => path.reverse()[depth - 1] ).filter( residue => residue );
+    let depth_residues = this.paths().map( path => path.reverse()[depth - 1] ).filter( residue => residue ).filter(onlyUnique);
+    if ( depth_residues.length == 1 && depth_residues[0] === this.root ){
+      return this.root;
+    }
     let linkage_paths = this.paths(this.root,depth_residues)
                             .map( path => path.filter( res => res.parent )
                                               .map( res => { return { res: res , link: res.parent.linkageOf(res) }; } )

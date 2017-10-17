@@ -44,7 +44,7 @@ create_bold_tree = ( sugar, root, units ) => {
       child.parent_linkage = parseInt(parent_link);
       waiting_children.push([parseInt(child_link),child]);
     } else if ( unit == '[' ) {
-      waiting_children.forEach( child_adder.bind(null,root) );
+      waiting_children.reverse().forEach( child_adder.bind(null,root) );
       waiting_children.length = 0;
       return;
     } else {
@@ -54,7 +54,7 @@ create_bold_tree = ( sugar, root, units ) => {
       child.anomer = anomer;
       child.parent_linkage = parseInt(parent_link);
       root.addChild(parseInt(child_link),child);
-      waiting_children.forEach( child_adder.bind(null,root) );
+      waiting_children.reverse().forEach( child_adder.bind(null,root) );
       waiting_children.length = 0;
       root = child;
     }
