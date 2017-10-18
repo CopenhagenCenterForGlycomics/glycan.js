@@ -46,20 +46,18 @@ let parseReaction = (sugar) => {
 };
 
 let test_sugar_substrate = function(sugar) {
-  sugar.clone();
-  // Get paths, skip 'Any' wildcards etc
+  return sugar.match_sugar_pattern(this);
 };
 
 let execute = function(sugar) {
-  // We should be searching for where this could actually execute
-  let substrate = sugar.locate_monosaccharide(this[ reaction_position_string ]);
-
-  if ( ! substrate ) {
-    throw new Error('Cannot execute reaction');
-  }
-  let addition = this[ reaction_sugar ].clone();
-  for (let kid in addition.root.children) {
-    kid.graft(substrate);
+  for (let substrate of this.test_sugar_substrate(sugar)) {
+    if ( ! substrate ) {
+      throw new Error('Cannot execute reaction');
+    }
+    let addition = this[ reaction_sugar ].clone();
+    for (let kid in addition.root.children) {
+      kid.graft(substrate);
+    }
   }
 };
 

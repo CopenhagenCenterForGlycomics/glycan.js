@@ -46,13 +46,13 @@ export default class Sugar {
     return this.composition(root).filter( mono => mono.children.length === 0);
   }
 
-  locate_monosaccharide(location) {
+  locate_monosaccharide(location,root=this.root) {
     let [,depth,branch] = location.match(/[a-zA-Z]+|[0-9]+/g);
     depth = parseInt(depth);
     branch = branch.charCodeAt(0) - 'a'.charCodeAt(0);
-    let depth_residues = this.paths().map( path => path.reverse()[depth - 1] ).filter( residue => residue ).filter(onlyUnique);
-    if ( depth_residues.length == 1 && depth_residues[0] === this.root ){
-      return this.root;
+    let depth_residues = this.paths(root).map( path => path.reverse()[depth - 1] ).filter( residue => residue ).filter(onlyUnique);
+    if ( depth_residues.length == 1 && depth_residues[0] === root ){
+      return root;
     }
     return depth_residues[branch];
 /*
@@ -92,6 +92,20 @@ export default class Sugar {
     return new_sugar;
   }
 
+/*
+  match_sugar_pattern(pattern,comparator) {
+    let paths = this.paths();
+    let search_paths = pattern.paths();
+    /*
+      for each path in the pattern:
+        find the residues in the paths that match with the search path
+        search path index: [ MonoA, MonoB, MonoC ]
+        Flip indexing - { MonoA: [search_path_indices...]}
+        Filter monos so that they have all search path indices - target roots?
+
+    /
+  }
+*/
   *breadth_first_traversal(start=this.root) {
     let queue = [];
     queue.push(start);
