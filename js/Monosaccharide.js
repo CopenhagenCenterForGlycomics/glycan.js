@@ -193,6 +193,10 @@ export default class Monosaccharide {
     }
   }
 
+  graft(child) {
+    this.addChild(child.parent.linkageOf(child),child);
+  }
+
   childAt(linkage) {
     var kids = this.child_linkages.get(linkage);
     return kids ? kids[0] : kids;
