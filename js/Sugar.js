@@ -15,6 +15,10 @@ let onlyUnique = function(value, index, self) {
   return self.indexOf(value) === index;
 };
 
+let global_match_subpath = function() {
+
+};
+
 export default class Sugar {
   constructor() {
   }
@@ -92,10 +96,25 @@ export default class Sugar {
     return new_sugar;
   }
 
-/*
   match_sugar_pattern(pattern,comparator) {
     let paths = this.paths();
     let search_paths = pattern.paths();
+
+    // let leaf_counts  = pattern.composition( residue => pattern.leaves(residue).length );
+
+    search_paths.forEach( search_path => {
+      let matcher = global_match_subpath.bind(null,search_path,comparator);
+      let matched_subpaths = paths.map( matcher );
+      // Maybe we don't need to do this part?
+      // let unique_matched_subpaths = filter_unique_paths( matcher );
+      let matched_residues = [].concat.apply([], matched_subpaths).filter(onlyUnique);
+      matched_residues.forEach( res => {
+        res.search_path_match_count += 1;
+      });
+    });
+
+    return this.composition().filter( res => res.search_path_match_count == pattern.leaves().length );
+
     /*
       for each path in the pattern:
         find the residues in the paths that match with the search path
@@ -103,9 +122,9 @@ export default class Sugar {
         Flip indexing - { MonoA: [search_path_indices...]}
         Filter monos so that they have all search path indices - target roots?
 
-    /
+    */
   }
-*/
+
   *breadth_first_traversal(start=this.root) {
     let queue = [];
     queue.push(start);
