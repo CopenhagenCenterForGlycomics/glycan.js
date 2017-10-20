@@ -15,9 +15,27 @@ let onlyUnique = function(value, index, self) {
   return self.indexOf(value) === index;
 };
 
-let global_match_subpath = function() {
-
+let global_match_subpath = function(path_pattern,comparator,path) {
+  // console.log("Pattern residues",path_pattern.map( pat => pat.identifier ));
+  // console.log("Path residues",path.map( res => res.identifier ));
+  let test_residue = null;
+  let loop_pattern = [].concat(path_pattern);
+  let loop_path = [].concat(path);
+  while((test_residue = loop_pattern.shift())) {
+    let pattern_residues_remaining = loop_pattern.length > 0;
+    loop_path = loop_path.filter( comparator.bind(null,test_residue) );
+    if (pattern_residues_remaining) {
+      loop_path = loop_path.map( matched => matched.parent );
+    }
+    loop_path = loop_path.filter( residue => (residue !== null) );
+  }
+  // We get back the roots of paths where we match the pattern
+  // calculate the indices of the elements
+  return loop_path.map(start => path.indexOf(start) )
+                       .map(start_idx => path.slice( start_idx - path_pattern.length + 1, start_idx + 1 ));
 };
+
+let flatten = array => [].concat.apply([], array);
 
 export default class Sugar {
   constructor() {
@@ -99,30 +117,23 @@ export default class Sugar {
   match_sugar_pattern(pattern,comparator) {
     let paths = this.paths();
     let search_paths = pattern.paths();
+    let potential_roots = [];
 
-    // let leaf_counts  = pattern.composition( residue => pattern.leaves(residue).length );
+    let match_roots = match => match.map( residues => residues[residues.length - 1] );
 
     search_paths.forEach( search_path => {
       let matcher = global_match_subpath.bind(null,search_path,comparator);
-      let matched_subpaths = paths.map( matcher );
-      // Maybe we don't need to do this part?
-      // let unique_matched_subpaths = filter_unique_paths( matcher );
-      let matched_residues = [].concat.apply([], matched_subpaths).filter(onlyUnique);
+      let subpaths = paths.map( matcher );
+      potential_roots = potential_roots.concat(
+                          flatten( subpaths.map( match_roots ) )
+                        ).filter(onlyUnique);
+      let matched_residues = flatten(flatten(subpaths)).filter(onlyUnique);
       matched_residues.forEach( res => {
-        res.search_path_match_count += 1;
+        res.search_path_match_count = (res.search_path_match_count || 0) + 1;
       });
     });
 
-    return this.composition().filter( res => res.search_path_match_count == pattern.leaves().length );
-
-    /*
-      for each path in the pattern:
-        find the residues in the paths that match with the search path
-        search path index: [ MonoA, MonoB, MonoC ]
-        Flip indexing - { MonoA: [search_path_indices...]}
-        Filter monos so that they have all search path indices - target roots?
-
-    */
+    return potential_roots.filter( res => res.search_path_match_count == pattern.leaves().length );
   }
 
   *breadth_first_traversal(start=this.root) {
