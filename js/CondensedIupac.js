@@ -1,6 +1,14 @@
 
 let follow_bold_branch, create_bold_tree;
 
+let write_link = link => {
+  return link <= 0 ? '?' : ''+link;
+};
+
+let parse_link = link_string => {
+  return link_string == '?' ? 0 : parseInt(link_string);
+};
+
 let get_monosaccharide = (sugar,proto) => {
   // There should be a per-object
   // and per-class override of the
@@ -41,8 +49,8 @@ create_bold_tree = ( sugar, root, units ) => {
       let [child, linkage] = follow_bold_branch(sugar,units);
       let [anomer,parent_link,,child_link] = (linkage || '').split('');
       child.anomer = anomer;
-      child.parent_linkage = parseInt(parent_link);
-      waiting_children.push([parseInt(child_link),child]);
+      child.parent_linkage = parse_link(parent_link);
+      waiting_children.push([parse_link(child_link),child]);
     } else if ( unit == '[' ) {
       waiting_children.reverse().forEach( child_adder.bind(null,root) );
       waiting_children.length = 0;
@@ -52,8 +60,8 @@ create_bold_tree = ( sugar, root, units ) => {
       let [anomer,parent_link,,child_link] = (linkage || '').split('');
       let child = get_monosaccharide(sugar,child_root);
       child.anomer = anomer;
-      child.parent_linkage = parseInt(parent_link);
-      root.addChild(parseInt(child_link),child);
+      child.parent_linkage = parse_link(parent_link);
+      root.addChild(parse_link(child_link),child);
       waiting_children.reverse().forEach( child_adder.bind(null,root) );
       waiting_children.length = 0;
       root = child;
@@ -77,7 +85,7 @@ let parse_sequence = function(sequence) {
   let units = sequence.split(/([\[\]])/);
 
   // Reverse ordering of branches so we see closer residues first
-  units = units.map( unit => unit.split(/\)(?=[A-Za-z])/).reverse().join(')') )
+  units = units.map( unit => unit.split(/\)(?=[A-Za-z\*])/).reverse().join(')') )
                .map( unit => unit.match(/\d$/) ? unit+')' : unit );
 
   // We wish to split the units by the linkages
@@ -104,7 +112,7 @@ let write_linkage = (mono) => {
   if (! mono.parent ) {
     return '';
   }
-  return '('+ mono.anomer + mono.parent_linkage + '-';
+  return '('+ mono.anomer + write_link(mono.parent_linkage) + '-';
 };
 
 
@@ -113,10 +121,9 @@ let link_expander = function(links) {
   return links[1].map( (mono) => [ position , mono ]);
 };
 
-
 let write_sequence = function(start=this.root) {
   let self = this;
-  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+kid[0]+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
+  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+write_link(kid[0])+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   return child_sequence+write_monosaccharide(start)+write_linkage(start);
 };
 

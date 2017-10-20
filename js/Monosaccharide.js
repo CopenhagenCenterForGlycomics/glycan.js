@@ -100,13 +100,14 @@ export default class Monosaccharide {
   // methods:
   // add child
   addChild(linkage,child) {
-
     if (linkage > MAX_KNOWN_LINKAGE) {
       throw new Error(`Cannot set defined linkage greater than ${MAX_KNOWN_LINKAGE}`);
     }
 
     if (linkage <= 0) {
-      let unknown_count = this[unknown_count_symbol]++;
+      this[unknown_count_symbol] = (this[unknown_count_symbol] || 0);
+      let unknown_count =  this[unknown_count_symbol];
+      this[unknown_count_symbol] = unknown_count+1;
       linkage = MAX_KNOWN_LINKAGE+1+unknown_count;
     }
 
@@ -154,7 +155,7 @@ export default class Monosaccharide {
   }
 
   // remove child
-  removeChild(new_linkage) {
+  removeChild(new_linkage,target) {
     var self = this;
 
     var kids = children_map.get(self);
@@ -165,9 +166,11 @@ export default class Monosaccharide {
       child.parent = null;
     };
 
+    let target_matcher = (kid) => target ? (kid === target) : true;
+
     for (let [linkage,children] of this.child_linkages) {
       if (new_linkage == linkage) {
-        children.forEach(remover);
+        children.filter( target_matcher ).forEach(remover);
       }
     }
   }
@@ -177,7 +180,7 @@ export default class Monosaccharide {
     let parent_pos = child.parent_linkage;
     let anomer = child.anomer;
 
-    this.removeChild(position);
+    this.removeChild(position,child);
     new_child.parent_linkage = parent_pos;
     new_child.anomer = anomer;
     this.addChild(position,new_child);
@@ -194,7 +197,10 @@ export default class Monosaccharide {
   }
 
   graft(child) {
-    this.addChild(child.parent.linkageOf(child),child);
+    let old_parent = child.parent;
+    let linkage = old_parent.linkageOf(child);
+    old_parent.removeChild(linkage,child);
+    this.addChild(linkage,child);
   }
 
   childAt(linkage) {
@@ -215,6 +221,14 @@ export default class Monosaccharide {
     result[anomer_symbol] = this[anomer_symbol];
     result[parent_linkage_symbol] = this[parent_linkage_symbol];
     return result;
+  }
+
+  toSugar(sugarclass) {
+    let temp_sugar = new sugarclass();
+    temp_sugar.root = this;
+    let return_value = temp_sugar.clone();
+    temp_sugar.root = null;
+    return return_value;
   }
 
   // cast to sugar (make monosaccharide a sugar/glycan class)

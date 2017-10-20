@@ -11,6 +11,8 @@ let getPropertyDescriptor = function(object,descriptor) {
   return retval;
 };
 
+let flatten = array => [].concat.apply([], array);
+
 let onlyUnique = function(value, index, self) {
   return self.indexOf(value) === index;
 };
@@ -27,7 +29,7 @@ let global_match_subpath = function(path_pattern,comparator,path) {
     if (pattern_residues_remaining) {
       loop_path = loop_path.map( matched => matched.parent );
     }
-    loop_path = loop_path.filter( residue => (residue !== null) );
+    loop_path = loop_path.filter( residue => (residue !== null && typeof residue !== 'undefined') );
   }
   // We get back the roots of paths where we match the pattern
   // calculate the indices of the elements
@@ -35,7 +37,42 @@ let global_match_subpath = function(path_pattern,comparator,path) {
                        .map(start_idx => path.slice( start_idx - path_pattern.length + 1, start_idx + 1 ));
 };
 
-let flatten = array => [].concat.apply([], array);
+let search_with_wildcards = function(sugar,pattern,comparator) {
+  let wildcard_residues = pattern.composition().filter( res => res.identifier === '*' );
+
+  let wildcard_subtrees = wildcard_residues.map( wildcard => wildcard.children.map( kid => {
+    let new_sugar = kid.toSugar(pattern.constructor);
+    new_sugar.linkage = wildcard.linkageOf(kid);
+    return new_sugar;
+  }));
+
+  let root_sugar = pattern.clone();
+
+  root_sugar.composition().filter( res => res.identifier === '*').forEach( wildcard => {
+    wildcard.children.map( kid => wildcard.removeChild(wildcard.linkageOf(kid),kid));
+  });
+
+  wildcard_subtrees.forEach( subtree_set => subtree_set.forEach( subtree => {
+    let mono_class = subtree.constructor.Monosaccharide;
+    let new_root = new mono_class('*');
+    new_root.addChild(subtree.linkage,subtree.root);
+    subtree.root = new_root;
+  }));
+
+  let root_result = sugar.match_sugar_pattern(root_sugar, comparator, true);
+  let result = wildcard_subtrees.map( subtree_set => {
+    return subtree_set.map( subtree => {
+      let roots = sugar.match_sugar_pattern( subtree, comparator, true );
+      roots = roots.filter(root => root.parent.linkageOf(root) == subtree.linkage )
+                   .filter( root => {
+                      let parents = [...sugar.residues_to_root(root)];
+                      return root_result.reduce((result,val) => result || parents.indexOf(val),false);
+                   });
+      return roots;
+    });
+  });
+  return flatten(flatten(result));
+};
 
 export default class Sugar {
   constructor() {
@@ -105,7 +142,7 @@ export default class Sugar {
         cloned.set(node,node.clone());
       }
       let node_clone = cloned.get(node);
-      if (node.parent) {
+      if (node.parent && cloned.get(node.parent)) {
         cloned.get(node.parent).addChild(node.parent.linkageOf(node),node_clone);
       }
     }
@@ -114,11 +151,14 @@ export default class Sugar {
     return new_sugar;
   }
 
-  match_sugar_pattern(pattern,comparator) {
+  match_sugar_pattern(pattern,comparator,fixed) {
+    if (! fixed && pattern.composition().filter( res => res.identifier === '*' ).length > 0) {
+      return search_with_wildcards(this,pattern,comparator);
+    }
     let paths = this.paths();
     let search_paths = pattern.paths();
     let potential_roots = [];
-
+    this.composition().forEach( res => res.search_path_match_count = 0 );
     let match_roots = match => match.map( residues => residues[residues.length - 1] );
 
     search_paths.forEach( search_path => {
@@ -151,7 +191,6 @@ export default class Sugar {
   //      given a traversal algorithm
   // FIXME - Union - Create a union sugar from two sugars
   // FIXME - Subtract - Get residues that aren't common
-  // FIXME - Intersect - Find the residues that match with given sugar
 
   // Search methods
   // FIXME - Find residue by linkage path
