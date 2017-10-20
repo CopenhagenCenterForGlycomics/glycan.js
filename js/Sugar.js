@@ -1,6 +1,8 @@
 'use strict';
 import Monosaccharide from './Monosaccharide';
 
+import SugarSearchResultWrapper from './SugarSearchResult';
+
 let root_symbol = Symbol('root');
 
 let getPropertyDescriptor = function(object,descriptor) {
@@ -18,8 +20,6 @@ let onlyUnique = function(value, index, self) {
 };
 
 let global_match_subpath = function(path_pattern,comparator,path) {
-  // console.log("Pattern residues",path_pattern.map( pat => pat.identifier ));
-  // console.log("Path residues",path.map( res => res.identifier ));
   let test_residue = null;
   let loop_pattern = [].concat(path_pattern);
   let loop_path = [].concat(path);
@@ -134,9 +134,9 @@ export default class Sugar {
     return return_value.reduce( (a,b) => a.concat(b) );
   }
 
-  clone() {
+  clone(visitor) {
     let cloned = new WeakMap();
-    let nodes = this.breadth_first_traversal();
+    let nodes = this.breadth_first_traversal(this.root,visitor);
     for (let node of nodes) {
       if ( ! cloned.has(node) ) {
         cloned.set(node,node.clone());
@@ -158,8 +158,10 @@ export default class Sugar {
     let paths = this.paths();
     let search_paths = pattern.paths();
     let potential_roots = [];
+    let potential_leaves = [];
     this.composition().forEach( res => res.search_path_match_count = 0 );
     let match_roots = match => match.map( residues => residues[residues.length - 1] );
+    let match_leaves = match => match.map( residues => residues[0] );
 
     search_paths.forEach( search_path => {
       let matcher = global_match_subpath.bind(null,search_path,comparator);
@@ -167,22 +169,54 @@ export default class Sugar {
       potential_roots = potential_roots.concat(
                           flatten( subpaths.map( match_roots ) )
                         ).filter(onlyUnique);
+      potential_leaves = potential_leaves.concat(
+                          flatten( subpaths.map( match_leaves ) )
+                        ).filter(onlyUnique);
       let matched_residues = flatten(flatten(subpaths)).filter(onlyUnique);
       matched_residues.forEach( res => {
         res.search_path_match_count = (res.search_path_match_count || 0) + 1;
       });
     });
-
-    return potential_roots.filter( res => res.search_path_match_count == pattern.leaves().length );
+    let wanted_roots = potential_roots.filter( res => res.search_path_match_count == pattern.leaves().length );
+    let wanted_leaves = potential_leaves.filter( res => {
+      if (wanted_roots.indexOf(res) >= 0) {
+        return true;
+      }
+      while ( (res = res.parent) ) {
+        if (res.search_path_match_count == 0) {
+          return false;
+        }
+        if (wanted_roots.indexOf(res) >= 0) {
+          return true;
+        }
+      }
+    });
+    let wanted_additional = [];
+    wanted_leaves.forEach( res => {
+      while ((res = res.parent)) {
+        if (wanted_roots.indexOf(res) >= 0) {
+          return;
+        }
+        wanted_additional.push(res);
+      }
+    });
+    let SugarSearchResult = SugarSearchResultWrapper(this.constructor);
+    new SugarSearchResult(this,wanted_roots.concat(wanted_leaves).concat(wanted_additional).filter(onlyUnique));
+    return wanted_roots;
   }
 
-  *breadth_first_traversal(start=this.root) {
+  *breadth_first_traversal(start=this.root,visitor=(x)=>x) {
     let queue = [];
     queue.push(start);
     while (queue.length > 0) {
       let curr = queue.shift();
       queue = queue.concat(curr.children);
-      yield curr;
+      if (visitor) {
+        curr = visitor(curr);
+      }
+      if (curr) {
+        yield curr;
+      }
     }
   }
 

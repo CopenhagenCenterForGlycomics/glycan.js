@@ -47,6 +47,19 @@ QUnit.test( 'Finding single residue patterns' , function( assert ) {
   assert.ok(matches[0].identifier === 'A','Matches at the correct location');
 });
 
+QUnit.test( 'Finding longer residue patterns' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'A(a1-2)B(a1-2)C(a1-2)D(a1-2)R';
+
+  let search_sugar = new IupacSugar();
+  search_sugar.sequence = 'A(a1-2)B(a1-2)C(a1-2)D';
+
+  let matches = sugar.match_sugar_pattern(search_sugar, (a,b) => a.identifier === b.identifier );
+
+  assert.ok(matches.length === 1,'Matches single location');
+  assert.ok(matches[0].identifier === 'D','Matches at the correct location');
+});
+
 QUnit.test( 'Finding monosaccharide patterns on a branch' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'A(a1-2)B(a1-3)[C(a1-2)D(a1-2)]E(a1-2)R';
@@ -75,6 +88,19 @@ QUnit.test( 'Finding repeated monosaccharide patterns' , function( assert ) {
   assert.ok(matches[0].identifier === 'B','Matches at the correct location');
   assert.ok(matches[1].identifier === 'B','Matches at the correct location');
   assert.ok(matches[1] !== matches[0],'Doesnt match the same residue twice');
+});
+
+QUnit.test( 'Finding repeated monosaccharide patterns differing by a branch' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'A(a1-2)B(a1-2)C(a1-2)A(a1-2)[C(a1-2)]B(a1-2)R';
+
+  let search_sugar = new IupacSugar();
+  search_sugar.sequence = 'A(a1-2)[C(a1-2)]B';
+
+  let matches = sugar.match_sugar_pattern(search_sugar, (a,b) => a.identifier === b.identifier );
+
+  assert.ok(matches.length === 1,'Matches correct number of locations');
+  assert.ok(matches[0].identifier === 'B','Matches at the correct location');
 });
 
 
