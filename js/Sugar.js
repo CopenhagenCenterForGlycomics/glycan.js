@@ -31,8 +31,7 @@ let global_match_subpath = function(path_pattern,comparator,path) {
     }
     loop_path = loop_path.filter( residue => (residue !== null && typeof residue !== 'undefined') );
   }
-  // We get back the roots of paths where we match the pattern
-  // calculate the indices of the elements
+  // We get back the elements of the paths where we match the pattern
   return loop_path.map(start => path.indexOf(start) )
                        .map(start_idx => path.slice( start_idx - path_pattern.length + 1, start_idx + 1 ));
 };
@@ -201,7 +200,7 @@ export default class Sugar {
       }
     });
     let SugarSearchResult = SugarSearchResultWrapper(this.constructor);
-    new SugarSearchResult(this,wanted_roots.concat(wanted_leaves).concat(wanted_additional).filter(onlyUnique));
+    new SugarSearchResult(this,wanted_roots[0],pattern,comparator);
     return wanted_roots;
   }
 
