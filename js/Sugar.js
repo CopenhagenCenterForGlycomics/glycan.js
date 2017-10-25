@@ -157,10 +157,8 @@ export default class Sugar {
     let paths = this.paths();
     let search_paths = pattern.paths();
     let potential_roots = [];
-    let potential_leaves = [];
-    this.composition().forEach( res => res.search_path_match_count = 0 );
+    let search_path_match_count = new WeakMap();
     let match_roots = match => match.map( residues => residues[residues.length - 1] );
-    let match_leaves = match => match.map( residues => residues[0] );
 
     search_paths.forEach( search_path => {
       let matcher = global_match_subpath.bind(null,search_path,comparator);
@@ -168,40 +166,15 @@ export default class Sugar {
       potential_roots = potential_roots.concat(
                           flatten( subpaths.map( match_roots ) )
                         ).filter(onlyUnique);
-      potential_leaves = potential_leaves.concat(
-                          flatten( subpaths.map( match_leaves ) )
-                        ).filter(onlyUnique);
       let matched_residues = flatten(flatten(subpaths)).filter(onlyUnique);
       matched_residues.forEach( res => {
-        res.search_path_match_count = (res.search_path_match_count || 0) + 1;
+        search_path_match_count.set(res, (search_path_match_count.get(res) || 0)+ 1 );
       });
     });
-    let wanted_roots = potential_roots.filter( res => res.search_path_match_count == pattern.leaves().length );
-    let wanted_leaves = potential_leaves.filter( res => {
-      if (wanted_roots.indexOf(res) >= 0) {
-        return true;
-      }
-      while ( (res = res.parent) ) {
-        if (res.search_path_match_count == 0) {
-          return false;
-        }
-        if (wanted_roots.indexOf(res) >= 0) {
-          return true;
-        }
-      }
-    });
-    let wanted_additional = [];
-    wanted_leaves.forEach( res => {
-      while ((res = res.parent)) {
-        if (wanted_roots.indexOf(res) >= 0) {
-          return;
-        }
-        wanted_additional.push(res);
-      }
-    });
-    let SugarSearchResult = SugarSearchResultWrapper(this.constructor);
+    let wanted_roots = potential_roots.filter( res => search_path_match_count.get(res) == pattern.leaves().length );
+    let SearchResultSugar = SugarSearchResultWrapper(this.constructor);
     console.log('New SearchResult',wanted_roots[0],pattern);
-    let return_sugars = wanted_roots.map( root => new SugarSearchResult(this,root,pattern,comparator));
+    let return_sugars = wanted_roots.map( root => new SearchResultSugar(this,root,pattern,comparator));
     return return_sugars.map( sug => sug.root.original );
   }
 
