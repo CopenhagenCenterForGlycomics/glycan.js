@@ -200,6 +200,7 @@ export default class Sugar {
       }
     });
     let SugarSearchResult = SugarSearchResultWrapper(this.constructor);
+    console.log('New SearchResult',wanted_roots[0],pattern);
     new SugarSearchResult(this,wanted_roots[0],pattern,comparator);
     return wanted_roots;
   }
