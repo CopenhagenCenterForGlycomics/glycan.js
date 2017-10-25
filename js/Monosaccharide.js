@@ -204,7 +204,7 @@ export default class Monosaccharide {
   }
 
   childAt(linkage) {
-    var kids = this.child_linkages.get(linkage);
+    let kids = this.child_linkages.get(linkage);
     return kids ? kids[0] : kids;
   }
 

@@ -201,8 +201,8 @@ export default class Sugar {
     });
     let SugarSearchResult = SugarSearchResultWrapper(this.constructor);
     console.log('New SearchResult',wanted_roots[0],pattern);
-    new SugarSearchResult(this,wanted_roots[0],pattern,comparator);
-    return wanted_roots;
+    let return_sugars = wanted_roots.map( root => new SugarSearchResult(this,root,pattern,comparator));
+    return return_sugars.map( sug => sug.root.original );
   }
 
   *breadth_first_traversal(start=this.root,visitor=(x)=>x) {
