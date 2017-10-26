@@ -10,10 +10,9 @@ let noop = () => {};
 let wrap_monosaccharide = sugar => {
   let base = sugar.constructor.Monosaccharide;
   return class extends base {
-    constructor(original,wanted) {
+    constructor(original) {
       super(original.identifier);
       this.original = original;
-      this.wanted = wanted;
       return this;
     }
     get anomer() {
@@ -43,7 +42,6 @@ let wrap_monosaccharide = sugar => {
     clone() {
       let cloned = new this.constructor(this.original);
       cloned.original = this.original;
-      cloned.wanted = this.wanted;
       return cloned;
     }
   };
@@ -52,39 +50,13 @@ let wrap_monosaccharide = sugar => {
 let build_sugar = function(target,original,wanted) {
   let wrap_class = wrap_monosaccharide(original);
   target.constructor._mono = wrap_class;
-  // let wrap_map = new WeakMap();
-
-  // let to_clone = Object.create(original);
-
-  // let cloned = to_clone.clone((res) => {
-  //   if ( res instanceof wrap_class) {
-  //     return res;
-  //   }
-  //   let wrapped = wrap_map.get(res);
-  //   if ( ! wrapped ) {
-  //     wrapped = new wrap_class(res,wanted.indexOf(res) >= 0);
-  //     wrap_map.set(res,wrapped);
-  //   }
-
-  //   if (res.parent) {
-  //     wrapped.parent = wrap_map.get(res.parent);
-  //   } else {
-  //     to_clone.root = wrapped;
-  //   }
-  //   return wrapped;
-  // });
   target.root = new wrap_class(wanted[0]);
-  // // Get all the residues from the deepest to the shallowest
-  // let composition = [...target.breadth_first_traversal()].reverse();
-  // console.log(composition.map( res => [res.identifier, res.wanted ] ));
   return target;
 };
 
 let clone_and_add_monosaccharide = function(wrapped_sugar,parent,child) {
-  wrapped_sugar.composition().forEach( res => res.wanted = false );
-  parent.wanted = true;
   let new_sugar = wrapped_sugar.clone();
-  parent = new_sugar.composition().filter( res => res.wanted )[0];
+  parent = new_sugar.composition().filter( res => res.original === parent.original )[0];
   let wrapped_child = new wrapped_sugar.constructor.Monosaccharide(child);
   parent.addChild(parent.original.linkageOf(child),wrapped_child);
   return { sugar: new_sugar, child: wrapped_child};
@@ -99,7 +71,6 @@ let attach_via_cloning = (result_sugar,attachment,mapped_list,child) => {
 let residues_in_mapping = (sugar,mapped_list) => {
   return sugar.composition().filter( residue => mapped_list.indexOf(residue.original) >= 0 );
 };
-
 
 let trace_sugar = function(result,search,search_root,template,comparator) {
   let cursor_mapping = {};
@@ -181,8 +152,8 @@ let trace_sugar = function(result,search,search_root,template,comparator) {
   return sugar_sets;
 };
 
-let SearchResultWrapper = function(base) {
-  return class SugarSearchResult extends base {
+let TracingWrapper = function(base) {
+  return class extends base {
     constructor(original,start,template,comparator) {
       super();
       if ( ! original ) {
@@ -197,4 +168,4 @@ let SearchResultWrapper = function(base) {
   };
 };
 
-export default SearchResultWrapper;
+export default TracingWrapper;

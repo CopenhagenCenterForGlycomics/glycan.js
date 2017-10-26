@@ -1,7 +1,7 @@
 'use strict';
 import Monosaccharide from './Monosaccharide';
 
-import SugarSearchResultWrapper from './SugarSearchResult';
+import TracingWrapper from './SugarSearchResult';
 
 let root_symbol = Symbol('root');
 
@@ -172,7 +172,7 @@ export default class Sugar {
       });
     });
     let wanted_roots = potential_roots.filter( res => search_path_match_count.get(res) == pattern.leaves().length );
-    let SearchResultSugar = SugarSearchResultWrapper(this.constructor);
+    let SearchResultSugar = TracingWrapper(this.constructor);
     console.log('New SearchResult',wanted_roots[0],pattern);
     let return_sugars = wanted_roots.map( root => new SearchResultSugar(this,root,pattern,comparator));
     return return_sugars.map( sug => sug.root.original );
