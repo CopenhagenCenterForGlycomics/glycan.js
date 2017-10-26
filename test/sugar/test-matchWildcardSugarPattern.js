@@ -61,3 +61,19 @@ QUnit.test( 'Finding lots of same branch' , function( assert ) {
   assert.ok(matches[2].identifier === 'bbb','Matches at the correct location');
   assert.ok(matches[3].identifier === 'bbbb','Matches at the correct location');
 });
+
+QUnit.test( 'Finding lots of stubby branch' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'a(a1-2)[aa(a1-2)][aaa(a1-2)][aaaa(a1-2)]r';
+
+  let search_sugar = new IupacSugar();
+  search_sugar.sequence = 'A(a1-2)*(u?-?)R';
+  let matches = sugar.match_sugar_pattern(search_sugar, (a,b) => {
+    if (a.identifier === '*' || b.identifier === '*') {
+      return true;
+    }
+    return firstchar_comparator(a,b);
+  });
+  assert.ok(matches.length ===  1,'Matches single location');
+  assert.ok(matches[0].identifier === 'r','Matches at the correct location');
+});

@@ -79,10 +79,10 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
   let result = wildcard_subtrees.map( subtree_set => {
     return subtree_set.map( subtree => {
       let roots = match_fixed_paths(sugar,subtree, comparator);
-      roots = roots.filter(root => root.parent.linkageOf(root) == subtree.linkage )
+      roots = roots.filter(root => ((! root.parent) || (root.parent.linkageOf(root) == subtree.linkage)) )
                    .filter( root => {
                       let parents = [...sugar.residues_to_root(root)];
-                      return root_result.reduce((result,val) => result || parents.indexOf(val),false);
+                      return root_result.reduce((result,val) => (result || (parents.indexOf(val) >= 0)),false);
                    });
       return roots;
     });
