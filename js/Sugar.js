@@ -1,7 +1,9 @@
 'use strict';
 import Monosaccharide from './Monosaccharide';
 
-import TracingWrapper from './SugarSearchResult';
+import Tracer from './Tracing';
+
+import Searcher from './Searching';
 
 let root_symbol = Symbol('root');
 
@@ -17,60 +19,6 @@ let flatten = array => [].concat.apply([], array);
 
 let onlyUnique = function(value, index, self) {
   return self.indexOf(value) === index;
-};
-
-let global_match_subpath = function(path_pattern,comparator,path) {
-  let test_residue = null;
-  let loop_pattern = [].concat(path_pattern);
-  let loop_path = [].concat(path);
-  while((test_residue = loop_pattern.shift())) {
-    let pattern_residues_remaining = loop_pattern.length > 0;
-    loop_path = loop_path.filter( comparator.bind(null,test_residue) );
-    if (pattern_residues_remaining) {
-      loop_path = loop_path.map( matched => matched.parent );
-    }
-    loop_path = loop_path.filter( residue => (residue !== null && typeof residue !== 'undefined') );
-  }
-  // We get back the elements of the paths where we match the pattern
-  return loop_path.map(start => path.indexOf(start) )
-                       .map(start_idx => path.slice( start_idx - path_pattern.length + 1, start_idx + 1 ));
-};
-
-let search_with_wildcards = function(sugar,pattern,comparator) {
-  let wildcard_residues = pattern.composition().filter( res => res.identifier === '*' );
-
-  let wildcard_subtrees = wildcard_residues.map( wildcard => wildcard.children.map( kid => {
-    let new_sugar = kid.toSugar(pattern.constructor);
-    new_sugar.linkage = wildcard.linkageOf(kid);
-    return new_sugar;
-  }));
-
-  let root_sugar = pattern.clone();
-
-  root_sugar.composition().filter( res => res.identifier === '*').forEach( wildcard => {
-    wildcard.children.map( kid => wildcard.removeChild(wildcard.linkageOf(kid),kid));
-  });
-
-  wildcard_subtrees.forEach( subtree_set => subtree_set.forEach( subtree => {
-    let mono_class = subtree.constructor.Monosaccharide;
-    let new_root = new mono_class('*');
-    new_root.addChild(subtree.linkage,subtree.root);
-    subtree.root = new_root;
-  }));
-
-  let root_result = sugar.match_sugar_pattern(root_sugar, comparator, true);
-  let result = wildcard_subtrees.map( subtree_set => {
-    return subtree_set.map( subtree => {
-      let roots = sugar.match_sugar_pattern( subtree, comparator, true );
-      roots = roots.filter(root => root.parent.linkageOf(root) == subtree.linkage )
-                   .filter( root => {
-                      let parents = [...sugar.residues_to_root(root)];
-                      return root_result.reduce((result,val) => result || parents.indexOf(val),false);
-                   });
-      return roots;
-    });
-  });
-  return flatten(flatten(result));
 };
 
 export default class Sugar {
@@ -150,32 +98,17 @@ export default class Sugar {
     return new_sugar;
   }
 
-  match_sugar_pattern(pattern,comparator,fixed) {
-    if (! fixed && pattern.composition().filter( res => res.identifier === '*' ).length > 0) {
-      return search_with_wildcards(this,pattern,comparator);
+  match_sugar_pattern(pattern,comparator) {
+    let return_roots = Searcher.search(this,pattern,comparator);
+    if (pattern.composition().map( res => res.identifier).filter( id => id === '*').length > 0) {
+      return return_roots;
     }
-    let paths = this.paths();
-    let search_paths = pattern.paths();
-    let potential_roots = [];
-    let search_path_match_count = new WeakMap();
-    let match_roots = match => match.map( residues => residues[residues.length - 1] );
-
-    search_paths.forEach( search_path => {
-      let matcher = global_match_subpath.bind(null,search_path,comparator);
-      let subpaths = paths.map( matcher );
-      potential_roots = potential_roots.concat(
-                          flatten( subpaths.map( match_roots ) )
-                        ).filter(onlyUnique);
-      let matched_residues = flatten(flatten(subpaths)).filter(onlyUnique);
-      matched_residues.forEach( res => {
-        search_path_match_count.set(res, (search_path_match_count.get(res) || 0)+ 1 );
-      });
-    });
-    let wanted_roots = potential_roots.filter( res => search_path_match_count.get(res) == pattern.leaves().length );
-    let SearchResultSugar = TracingWrapper(this.constructor);
-    console.log('New SearchResult',wanted_roots[0],pattern);
-    let return_sugars = wanted_roots.map( root => new SearchResultSugar(this,root,pattern,comparator));
+    let return_sugars = flatten(return_roots.map( root => this.trace(pattern,root,comparator)));
     return return_sugars.map( sug => sug.root.original );
+  }
+
+  trace(template,start=this.root,comparator=(a,b) => true||a||b) {
+    return Tracer.trace(this,start,template,comparator);
   }
 
   *breadth_first_traversal(start=this.root,visitor=(x)=>x) {

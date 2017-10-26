@@ -1,5 +1,7 @@
+'use strict';
 import * as debug from 'debug-any-level';
 
+import Monosaccharide from './Monosaccharide';
 
 const module_string='glycanjs:tracing';
 
@@ -7,9 +9,7 @@ const log = debug(module_string);
 
 let noop = () => {};
 
-let wrap_monosaccharide = sugar => {
-  let base = sugar.constructor.Monosaccharide;
-  return class extends base {
+class TracedMonosaccharide extends Monosaccharide {
     constructor(original) {
       super(original.identifier);
       this.original = original;
@@ -44,13 +44,10 @@ let wrap_monosaccharide = sugar => {
       cloned.original = this.original;
       return cloned;
     }
-  };
-};
+}
 
-let build_sugar = function(target,original,wanted) {
-  let wrap_class = wrap_monosaccharide(original);
-  target.constructor._mono = wrap_class;
-  target.root = new wrap_class(wanted[0]);
+let initialise_sugar = function(target,wanted) {
+  target.root = new TracedMonosaccharide(wanted);
   return target;
 };
 
@@ -72,7 +69,7 @@ let residues_in_mapping = (sugar,mapped_list) => {
   return sugar.composition().filter( residue => mapped_list.indexOf(residue.original) >= 0 );
 };
 
-let trace_sugar = function(result,search,search_root,template,comparator) {
+let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
   let cursor_mapping = {};
   let sugar_sets = [];
   let attachment_to_sugar = new WeakMap();
@@ -87,7 +84,7 @@ let trace_sugar = function(result,search,search_root,template,comparator) {
 
     if ( ! cursor.parent ) {
       log.info('The cursor is at the root - the search sugar is at',search_root.identifier);
-      sugar_sets.push(build_sugar(result,search,[ search_root ]));
+      sugar_sets.push(initialise_sugar(new ResultClass(),search_root));
       cursor_mapping[cursor] = [ sugar_sets[0].composition()[0].original ];
       log.info('Done with this cursor',cursor.identifier);
       return sugar_sets.length > 0;
@@ -152,20 +149,19 @@ let trace_sugar = function(result,search,search_root,template,comparator) {
   return sugar_sets;
 };
 
-let TracingWrapper = function(base) {
-  return class extends base {
-    constructor(original,start,template,comparator) {
-      super();
-      if ( ! original ) {
-        return;
+class Tracer {
+  static trace(source,start,template,comparator) {
+
+    let own_constructor = source.constructor;
+
+    let TracedClass = class extends own_constructor {
+      static get Monosaccharide() {
+        return TracedMonosaccharide;
       }
-      this.sets = trace_sugar(this,original,start,template,comparator);
-    }
+    };
 
-    static get Monosaccharide() {
-      return this._mono;
-    }
-  };
-};
+    return trace_sugar(TracedClass,source,start,template,comparator);
+  }
+}
 
-export default TracingWrapper;
+export default Tracer;
