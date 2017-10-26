@@ -77,3 +77,26 @@ QUnit.test( 'Finding lots of stubby branch' , function( assert ) {
   assert.ok(matches.length ===  1,'Matches single location');
   assert.ok(matches[0].identifier === 'r','Matches at the correct location');
 });
+
+QUnit.test( 'Tracing lots of stubby branch' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'a(a1-2)[aa(a1-2)][aaa(a1-2)][aaaa(a1-2)]r';
+
+  let search_sugar = new IupacSugar();
+  search_sugar.sequence = 'A(a1-2)R';
+  let matches = sugar.trace(search_sugar,sugar.root, firstchar_comparator ).map( sug => sug.root );
+  assert.ok(matches.length ===  4,'Matches single location');
+  assert.ok(matches[0].identifier === 'r','Matches at the correct location');
+  assert.ok(matches[1].identifier === 'r','Matches at the correct location');
+  assert.ok(matches[2].identifier === 'r','Matches at the correct location');
+  assert.ok(matches[3].identifier === 'r','Matches at the correct location');
+  assert.ok(matches[0].children[0].identifier === 'a','Matches at the correct location');
+  assert.ok(matches[1].children[0].identifier === 'aa','Matches at the correct location');
+  assert.ok(matches[2].children[0].identifier === 'aaa','Matches at the correct location');
+  assert.ok(matches[3].children[0].identifier === 'aaaa','Matches at the correct location');
+  assert.ok(matches[0].children.length === 1,'Matches at the correct location');
+  assert.ok(matches[1].children.length === 1,'Matches at the correct location');
+  assert.ok(matches[2].children.length === 1,'Matches at the correct location');
+  assert.ok(matches[3].children.length === 1,'Matches at the correct location');
+
+});
