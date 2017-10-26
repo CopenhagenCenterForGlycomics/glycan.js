@@ -1,3 +1,10 @@
+import * as debug from 'debug-any-level';
+
+
+const module_string='glycanjs:tracing';
+
+const log = debug(module_string);
+
 let noop = () => {};
 
 let wrap_monosaccharide = sugar => {
@@ -89,64 +96,88 @@ let attach_via_cloning = (result_sugar,attachment,mapped_list,child) => {
   return clone_results.sugar;
 };
 
+let residues_in_mapping = (sugar,mapped_list) => {
+  return sugar.composition().filter( residue => mapped_list.indexOf(residue.original) >= 0 );
+};
+
 
 let trace_sugar = function(result,search,search_root,template,comparator) {
   let cursor_mapping = {};
   let sugar_sets = [];
   let attachment_to_sugar = new WeakMap();
-  console.log('Tracing',template.sequence,'onto',search.sequence);
-  let res = [...template.breadth_first_traversal(template.root, cursor => {
-    console.log('Template cursor is',cursor.identifier);
+
+  log.info('Tracing',template.sequence,'onto',search.sequence,'moving cursor over template');
+
+  let successful_mappings = [...template.breadth_first_traversal(template.root, cursor => {
+
+    log.info('Template cursor is positioned at',cursor.identifier);
+
     attachment_to_sugar = new WeakMap();
+
     if ( ! cursor.parent ) {
-      console.log('We map this to the search root that is',search_root.identifier);
+      log.info('The cursor is at the root - the search sugar is at',search_root.identifier);
       sugar_sets.push(build_sugar(result,search,[ search_root ]));
       cursor_mapping[cursor] = [ sugar_sets[0].composition()[0].original ];
-      return cursor;
+      log.info('Done with this cursor',cursor.identifier);
+      return sugar_sets.length > 0;
+    } else {
+      cursor_mapping[cursor] = [];
     }
 
-    console.log('Mapped parent is',cursor_mapping[cursor.parent].map( res => res.identifier));
+    log.info('Residues in the search tree that correspond to the cursor parent are',cursor_mapping[cursor.parent].map( res => res.identifier));
+
     let wanted_linkage = cursor.parent.linkageOf(cursor);
 
-    // We only want the sugar sets that have mapped the parent residue of the current cursor
-    sugar_sets = sugar_sets.filter( sug => sug.composition().filter( residue => cursor_mapping[cursor.parent].indexOf(residue.original) >= 0 ).length > 0 );
+    // If one of the result WrappedSugars doesn't contain the place where we will
+    // attach monosaccharides (i.e. a monosaccharide wrapping the search sugar parent
+    // corresponding to the parent of the cursor), we don't want that sugar
 
-    console.log('Current sets of sugars are',sugar_sets);
+    sugar_sets = sugar_sets.filter( sug => residues_in_mapping(sug,cursor_mapping[cursor.parent]).length > 0);
+
+    log.info('Current sets of sugars are',sugar_sets);
 
     // The attachment points on the results are found by finding the monosaccharides corresponding to cursor parent
     let attachment_points = sugar_sets.map( sugar => {
-      let attach_point = sugar.composition().filter( residue => cursor_mapping[cursor.parent].indexOf(residue.original) >= 0 )[0];
-      attachment_to_sugar.set(attach_point,sugar);
-      return attach_point;
+      let attach_point = residues_in_mapping(sugar,cursor_mapping[cursor.parent]);
+      if (attach_point.length > 1) {
+        throw new Error('Tracing mapped a template residue to more than one residue in the search sugar');
+      }
+      attachment_to_sugar.set(attach_point[0],sugar);
+      return attach_point[0];
     });
 
     sugar_sets = [];
-    cursor_mapping[cursor] = [];
 
-    console.log('List of attachment points (i.e. search roots) on the sets of sugars',attachment_points.map( res => res.identifier ));
+    log.info('We need to find children of the attachment points linked via a',wanted_linkage,'linkage');
 
     for (let attachment of attachment_points) {
       // Get all the children that could possibly match this linkage we are after
       let search_parent = attachment.original;
-      console.log('Testing an attachment point for linkage',search_parent.identifier,wanted_linkage);
+
+      log.info('Attachment point is a wrapped residue with identifier',search_parent.identifier);
+
       let search_kids = wanted_linkage == 0 ? search_parent.children : search_parent.child_linkages.get(wanted_linkage);
 
-      // Check to find all the children matching the original children at the attachment point
-      console.log('We have a set of kids of length',(search_kids || []).length);
+      log.info('We want to find a match for the cursor from within',(search_kids || []).length,'possible child residues');
+
+      // Check to find all the wrapped children of the attachment point matching against the cursor
       let valid_search_kids = [].concat(search_kids).filter( comparator.bind(null,cursor) ).filter( res => res );
 
       if (valid_search_kids.length >= 1) {
         let attach_child_residue = attach_via_cloning.bind(null,attachment_to_sugar.get(attachment),attachment,cursor_mapping[cursor]);
-        console.log('Valid search kids are',valid_search_kids);
+        log.info('Valid children in search sugar are',valid_search_kids.map( res => res.identifier ));
         let sets_of_new_sugars = valid_search_kids.map( attach_child_residue );
         sugar_sets = sugar_sets.concat(sets_of_new_sugars);
-        console.log('Now have',sugar_sets.length,'valid sets');
       }
     }
+    return sugar_sets.length > 0;
   })];
-  console.log('Ignore',res.length);
+
+  log.info('We mapped',successful_mappings.length,'out of',template.composition().length,'residues');
+
   // Careful about which array we are pointing to here.
-  console.log(sugar_sets.map( sug => sug.sequence ));
+  log.info(sugar_sets.map( sug => sug.sequence ));
+
   return sugar_sets;
 };
 

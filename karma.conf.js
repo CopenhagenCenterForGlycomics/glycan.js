@@ -2,7 +2,6 @@
 // Generated on Mon Apr 20 2015 22:29:04 GMT+0200 (CEST)
 
 module.exports = function(config) {
-
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -26,9 +25,13 @@ module.exports = function(config) {
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
       'js/**/*.js',
+      'test/test.js',
       'test/**/*.js'
     ],
 
+    client: {
+        qunit: { debug: process.env.DEBUG }
+    },
 
     // list of files to exclude
     exclude: [

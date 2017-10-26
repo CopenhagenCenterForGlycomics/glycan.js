@@ -1,5 +1,7 @@
 /*global QUnit,Promise,window*/
 
+import * as debug from 'debug-any-level';
+
 // Polyfill in the bind function, just in case we
 // don't have it available
 
@@ -30,6 +32,10 @@ if ( ! window.Promise ) {
     window.Promise = require('promise-polyfill');
 }
 
+if ( QUnit.config && QUnit.config.debug ) {
+  debug.enable(QUnit.config.debug);
+  debug.useColors = () => false;
+}
 
 // We probably want to have promises to handle
 // any async stuff
