@@ -36,7 +36,7 @@ QUnit.test( 'Render odd branched multisugar' , function( assert ) {
 
 QUnit.test( 'Render tall branched sugar' , function( assert ) {
   var sugar = new IupacSugar();
-  sugar.sequence = 'A(b1-3)[B(b1-3)][C(b1-3)][D(b1-3)]E(b1-3)F(b1-3)G(b1-3)[H(b1-3)[I(b1-3)][J(b1-3)][K(b1-3)]L(b1-3)M(b1-3)N(b1-6)]R';
+  sugar.sequence = 'G(b1-3)[H(b1-3)][I(b1-3)][J(b1-3)]E(b1-3)C(b1-3)A(b1-3)[K(b1-3)[L(b1-3)][M(b1-3)][N(b1-3)]F(b1-3)D(b1-3)B(b1-6)]R';
   CondensedLayout.PerformLayout(sugar);
   assert.ok(true,'noop');
 });

@@ -1,5 +1,11 @@
 import QuadTree from '../lib/QuadTree';
 
+import * as debug from 'debug-any-level';
+
+const module_string='glycanjs:condensedlayout';
+
+const log = debug(module_string);
+
 let calculate_position = (item,layouts) => {
 
   const DELTA_X = 1;
@@ -12,7 +18,7 @@ let calculate_position = (item,layouts) => {
     r: 0.5
   };
 
-  position.collision = false;
+  position.collision = [];
 
   if (item.children.length > 1 && ! layouts.has(item) ) {
     position.spread_count = item.children.length;
@@ -36,7 +42,7 @@ let calculate_position = (item,layouts) => {
 
   if ( parent_position.spread ) {
     position.dy = parent_position.spread * DELTA_Y;
-    position.dx = DELTA_X*(position.item_index - 1 - Math.floor(parent_position.spread_count / 2) + 0.5*(1-(parent_position.spread_count % 2)));
+    position.dx = parent_position.spread * DELTA_X*(position.item_index - 1 - Math.floor(parent_position.spread_count / 2) + 0.5*(1-(parent_position.spread_count % 2)));
   }
 
   if (parent_position.grid_spread) {
@@ -80,7 +86,8 @@ let check_overlaps = (positions) => {
         continue;
       }
       let item_position = positions[item.idx].position;
-      if (item_position.collision && check_position.collision) {
+      if (item_position.collision.indexOf(check_position) >= 0 &&
+          check_position.collision.indexOf(item_position) >= 0 ) {
         continue;
       }
       let dx = check_position.x - item_position.x;
@@ -88,18 +95,25 @@ let check_overlaps = (positions) => {
       let radii = check_position.r + item_position.r;
 
       let colliding = (( dx * dx )  + ( dy * dy )) < (radii * radii);
-      item_position.collision = item_position.collision || colliding;
-      check_position.collision = check_position.collision || colliding;
+      if (colliding) {
+        item_position.collision.push(check_position);
+        check_position.collision.push(item_position);
+      }
     }
   }
 };
 
 let derive_item_position = (layout,item) => {
-        derive_position(layout.get(item),item.parent ? layout.get(item.parent) : null );
-        return { position: layout.get(item), item: item };
-      };
+  derive_position(layout.get(item),item.parent ? layout.get(item.parent) : null );
+  log.info('Position for',item.identifier,layout.get(item).x,layout.get(item).y);
+  return { position: layout.get(item), item: item };
+};
 
 let is_not_resolved = (resolved,overlapping) => ! resolved[overlapping];
+
+let map_get_item = (map,item) => map.get(item);
+
+let path_to_root = (sugar,start) => [...sugar.residues_to_root(start)];
 
 let CondensedLayout = class {
   static PerformLayout(renderable) {
@@ -109,9 +123,10 @@ let CondensedLayout = class {
     // increasing depth
     let items = [...renderable.breadth_first_traversal()];
 
-    let is_overlapping = 2;
+    let overlap_tries_remaining = 20;
 
-    while (is_overlapping > 0) {
+    while (overlap_tries_remaining >= 0) {
+      log.info('Looping to resolve overlaps on loop',overlap_tries_remaining--);
 
       for (let item of items) {
         calculate_position(item,layout);
@@ -121,42 +136,53 @@ let CondensedLayout = class {
 
       check_overlaps(positions);
 
-      let overlapping = positions.filter( position => position.position.collision ).map( overlap => overlap.item );
+      let overlapping = positions.filter( position => position.position.collision.length > 0 ).map( overlap => overlap.item );
 
-      console.log(renderable.sequence);
+      let positions_overlap_map = new WeakMap();
       for (let item of overlapping) {
-        console.log(item.identifier,layout.get(item));
-      }
-
-      is_overlapping--;
-      if (is_overlapping === 0) {
-        throw new Error('Could not resolve layout');
+        positions_overlap_map.set(layout.get(item),item);
       }
 
       if ( overlapping.length < 1) {
-        is_overlapping = 0;
+        log.info('No overlaps to resolve - breaking');
+        break;
       }
 
 
       let overlap_roots = new WeakMap();
 
       for (let item of overlapping) {
+        let colliding_parents = [].concat.apply([], layout.get(item)
+                                      .collision
+                                      .map( map_get_item.bind(null,positions_overlap_map) )
+                                      .map( path_to_root.bind(null,renderable) ));
+        log.info(item.identifier,
+                    'collides with',
+                    colliding_parents[0].identifier,
+                    'at',
+                    layout.get(item).x,layout.get(item).y,
+                    layout.get(item).collision.map( coll => [coll.x,coll.y]),
+                    'which is a child of',
+                    colliding_parents.map(res => res.identifier));
         for (let parent of renderable.residues_to_root(item)) {
           if ( parent === item ) {
             continue;
           }
           if (! overlap_roots.has(parent)) {
             overlap_roots.set(parent,[]);
-            console.log('Overlap root of',parent.identifier);
           }
-          overlap_roots.get(parent).push(item);
+          // First parent this residue collides with
+          if (colliding_parents.indexOf(parent) >= 0) {
+            log.info('Overlap root of',parent.identifier,'for',item.identifier);
+            overlap_roots.get(parent).push(item);
+            break;
+          }
         }
       }
 
       let resolved = {};
 
-      for (let item of items.reverse()) {
-        console.log(item.identifier);
+      for (let item of [].concat(items).reverse()) {
         if (overlap_roots.has(item)) {
           // We need to know *who* it is overlapping with!
 
@@ -165,8 +191,8 @@ let CondensedLayout = class {
             resolved[to_resolve] = true;
           }
           if (unresolved.length > 0) {
-            console.log('Spreading at',item.identifier);
             layout.get(item).spread = layout.get(item).spread + 1;
+            log.info('Increasing spread for',item.identifier,'to',layout.get(item).spread);
           }
         }
       }
@@ -174,8 +200,10 @@ let CondensedLayout = class {
     }
 
     console.log(renderable.sequence);
-    for (let item of items) {
-      console.log(item.identifier,layout.get(item));
+    if (log.enabled) {
+      for (let item of items) {
+        log.info('Laid out',item.identifier,layout.get(item));
+      }
     }
 
     // layout the root
