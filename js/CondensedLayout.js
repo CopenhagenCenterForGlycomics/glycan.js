@@ -184,8 +184,6 @@ let CondensedLayout = class {
 
       for (let item of [].concat(items).reverse()) {
         if (overlap_roots.has(item)) {
-          // We need to know *who* it is overlapping with!
-
           let unresolved = overlap_roots.get(item).filter( is_not_resolved.bind(null,resolved) );
           for (let to_resolve of unresolved) {
             resolved[to_resolve] = true;
@@ -199,8 +197,8 @@ let CondensedLayout = class {
 
     }
 
-    console.log(renderable.sequence);
     if (log.enabled) {
+      log.info('Done layout for',renderable.sequence);
       for (let item of items) {
         log.info('Laid out',item.identifier,layout.get(item));
       }
