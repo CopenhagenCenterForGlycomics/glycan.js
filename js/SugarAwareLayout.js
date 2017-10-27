@@ -1,4 +1,4 @@
-import {CondensedLayout} from './CondensedLayout';
+import CondensedLayout from './CondensedLayout';
 
 class SugarAwareLayout extends CondensedLayout {
   performLayout() {

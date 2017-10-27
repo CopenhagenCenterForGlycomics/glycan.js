@@ -1,6 +1,9 @@
 // Define the position of the thing
 // in some user space
 
+const position_symbol = Symbol('position');
+
+
 let Renderable = class {
   get rendered() {
     // Get the actual rendered element / reference to element
@@ -10,13 +13,13 @@ let Renderable = class {
 
   }
   set cx(cx) {
-    this.cx=cx;
+    this[position_symbol].cx = cx;
   }
   get cy() {
 
   }
   set cy(cy) {
-    this.cy=cy;
+    this[position_symbol].cy = cy;
   }
   get radius() {
 

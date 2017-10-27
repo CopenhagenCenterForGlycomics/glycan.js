@@ -24,9 +24,10 @@ module.exports = function(config) {
     // that the polyfills are loaded, ready for the tests.
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
+      'lib/**/*.js',
       'js/**/*.js',
       'test/test.js',
-      'test/**/*.js'
+      'test/**/*-basicLayout.js'
     ],
 
     client: {
@@ -42,6 +43,7 @@ module.exports = function(config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
         'js/**/*.js' : ['browserify'],
+        'lib/**/*.js' : ['browserify'],
         'test/**/test.js' : ['browserify'],
         'test/**/test-*.js' : ['browserify']
     },
