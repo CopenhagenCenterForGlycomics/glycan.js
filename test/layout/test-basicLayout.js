@@ -40,3 +40,11 @@ QUnit.test( 'Render tall branched sugar' , function( assert ) {
   CondensedLayout.PerformLayout(sugar);
   assert.ok(true,'noop');
 });
+
+QUnit.test( 'N-linked bisecting GlcNAc' , function( assert ) {
+  var sugar = new IupacSugar();
+  sugar.sequence = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
+  CondensedLayout.PerformLayout(sugar);
+  assert.ok(true,'noop');
+});
+

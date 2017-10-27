@@ -206,7 +206,7 @@ let CondensedLayout = class {
 
     // layout the root
     // layout children
-    return renderable;
+    return layout;
   }
 };
 
