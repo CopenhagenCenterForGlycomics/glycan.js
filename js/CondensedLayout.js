@@ -6,31 +6,23 @@ const module_string='glycanjs:condensedlayout';
 
 const log = debug(module_string);
 
-let calculate_position = (item,layouts) => {
+let calculate_position = (sugar,item,position={dx:0,dy:0,r:0.5},parent_position={}) => {
 
   const DELTA_X = 1;
   const DELTA_Y = 1;
 
   // upwards = positive y
-  let position = layouts.has(item) ? layouts.get(item) : {
-    dx: 0,
-    dy: 0,
-    r: 0.5
-  };
 
   position.collision = [];
 
-  if (item.children.length > 1 && ! layouts.has(item) ) {
+  if (item.children.length > 1 && ! position.spread_count ) {
     position.spread_count = item.children.length;
     position.spread = 1;
   }
 
   if ( ! item.parent ) {
-    layouts.set(item,position);
-    return;
+    return position;
   }
-
-  let parent_position = layouts.get(item.parent);
 
   position.dy = DELTA_Y;
   position.dx = 0;
@@ -49,7 +41,7 @@ let calculate_position = (item,layouts) => {
     position.dx = DELTA_X*position.item_index;
   }
 
-  layouts.set(item,position);
+  return position;
 };
 
 let derive_position = (position,parent_position) => {
@@ -116,8 +108,11 @@ let map_get_item = (map,item) => map.get(item);
 let path_to_root = (sugar,start) => [...sugar.residues_to_root(start)];
 
 let CondensedLayout = class {
-  static PerformLayout(renderable) {
+  static LayoutMonosaccharide(renderable,monosaccharide,position,parent_position) {
+    return calculate_position(renderable,monosaccharide,position,parent_position);
+  }
 
+  static PerformLayout(renderable) {
     let layout = new WeakMap();
     // Items in the tree based upon
     // increasing depth
@@ -129,7 +124,9 @@ let CondensedLayout = class {
       log.info('Looping to resolve overlaps on loop',overlap_tries_remaining--);
 
       for (let item of items) {
-        calculate_position(item,layout);
+        let current_layout = layout.has(item) ? layout.get(item) : undefined;
+        let parent_layout = (item.parent && layout.has(item.parent)) ? layout.get(item.parent) : undefined;
+        layout.set( item, this.LayoutMonosaccharide(renderable,item,current_layout,parent_layout) );
       }
 
       let positions = items.map( derive_item_position.bind(null,layout) );

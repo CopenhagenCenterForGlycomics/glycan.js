@@ -3,6 +3,7 @@
 import Sugar from '../../js/Sugar';
 import {IO as Iupac} from '../../js/CondensedIupac';
 import CondensedLayout from '../../js/CondensedLayout';
+import SugarAwareLayout from '../../js/SugarAwareLayout';
 
 
 class IupacSugar extends Iupac(Sugar) {}
@@ -44,7 +45,7 @@ QUnit.test( 'Render tall branched sugar' , function( assert ) {
 QUnit.test( 'N-linked bisecting GlcNAc' , function( assert ) {
   var sugar = new IupacSugar();
   sugar.sequence = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
-  CondensedLayout.PerformLayout(sugar);
+  SugarAwareLayout.PerformLayout(sugar);
   assert.ok(true,'noop');
 });
 
