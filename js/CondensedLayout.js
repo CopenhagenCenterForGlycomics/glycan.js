@@ -6,10 +6,12 @@ const module_string='glycanjs:condensedlayout';
 
 const log = debug(module_string);
 
+const DELTA_X = 1;
+const DELTA_Y = -1;
+
+
 let calculate_position = (sugar,item,position={dx:0,dy:0,r:0.5},parent_position={}) => {
 
-  const DELTA_X = 1;
-  const DELTA_Y = 1;
 
   // upwards = positive y
 
