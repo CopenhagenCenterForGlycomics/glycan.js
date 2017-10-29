@@ -23,13 +23,16 @@
     "precommit-hook": "^3.0.0",
     "promise-polyfill": "^2.0.2",
     "qunit": "^0.7.6",
-    "qunitjs": "^1.18.0"
+    "qunitjs": "^1.18.0",
+    "watchify": "^3.9.0"
   },
   "scripts": {
     "jshint-pre-commit": "./scripts/jshint-pre-commit.sh",
     "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
     "build": "./node_modules/babel-cli/bin/babel.js js -d dist",
-    "build-watch": "./node_modules/babel-cli/bin/babel.js js --watch -d dist",
+    "build-watch": "./node_modules/babel-cli/bin/babel.js lib js --watch -d dist",
+    "build-watch-web": "./node_modules/watchify/bin/cmd.js js/glycan.js -o glycan-bundle.js -t [ babelify --presets [ env ] ] -v",
+    "server": "python -m SimpleHTTPServer",
     "lint": "jshint .",
     "validate": "npm ls"
   },
