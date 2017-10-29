@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sviewer</title>
+	<script type="text/javascript" src="node_modules/babel-polyfill/dist/polyfill.js"></script>
+	<script type="text/javascript" src="glycan-bundle.js"></script>
+</head>
+<body>
+	<textarea id="seq" >GlcNAc(a2-3)[GlcNAc(b1-4)]Gal(b1-3)GlcNAc</textarea>
+	<div id="output" style="position:fixed; width: 200px; height: 300px;">
+	</div>
+<script type="text/javascript">
+	window.onload = function() {
+		let sug = new Glycan.IupacSugar();
+		sug.sequence = document.getElementById('seq').value;
+		let renderer = new Glycan.SVGRenderer(document.getElementById('output'),Glycan.SugarAwareLayout);
+		renderer.addSugar(sug);
+		renderer.refresh();
+	};
+</script>
+</body>
+</html>
