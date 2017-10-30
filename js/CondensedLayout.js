@@ -40,7 +40,9 @@ let calculate_position = (sugar,item,position={dx:0,dy:0,r:0.5},parent_position=
   }
 
   // Make room for linkage
-  position.dy += 0.5*DELTA_Y;
+  if (! parent_position.spread || parent_position.spread < 2 ) {
+    position.dy += 0.5*DELTA_Y;
+  }
 
   if (parent_position.grid_spread) {
     position.dx = DELTA_X*position.item_index;
