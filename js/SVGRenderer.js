@@ -30,15 +30,6 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
                  (parent_pos.y + parent_pos.height / 2));
 
 
-  // let new_line = canvas.line( 10*(parent_pos.x + parent_pos.width / 2),
-  //              10*(parent_pos.y + parent_pos.height / 2),
-  //              10*(parent_pos.x + parent_pos.width / 2 + gradient * ((child_pos.y + child_pos.height / 2) - ( parent_pos.y + parent_pos.height / 2 ))),
-  //              10*(child_pos.y + child_pos.height / 2 ));
-
-  // new_line.setAttribute('stroke' ,'#f00');
-  // new_line.setAttribute('stroke-width' ,'1');
-
-
   let xpos = ( gradient * ( 0.75*(child_pos.y - (parent_pos.height + parent_pos.y)) + (parent_pos.height / 2) ) );
 
   if (xpos === 0) {
@@ -62,6 +53,7 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     }
   }
   canvas.sendToBack(label);
+  return label;
 };
 
 const render_linkage = function(child_pos,parent_pos,child,parent,canvas) {
@@ -84,9 +76,14 @@ const render_linkage = function(child_pos,parent_pos,child,parent,canvas) {
 const render_sugar = function(sugar,layout_engine,canvas) {
   log.info('Laying out',sugar.sequence);
   let layout = layout_engine.PerformLayout(sugar);
+  let xvals = [];
+  let yvals = [];
   for (let residue of sugar.composition()) {
     let position = layout.get(residue);
-
+    xvals.push(position.x);
+    xvals.push(position.x+position.width);
+    yvals.push(position.y);
+    yvals.push(position.y+position.height);
     render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, canvas );
 
     let icon = canvas.use(`sugars.svg#${residue.identifier.toLowerCase()}`,position.x*10,position.y*10,position.width*10,position.height*10);
@@ -94,6 +91,11 @@ const render_sugar = function(sugar,layout_engine,canvas) {
       icon.setAttribute('transform',`rotate(90,${10*(position.x + position.width/2)},${10*(position.y + position.height/2)})`);
     }
   }
+  let min_x = Math.min(...xvals);
+  let min_y = Math.min(...yvals);
+  let width = Math.max(...xvals) - min_x;
+  let height = Math.max(...yvals) - min_y;
+  canvas.canvas.setAttribute('viewBox',`${10*min_x} ${10*min_y} ${10*width} ${10*height}`);
 };
 
 class SVGRenderer {

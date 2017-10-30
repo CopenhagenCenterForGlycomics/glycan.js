@@ -10,17 +10,26 @@
 		NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc
 		Gal(b1-3)[GlcNAc(b1-4)]GalNAc
 		NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Gal(b1-4)[NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Gal(b1-6)]GlcNAc
+		NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
-	<textarea id="seq" >NeuGc(a2-3)[GlcA(b1-?)]Gal(b1-4)Gal(b1-4)[NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Gal(b1-6)]GlcNAc</textarea>
+	<textarea id="seq" >NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc</textarea>
 	<div id="output" style="position:fixed; width: 200px; height: 300px;">
 	</div>
 <script type="text/javascript">
-	window.onload = function() {
+	let change_sequence = function(seq) {
 		let sug = new Glycan.IupacSugar();
-		sug.sequence = document.getElementById('seq').value;
+		sug.sequence = seq;
+		document.getElementById('output').innerHTML = '';
 		let renderer = new Glycan.SVGRenderer(document.getElementById('output'),Glycan.SugarAwareLayout);
 		renderer.addSugar(sug);
 		renderer.refresh();
+	};
+
+	window.onload = function() {
+		change_sequence(document.getElementById('seq').value);
+		document.getElementById('seq').onchange = function() {
+			change_sequence(this.value);
+		};
 	};
 </script>
 </body>
