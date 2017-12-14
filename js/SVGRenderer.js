@@ -29,6 +29,12 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
                  ((child_pos.y + child_pos.height / 2) -
                  (parent_pos.y + parent_pos.height / 2));
 
+  if (! isFinite(gradient)) {
+    gradient = 1.75;
+    if (child_pos.x > parent_pos.x) {
+      gradient *= -1;
+    }
+  }
 
   let xpos = ( gradient * ( 0.75*(child_pos.y - (parent_pos.height + parent_pos.y)) + (parent_pos.height / 2) ) );
 
@@ -38,6 +44,12 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
 
   let xcoord = 10*(xpos + parent_pos.x + parent_pos.width / 2);
   let ycoord = 10*(child_pos.y + child_pos.height + 0.1);
+  if (child_pos.y === parent_pos.y) {
+    ycoord = 10*(child_pos.y + child_pos.height - 0.125);
+    if ( ycoord > 2.5 ) {
+      ycoord = 2.5;
+    }
+  }
   let label = canvas.text( xcoord, ycoord, fancy_anomer+linkage);
   label.setAttribute('font-size','3');
   label.setAttribute('dominant-baseline','hanging');
@@ -87,8 +99,15 @@ const render_sugar = function(sugar,layout_engine,canvas) {
     render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, canvas );
 
     let icon = canvas.use(`sugars.svg#${residue.identifier.toLowerCase()}`,position.x*10,position.y*10,position.width*10,position.height*10);
+    let rotate_angle = 0;
+    if (position.rotate) {
+      rotate_angle = position.rotate;
+    }
     if (ROTATE) {
-      icon.setAttribute('transform',`rotate(90,${10*(position.x + position.width/2)},${10*(position.y + position.height/2)})`);
+      rotate_angle += 90;
+    }
+    if (rotate_angle !== 0) {
+      icon.setAttribute('transform',`rotate(${rotate_angle},${10*(position.x + position.width/2)},${10*(position.y + position.height/2)})`);
     }
   }
   let min_x = Math.min(...xvals);
