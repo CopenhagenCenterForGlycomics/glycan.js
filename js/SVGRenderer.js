@@ -30,9 +30,9 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
                  (parent_pos.y + parent_pos.height / 2));
 
   if (! isFinite(gradient)) {
-    gradient = 1.75;
+    gradient = 2;
     if (child_pos.x > parent_pos.x) {
-      gradient *= -1;
+      gradient = -2;
     }
   }
 
@@ -45,7 +45,7 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   let xcoord = 10*(xpos + parent_pos.x + parent_pos.width / 2);
   let ycoord = 10*(child_pos.y + child_pos.height + 0.1);
   if (child_pos.y === parent_pos.y) {
-    ycoord = 10*(child_pos.y + child_pos.height - 0.125);
+    ycoord = 10*(child_pos.y + 0.125);// + child_pos.height - 0.125);
     if ( ycoord > 2.5 ) {
       ycoord = 2.5;
     }

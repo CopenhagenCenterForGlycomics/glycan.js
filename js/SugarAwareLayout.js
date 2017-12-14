@@ -14,7 +14,9 @@ class SugarAwareLayout extends CondensedLayout {
       position.dx = [2,3].indexOf(res.parent.linkageOf(res)) >= 0 ? -1 * DELTA_X : DELTA_X;
       if (res.identifier == 'Fuc') {
         position.rotate = (position.dx < 0 ) ? 90 : -90;
+        return position;
       }
+      position.dx += (position.dx < 0) ? -0.25 : 0.25;
       return position;
     }
     if (res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0) {
