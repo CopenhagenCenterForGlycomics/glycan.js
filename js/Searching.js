@@ -74,7 +74,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
     new_root.addChild(subtree.linkage,subtree.root);
     subtree.root = new_root;
   }));
-
+  log.info('Wildcard matching root',sugar.sequence,root_sugar.sequence);
   let root_result = match_fixed_paths(sugar,root_sugar, comparator);
   let result = wildcard_subtrees.map( subtree_set => {
     return subtree_set.map( subtree => {
@@ -82,9 +82,17 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       roots = roots.filter(root => ((! root.parent) || (root.parent.linkageOf(root) == subtree.linkage)) )
                    .filter( root => {
                       let parents = [...sugar.residues_to_root(root)];
+                      if (parents.length) {
+                        throw new Error('FIXME');                        
+                      }
+                      // We should store the actual root monosaccharide here
+                      // return { root: root, parent_root: root_result_val };
                       return root_result.reduce((result,val) => (result || (parents.indexOf(val) >= 0)),false);
                    });
-      return roots;
+      // sugar.trace(subtree, root.root, comparator )
+      // which gets merged with sugar.trace( root_sugar, root.parent_root, comparator);
+      roots = roots.map( root => sugar.trace( subtree, root, comparator ));
+      return flatten(roots);
     });
   });
   return flatten(flatten(result));
