@@ -133,7 +133,7 @@ let CondensedLayout = class {
       for (let item of items) {
         let current_layout = layout.has(item) ? layout.get(item) : undefined;
         let parent_layout = (item.parent && layout.has(item.parent)) ? layout.get(item.parent) : undefined;
-        layout.set( item, this.LayoutMonosaccharide(renderable,item,current_layout,parent_layout) );
+        layout.set( item, this.LayoutMonosaccharide(renderable,item,current_layout,parent_layout, layout ) );
       }
 
       let positions = items.map( derive_item_position.bind(null,layout) );
