@@ -33,6 +33,7 @@
     "build-watch": "./node_modules/babel-cli/bin/babel.js lib js --watch -d dist",
     "build-watch-web": "./node_modules/watchify/bin/cmd.js js/glycan.js -o glycan-bundle.js -t [ babelify --presets [ env ] ] -v",
     "server": "python -m SimpleHTTPServer",
+    "start" : "npm run-script build-watch-web & npm run-script server",
     "lint": "jshint .",
     "validate": "npm ls"
   },
