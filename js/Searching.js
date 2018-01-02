@@ -96,7 +96,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
   let root_trees = flatten(root_result.map( root => {
     return sugar.trace(root_sugar, root, comparator);
   }));
-
+  log.info('Sequences of root sequence matched',root_trees.map( rt => rt.sequence ));
   // Grab the original leaves for the root match subtrees
   let root_trees_by_leaf_original = map_leaf_originals(root_trees);
   let result = wildcard_subtrees.map( subtree_set => {

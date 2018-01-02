@@ -93,6 +93,30 @@ QUnit.test( 'Finding lots of stubby branch' , function( assert ) {
   assert.ok(matches[3].sequence === 'aaaa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
 });
 
+QUnit.test( 'Finding lots of stubby branch with a stem' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'a(a1-2)[aa(a1-2)][aaa(a1-2)][aaaa(a1-2)]b(a1-2)r';
+
+  let search_sugar = new IupacSugar();
+  search_sugar.sequence = 'A(a1-2)*(u?-?)B(a1-2)R';
+  let matches = sugar.match_sugar_pattern(search_sugar, (a,b) => {
+    if (a.identifier === '*' || b.identifier === '*') {
+      return true;
+    }
+    return firstchar_comparator(a,b);
+  });
+  console.log(matches.length);
+  assert.ok(matches.length ===  4,'Matches all subtrees');
+  assert.ok(matches[0].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[1].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[2].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[3].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[0].sequence === 'a(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[1].sequence === 'aa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[2].sequence === 'aaa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[3].sequence === 'aaaa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+});
+
 QUnit.test( 'Tracing lots of stubby branch' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'a(a1-2)[aa(a1-2)][aaa(a1-2)][aaaa(a1-2)]r';
