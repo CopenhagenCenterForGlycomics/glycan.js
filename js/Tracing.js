@@ -42,6 +42,11 @@ class TracedMonosaccharide extends Monosaccharide {
     clone() {
       let cloned = new this.constructor(this.original);
       cloned.original = this.original;
+      for (let prop in this) {
+        if (this.hasOwnProperty(prop)) {
+          cloned[prop] = this[prop];
+        }
+      }
       return cloned;
     }
 }
@@ -55,12 +60,21 @@ let clone_and_add_monosaccharide = function(wrapped_sugar,parent,child) {
   let new_sugar = wrapped_sugar.clone();
   parent = new_sugar.composition().filter( res => res.original === parent.original )[0];
   let wrapped_child = new wrapped_sugar.constructor.Monosaccharide(child);
+  wrapped_child = Object.assign(wrapped_child,child);
+
   parent.addChild(parent.original.linkageOf(child),wrapped_child);
+
   return { sugar: new_sugar, child: wrapped_child};
 };
 
-let attach_via_cloning = (result_sugar,attachment,mapped_list,child) => {
+let attach_via_cloning = (result_sugar,attachment,mapped_list,attrs,child) => {
   let clone_results = clone_and_add_monosaccharide(result_sugar,attachment,child);
+  for (let prop in attrs) {
+    if (attrs.hasOwnProperty(prop)) {
+      log.info('Copying property',prop);
+      clone_results.child[prop] = attrs[prop];
+    }
+  }
   mapped_list.push(child);
   return clone_results.sugar;
 };
@@ -86,6 +100,11 @@ let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
       log.info('The cursor is at the root - the search sugar is at',search_root.identifier);
       sugar_sets.push(initialise_sugar(new ResultClass(),search_root));
       cursor_mapping[cursor] = [ sugar_sets[0].composition()[0].original ];
+      for (let prop in cursor) {
+        if (cursor.hasOwnProperty(prop)) {
+          sugar_sets[0].composition()[0][prop] = cursor[prop];
+        }
+      }
       log.info('Done with this cursor',cursor.identifier);
       return sugar_sets.length > 0;
     } else {
@@ -132,7 +151,7 @@ let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
       let valid_search_kids = [].concat(search_kids).filter( comparator.bind(null,cursor) ).filter( res => res );
 
       if (valid_search_kids.length >= 1) {
-        let attach_child_residue = attach_via_cloning.bind(null,attachment_to_sugar.get(attachment),attachment,cursor_mapping[cursor]);
+        let attach_child_residue = attach_via_cloning.bind(null,attachment_to_sugar.get(attachment),attachment,cursor_mapping[cursor],Object.assign({},cursor));
         log.info('Valid children in search sugar are',valid_search_kids.map( res => res.identifier ));
         let sets_of_new_sugars = valid_search_kids.map( attach_child_residue );
         sugar_sets = sugar_sets.concat(sets_of_new_sugars);

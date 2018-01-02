@@ -56,14 +56,14 @@ let map_leaf_originals = function(trees) {
   let result = new WeakMap();
   for (let tree of trees) {
     for (let leaf of tree.leaves()) {
-      result.set(leaf.original,tree);
+      if (leaf.is_wildcard) {
+        log.info('Wildcard position is',leaf.original.identifier);
+        result.set(leaf.original,tree);
+        result.set(leaf.parent.original,tree);
+      }
     }
   }
   return result;
-};
-
-let filter_original = function(target,traced_monosaccharide) {
-  return traced_monosaccharide.original === target;
 };
 
 let match_wildcard_paths = function(sugar,pattern,comparator) {
@@ -80,6 +80,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
 
   root_sugar.composition().filter( res => res.identifier === '*').forEach( wildcard => {
     wildcard.children.map( kid => wildcard.removeChild(wildcard.linkageOf(kid),kid));
+    wildcard.is_wildcard = true;
   });
 
   wildcard_subtrees.forEach( subtree_set => subtree_set.forEach( subtree => {
@@ -97,11 +98,16 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
     return sugar.trace(root_sugar, root, comparator);
   }));
   log.info('Sequences of root sequence matched',root_trees.map( rt => rt.sequence ));
+  root_trees.forEach( rt => {
+    let wildcard = rt.composition().filter( res => res.is_wildcard )[0];
+    log.info('Wildcard for root tree is ',wildcard,wildcard.parent.identifier);
+  });
   // Grab the original leaves for the root match subtrees
   let root_trees_by_leaf_original = map_leaf_originals(root_trees);
   let result = wildcard_subtrees.map( subtree_set => {
     return subtree_set.map( subtree => {
       let roots = match_fixed_paths(sugar,subtree, comparator);
+      log.info('Subtree match roots',roots.map( r => r.identifier ));
       roots = roots.filter(root => ((! root.parent) || (root.parent.linkageOf(root) == subtree.linkage)) )
                    .map( root => {
                       if (root_result.indexOf(root) >= 0) {
@@ -124,7 +130,10 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
         let grafted_results = [];
         for (let traced_subtree of subtree_results) {
           let result_tree = traced_parent.clone();
-          let graft_residue = result_tree.composition().filter( filter_original.bind(null,root_pair.parent_leaf) )[0];
+          let graft_residue = result_tree.composition().filter( res => res.is_wildcard)[0];
+          if (graft_residue.parent.original === traced_subtree.root.original) {
+            graft_residue = graft_residue.parent;
+          }
           graft_residue.parent.replaceChild(graft_residue,traced_subtree.root);
           grafted_results.push(result_tree);
         }

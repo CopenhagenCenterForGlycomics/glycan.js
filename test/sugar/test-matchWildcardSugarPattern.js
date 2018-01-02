@@ -27,6 +27,23 @@ QUnit.test( 'Finding a single monosaccharide match' , function( assert ) {
   assert.ok(matches[0].sequence === 'a(a1-2)b(a1-2)r','Matches the correct subtree');
 });
 
+QUnit.test( 'Finding a stemmed monosaccharide match' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'a(a1-2)b(a1-2)c(a1-2)r';
+
+  let search_sugar = new IupacSugar();
+  search_sugar.sequence = 'A(a1-2)*(u?-?)C(a1-2)R';
+  let matches = sugar.match_sugar_pattern(search_sugar, (a,b) => {
+    if (a.identifier === '*' || b.identifier === '*') {
+      return true;
+    }
+    return firstchar_comparator(a,b);
+  });
+  assert.ok(matches.length === 1,'Matches single location');
+  assert.ok(matches[0].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[0].sequence === 'a(a1-2)b(a1-2)c(a1-2)r','Matches the correct subtree');
+});
+
 QUnit.test( 'Finding a branched monosaccharide match' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'a(a1-2)b(a1-2)[aa(a1-2)bb(a1-2)cc(a1-2)]r';
@@ -111,10 +128,10 @@ QUnit.test( 'Finding lots of stubby branch with a stem' , function( assert ) {
   assert.ok(matches[1].root.identifier === 'r','Matches at the correct location');
   assert.ok(matches[2].root.identifier === 'r','Matches at the correct location');
   assert.ok(matches[3].root.identifier === 'r','Matches at the correct location');
-  assert.ok(matches[0].sequence === 'a(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
-  assert.ok(matches[1].sequence === 'aa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
-  assert.ok(matches[2].sequence === 'aaa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
-  assert.ok(matches[3].sequence === 'aaaa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[0].sequence === 'a(a1-2)*(u?-?)b(a1-2)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[1].sequence === 'aa(a1-2)*(u?-?)b(a1-2)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[2].sequence === 'aaa(a1-2)*(u?-?)b(a1-2)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[3].sequence === 'aaaa(a1-2)*(u?-?)b(a1-2)r','Matches the correct subtree including zero-length placeholder');
 });
 
 QUnit.test( 'Tracing lots of stubby branch' , function( assert ) {
