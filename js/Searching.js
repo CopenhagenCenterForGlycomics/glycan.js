@@ -110,9 +110,6 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       log.info('Subtree match roots',roots.map( r => r.identifier ));
       roots = roots.filter(root => ((! root.parent) || (root.parent.linkageOf(root) == subtree.linkage)) )
                    .map( root => {
-                      if (root_result.indexOf(root) >= 0) {
-                        return {root: root, parent_leaf: null };
-                      }
                       let parents = [...sugar.residues_to_root(root)];
                       for (let parent of parents) {
                         if (root_trees_by_leaf_original.get(parent)) {
@@ -123,18 +120,17 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
                    .filter( r => r );
       let result_trees = roots.map( root_pair => {
         let subtree_results = sugar.trace(subtree, root_pair.root, comparator );
-        if (root_pair.parent_leaf === null) {
-          return subtree_results;
-        }
         let traced_parent = root_trees_by_leaf_original.get(root_pair.parent_leaf);
         let grafted_results = [];
         for (let traced_subtree of subtree_results) {
           let result_tree = traced_parent.clone();
           let graft_residue = result_tree.composition().filter( res => res.is_wildcard)[0];
-          if (graft_residue.parent.original === traced_subtree.root.original) {
-            graft_residue = graft_residue.parent;
-          }
-          graft_residue.parent.replaceChild(graft_residue,traced_subtree.root);
+          let mono_class = subtree.constructor.Monosaccharide;
+          let new_wildcard = new mono_class('*');
+          new_wildcard.anomer = 'u';
+          new_wildcard.parent_linkage = 0;
+          traced_subtree.root.original = new_wildcard;
+          graft_residue.parent.replaceChild(graft_residue,traced_subtree.root,0);
           grafted_results.push(result_tree);
         }
         return grafted_results;

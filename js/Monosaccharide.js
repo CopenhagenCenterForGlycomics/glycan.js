@@ -175,7 +175,7 @@ export default class Monosaccharide {
     }
   }
 
-  replaceChild(child,new_child) {
+  replaceChild(child,new_child,override_position) {
     let position = this.linkageOf(child);
     let parent_pos = child.parent_linkage;
     let anomer = child.anomer;
@@ -183,7 +183,11 @@ export default class Monosaccharide {
     this.removeChild(position,child);
     new_child.parent_linkage = parent_pos;
     new_child.anomer = anomer;
-    this.addChild(position,new_child);
+    if (typeof override_position !== 'undefined') {
+      this.addChild(override_position,new_child);
+    } else {
+      this.addChild(position,new_child);
+    }
   }
 
   linkageOf(child) {
