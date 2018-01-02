@@ -23,7 +23,8 @@ QUnit.test( 'Finding a single monosaccharide match' , function( assert ) {
     return firstchar_comparator(a,b);
   });
   assert.ok(matches.length === 1,'Matches single location');
-  assert.ok(matches[0].identifier === 'b','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[0].sequence === 'a(a1-2)b(a1-2)r','Matches the correct subtree');
 });
 
 QUnit.test( 'Finding a branched monosaccharide match' , function( assert ) {
@@ -39,8 +40,11 @@ QUnit.test( 'Finding a branched monosaccharide match' , function( assert ) {
     return firstchar_comparator(a,b);
   });
   assert.ok(matches.length === 2,'Matches single location');
-  assert.ok(matches[0].identifier === 'b','Matches at the correct location');
-  assert.ok(matches[1].identifier === 'bb','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[1].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[0].sequence === 'a(a1-2)b(a1-2)r','Matches the correct subtree');
+  assert.ok(matches[1].sequence === 'aa(a1-2)bb(a1-2)r','Matches the correct subtree');
+
 });
 
 QUnit.test( 'Finding lots of same branch' , function( assert ) {
@@ -56,10 +60,14 @@ QUnit.test( 'Finding lots of same branch' , function( assert ) {
     return firstchar_comparator(a,b);
   });
   assert.ok(matches.length === 4,'Matches single location');
-  assert.ok(matches[0].identifier === 'b','Matches at the correct location');
-  assert.ok(matches[1].identifier === 'bb','Matches at the correct location');
-  assert.ok(matches[2].identifier === 'bbb','Matches at the correct location');
-  assert.ok(matches[3].identifier === 'bbbb','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[1].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[2].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[3].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[0].sequence === 'a(a1-2)b(a1-2)r','Matches the correct subtree');
+  assert.ok(matches[1].sequence === 'aa(a1-2)bb(a1-2)r','Matches the correct subtree');
+  assert.ok(matches[2].sequence === 'aaa(a1-2)bbb(a1-2)r','Matches the correct subtree');
+  assert.ok(matches[3].sequence === 'aaaa(a1-2)bbbb(a1-2)r','Matches the correct subtree');
 });
 
 QUnit.test( 'Finding lots of stubby branch' , function( assert ) {
@@ -74,8 +82,15 @@ QUnit.test( 'Finding lots of stubby branch' , function( assert ) {
     }
     return firstchar_comparator(a,b);
   });
-  assert.ok(matches.length ===  1,'Matches single location');
-  assert.ok(matches[0].identifier === 'r','Matches at the correct location');
+  assert.ok(matches.length ===  4,'Matches all subtrees');
+  assert.ok(matches[0].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[1].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[2].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[3].root.identifier === 'r','Matches at the correct location');
+  assert.ok(matches[0].sequence === 'a(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[1].sequence === 'aa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[2].sequence === 'aaa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
+  assert.ok(matches[3].sequence === 'aaaa(a1-2)*(u?-?)r','Matches the correct subtree including zero-length placeholder');
 });
 
 QUnit.test( 'Tracing lots of stubby branch' , function( assert ) {

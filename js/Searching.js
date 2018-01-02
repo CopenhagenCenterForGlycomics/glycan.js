@@ -99,7 +99,6 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
 
   // Grab the original leaves for the root match subtrees
   let root_trees_by_leaf_original = map_leaf_originals(root_trees);
-  console.log(root_trees.map( rt => rt.sequence ));
   let result = wildcard_subtrees.map( subtree_set => {
     return subtree_set.map( subtree => {
       let roots = match_fixed_paths(sugar,subtree, comparator);
@@ -119,23 +118,19 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       let result_trees = roots.map( root_pair => {
         let subtree_results = sugar.trace(subtree, root_pair.root, comparator );
         if (root_pair.parent_leaf === null) {
-          console.log(root_pair.root.identifier, 'Zero-length');
-          for (let traced_subtree of subtree_results) {
-            console.log(traced_subtree.sequence);
-          }
           return subtree_results;
         }
-        console.log(root_pair.root.identifier, root_pair.parent_leaf.identifier);
         let traced_parent = root_trees_by_leaf_original.get(root_pair.parent_leaf);
+        let grafted_results = [];
         for (let traced_subtree of subtree_results) {
           let result_tree = traced_parent.clone();
           let graft_residue = result_tree.composition().filter( filter_original.bind(null,root_pair.parent_leaf) )[0];
           graft_residue.parent.replaceChild(graft_residue,traced_subtree.root);
-          console.log(result_tree.sequence);
+          grafted_results.push(result_tree);
         }
+        return grafted_results;
       });
-      console.log(result_trees.length);
-      return [];
+      return flatten(result_trees);
     });
   });
   return flatten(flatten(result));
