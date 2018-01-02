@@ -121,14 +121,13 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       let result_trees = roots.map( root_pair => {
         let subtree_results = sugar.trace(subtree, root_pair.root, comparator );
         let traced_parent = root_trees_by_leaf_original.get(root_pair.parent_leaf);
+        let wildcard_res = root_sugar.composition().filter( res => res.is_wildcard )[0];
         let grafted_results = [];
         for (let traced_subtree of subtree_results) {
           let result_tree = traced_parent.clone();
           let graft_residue = result_tree.composition().filter( res => res.is_wildcard)[0];
-          let mono_class = subtree.constructor.Monosaccharide;
-          let new_wildcard = new mono_class('*');
-          new_wildcard.anomer = 'u';
-          new_wildcard.parent_linkage = 0;
+          let mono_class = result_tree.constructor.Monosaccharide;
+          let new_wildcard = new mono_class(wildcard_res);
           traced_subtree.root.original = new_wildcard;
           graft_residue.parent.replaceChild(graft_residue,traced_subtree.root,0);
           grafted_results.push(result_tree);
