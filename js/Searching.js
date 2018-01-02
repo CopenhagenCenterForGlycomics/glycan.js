@@ -80,19 +80,35 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
     return subtree_set.map( subtree => {
       let roots = match_fixed_paths(sugar,subtree, comparator);
       roots = roots.filter(root => ((! root.parent) || (root.parent.linkageOf(root) == subtree.linkage)) )
-                   .filter( root => {
+                   .map( root => {
                       let parents = [...sugar.residues_to_root(root)];
-                      if (parents.length) {
-                        throw new Error('FIXME');                        
+                      // In root_result we have an array of all the
+                      // roots of a search that match the first part of the search
+                      // We want to find the closest parent of this search
+                      // result that matches with a root of the first part of the search
+                      for (let parent of parents) {
+                        if (root_result.indexOf(parent) >= 0) {
+                          return { root: root, parent_root: parent };
+                        }
                       }
-                      // We should store the actual root monosaccharide here
-                      // return { root: root, parent_root: root_result_val };
-                      return root_result.reduce((result,val) => (result || (parents.indexOf(val) >= 0)),false);
-                   });
-      // sugar.trace(subtree, root.root, comparator )
+                   })
+                   .filter( r => r );
+      let result_trees = roots.map( root_pair => {
+        console.log(root_pair.root.identifier, root_pair.parent_root.identifier);
+        let subtree_results = sugar.trace(subtree, root_pair.root, comparator );
+        let parent_tree_results = sugar.trace( root_sugar, root_pair.parent_root, comparator );
+        for (let traced_subtree of subtree_results) {
+          for (let traced_parent of parent_tree_results) {
+            console.log(traced_subtree.sequence, traced_parent.sequence);
+          }
+        }
+        // Graft the subtree onto the parent_tree_result
+      });
+      console.log(result_trees.length);
       // which gets merged with sugar.trace( root_sugar, root.parent_root, comparator);
-      roots = roots.map( root => sugar.trace( subtree, root, comparator ));
-      return flatten(roots);
+      // roots = roots.map( root => sugar.trace( subtree, root, comparator ));
+      return [];
+      // return flatten(roots);
     });
   });
   return flatten(flatten(result));
