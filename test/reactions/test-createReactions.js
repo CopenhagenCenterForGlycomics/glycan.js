@@ -1,9 +1,12 @@
 /*global QUnit*/
 
 import Reaction from '../../js/Reaction';
+import Sugar from '../../js/Sugar';
+
 import {IO as Iupac} from '../../js/CondensedIupac';
 
 class IupacReaction extends Iupac(Reaction) {}
+class IupacSugar extends Iupac(Sugar) {}
 
 QUnit.module('Test that we can create Reactions from string representations', {
 });
@@ -32,6 +35,15 @@ QUnit.test( 'Throws error when reaction has incorrect location' , function( asse
   'Throws error when location is not possible');
 });
 
-// Reactions should be able to be tested against a Sugar
-// reaction.possible(sugar)
-// reaction.execute(sugar) (in-place modification)
+QUnit.test( 'Can execute a reaction' , function( assert ) {
+  let base_sequence = 'Gal(b1-2)Man(b1-3)[Gal(b1-2)Gal(b1-4)]GlcNAc';
+  let delta_sequence = 'Man(b1-4)';
+  let position = 'y3a';
+  let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
+  let reaction = new IupacReaction();
+  reaction.sequence = sequence;
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = base_sequence;
+  reaction.execute(test_sugar);
+  assert.ok(test_sugar.sequence === 'Man(b1-4)Gal(b1-2)Man(b1-3)[Gal(b1-2)Gal(b1-4)]GlcNAc');
+});

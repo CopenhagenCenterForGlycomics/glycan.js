@@ -75,7 +75,7 @@ let residues_in_mapping = (sugar,mapped_list) => {
 };
 
 let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
-  let cursor_mapping = {};
+  let cursor_mapping = new WeakMap();
   let sugar_sets = [];
   let attachment_to_sugar = new WeakMap();
 
@@ -90,15 +90,14 @@ let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
     if ( ! cursor.parent ) {
       log.info('The cursor is at the root - the search sugar is at',search_root.identifier);
       sugar_sets.push(initialise_sugar(new ResultClass(),search_root));
-      cursor_mapping[cursor] = [ sugar_sets[0].composition()[0].original ];
+      cursor_mapping.set(cursor,[ sugar_sets[0].composition()[0].original ]);
       sugar_sets[0].composition()[0].copyTagsFrom(cursor);
       log.info('Done with this cursor',cursor.identifier);
       return sugar_sets.length > 0;
     } else {
-      cursor_mapping[cursor] = [];
+      cursor_mapping.set(cursor, []);
     }
-
-    log.info('Residues in the search tree that correspond to the cursor parent are',cursor_mapping[cursor.parent].map( res => res.identifier));
+    log.info('Residues in the search tree that correspond to the cursor parent are',cursor_mapping.get(cursor.parent).map( res => res.identifier));
 
     let wanted_linkage = cursor.parent.linkageOf(cursor);
 
@@ -106,13 +105,13 @@ let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
     // attach monosaccharides (i.e. a monosaccharide wrapping the search sugar parent
     // corresponding to the parent of the cursor), we don't want that sugar
 
-    sugar_sets = sugar_sets.filter( sug => residues_in_mapping(sug,cursor_mapping[cursor.parent]).length > 0);
+    sugar_sets = sugar_sets.filter( sug => residues_in_mapping(sug,cursor_mapping.get(cursor.parent)).length > 0);
 
     log.info('Current sets of sugars are',sugar_sets);
 
     // The attachment points on the results are found by finding the monosaccharides corresponding to cursor parent
     let attachment_points = sugar_sets.map( sugar => {
-      let attach_point = residues_in_mapping(sugar,cursor_mapping[cursor.parent]);
+      let attach_point = residues_in_mapping(sugar,cursor_mapping.get(cursor.parent));
       if (attach_point.length > 1) {
         throw new Error('Tracing mapped a template residue to more than one residue in the search sugar');
       }
@@ -138,7 +137,7 @@ let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
       let valid_search_kids = [].concat(search_kids).filter( comparator.bind(null,cursor) ).filter( res => res );
 
       if (valid_search_kids.length >= 1) {
-        let attach_child_residue = attach_via_cloning.bind(null,attachment_to_sugar.get(attachment),attachment,cursor_mapping[cursor],cursor);
+        let attach_child_residue = attach_via_cloning.bind(null,attachment_to_sugar.get(attachment),attachment,cursor_mapping.get(cursor),cursor);
         log.info('Valid children in search sugar are',valid_search_kids.map( res => res.identifier ));
         let sets_of_new_sugars = valid_search_kids.map( attach_child_residue );
         sugar_sets = sugar_sets.concat(sets_of_new_sugars);
