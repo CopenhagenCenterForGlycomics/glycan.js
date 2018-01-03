@@ -224,6 +224,11 @@ export default class Monosaccharide {
     let result = new this.constructor(this.identifier);
     result[anomer_symbol] = this[anomer_symbol];
     result[parent_linkage_symbol] = this[parent_linkage_symbol];
+    for (let prop in this) {
+      if (this.hasOwnProperty(prop)) {
+        result[prop] = this[prop];
+      }
+    }
     return result;
   }
 
