@@ -4,6 +4,7 @@ let anomer_symbol = Symbol('anomer');
 let identifier_symbol = Symbol('identifier');
 let parent_linkage_symbol = Symbol('parent_linkage');
 let parent_symbol = Symbol('parent');
+let tags_symbol = Symbol('tags');
 
 const unknown_count_symbol = Symbol('unknown_count');
 const MAX_KNOWN_LINKAGE = 100;
@@ -220,15 +221,41 @@ export default class Monosaccharide {
     return this.identifier;
   }
 
+  setTag(tagname,value) {
+    this[tags_symbol] = this[tags_symbol] || {};
+    let tag_set = this[tags_symbol];
+    let tag_symbol = (typeof tagname === 'symbol') ? tagname : Symbol(tagname);
+    tag_set[tag_symbol] = (typeof value !== 'undefined') ? value : true;
+    if (value === null) {
+      delete tag_set[tag_symbol];
+    }
+    return tag_symbol;
+  }
+
+  get tags() {
+    if ( ! this[tags_symbol]) {
+      return Object.freeze({});
+    }
+    let result = {};
+    for (let tag of Object.getOwnPropertySymbols(this[tags_symbol])) {
+      result[tag] = this[tags_symbol][tag];
+    }
+    Object.freeze(result);
+    return result;
+  }
+
+  copyTagsFrom(residue) {
+    this[tags_symbol] = this[tags_symbol] || {};
+    for (const tag of Object.getOwnPropertySymbols(residue.tags)) {
+      this[tags_symbol][tag] = residue[tags_symbol][tag];
+    }
+  }
+
   clone() {
     let result = new this.constructor(this.identifier);
     result[anomer_symbol] = this[anomer_symbol];
     result[parent_linkage_symbol] = this[parent_linkage_symbol];
-    for (let prop in this) {
-      if (this.hasOwnProperty(prop)) {
-        result[prop] = this[prop];
-      }
-    }
+    result.copyTagsFrom(this);
     return result;
   }
 

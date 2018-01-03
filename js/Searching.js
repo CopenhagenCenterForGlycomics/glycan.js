@@ -6,6 +6,8 @@ const module_string='glycanjs:searching';
 
 const log = debug(module_string);
 
+const wildcard_symbol = Symbol('wildcard');
+
 let flatten = array => [].concat.apply([], array);
 
 let onlyUnique = function(value, index, self) {
@@ -56,7 +58,7 @@ let map_leaf_originals = function(trees) {
   let result = new WeakMap();
   for (let tree of trees) {
     for (let leaf of tree.leaves()) {
-      if (leaf.is_wildcard) {
+      if (leaf.tags[wildcard_symbol]) {
         log.info('Wildcard position is',leaf.original.identifier);
         result.set(leaf.original,tree);
         result.set(leaf.parent.original,tree);
@@ -80,7 +82,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
 
   root_sugar.composition().filter( res => res.identifier === '*').forEach( wildcard => {
     wildcard.children.map( kid => wildcard.removeChild(wildcard.linkageOf(kid),kid));
-    wildcard.is_wildcard = true;
+    wildcard.setTag(wildcard_symbol,true);
   });
 
   wildcard_subtrees.forEach( subtree_set => subtree_set.forEach( subtree => {
@@ -99,7 +101,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
   }));
   log.info('Sequences of root sequence matched',root_trees.map( rt => rt.sequence ));
   root_trees.forEach( rt => {
-    let wildcard = rt.composition().filter( res => res.is_wildcard )[0];
+    let wildcard = rt.composition_for_tag(wildcard_symbol)[0];
     log.info('Wildcard for root tree is ',wildcard,wildcard.parent.identifier);
   });
   // Grab the original leaves for the root match subtrees
@@ -121,11 +123,11 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       let result_trees = roots.map( root_pair => {
         let subtree_results = sugar.trace(subtree, root_pair.root, comparator );
         let traced_parent = root_trees_by_leaf_original.get(root_pair.parent_leaf);
-        let wildcard_res = root_sugar.composition().filter( res => res.is_wildcard )[0];
+        let wildcard_res = root_sugar.composition_for_tag(wildcard_symbol)[0];
         let grafted_results = [];
         for (let traced_subtree of subtree_results) {
           let result_tree = traced_parent.clone();
-          let graft_residue = result_tree.composition().filter( res => res.is_wildcard)[0];
+          let graft_residue = result_tree.composition_for_tag(wildcard_symbol)[0];
           let mono_class = result_tree.constructor.Monosaccharide;
           let new_wildcard = new mono_class(wildcard_res);
           traced_subtree.root.original = new_wildcard;

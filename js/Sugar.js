@@ -21,6 +21,8 @@ let onlyUnique = function(value, index, self) {
   return self.indexOf(value) === index;
 };
 
+let has_tag = (tag,res) => res.tags[tag];
+
 export default class Sugar {
   constructor() {
   }
@@ -79,6 +81,10 @@ export default class Sugar {
     let self = this;
     let return_value = [ [root] ].concat(root.children.map(child => self.composition(child)));
     return return_value.reduce( (a,b) => a.concat(b) );
+  }
+
+  composition_for_tag(tag) {
+    return this.composition().filter( has_tag.bind(null,tag) );
   }
 
   clone(visitor) {
