@@ -20,7 +20,7 @@ QUnit.test( 'Finding basic monosaccharides' , function( assert ) {
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 1,'Matches single location');
-  assert.ok(matches[0].identifier === 'b','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'b','Matches at the correct location');
 });
 
 QUnit.test( 'Finding basic monosaccharides at the root' , function( assert ) {
@@ -33,7 +33,7 @@ QUnit.test( 'Finding basic monosaccharides at the root' , function( assert ) {
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 1,'Matches single location');
-  assert.ok(matches[0].identifier === 'b','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'b','Matches at the correct location');
 });
 
 QUnit.test( 'Finding single residue patterns' , function( assert ) {
@@ -46,7 +46,7 @@ QUnit.test( 'Finding single residue patterns' , function( assert ) {
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 1,'Matches single location');
-  assert.ok(matches[0].identifier === 'a','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'a','Matches at the correct location');
 });
 
 QUnit.test( 'Finding longer residue patterns' , function( assert ) {
@@ -59,7 +59,7 @@ QUnit.test( 'Finding longer residue patterns' , function( assert ) {
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 1,'Matches single location');
-  assert.ok(matches[0].identifier === 'd','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'd','Matches at the correct location');
 });
 
 QUnit.test( 'Finding monosaccharide patterns on a branch' , function( assert ) {
@@ -72,8 +72,8 @@ QUnit.test( 'Finding monosaccharide patterns on a branch' , function( assert ) {
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 1,'Matches correct number of locations');
-  assert.ok(matches[0].identifier === 'b','Matches at the correct location');
-  assert.ok('e' === matches[0].parent.identifier,'Matches branch at right position');
+  assert.ok(matches[0].root.identifier === 'b','Matches at the correct location');
+  assert.ok('e' === matches[0].root.original.parent.identifier,'Matches branch at right position');
 });
 
 
@@ -87,9 +87,9 @@ QUnit.test( 'Finding repeated monosaccharide patterns' , function( assert ) {
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 2,'Matches correct number of locations');
-  assert.ok(matches[0].identifier === 'bb','Matches at the correct location');
-  assert.ok(matches[1].identifier === 'b','Matches at the correct location');
-  assert.ok(matches[1] !== matches[0],'Doesnt match the same residue twice');
+  assert.ok(matches[0].root.identifier === 'bb','Matches at the correct location');
+  assert.ok(matches[1].root.identifier === 'b','Matches at the correct location');
+  assert.ok(matches[1].root.original !== matches[0].root.original,'Doesnt match the same residue twice');
 });
 
 QUnit.test( 'Finding repeated monosaccharide patterns differing by a branch' , function( assert ) {
@@ -102,7 +102,7 @@ QUnit.test( 'Finding repeated monosaccharide patterns differing by a branch' , f
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 1,'Matches correct number of locations');
-  assert.ok(matches[0].identifier === 'b','Matches at the correct location');
+  assert.ok(matches[0].root.identifier === 'b','Matches at the correct location');
 });
 
 
@@ -116,8 +116,8 @@ QUnit.test( 'Finding repeated monosaccharide patterns on branches' , function( a
   let matches = sugar.match_sugar_pattern(search_sugar, firstchar_comparator );
 
   assert.ok(matches.length === 2,'Matches correct number of locations');
-  assert.ok(matches[0].identifier === 'bb','Matches at the correct location');
-  assert.ok(matches[1].identifier === 'b','Matches at the correct location');
-  assert.ok(matches[1] !== matches[0],'Doesnt match the same residue twice');
-  assert.ok(matches[1].parent === matches[0].parent,'Doesnt match the same residue twice');
+  assert.ok(matches[0].root.identifier === 'bb','Matches at the correct location');
+  assert.ok(matches[1].root.identifier === 'b','Matches at the correct location');
+  assert.ok(matches[1].root.original !== matches[0].root.original,'Doesnt match the same residue twice');
+  assert.ok(matches[1].root.original.parent === matches[0].root.original.parent,'Doesnt match the same residue twice');
 });

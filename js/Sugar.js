@@ -110,7 +110,7 @@ export default class Sugar {
       return return_roots;
     }
     let return_sugars = flatten(return_roots.map( root => this.trace(pattern,root,comparator)));
-    return return_sugars.map( sug => sug.root.original );
+    return return_sugars;
   }
 
   trace(template,start=this.root,comparator=(a,b) => true||a||b) {
