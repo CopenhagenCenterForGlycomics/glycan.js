@@ -15,10 +15,13 @@ const str = (num) => num.toFixed(PRECISION);
 class SVGCanvas {
   constructor(container) {
     log.info('Creating canvas element');
-    this.canvas = container.ownerDocument.createElementNS(SVGNS,'svg');
+    this.canvas = this.createElement('svg',container.ownerDocument);
     this.canvas.setAttribute('xmlns:xlink','http://www.w3.org/1999/xlink');
-
     container.appendChild(this.canvas);
+  }
+
+  createElement(tag,doc=this.canvas.ownerDocument) {
+    return doc.createElementNS(SVGNS,tag);
   }
 
   appendChild(element) {
