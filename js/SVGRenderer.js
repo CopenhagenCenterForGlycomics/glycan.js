@@ -19,7 +19,11 @@ const ROTATE = false;
 
 const SCALE = 100;
 
+const PRECISION = 1;
+
 const GLYCANJSNS = 'https://glycocode.com/glycanjs';
+
+const str = (num) => num.toFixed(PRECISION);
 
 const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   let fancy_anomer = '?';
@@ -55,7 +59,7 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     }
   }
   let label = canvas.text( xcoord, ycoord, fancy_anomer+linkage);
-  label.setAttribute('font-size',Math.floor(SCALE/3)+'');
+  label.setAttribute('font-size',str(Math.floor(SCALE/3)));
   label.setAttribute('dominant-baseline','hanging');
   if (xpos < 0) {
     label.setAttribute('text-anchor','end');
@@ -83,7 +87,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,canvas) {
       SCALE*(parent_pos.y + parent_pos.height / 2)
   ];
   let line = canvas.sendToBack(canvas.line(...positions));
-  line.setAttribute('stroke-width',(SCALE/100).toPrecision(1));
+  line.setAttribute('stroke-width',str(SCALE/100));
   line.setAttribute('stroke','#333');
 
   render_link_label(child.anomer,parent.linkageOf(child),child_pos,parent_pos,canvas);
