@@ -31,6 +31,16 @@ export default class Monosaccharide {
     this[identifier_symbol] = identifier;
   }
 
+  get depth() {
+    let start = this;
+    let count = 1;
+    while (start.parent) {
+      count++;
+      start = start.parent;
+    }
+    return count;
+  }
+
   get identifier() {
     return this[identifier_symbol];
   }

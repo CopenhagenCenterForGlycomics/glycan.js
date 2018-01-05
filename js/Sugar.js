@@ -75,6 +75,11 @@ export default class Sugar {
 */
   }
 
+  location_for_monosaccharide(residue) {
+    let depth_siblings = [...this.breadth_first_traversal()].filter( res => res.depth === residue.depth );
+    let branch_position = depth_siblings.indexOf(residue);
+    return 'y'+residue.depth+String.fromCharCode('a'.charCodeAt(0) + branch_position);
+  }
 
   // FIXME to use a well defined traversal alogirthm (DFS or BFS)
   composition(root=this.root) {
