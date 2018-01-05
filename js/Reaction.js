@@ -9,13 +9,25 @@ let reaction_position_string = Symbol('reaction_position_string');
 const validate_location = (sugar,location) => sugar.locate_monosaccharide(location);
 const attachment_tag = Symbol('attachment');
 
-let firstchar_comparator = (a,b) => a.identifier === b.identifier;
+let identifier_comparator = (a,b) => a.identifier === b.identifier;
 
 let comparator = (a,b) => {
-    if (a.identifier === '*' || b.identifier === '*') {
-      return true;
-    }
-    return firstchar_comparator(a,b);
+  if (a.identifier === '*' || b.identifier === '*') {
+    return true;
+  }
+
+  let same_id = identifier_comparator(a,b);
+  let same_linkage = false;
+
+  if ( a.parent && b.parent ) {
+    same_linkage = a.parent.linkageOf(a) === b.parent.linkageOf(b);
+  }
+
+  if ( ! a.parent && ! b.parent ) {
+    same_linkage = true;
+  }
+
+  return same_id && same_linkage;
 };
 
 
@@ -56,18 +68,16 @@ let parseReaction = (sugar) => {
   sugar[ reaction_position ].setTag(attachment_tag);
 };
 
-let test_sugar_substrate = function(sugar) {
-  return sugar.match_sugar_pattern(this,comparator);
+let find_sugar_substrates = function(sugar) {
+  let substrates = sugar.match_sugar_pattern(this,comparator) || [];
+  return substrates.map( match => match.composition_for_tag(attachment_tag)[0].original );
 };
 
 let execute = function(sugar) {
-  for (let substrate of this.canWorkOn(sugar)) {
-    if ( ! substrate ) {
-      throw new Error('Cannot execute reaction');
-    }
+  for (let attachment of find_sugar_substrates.call(this,sugar)) {
     let addition = this[ reaction_sugar ].clone();
     for (let kid of addition.root.children) {
-      substrate.composition_for_tag(attachment_tag)[0].original.graft(kid);
+      attachment.graft(kid);
     }
   }
 };
@@ -85,8 +95,13 @@ class Reaction extends Sugar {
     return this[ reaction_sugar ];
   }
 
-  canWorkOn(sugar) {
-    return test_sugar_substrate.call(this,sugar);
+  tagSubstrateResidues(sugar,tag=Symbol('substrate')) {
+    find_sugar_substrates.call(this,sugar).forEach( res => res.setTag(tag) );
+    return tag;
+  }
+
+  worksOn(sugar) {
+    return find_sugar_substrates.call(this,sugar).length > 0;
   }
 
   execute(sugar) {
