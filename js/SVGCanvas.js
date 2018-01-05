@@ -16,11 +16,23 @@ class SVGCanvas {
   constructor(container) {
     log.info('Creating canvas element');
     this.canvas = container.ownerDocument.createElementNS(SVGNS,'svg');
+    this.canvas.setAttribute('xmlns:xlink','http://www.w3.org/1999/xlink');
+
     container.appendChild(this.canvas);
   }
 
   appendChild(element) {
     this.canvas.appendChild(element);
+  }
+
+  group() {
+    let a_g = this.canvas.ownerDocument.createElementNS(SVGNS,'g');
+    this.appendChild(a_g);
+    return Object.create(this,{
+      appendChild: { value: el => a_g.appendChild(el) },
+      setAttribute: { value: (name,val) => a_g.setAttribute(name,val) },
+      setAttributeNS: { value: (ns,name,val) => a_g.setAttributeNS(ns,name,val) }
+    });
   }
 
   use(ref,x,y,width,height) {
@@ -29,7 +41,7 @@ class SVGCanvas {
     a_use.setAttribute('y', str(y));
     a_use.setAttribute('width', str(width));
     a_use.setAttribute('height', str(height));
-    a_use.setAttributeNS('http://www.w3.org/1999/xlink','href',ref);
+    a_use.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',ref);
     this.appendChild(a_use);
     return a_use;
   }
