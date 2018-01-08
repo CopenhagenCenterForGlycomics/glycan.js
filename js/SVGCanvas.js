@@ -34,7 +34,8 @@ class SVGCanvas {
     return Object.create(this,{
       appendChild: { value: el => a_g.appendChild(el) },
       setAttribute: { value: (name,val) => a_g.setAttribute(name,val) },
-      setAttributeNS: { value: (ns,name,val) => a_g.setAttributeNS(ns,name,val) }
+      setAttributeNS: { value: (ns,name,val) => a_g.setAttributeNS(ns,name,val) },
+      element: { value: a_g }
     });
   }
 
