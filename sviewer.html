@@ -34,7 +34,7 @@
 		output.style.height = '300px';
 		output.style.float = 'left';
 		document.getElementById('output').appendChild(output);
-		let renderer = new Glycan.SVGRenderer(output,Glycan.SugarAwareLayout);
+		let renderer = new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
 		renderer.addSugar(sug);
 		renderer.refresh();
 		output.firstChild.style.width = '100%';

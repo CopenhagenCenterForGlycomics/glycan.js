@@ -34,29 +34,47 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   if (anomer === 'a') { fancy_anomer = '\u03B1'; }
 
   linkage = linkage || '?';
+  let [child_cx,child_cy,parent_cx,parent_cy] = [child_pos.x+child_pos.width/2,
+                                             child_pos.y+child_pos.height/2,
+                                             parent_pos.x+parent_pos.width/2,
+                                             parent_pos.y+parent_pos.height/2];
 
-  let gradient = ((child_pos.x + child_pos.width / 2) -
-                 (parent_pos.x + parent_pos.width / 2)) /
-                 ((child_pos.y + child_pos.height / 2) -
-                 (parent_pos.y + parent_pos.height / 2));
+  let gradient = (child_cx -
+                 parent_cx) /
+                 (child_cy -
+                 parent_cy);
 
   if (! isFinite(gradient)) {
-    gradient = 2;
+    gradient = -1;
     if (child_pos.x > parent_pos.x) {
-      gradient = -2;
+      gradient = 1;
     }
   }
 
-  let xpos = ( gradient * ( 0.75*(child_pos.y - (parent_pos.height + parent_pos.y)) + (parent_pos.height / 2) ) );
+  let residue_distance = child_cy - parent_cy;
 
+  let child_distance = residue_distance*0.75;
+
+  if (Math.abs(residue_distance) >= (child_pos.height + parent_pos.height)/2 ) {
+    residue_distance -= (child_pos.height + parent_pos.height)/2;
+    child_distance = residue_distance*0.75 + parent_pos.height/2;
+  } else if (residue_distance == 0) {
+    child_distance = 0.425*Math.abs(child_cx - parent_cx);
+  }
+  let xpos = ( gradient * child_distance );
   if (xpos === 0) {
-    xpos += 0.1;
+    xpos += child_pos.width/10;
+  }
+  let xcoord = SCALE*(xpos + parent_cx);
+  let ycoord = 0;
+  if ((child_pos.y + 1.1*child_pos.height) < parent_pos.y) {
+    ycoord = SCALE*(child_pos.y + 1.1 * child_pos.height);
+  } else {
+    ycoord = SCALE*(child_pos.y + 1*child_pos.height);
   }
 
-  let xcoord = SCALE*(xpos + parent_pos.x + parent_pos.width / 2);
-  let ycoord = SCALE*(child_pos.y + child_pos.height + 0.1);
   if (child_pos.y === parent_pos.y) {
-    ycoord = SCALE*(child_pos.y + 0.125);// + child_pos.height - 0.125);
+    ycoord = SCALE*(child_pos.y + child_pos.height/8);
     if ( ycoord > SCALE/4 ) {
       ycoord = SCALE/4;
     }
@@ -103,9 +121,6 @@ const update_icon_position = function(element,x,y,width,height,rotate) {
   let rotate_str = '';
   if (rotate !== 0) {
     rotate_str = `rotate(${str(rotate)},${str(x + width/2)},${str(y + height/2)})`;
-    // element.setAttribute('transform',`rotate(${str(rotate)},${str(x + width/2)},${str(y + height/2)})`);
-  // } else {
-  //   element.removeAttribute('transform');
   }
 
   let transform = `${rotate_str} translate(${str(x)},${str(y)}) scale(${str(width)},${str(height)})`;
@@ -158,10 +173,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       icon = current.residue;
     }
 
-    if (current.linkage) {
-      // current.linkage.parentNode.removeChild(current.linkage);
-    } else {
+    if ( ! current.linkage ) {
       current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
+    } else {
+      // Do nothing
     }
 
     let rotate_angle = 0;
@@ -212,7 +227,7 @@ class SVGRenderer {
       window.requestAnimationFrame(looper);
       // console.log(fps);
     };
-    window.requestAnimationFrame(looper);
+    // window.requestAnimationFrame(looper);
   }
   get element() {
     return this[canvas_symbol];
