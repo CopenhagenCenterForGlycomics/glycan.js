@@ -4,6 +4,14 @@
 	<title>Sviewer</title>
 	<script type="text/javascript" src="node_modules/babel-polyfill/dist/polyfill.js"></script>
 	<script type="text/javascript" src="glycan-bundle.js"></script>
+<style type="text/css">
+	* {
+  -moz-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  -webkit-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+}
+</style>
 </head>
 <body>
 	<pre id="seqs">
@@ -34,8 +42,21 @@
 		output.style.height = '300px';
 		output.style.float = 'left';
 		document.getElementById('output').appendChild(output);
-		let renderer = new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
+		let renderer = new Glycan.SVGRenderer(output,Glycan.SugarAwareLayout);
 		renderer.addSugar(sug);
+		setInterval(function() {
+			let residues = sug.composition();
+			let targ = residues[Math.floor(Math.random()*residues.length)];
+			if (targ.identifier === 'Fuc' || targ.identifier === 'NeuAc') {
+				return;
+			}
+			let new_res = new Glycan.Monosaccharide('Gal');
+			new_res.anomer = 'a';
+			new_res.parent_link = 1;
+			targ.addChild(4,new_res);
+			targ = new_res;
+			renderer.refresh();
+		},1000);
 		renderer.refresh();
 		output.firstChild.style.width = '100%';
 		output.firstChild.style.height = '100%';		

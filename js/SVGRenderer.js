@@ -12,6 +12,8 @@ const container_symbol = Symbol('document_container');
 
 const canvas_symbol = Symbol('canvas');
 
+const layout_cache = Symbol('cached_layout');
+
 const layout_engine = Symbol('layout');
 
 const rendered_sugars_symbol = Symbol('rendered_sugars');
@@ -27,6 +29,20 @@ const PRECISION = 1;
 const GLYCANJSNS = 'https://glycocode.com/glycanjs';
 
 const str = (num) => num.toFixed(PRECISION);
+
+const calculate_moved_residues = function(layout,residue) {
+  let current = this[layout_cache].get(residue);
+  let updated = layout.get(residue);
+  if ( ! current ) {
+    this[layout_cache].set(residue,layout.get(residue));
+    return true;
+  }
+  this[layout_cache].set(residue,updated);
+  return ( ! ( current.x === updated.x &&
+     current.y === updated.y &&
+     current.width === updated.width &&
+     current.height === updated.height ));
+};
 
 const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   let fancy_anomer = '?';
@@ -176,6 +192,8 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     if ( ! current.linkage ) {
       current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
     } else {
+      current.linkage.parentNode.removeChild(current.linkage);
+      current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
       // Do nothing
     }
 
@@ -189,17 +207,44 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
     update_icon_position(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
   }
+
+
+
   let min_x = Math.min(...xvals);
   let min_y = Math.min(...yvals);
   let width = Math.max(...xvals) - min_x;
   let height = Math.max(...yvals) - min_y;
 
-  container.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
 
-  if ( ! container.laidOut ) {
-    canvas.canvas.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
-    container.laidOut = true;
+  if (new_residues.length < sugar.composition().length) {
+    let [curr_min_x,curr_min_y,curr_width,curr_height] = container.element.getAttribute('viewBox').split(' ').map(parseFloat).map(x => x/SCALE);
+    let curr_max_x = curr_min_x + curr_width;
+    let curr_max_y = curr_min_y + curr_height;
+    let max_x = min_x + width;
+    let max_y = min_y + height;
+    if (curr_min_x < min_x) {
+      min_x = curr_min_x;
+    }
+    if (curr_max_x > max_x) {
+      max_x = curr_max_x;
+    }
+    width = max_x - min_x;
+
+    if (curr_min_y < min_y) {
+      min_y = curr_min_y;
+    }
+    if (curr_max_y > max_y) {
+      max_y = curr_max_y;
+    }
+    height = max_y - min_y;
   }
+
+  container.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
+  canvas.canvas.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
+
+  // if ( ! container.laidOut ) {
+  //   // container.laidOut = true;
+  // }
   return container;
 };
 
@@ -207,6 +252,7 @@ class SVGRenderer {
   constructor(container,layout) {
     this[container_symbol] = container;
     this[layout_engine] = layout;
+    this[layout_cache] = new WeakMap();
     this[canvas_symbol] = new SVGCanvas(container);
     this[canvas_symbol].canvas.setAttribute('viewBox','-30 -60 60 100');
     this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
@@ -222,7 +268,7 @@ class SVGRenderer {
       before=now;
 
       counter += Math.PI/50;
-      SCALE = 100 + 90*Math.cos(counter);
+      // SCALE = 100 + 90*Math.cos(counter);
       this.refresh();
       window.requestAnimationFrame(looper);
       // console.log(fps);
@@ -241,9 +287,8 @@ class SVGRenderer {
   refresh() {
     for (let sugar of this[rendered_sugars_symbol]) {
       let layout = layout_sugar(sugar,this[layout_engine]);
-      // let current_layout = this[layout_cache].get(sugar);
-      // let modified_residues = calculate_moved_residues(layout,current_layout);
-      render_sugar.bind(this)(sugar, layout);
+      let modified_residues = sugar.composition().filter(calculate_moved_residues.bind(this,layout));
+      render_sugar.bind(this)(sugar, layout,modified_residues);
     }
   }
 }
