@@ -56,6 +56,12 @@
 			targ.addChild(4,new_res);
 			targ = new_res;
 			renderer.refresh();
+			if ( Math.floor(Math.random()*10) >= 5 ) {
+				let removed = sug.leaves()[0];
+				console.log(removed.children.length);
+				removed.parent.removeChild(removed.parent.linkageOf(removed),removed);
+				renderer.refresh();
+			}
 		},1000);
 		renderer.refresh();
 		output.firstChild.style.width = '100%';

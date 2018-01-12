@@ -148,6 +148,18 @@ const update_icon_position = function(element,x,y,width,height,rotate) {
   // element.setAttribute('height',str(height));
 };
 
+const cleanup_residues = function(active_residues) {
+  let active = new Set(active_residues);
+  for (let res in this.rendered.keys()) {
+    if (! active.has(res)) {
+      let elements = this.rendered.get(res);
+      elements.residue.parentNode.removeChild(elements.residue);
+      elements.linkage.parentNode.removeChild(elements.linkage);
+      this.rendered.delete(res);
+    }
+  }
+};
+
 const layout_sugar = function(sugar,layout_engine) {
   log.info('Laying out',sugar.sequence);
   let layout = layout_engine.PerformLayout(sugar);
@@ -165,7 +177,9 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     container.setAttributeNS(GLYCANJSNS,'glycanjs:sequence',sugar.sequence);
     this.rendered.set(sugar,container);
   }
-
+  if (new_residues.length < 1) {
+    return;
+  }
   for (let residue of new_residues) {
 
     let position = layout.get(residue);
@@ -257,7 +271,7 @@ class SVGRenderer {
     this[canvas_symbol].canvas.setAttribute('viewBox','-30 -60 60 100');
     this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
     this[rendered_sugars_symbol] = [];
-    this[rendered_symbol] = new WeakMap();
+    this[rendered_symbol] = new Map();
     let counter = 0;
     let before,now,fps;
     before=Date.now();
@@ -285,9 +299,14 @@ class SVGRenderer {
     this[rendered_sugars_symbol].push(sugar);
   }
   refresh() {
+    cleanup_residues.bind(this)(Array.prototype.concat(...this[rendered_sugars_symbol].map(sug => sug.composition())));
     for (let sugar of this[rendered_sugars_symbol]) {
       let layout = layout_sugar(sugar,this[layout_engine]);
       let modified_residues = sugar.composition().filter(calculate_moved_residues.bind(this,layout));
+      console.log('Modified residues length is ',modified_residues.length);
+      // if (modified_residues.length === 0) {
+        modified_residues = sugar.composition();
+      // }
       render_sugar.bind(this)(sugar, layout,modified_residues);
     }
   }
