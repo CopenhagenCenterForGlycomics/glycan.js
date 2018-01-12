@@ -23,6 +23,11 @@
 		Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 		Fuc(a1-2)[NeuAc(a2-3)]GalNAc(b1-4)GlcNAc(b1-2)GalNAc(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
+	<div draggable="true" id="dragsource">
+	<svg>
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac"</use>
+	</svg>
+	</div>
 	<textarea id="seq" >NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc</textarea>
 	<div id="output">
 	</div>
@@ -44,7 +49,7 @@
 		document.getElementById('output').appendChild(output);
 		let renderer = new Glycan.SVGRenderer(output,Glycan.SugarAwareLayout);
 		renderer.addSugar(sug);
-		setInterval(function() {
+		setTimeout(function() {
 			if ( Math.floor(Math.random()*10) >= 5 ) {
 				if (sug.composition().length < 3) {
 					return;
@@ -64,7 +69,7 @@
 				targ = new_res;
 			}
 			renderer.refresh();
-		},1000);
+		},200);
 		renderer.refresh();
 		output.firstChild.style.width = '100%';
 		output.firstChild.style.height = '100%';		
@@ -76,6 +81,57 @@
 			append_sequence(seq.trim());
 		}
 		append_sequence(document.getElementById('seq').value);		
+
+	};
+
+	var global_drags = {};
+
+	document.getElementById('dragsource').addEventListener('dragstart', function (evt) {
+		// We'll handle this event so first stop bubbling up
+		evt.stopPropagation();
+		// If we'd like to prevent dragging because of some condition,
+		// we'd simply call preventDefault() and be done here
+		if (false) {
+		  evt.preventDefault();
+		  return;
+		}
+		// Now setup our dataTransfer object properly
+		// First we'll allow a move action — this is used for the cursor
+		evt.dataTransfer.effectAllowed = 'copy';
+		evt.dataTransfer.dropEffect = 'copy';
+		// Setup some dummy drag-data to ensure dragging
+		let drag_id = 'drag/'+(new Date().getTime());
+		evt.dataTransfer.setData(drag_id, '');
+
+		global_drags[drag_id] = {'residue' : 'NeuAc', 'visited' : []};
+		// Now we'll create a dummy image for our dragImage
+		// var dragImage = document.createElement('div');
+		// dragImage.setAttribute('style', 'position: absolute; left: 0px; top: 0px; width: 40px; height: 40px; background: red; z-index: -1');
+		// document.body.appendChild(dragImage);
+		// // And finally we assign the dragImage and center it on cursor
+		// evt.dataTransfer.setDragImage(dragImage, 20, 20);
+	});
+
+	makeDragTarget = function(element) {
+		element.style.pointerEvents = 'all';
+		element.addEventListener('dragover', (ev) => {
+			ev.preventDefault();
+		});
+		element.addEventListener('dragenter', (ev) => {
+			console.log('Drag enter');
+			ev.preventDefault();
+			let targets = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/));
+			for (let target of targets) {
+				global_drags[target].visited.push(element.getAttribute('transform'));
+			}
+		});
+		element.addEventListener('drop', (ev) => {
+			let targets = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/));
+			ev.visited = [];
+			for (let target of targets) {
+				ev.visited.push(global_drags[target].visited);
+			}
+		},{capture: true, passive: true});
 	};
 
 	window.onload = function() {

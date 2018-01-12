@@ -31,6 +31,20 @@ const GLYCANJSNS = 'https://glycocode.com/glycanjs';
 
 const str = (num) => num.toFixed(PRECISION);
 
+const supported_events = 'mousemove mousedown mouseup click touchstart touchend touchmove drop';
+
+const wire_canvas_events = function(canvas,callback) {
+  for (let target of supported_events.split(' ')) {
+    canvas.addEventListener( target, callback, { passive: true, capture: false } );
+  }
+};
+
+const handle_events = function(event) {
+  if (event.type !== 'mousemove') {
+    console.log(event.type,event.target,event);
+  }
+};
+
 const calculate_moved_residues = function(layout,residue) {
   let current = this[layout_cache].get(residue);
   let updated = layout.get(residue);
@@ -179,6 +193,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   if ( ! container ) {
     container = canvas.group();
     container.setAttributeNS(GLYCANJSNS,'glycanjs:sequence',sugar.sequence);
+    container.setAttributeNS(null,'pointer-events','none');
     this.rendered.set(sugar,container);
   }
   if (new_residues.length < 1) {
@@ -278,6 +293,7 @@ class SVGRenderer {
     this[canvas_symbol] = new SVGCanvas(container);
     this[canvas_symbol].canvas.setAttribute('viewBox','-30 -60 60 100');
     this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
+    wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this), {passive:true, capture: false } );
     this[rendered_sugars_symbol] = [];
     this[rendered_symbol] = new Map();
     let counter = 0;
@@ -311,10 +327,6 @@ class SVGRenderer {
     for (let sugar of this[rendered_sugars_symbol]) {
       let layout = layout_sugar(sugar,this[layout_engine]);
       let modified_residues = sugar.composition().filter(calculate_moved_residues.bind(this,layout));
-      console.log('Modified residues length is ',modified_residues.length);
-      // if (modified_residues.length === 0) {
-        modified_residues = sugar.composition();
-      // }
       render_sugar.bind(this)(sugar, layout,modified_residues);
     }
   }
