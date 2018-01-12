@@ -45,23 +45,25 @@
 		let renderer = new Glycan.SVGRenderer(output,Glycan.SugarAwareLayout);
 		renderer.addSugar(sug);
 		setInterval(function() {
-			let residues = sug.composition();
-			let targ = residues[Math.floor(Math.random()*residues.length)];
-			if (targ.identifier === 'Fuc' || targ.identifier === 'NeuAc') {
-				return;
-			}
-			let new_res = new Glycan.Monosaccharide('Gal');
-			new_res.anomer = 'a';
-			new_res.parent_link = 1;
-			targ.addChild(4,new_res);
-			targ = new_res;
-			renderer.refresh();
 			if ( Math.floor(Math.random()*10) >= 5 ) {
+				if (sug.composition().length < 3) {
+					return;
+				}
 				let removed = sug.leaves()[0];
-				console.log(removed.children.length);
 				removed.parent.removeChild(removed.parent.linkageOf(removed),removed);
-				renderer.refresh();
+			} else {
+				let residues = sug.composition();
+				let targ = residues[Math.floor(Math.random()*residues.length)];
+				if (targ.identifier === 'Fuc' || targ.identifier === 'NeuAc') {
+					return;
+				}
+				let new_res = new Glycan.Monosaccharide('Gal');
+				new_res.anomer = 'a';
+				new_res.parent_link = 1;
+				targ.addChild(4,new_res);
+				targ = new_res;
 			}
+			renderer.refresh();
 		},1000);
 		renderer.refresh();
 		output.firstChild.style.width = '100%';

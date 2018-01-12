@@ -3,6 +3,7 @@
 import * as debug from 'debug-any-level';
 
 import SVGCanvas from './SVGCanvas';
+import Monosaccharide from './Monosaccharide';
 
 const module_string='glycanjs:svgrenderer';
 
@@ -150,7 +151,10 @@ const update_icon_position = function(element,x,y,width,height,rotate) {
 
 const cleanup_residues = function(active_residues) {
   let active = new Set(active_residues);
-  for (let res in this.rendered.keys()) {
+  for (let res of this.rendered.keys()) {
+    if ( ! (res instanceof Monosaccharide) ) {
+      continue;
+    }
     if (! active.has(res)) {
       let elements = this.rendered.get(res);
       elements.residue.parentNode.removeChild(elements.residue);
@@ -251,6 +255,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       max_y = curr_max_y;
     }
     height = max_y - min_y;
+  }
+
+  if ( isNaN(min_x + min_y+ width + height) ) {
+    return container;
   }
 
   container.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
