@@ -250,10 +250,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
 
 
-  let min_x = Math.min(...xvals);
-  let min_y = Math.min(...yvals);
-  let width = Math.max(...xvals) - min_x;
-  let height = Math.max(...yvals) - min_y;
+  let min_x = Math.min(...xvals)-1;
+  let min_y = Math.min(...yvals)-1;
+  let width = Math.max(...xvals) - min_x + 1;
+  let height = Math.max(...yvals) - min_y + 1;
 
 
   if (new_residues.length < sugar.composition().length) {

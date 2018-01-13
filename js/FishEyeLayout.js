@@ -6,7 +6,7 @@ const module_string='glycanjs:fisheyelayout';
 
 const log = debug(module_string);
 
-var radius = 2,
+var radius = 5,
     distortion = 3,
     k0,
     k1,
