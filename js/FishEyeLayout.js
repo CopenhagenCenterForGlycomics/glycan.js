@@ -6,7 +6,7 @@ const module_string='glycanjs:fisheyelayout';
 
 const log = debug(module_string);
 
-var radius = 6,
+var radius = 2,
     distortion = 3,
     k0,
     k1,
@@ -32,6 +32,14 @@ function fisheye(d) {
 }
 
 class FishEyeLayout extends SugarAwareLayout {
+  static get focus() {
+    return [].concat(focus);
+  }
+  static set focus(newfocus) {
+    focus[0] = newfocus[0];
+    focus[1] = newfocus[1];
+    rescale();
+  }
   static PerformLayout(renderable) {
     log('Performing FishEyeLayout');
     let layout = super.PerformLayout(renderable);

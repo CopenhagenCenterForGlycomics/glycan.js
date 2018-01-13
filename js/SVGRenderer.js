@@ -1,4 +1,3 @@
-/*global window */
 'use strict';
 import * as debug from 'debug-any-level';
 
@@ -31,18 +30,26 @@ const GLYCANJSNS = 'https://glycocode.com/glycanjs';
 
 const str = (num) => num.toFixed(PRECISION);
 
-const supported_events = 'mousemove mousedown mouseup click touchstart touchend touchmove drop';
+const supported_events = 'mousemove mousedown mouseup click touchstart touchend touchmove drop dragover';
 
 const wire_canvas_events = function(canvas,callback) {
   for (let target of supported_events.split(' ')) {
-    canvas.addEventListener( target, callback, { passive: true, capture: false } );
+    canvas.addEventListener( target, callback, { passive: true, capture: true } );
   }
 };
 
-const handle_events = function(event) {
-  if (event.type !== 'mousemove') {
-    console.log(event.type,event.target,event);
+const handle_events = function(svg,event) {
+  if (event.clientX) {
+    var pt=svg.createSVGPoint();
+    pt.x=event.clientX;
+    pt.y=event.clientY;
+    let transformed = pt.matrixTransform(svg.getScreenCTM().inverse());
+    event.svgX = transformed.x / SCALE;
+    event.svgY = transformed.y / SCALE;
   }
+  // if (event.type !== 'mousemove') {
+  //   console.log(event.type,event.target,event);
+  // }
 };
 
 const calculate_moved_residues = function(layout,residue) {
@@ -276,12 +283,12 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     return container;
   }
 
-  container.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
-  canvas.canvas.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
 
-  // if ( ! container.laidOut ) {
-  //   // container.laidOut = true;
-  // }
+  if ( ! container.laidOut ) {
+    container.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
+    canvas.canvas.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
+    container.laidOut = true;
+  }
   return container;
 };
 
@@ -293,25 +300,27 @@ class SVGRenderer {
     this[canvas_symbol] = new SVGCanvas(container);
     this[canvas_symbol].canvas.setAttribute('viewBox','-30 -60 60 100');
     this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
-    wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this), {passive:true, capture: false } );
+    wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this,this[canvas_symbol].canvas), {passive:true, capture: false } );
     this[rendered_sugars_symbol] = [];
     this[rendered_symbol] = new Map();
-    let counter = 0;
-    let before,now,fps;
-    before=Date.now();
-    fps=0;
-    let looper = () => {
-      now=Date.now();
-      fps=Math.round(1000/(now-before));
-      before=now;
+    // let counter = 0;
+    // let before,now,fps;
+    // before=Date.now();
+    // fps=0;
+    // let looper = () => {
+    //   now=Date.now();
+    //   fps=Math.round(1000/(now-before));
+    //   before=now;
 
-      counter += Math.PI/50;
-      // SCALE = 100 + 90*Math.cos(counter);
-      this.refresh();
-      window.requestAnimationFrame(looper);
-      // console.log(fps);
-    };
+    //   counter += Math.PI/50;
+    //   SCALE = 100 + 90*Math.cos(counter);
+    //   this.refresh(true);
+    //   window.requestAnimationFrame(looper);
+    //   // console.log(fps);
+    // };
+
     // window.requestAnimationFrame(looper);
+
   }
   get element() {
     return this[canvas_symbol];
