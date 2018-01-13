@@ -27,7 +27,7 @@
 body {
   /* Disables pull-to-refresh but allows overscroll glow effects. */
   /*overscroll-behavior-y: contain;*/
-  height: 100%;
+  position: fixed;
   overflow: hidden;
 }
 </style>
@@ -42,9 +42,6 @@ body {
 		Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 		Fuc(a1-2)[NeuAc(a2-3)]GalNAc(b1-4)GlcNAc(b1-2)GalNAc(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
-	<div draggable="true" style="-webkit-user-drag: element;">
-		Foobar
-	</div>
 	<div draggable="true" id="dragsource" style="-webkit-user-drag: element;">
 	<svg>
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac"</use>
@@ -75,9 +72,16 @@ body {
 			ev.preventDefault();
 		});
 
+		let last_req = null;
+
 		renderer.element.canvas.addEventListener('dragover', (ev) => {
 			Glycan.FishEyeLayout.focus = [ ev.svgX, ev.svgY ];
-			renderer.refresh();
+			if (last_req) {
+				cancelAnimationFrame(last_req);
+			}
+			last_req = requestAnimationFrame(function() {
+				renderer.refresh();
+			});
 		});
 		/*setTimeout(function() {
 			if ( Math.floor(Math.random()*10) >= 5 ) {
