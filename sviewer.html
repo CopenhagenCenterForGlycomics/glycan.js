@@ -67,8 +67,20 @@ body {
 
 		let last_req = null;
 
+		renderer.element.canvas.addEventListener('dragleave', (ev) => {
+			Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
+			if (last_req) {
+				cancelAnimationFrame(last_req);
+			}
+			last_req = requestAnimationFrame(function() {
+				renderer.refresh();
+			});
+		});
 		renderer.element.canvas.addEventListener('dragover', (ev) => {
 			Glycan.FishEyeLayout.focus = [ ev.svgX, ev.svgY ];
+			let [min_x,min_y,width,height] = renderer.element.canvas.getAttribute('viewBox').split(' ').map( val => parseFloat(val) );
+			Glycan.FishEyeLayout.zoom = Math.floor(height / 100);
+			Glycan.FishEyeLayout.lock_residues = true;
 			if (last_req) {
 				cancelAnimationFrame(last_req);
 			}

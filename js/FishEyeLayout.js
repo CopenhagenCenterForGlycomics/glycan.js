@@ -6,11 +6,13 @@ const module_string='glycanjs:fisheyelayout';
 
 const log = debug(module_string);
 
-var radius = 5,
+var radius = 2,
     distortion = 3,
     k0,
     k1,
     focus = [-100, -3];
+
+let residue_only = true;
 
 function rescale() {
   k0 = Math.exp(distortion);
@@ -40,6 +42,22 @@ class FishEyeLayout extends SugarAwareLayout {
     focus[1] = newfocus[1];
     rescale();
   }
+  static get zoom() {
+    return distortion;
+  }
+  static set zoom(zoom) {
+    distortion = zoom;
+    rescale();
+  }
+
+  static get lock_residues() {
+    return residue_only;
+  }
+  static set lock_residues(flag) {
+    residue_only = flag;
+  }
+
+
   static PerformLayout(renderable) {
     log('Performing FishEyeLayout');
     let layout = super.PerformLayout(renderable);
@@ -48,9 +66,18 @@ class FishEyeLayout extends SugarAwareLayout {
       let [x,y,width,height] = [position.x,position.y,position.width,position.height];
       let scaled_center = fisheye({x: x + (width/2), y: y + (height/2)});
       let scaled_top = fisheye({x: x + (width/2), y: y + height});
-      let new_size = 2*(scaled_top.y - scaled_center.y);
-      position.x = scaled_center.x - (new_size/2);
-      position.y = scaled_center.y - (new_size/2);
+      let scaled_edge = fisheye({x: x + width, y: y + (height/2)});
+
+      let new_size = Math.max( 2*(scaled_top.y - scaled_center.y), 2*(scaled_edge.x - scaled_center.x) );
+      if (residue_only) {
+        position.x = position.x - ((new_size - width)/2);
+        position.y = position.y - ((new_size - height)/2);
+      } else {
+        position.x = scaled_center.x - (new_size/2);
+        position.y = scaled_center.y - (new_size/2);
+      }
+      position.z = scaled_center.z;
+
       position.width = new_size;
       position.height = new_size;
     }

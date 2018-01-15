@@ -84,6 +84,12 @@ class SVGCanvas {
     return element;
   }
 
+  sendToFront(element) {
+    let parent = element.parentNode;
+    parent.insertBefore(element,null);
+    return element;
+  }
+
 }
 
 export default SVGCanvas;

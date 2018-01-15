@@ -28,6 +28,8 @@ const PRECISION = 1;
 
 const GLYCANJSNS = 'https://glycocode.com/glycanjs';
 
+const FULL_REFRESH = true;
+
 const str = (num) => num.toFixed(PRECISION);
 
 const supported_events = 'mousemove mousedown mouseup click touchstart touchend touchmove drop dragover';
@@ -63,7 +65,8 @@ const calculate_moved_residues = function(layout,residue) {
   return ( ! ( current.x === updated.x &&
      current.y === updated.y &&
      current.width === updated.width &&
-     current.height === updated.height ));
+     current.height === updated.height &&
+     current.z === updated.z ));
 };
 
 const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
@@ -206,6 +209,8 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   if (new_residues.length < 1) {
     return;
   }
+  let zindices = [];
+
   for (let residue of new_residues) {
 
     let position = layout.get(residue);
@@ -229,6 +234,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       icon = current.residue;
     }
 
+    if (position.z !== 1) {
+      zindices.push({ z: position.z, icon: icon });
+    }
+
     if ( ! current.linkage ) {
       current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
     } else {
@@ -246,6 +255,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     }
 
     update_icon_position(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
+  }
+
+  for (let zindex of zindices.sort( (a,b) => a.z - b.z ) ) {
+    container.sendToFront(zindex.icon);
   }
 
 
@@ -335,7 +348,7 @@ class SVGRenderer {
     cleanup_residues.bind(this)(Array.prototype.concat(...this[rendered_sugars_symbol].map(sug => sug.composition())));
     for (let sugar of this[rendered_sugars_symbol]) {
       let layout = layout_sugar(sugar,this[layout_engine]);
-      let modified_residues = sugar.composition().filter(calculate_moved_residues.bind(this,layout));
+      let modified_residues = FULL_REFRESH ? sugar.composition() : sugar.composition().filter(calculate_moved_residues.bind(this,layout));
       render_sugar.bind(this)(sugar, layout,modified_residues);
     }
   }
