@@ -111,7 +111,7 @@ body {
 		},200);*/
 		renderer.refresh();
 		output.firstChild.style.width = '100%';
-		output.firstChild.style.height = '100%';		
+		output.firstChild.style.height = '100%';
 	};
 	let load_all_seqs = function() {
 		clear_sequences();
@@ -119,7 +119,7 @@ body {
 		for (let seq of document.getElementById('seqs').textContent.split('\n')) {
 			append_sequence(seq.trim());
 		}
-		append_sequence(document.getElementById('seq').value);		
+		append_sequence(document.getElementById('seq').value);
 
 	};
 
