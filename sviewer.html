@@ -8,7 +8,7 @@
 	<script type="text/javascript" src="glycan-bundle.js"></script>
 
  <style type="text/css">
-  #input svg	* {
+#output svg * {
   -moz-transition: all 0.5s ease-in-out;
   -o-transition: all 0.5s ease-in-out;
   -webkit-transition: all 0.5s ease-in-out;
@@ -28,7 +28,7 @@ x-piemenu {
 	pointer-events: none;
 }
 button {
-	border: 0px;
+	font-size: 3px;
 }
 button:hover {
 	background: #f00;
@@ -40,10 +40,10 @@ button:hover {
   <button><span>ABC</span></button>
   <button><span>DEF</span></button>
   <button><span>ABC</span></button>
-  <button><span>DEF</span></button>
+<!--   <button><span>DEF</span></button>
   <button><span>ABC</span></button>
   <button><span>DEFG<br/>HIJK</span></button>
-	</x-piemenu>
+ -->	</x-piemenu>
 	<pre id="seqs" style="display: none;">
 		NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc
 		Gal(b1-3)[GlcNAc(b1-4)]GalNAc
@@ -79,9 +79,6 @@ button:hover {
 		document.getElementById('output').appendChild(output);
 		let renderer = new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
 		renderer.addSugar(sug);
-		// renderer.element.canvas.addEventListener('dragenter', (ev) => {
-		// 	ev.preventDefault();
-		// });
 
 		let last_req = null;
 
@@ -98,6 +95,20 @@ button:hover {
 				renderer.refresh();
 			});
 		});
+		document.body.addEventListener('dragend', (ev) => {
+			setTimeout(() =>{
+				document.getElementById('pie').removeAttribute('active');
+			},100);
+
+			Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
+			if (last_req) {
+				cancelAnimationFrame(last_req);
+			}
+			last_req = requestAnimationFrame(function() {
+				renderer.refresh();
+			});
+		});
+
 		renderer.element.canvas.addEventListener('dragover', (ev) => {
 			setTimeout(() => {
 				document.getElementById('pie').setAttribute('active',true);
@@ -116,7 +127,8 @@ button:hover {
 				renderer.refresh();
 			});
 		});
-		/*setTimeout(function() {
+
+		setInterval(function() {
 			if ( Math.floor(Math.random()*10) >= 5 ) {
 				if (sug.composition().length < 3) {
 					return;
@@ -136,7 +148,7 @@ button:hover {
 				targ = new_res;
 			}
 			renderer.refresh();
-		},200);*/
+		},1000);
 		renderer.refresh();
 		output.firstChild.style.width = '100%';
 		output.firstChild.style.height = '100%';
@@ -155,8 +167,38 @@ button:hover {
 
 	//https://codepen.io/anon/pen/WdyZvY
 
+	document.body.addEventListener('dragstart', (evt) => {
+		if ( ! evt.isTrusted ) {
+			return;
+		}
+		// Setup some dummy drag-data to ensure dragging
+		let drag_id = 'drag/'+(new Date().getTime());
+		console.log(evt);
+		evt.dataTransfer.setData(drag_id, '');
+		evt.dataTransfer.effectAllowed = 'copy';
+		evt.dataTransfer.dropEffect = 'copy';
+
+		let target = evt.target;
+		var event = new Event('dragstart');
+		event.bubbles = false;
+		event.dataTransfer = { types: [ drag_id ] };
+		event.data = { };
+		global_drags[drag_id] = event.data;
+		target.dispatchEvent(event);
+		evt.stopPropagation();
+	},{capture: true});
+
+	document.body.addEventListener('dragenter', (ev) => {
+		let drag_id = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/))[0];
+		ev.data = global_drags[drag_id];
+	},{capture: true});
+
+	document.body.addEventListener('drop', (ev) => {
+		let drag_id = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/))[0];
+		ev.data = global_drags[drag_id];
+	},{capture: true});
+
 	document.getElementById('dragsource').addEventListener('dragstart', function (evt) {
-		// We'll handle this event so first stop bubbling up
 		evt.stopPropagation();
 		// If we'd like to prevent dragging because of some condition,
 		// we'd simply call preventDefault() and be done here
@@ -164,21 +206,8 @@ button:hover {
 		  evt.preventDefault();
 		  return;
 		}
-		// Now setup our dataTransfer object properly
-		// First we'll allow a move action — this is used for the cursor
-		evt.dataTransfer.effectAllowed = 'copy';
-		evt.dataTransfer.dropEffect = 'copy';
-		// Setup some dummy drag-data to ensure dragging
-		let drag_id = 'drag/'+(new Date().getTime());
-		evt.dataTransfer.setData(drag_id, '');
-
-		global_drags[drag_id] = {'residue' : 'NeuAc', 'visited' : []};
-		// Now we'll create a dummy image for our dragImage
-		// var dragImage = document.createElement('div');
-		// dragImage.setAttribute('style', 'position: absolute; left: 0px; top: 0px; width: 40px; height: 40px; background: red; z-index: -1');
-		// document.body.appendChild(dragImage);
-		// // And finally we assign the dragImage and center it on cursor
-		// evt.dataTransfer.setDragImage(dragImage, 20, 20);
+		evt.data.residue = 'NeuAc';
+		evt.data.visited = [];
 	});
 
 	document.getElementById('dragsource').addEventListener('dragend', (evt) => {
@@ -189,21 +218,14 @@ button:hover {
 		element.style.pointerEvents = 'all';
 		element.addEventListener('dragover', ev => ev.preventDefault() );
 		element.addEventListener('dragenter', (ev) => {
-			console.log('Drag enter');
 			ev.preventDefault();
-			let targets = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/));
-			console.log("Drag enter ",targets);
-			for (let target of targets) {
-				global_drags[target].visited.push(element.getAttribute('glycanjs:identifier'));
+			if (ev.data.visited.indexOf(element.getAttribute('glycanjs:identifier')) < 0) {
+				ev.data.visited.push(element.getAttribute('glycanjs:identifier'));
 			}
 		});
 		element.addEventListener('drop', (ev) => {
-			let targets = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/));
-			ev.visited = [];
-			for (let target of targets) {
-				ev.visited.push(global_drags[target].visited);
-			}
-		},{capture: true, passive: true});
+			console.log(ev.data);
+		},{capture: false, passive: true});
 	};
 
 	window.onload = function() {

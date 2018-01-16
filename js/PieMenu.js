@@ -21,6 +21,7 @@ tmpl.innerHTML = `
     :host *::slotted(*) {
       display: block;
       background: #eee;
+      border: 0;
       color: black;
       position: absolute;
       top: 0;
@@ -55,7 +56,7 @@ const upgrade_elements = function(slot) {
   let all_styles = [];
   let all_items = items.filter( item => item instanceof HTMLElement );
   let start_angle = -60;
-  let end_angle = 90;
+  let end_angle = 60;
   let delta = (end_angle - start_angle) / all_items.length;
   angle = start_angle;
   const notch = 0.2;
