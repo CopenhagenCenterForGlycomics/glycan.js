@@ -28,7 +28,7 @@ tmpl.innerHTML = `
       left: 0;
       width: 100%;
       height: 100%;
-      clip-path: url(#sector);
+      clip-path: url(#sectorWeight1);
       transform: scale(0.01);
     }
   </style>
@@ -36,7 +36,7 @@ tmpl.innerHTML = `
   </style>
   <svg id="sectorsvg" width="0" height="0">
   <defs>
-  <clipPath id="sector" clipPathUnits="objectBoundingBox">
+  <clipPath id="sectorWeight1" clipPathUnits="objectBoundingBox">
     <path fill="none" stroke="#111" stroke-width="0.01" d="M0.5,0.5 m0.2,0 l0.3,0 A0.5,0.5 0 0,0 0.75,0.06699 L0.6,0.326 A0.5,0.5 0 0,1 0.7,0.5 z"></path>
   </clipPath>
   </defs>
@@ -57,18 +57,26 @@ const upgrade_elements = function(slot) {
   let all_items = items.filter( item => item instanceof HTMLElement );
   let start_angle = -60;
   let end_angle = 60;
-  let delta = (end_angle - start_angle) / all_items.length;
+
+  let all_weights = all_items.map( item => parseInt(item.getAttribute('weight') || '1') );
+  let sum_weights = all_weights.reduce((acc, val) => acc + val,0);
+  let max_weight = Math.max(...all_weights);
+  console.log(max_weight);
+  let base_delta = (end_angle - start_angle) / sum_weights;
   angle = start_angle;
+  let delta = base_delta;
   const notch = 0.2;
   if (items.length > 0) {
     this.sectorpath.setAttribute('d',`M0.5,0.5 m${notch},0 l${0.5-notch},0 A0.5,0.5 0 0,0 ${ang(0.5+0.5*Math.cos(Math.PI/180*delta))},${ang(0.5-0.5*Math.sin(Math.PI/180*delta))} L${ang(0.5+(notch)*Math.cos(Math.PI/180*delta))},${ang(0.5-(notch)*Math.sin(Math.PI/180*delta))} A0.5,0.5 0 0,1 ${0.5+notch},0.5 z`);
   }
 
-  let icon_x_offset = str(50+(100*Math.cos((Math.PI/180)*delta*0.5)*(0.5 - 0.2)));
-  let icon_y_offset = str(50+(100*Math.sin((Math.PI/180)*delta*0.5)*(0.5 - 0.2)));
 
 
   for(let item of all_items) {
+    delta = base_delta * parseInt(item.getAttribute('weight') || '1');
+    let icon_x_offset = str(50+(100*Math.cos((Math.PI/180)*delta*0.5)*(0.5 - 0.2)));
+    let icon_y_offset = str(50+(100*Math.sin((Math.PI/180)*delta*0.5)*(0.5 - 0.2)));
+
     if (item.firstChild && item.firstChild.setAttribute) {
       item.firstChild.style.bottom = `calc(${icon_y_offset}% - 0px)`;
       item.firstChild.style.left = `calc(${icon_x_offset}% + 0px)`;
