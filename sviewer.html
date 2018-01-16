@@ -23,6 +23,10 @@ body {
 /*  position: fixed;
 */  overflow: hidden;
 }
+x-piemenu {
+	position: absolute;
+	pointer-events: none;
+}
 button {
 	border: 0px;
 }
@@ -32,7 +36,7 @@ button:hover {
 </style>
 </head>
 <body>
-	<x-piemenu active style="width: 100px; height: 100px;">
+	<x-piemenu id="pie" style="width: 100px; height: 100px;">
   <button><span>ABC</span></button>
   <button><span>DEF</span></button>
   <button><span>ABC</span></button>
@@ -82,6 +86,10 @@ button:hover {
 		let last_req = null;
 
 		renderer.element.canvas.addEventListener('dragleave', (ev) => {
+			setTimeout(() =>{
+				document.getElementById('pie').removeAttribute('active');
+			},100);
+
 			Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
 			if (last_req) {
 				cancelAnimationFrame(last_req);
@@ -91,6 +99,12 @@ button:hover {
 			});
 		});
 		renderer.element.canvas.addEventListener('dragover', (ev) => {
+			setTimeout(() => {
+				document.getElementById('pie').setAttribute('active',true);
+				document.getElementById('pie').style.top = (ev.clientY-50)+'px';
+				document.getElementById('pie').style.left = (ev.clientX-50)+'px';
+			},0);
+
 			Glycan.FishEyeLayout.focus = [ ev.svgX, ev.svgY ];
 			let [min_x,min_y,width,height] = renderer.element.canvas.getAttribute('viewBox').split(' ').map( val => parseFloat(val) );
 			Glycan.FishEyeLayout.zoom = Math.floor(height / 100);
@@ -165,6 +179,10 @@ button:hover {
 		// document.body.appendChild(dragImage);
 		// // And finally we assign the dragImage and center it on cursor
 		// evt.dataTransfer.setDragImage(dragImage, 20, 20);
+	});
+
+	document.getElementById('dragsource').addEventListener('dragend', (evt) => {
+		document.getElementById('pie').removeAttribute('active');
 	});
 
 	makeDragTarget = function(element) {
