@@ -17,6 +17,10 @@ tmpl.innerHTML = `
       padding: 0;
       display: block;
       position: relative;
+      transform: scale(0.99);
+    }
+    :host([active]) {
+      transform: scale(1);
     }
     :host *::slotted(*) {
       display: block;
@@ -28,8 +32,8 @@ tmpl.innerHTML = `
       left: 0;
       width: 100%;
       height: 100%;
+      -webkit-clip-path: url(#sectorWeight1);
       clip-path: url(#sectorWeight1);
-      transform: scale(0.01);
     }
   </style>
   <style id="angles">
@@ -88,13 +92,15 @@ const upgrade_elements = function(slot) {
     }
     item.style.transitionDelay = `${str(transition_delay)}s`;
     item.style.transition = `transform ${str(max_time)}s`;
+    item.style.transform = 'scale(0.001)';
     transition_delay+= 0.1;
     max_time -= 0.1;
     let classname = `rot${str(angle)}`;
     classname = classname.replace(/[-\.]/g,'x');
     item.setAttribute('class',classname);
 
-    let basic_styles = `:host([active]) *::slotted(.${classname}) { transform: rotate(${str(-1*angle)}deg); }`;
+    let basic_styles = `:host([active]) *::slotted(.${classname}) { transform: rotate(${str(-1*angle)}deg) !important; }`;
+
     all_styles.push(basic_styles);
     angle += delta;
   }
@@ -109,6 +115,7 @@ class PieMenu extends WrapHTML {
   constructor() {
     super();
     log('Initiating custom PieMenu element');
+
     let shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.appendChild(tmpl.content.cloneNode(true));
     let sectorsvg = shadowRoot.getElementById('sectorsvg');

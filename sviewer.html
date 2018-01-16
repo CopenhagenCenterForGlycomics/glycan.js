@@ -3,9 +3,10 @@
 <head>
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,shrink-to-fit=no"/>
 	<title>Sviewer</title>
+	<script type="text/javascript" src="webcomponents-lite.js"></script>
 	<script type="text/javascript" src="node_modules/babel-polyfill/dist/polyfill.js"></script>
 	<script type="text/javascript" src="dragdroptouch.js"></script>
-	<script type="text/javascript" src="glycan-bundle.js"></script>
+ 	<script type="text/javascript" src="glycan-bundle.js"></script>
 
  <style type="text/css">
 #output svg * {
@@ -28,7 +29,7 @@ x-piemenu {
 	pointer-events: none;
 }
 button {
-	font-size: 3px;
+	font-size: 8px;
 }
 button:hover {
 	background: #f00;
@@ -38,7 +39,7 @@ button:hover {
 <body>
 	<x-piemenu id="pie" style="width: 100px; height: 100px;">
   <button><span>ABC</span></button>
-  <button weight="2"><span>DEF</span></button>
+  <button weight="1"><span>DEF</span></button>
   <button><span>ABC</span></button>
 <!--   <button><span>DEF</span></button>
   <button><span>ABC</span></button>
@@ -62,6 +63,30 @@ button:hover {
 	<div id="output">
 	</div>
 <script type="text/javascript">
+	let old_dispatch = DragDropTouch.prototype._dispatchEvent;
+	let shim_dispatch = function(e,type,target) {
+        if (e && target) {
+            var evt = document.createEvent('Event'), t = e.touches ? e.touches[0] : e;
+            evt.initEvent(type, true, true);
+            evt.button = 0;
+            evt.which = evt.buttons = 1;
+            this._copyProps(evt, e, DragDropTouch._kbdProps);
+            this._copyProps(evt, t, DragDropTouch._ptProps);
+            evt.dataTransfer = this._dataTransfer;
+            target.dispatchEvent(evt);
+            return evt;
+        }
+        return false;
+	};
+	DragDropTouch.prototype._dispatchEvent = function(e,type,target) {
+		if (e && target) {
+			let new_ev = shim_dispatch.bind(this)(e,type,document.body);
+			new_ev.shim = true;
+			target.dispatchEvent(new_ev);
+			return new_ev.defaultPrevented;
+		}
+		return false;
+	};
 	let clear_sequences = function() {
 		document.getElementById('output').innerHTML = '';
 	};
@@ -128,27 +153,27 @@ button:hover {
 			});
 		});
 
-		setInterval(function() {
-			if ( Math.floor(Math.random()*10) >= 5 ) {
-				if (sug.composition().length < 3) {
-					return;
-				}
-				let removed = sug.leaves()[0];
-				removed.parent.removeChild(removed.parent.linkageOf(removed),removed);
-			} else {
-				let residues = sug.composition();
-				let targ = residues[Math.floor(Math.random()*residues.length)];
-				if (targ.identifier === 'Fuc' || targ.identifier === 'NeuAc') {
-					return;
-				}
-				let new_res = new Glycan.Monosaccharide('Gal');
-				new_res.anomer = 'a';
-				new_res.parent_link = 1;
-				targ.addChild(4,new_res);
-				targ = new_res;
-			}
-			renderer.refresh();
-		},1000);
+		// setInterval(function() {
+		// 	if ( Math.floor(Math.random()*10) >= 5 ) {
+		// 		if (sug.composition().length < 3) {
+		// 			return;
+		// 		}
+		// 		let removed = sug.leaves()[0];
+		// 		removed.parent.removeChild(removed.parent.linkageOf(removed),removed);
+		// 	} else {
+		// 		let residues = sug.composition();
+		// 		let targ = residues[Math.floor(Math.random()*residues.length)];
+		// 		if (targ.identifier === 'Fuc' || targ.identifier === 'NeuAc') {
+		// 			return;
+		// 		}
+		// 		let new_res = new Glycan.Monosaccharide('Gal');
+		// 		new_res.anomer = 'a';
+		// 		new_res.parent_link = 1;
+		// 		targ.addChild(4,new_res);
+		// 		targ = new_res;
+		// 	}
+		// 	renderer.refresh();
+		// },1000);
 		renderer.refresh();
 		output.firstChild.style.width = '100%';
 		output.firstChild.style.height = '100%';
@@ -168,12 +193,12 @@ button:hover {
 	//https://codepen.io/anon/pen/WdyZvY
 
 	document.body.addEventListener('dragstart', (evt) => {
-		if ( ! evt.isTrusted ) {
+		if ( ! evt.isTrusted && ! evt.shim ) {
 			return;
 		}
+		console.log("Setting up data");
 		// Setup some dummy drag-data to ensure dragging
 		let drag_id = 'drag/'+(new Date().getTime());
-		console.log(evt);
 		evt.dataTransfer.setData(drag_id, '');
 		evt.dataTransfer.effectAllowed = 'copy';
 		evt.dataTransfer.dropEffect = 'copy';
