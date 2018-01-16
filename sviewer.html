@@ -23,9 +23,23 @@ body {
 /*  position: fixed;
 */  overflow: hidden;
 }
+button {
+	border: 0px;
+}
+button:hover {
+	background: #f00;
+}
 </style>
 </head>
 <body>
+	<x-piemenu active style="width: 100px; height: 100px;">
+  <button><span>ABC</span></button>
+  <button><span>DEF</span></button>
+  <button><span>ABC</span></button>
+  <button><span>DEF</span></button>
+  <button><span>ABC</span></button>
+  <button><span>DEFG<br/>HIJK</span></button>
+	</x-piemenu>
 	<pre id="seqs" style="display: none;">
 		NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc
 		Gal(b1-3)[GlcNAc(b1-4)]GalNAc
