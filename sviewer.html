@@ -29,6 +29,10 @@ x-piemenu {
 	top: 0px;
 	left: 0px;
 	pointer-events: none;
+	width: 200px;
+	margin-left: -50px;
+	margin-top: -50px;
+	height: 200px;
 }
 x-piemenu[active] label {
 	pointer-events: all;
@@ -44,12 +48,12 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 </head>
 <body>
 	<form id="new_linkage">
-	<x-piemenu id="anomer_menu" style="width: 100px; height: 100px;">
+	<x-piemenu id="anomer_menu" >
   <label><span>a</span><input name="anomer" value="a" type="radio"></label>
   <label><span>b</span><input name="anomer" value="b" type="radio"></label>
   <label><span>?</span><input name="anomer" value="?" type="radio"></label>
 	</x-piemenu>
-	<x-piemenu id="linkage_menu" style="width: 100px; height: 100px;">
+	<x-piemenu id="linkage_menu">
   <label><span>2</span><input name="linkage" value="2" type="radio"></label>
   <label><span>3</span><input name="linkage" value="3" type="radio"></label>
   <label><span>4</span><input name="linkage" value="4" type="radio"></label>
