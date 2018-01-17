@@ -2,13 +2,20 @@
 'use strict';
 
 const shim_dispatch = function(e,type,target) {
+  let related = null;
   if (e && target) {
+      if (type == 'dragleave') {
+        related = this._getTarget(e);
+      }
       var evt = document.createEvent('Event'), t = e.touches ? e.touches[0] : e;
       evt.initEvent(type, true, true);
       evt.button = 0;
       evt.which = evt.buttons = 1;
       this._copyProps(evt, e, DragDropTouch._kbdProps);
       this._copyProps(evt, t, DragDropTouch._ptProps);
+      if (evt.type === 'dragleave') {
+        evt.relatedTarget = related;
+      }
       evt.dataTransfer = this._dataTransfer;
       target.dispatchEvent(evt);
       return evt;
