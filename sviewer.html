@@ -297,13 +297,13 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 
 			linkage_chooser.addEventListener('drop', (ev) => {
 				let residue = document.getElementById('new_linkage').residue;
-				console.log(JSON.stringify([...new FormData(document.getElementById('new_linkage'))]));
+				// console.log(JSON.stringify([...new FormData(document.getElementById('new_linkage'))]));
 				console.log(residue.identifier);
 				let new_mono = new Glycan.Monosaccharide('NeuAc');
 				new_mono.anomer = document.getElementById('new_linkage').anomer.value;
 				residue.addChild(document.getElementById('new_linkage').linkage.value,new_mono);
 				residue.renderer.refresh();
-				enableDropResidue(renderer,new_mono);
+				enableDropResidue(residue.renderer,new_mono);
 				delete document.getElementById('new_linkage').residue;
 				last_linkage = null;
 				last_anomer = null;
