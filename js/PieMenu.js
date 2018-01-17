@@ -65,11 +65,11 @@ const upgrade_elements = function(slot) {
   let all_weights = all_items.map( item => parseInt(item.getAttribute('weight') || '1') );
   let sum_weights = all_weights.reduce((acc, val) => acc + val,0);
   let max_weight = Math.max(...all_weights);
-  console.log(max_weight);
   let base_delta = (end_angle - start_angle) / sum_weights;
   angle = start_angle;
   let delta = base_delta;
   const notch = 0.2;
+  console.log(max_weight);
   if (items.length > 0) {
     this.sectorpath.setAttribute('d',`M0.5,0.5 m${notch},0 l${0.5-notch},0 A0.5,0.5 0 0,0 ${ang(0.5+0.5*Math.cos(Math.PI/180*delta))},${ang(0.5-0.5*Math.sin(Math.PI/180*delta))} L${ang(0.5+(notch)*Math.cos(Math.PI/180*delta))},${ang(0.5-(notch)*Math.sin(Math.PI/180*delta))} A0.5,0.5 0 0,1 ${0.5+notch},0.5 z`);
   }
@@ -86,6 +86,7 @@ const upgrade_elements = function(slot) {
       item.firstChild.style.left = `calc(${icon_x_offset}% + 0px)`;
       item.firstChild.style.position  ='absolute';
       item.firstChild.style.transform = `rotate(${str(angle)}deg)`;
+      item.firstChild.style.pointerEvents = 'none';
     }
     if (! item.style) {
       continue;
