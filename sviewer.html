@@ -63,30 +63,7 @@ button:hover {
 	<div id="output">
 	</div>
 <script type="text/javascript">
-	let old_dispatch = DragDropTouch.prototype._dispatchEvent;
-	let shim_dispatch = function(e,type,target) {
-        if (e && target) {
-            var evt = document.createEvent('Event'), t = e.touches ? e.touches[0] : e;
-            evt.initEvent(type, true, true);
-            evt.button = 0;
-            evt.which = evt.buttons = 1;
-            this._copyProps(evt, e, DragDropTouch._kbdProps);
-            this._copyProps(evt, t, DragDropTouch._ptProps);
-            evt.dataTransfer = this._dataTransfer;
-            target.dispatchEvent(evt);
-            return evt;
-        }
-        return false;
-	};
-	DragDropTouch.prototype._dispatchEvent = function(e,type,target) {
-		if (e && target) {
-			let new_ev = shim_dispatch.bind(this)(e,type,document.body);
-			new_ev.shim = true;
-			target.dispatchEvent(new_ev);
-			return new_ev.defaultPrevented;
-		}
-		return false;
-	};
+	new Glycan.DragManager(document.body);
 	let clear_sequences = function() {
 		document.getElementById('output').innerHTML = '';
 	};
@@ -187,41 +164,6 @@ button:hover {
 		append_sequence(document.getElementById('seq').value);
 
 	};
-
-	var global_drags = {};
-
-	//https://codepen.io/anon/pen/WdyZvY
-
-	document.body.addEventListener('dragstart', (evt) => {
-		if ( ! evt.isTrusted && ! evt.shim ) {
-			return;
-		}
-		console.log("Setting up data");
-		// Setup some dummy drag-data to ensure dragging
-		let drag_id = 'drag/'+(new Date().getTime());
-		evt.dataTransfer.setData(drag_id, '');
-		evt.dataTransfer.effectAllowed = 'copy';
-		evt.dataTransfer.dropEffect = 'copy';
-
-		let target = evt.target;
-		var event = new Event('dragstart');
-		event.bubbles = false;
-		event.dataTransfer = { types: [ drag_id ] };
-		event.data = { };
-		global_drags[drag_id] = event.data;
-		target.dispatchEvent(event);
-		evt.stopPropagation();
-	},{capture: true});
-
-	document.body.addEventListener('dragenter', (ev) => {
-		let drag_id = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/))[0];
-		ev.data = global_drags[drag_id];
-	},{capture: true});
-
-	document.body.addEventListener('drop', (ev) => {
-		let drag_id = ev.dataTransfer.types.filter( type => type.match(/^drag\/\d+/))[0];
-		ev.data = global_drags[drag_id];
-	},{capture: true});
 
 	document.getElementById('dragsource').addEventListener('dragstart', function (evt) {
 		evt.stopPropagation();
