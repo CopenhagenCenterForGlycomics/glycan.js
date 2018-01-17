@@ -19,7 +19,9 @@ class SugarAwareLayout extends CondensedLayout {
       position.dx += (position.dx < 0) ? -0.25 : 0.25;
       return position;
     }
-    if (res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0) {
+    if (res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0 &&
+        res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) >= 0 ).length == 1
+        ) {
       position.dx = 0;
     }
     if (res.identifier === 'Man' && res.siblings.length > 0) {
