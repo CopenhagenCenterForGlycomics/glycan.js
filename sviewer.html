@@ -30,8 +30,8 @@ x-piemenu {
 	left: 0px;
 	pointer-events: none;
 	width: 200px;
-	margin-left: -50px;
-	margin-top: -50px;
+	margin-left: -100px;
+	margin-top: -100px;
 	height: 200px;
 }
 x-piemenu[active] label {
@@ -100,6 +100,14 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		let last_req = null;
 
 		renderer.element.canvas.addEventListener('dragleave', (ev) => {
+			if (ev.relatedTarget === renderer.element.canvas) {
+				setTimeout(() =>{
+					document.getElementById('anomer_menu').removeAttribute('active');
+					document.getElementById('linkage_menu').removeAttribute('active');
+					delete document.getElementById('new_linkage').residue;
+				},100);
+			}
+
 			Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
 			if (last_req) {
 				cancelAnimationFrame(last_req);
@@ -128,7 +136,6 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 			if (
 			document.getElementById('linkage_menu').hasAttribute('active') ||
 			document.getElementById('anomer_menu').hasAttribute('active') ) {
-				console.log("Skipping fisheye because of active menus");
 				return;
 			}
 
@@ -243,7 +250,7 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 				anomer_chooser.removeAttribute('active');
 				linkage_chooser.setAttribute('active',true);
 				unselectMenu(linkage_chooser);
-			},500);
+			},700);
 		});
 		anomer_chooser.addEventListener('dragleave', (ev) => {
 			if (ev.relatedTarget !== anomer_chooser) {
@@ -347,10 +354,10 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 				let target_pos = ev.target.getBoundingClientRect();
 				let left_pos = target_pos.left + target_pos.width / 2;
 				let top_pos = target_pos.top + target_pos.height / 2;
-				anomer_chooser.style.top = (top_pos-50)+'px';
-				anomer_chooser.style.left = (left_pos-50)+'px';
-				linkage_chooser.style.top = (top_pos-50)+'px';
-				linkage_chooser.style.left = (left_pos-50)+'px';
+				anomer_chooser.style.top = (top_pos)+'px';
+				anomer_chooser.style.left = (left_pos)+'px';
+				linkage_chooser.style.top = (top_pos)+'px';
+				linkage_chooser.style.left = (left_pos)+'px';
 				anomer_chooser.setAttribute('active',true);
 				unselectMenu(anomer_chooser);
 			},500);

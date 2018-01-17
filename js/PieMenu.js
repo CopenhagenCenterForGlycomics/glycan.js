@@ -68,7 +68,7 @@ const upgrade_elements = function(slot) {
   let base_delta = (end_angle - start_angle) / sum_weights;
   angle = start_angle;
   let delta = base_delta;
-  const notch = 0.2;
+  const notch = 0.075;
   console.log(max_weight);
   if (items.length > 0) {
     this.sectorpath.setAttribute('d',`M0.5,0.5 m${notch},0 l${0.5-notch},0 A0.5,0.5 0 0,0 ${ang(0.5+0.5*Math.cos(Math.PI/180*delta))},${ang(0.5-0.5*Math.sin(Math.PI/180*delta))} L${ang(0.5+(notch)*Math.cos(Math.PI/180*delta))},${ang(0.5-(notch)*Math.sin(Math.PI/180*delta))} A0.5,0.5 0 0,1 ${0.5+notch},0.5 z`);
