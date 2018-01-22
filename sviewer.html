@@ -29,10 +29,10 @@ x-piemenu {
 	top: 0px;
 	left: 0px;
 	pointer-events: none;
-	width: 200px;
-	margin-left: -100px;
-	margin-top: -100px;
-	height: 200px;
+	width: 150px;
+	margin-left: -75px;
+	margin-top: -75px;
+	height: 150px;
 }
 x-piemenu[active] label {
 	pointer-events: all;
@@ -42,7 +42,8 @@ x-piemenu button, x-piemenu label {
 	font-size: 8px;
 }
 x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu label:hover {
-	background: #f00;
+	background: #6052E2;
+	color: #ffffff;
 }
 </style>
 </head>
@@ -354,8 +355,11 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 				let target_pos = ev.target.getBoundingClientRect();
 				let left_pos = target_pos.left + target_pos.width / 2;
 				let top_pos = target_pos.top + target_pos.height / 2;
+				let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2) ;
+				anomer_chooser.style.transform = `scale(${zoom})`;
 				anomer_chooser.style.top = (top_pos)+'px';
 				anomer_chooser.style.left = (left_pos)+'px';
+				linkage_chooser.style.transform = `scale(${zoom})`;
 				linkage_chooser.style.top = (top_pos)+'px';
 				linkage_chooser.style.left = (left_pos)+'px';
 				anomer_chooser.setAttribute('active',true);

@@ -17,6 +17,7 @@ tmpl.innerHTML = `
       padding: 0;
       display: block;
       position: relative;
+      filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));
       transform: scale(0.99);
     }
     :host([active]) {
