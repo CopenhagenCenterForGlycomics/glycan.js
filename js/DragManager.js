@@ -1,4 +1,4 @@
-/* globals document,DragDropTouch,Event */
+/* globals document,DragDropTouch,Event,window */
 'use strict';
 
 const shim_dispatch = function(e,type,target) {
@@ -54,7 +54,13 @@ const dragstart_event = function(e) {
   }
 
   let drag_id = 'drag/'+uuid();
-  e.dataTransfer.setData(drag_id, '');
+  try {
+    e.dataTransfer.setData(drag_id, '');
+  } catch (err) {
+    console.log('Couldnt set drag id, using global drag id');
+    e.dataTransfer.setData('text',drag_id);
+    window.global_drag = drag_id;
+  }
   e.dataTransfer.effectAllowed = 'copy';
   e.dataTransfer.dropEffect = 'copy';
 
@@ -68,7 +74,8 @@ const dragstart_event = function(e) {
 };
 
 const populate_event_data = function(e) {
-  let drag_id = e.dataTransfer.types.filter( type => type.match(/^drag\/\d+/))[0];
+
+  let drag_id = [...e.dataTransfer.types].filter( type => type.match(/^drag\/\d+/))[0] || window.global_drag;
   e.data = this.drags.get(drag_id);
 };
 
