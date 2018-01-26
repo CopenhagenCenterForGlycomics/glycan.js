@@ -71,3 +71,19 @@ jobs:
                 name: Deploy to S3
                 command: |
                     aws --region us-east-1 s3 sync glycan-bundle.js s3://somebucket/glycan-bundle.js --delete
+
+workflows:
+    version: 2
+    # The build and deploy workflow
+    build_and_deploy:
+        jobs:
+            - build
+            # The deploy job will only run on the filtered branches and
+            # require the build job to be successful before it starts
+            - deploy:
+                requires:
+                    - build
+                filters:
+                    branches:
+                        only:
+                            - master
