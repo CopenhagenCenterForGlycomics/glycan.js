@@ -1,4 +1,4 @@
-/* globals document,HTMLElement,customElements,ShadyCSS */
+/* globals document,HTMLElement,customElements */
 'use strict';
 
 import * as debug from 'debug-any-level';
@@ -107,23 +107,24 @@ const upgrade_elements = function(slot) {
     angle += delta;
   }
   this.hoverstyles.innerHTML = all_styles.join('\n');
-  let temp_template = document.createElement('template');
-  temp_template.innerHTML = '<style type="text/css">'+all_styles.join('\n')+'</style>';
-  ShadyCSS.prepareTemplate(temp_template,'x-piemenu');
-  this.hoverstyles.innerHTML = temp_template.innerHTML;
+  // let temp_template = document.createElement('template');
+  // temp_template.innerHTML = '<style type="text/css">'+all_styles.join('\n')+'</style>';
+  // ShadyCSS.prepareTemplate(temp_template,'x-piemenu');
+  // this.hoverstyles.innerHTML = temp_template.innerHTML;
 };
 
 function WrapHTML() { return Reflect.construct(HTMLElement, [], Object.getPrototypeOf(this).constructor); }
 Object.setPrototypeOf(WrapHTML.prototype, HTMLElement.prototype);
 Object.setPrototypeOf(WrapHTML, HTMLElement);
 
-ShadyCSS.prepareTemplate(tmpl,'x-piemenu');
+// ShadyCSS.prepareTemplate(tmpl,'x-piemenu');
 
 
 class PieMenu extends WrapHTML {
   constructor() {
     super();
     log('Initiating custom PieMenu element');
+
     let shadowRoot = this.attachShadow({mode: 'open'});
     shadowRoot.appendChild(tmpl.content.cloneNode(true));
     let sectorsvg = shadowRoot.getElementById('sectorsvg');
@@ -139,7 +140,7 @@ class PieMenu extends WrapHTML {
     let slot = shadowRoot.getElementById('items');
     slot.addEventListener('slotchange', upgrade_elements.bind(this,slot));
     upgrade_elements.bind(this)(slot);
-    ShadyCSS.styleElement(this);
+    // ShadyCSS.styleElement(this);
   }
 }
 
