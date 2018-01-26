@@ -1,6 +1,10 @@
 /* globals document,DragDropTouch,Event,window */
 'use strict';
 
+if (typeof window.DragDropTouch === 'undefined') {
+  window.DragDropTouch = { prototype: {} };
+}
+
 const shim_dispatch = function(e,type,target) {
   let related = null;
   if (e && target) {
