@@ -71,7 +71,8 @@ jobs:
             name: Deploy to S3
             command: |
                 aws --region us-east-1 s3 cp glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js --delete
-                aws --region us-east-1 s3 cp glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js-{{ .Environment.CIRCLE_SHA1 }} --delete
+                aws --region us-east-1 s3 cp glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js-$CIRCLE_BRANCH --delete
+                aws --region us-east-1 s3 cp glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js-$CIRCLE_SHA1 --delete
 
 workflows:
     version: 2
