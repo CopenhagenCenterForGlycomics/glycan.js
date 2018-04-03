@@ -118,6 +118,7 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		output.style.height = '150px';
 		output.style.float = 'left';
 		document.getElementById('output').appendChild(output);
+		Glycan.FishEyeLayout.LINKS = false;
 		let renderer = new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
 		renderer.addSugar(sug);
 

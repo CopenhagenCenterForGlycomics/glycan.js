@@ -6,12 +6,14 @@ const module_string='glycanjs:condensedlayout';
 
 const log = debug(module_string);
 
-const DELTA_X = 1;
-const DELTA_Y = -1;
+const BASE_DELTA_X = 1;
+const BASE_DELTA_Y = 1;
 
 
-let calculate_position = (sugar,item,position={dx:0,dy:0,r:0.5},parent_position={}) => {
+let calculate_position = function(sugar,item,position={dx:0,dy:0,r:0.5},parent_position={}) {
 
+  const DELTA_Y = this.DELTA_Y;
+  const DELTA_X = this.DELTA_X;
 
   // upwards = positive y
 
@@ -26,7 +28,7 @@ let calculate_position = (sugar,item,position={dx:0,dy:0,r:0.5},parent_position=
     return position;
   }
 
-  position.dy = DELTA_Y;
+  position.dy = -1 * DELTA_Y;
   position.dx = 0;
 
   if ( ! position.item_index && parent_position.spread_count ) {
@@ -35,13 +37,13 @@ let calculate_position = (sugar,item,position={dx:0,dy:0,r:0.5},parent_position=
   }
 
   if ( parent_position.spread ) {
-    position.dy = parent_position.spread * DELTA_Y;
+    position.dy = -1 * parent_position.spread * DELTA_Y;
     position.dx = parent_position.spread * DELTA_X*(position.item_index - 1 - Math.floor(parent_position.spread_count / 2) + 0.5*(1-(parent_position.spread_count % 2)));
   }
 
   // Make room for linkage
   if (! parent_position.spread || parent_position.spread < 2 ) {
-    position.dy += 0.5*DELTA_Y;
+    position.dy += -1 * position.r;
   }
 
   if (parent_position.grid_spread) {
@@ -115,8 +117,25 @@ let map_get_item = (map,item) => map.get(item);
 let path_to_root = (sugar,start) => [...sugar.residues_to_root(start)];
 
 let CondensedLayout = class {
+
+  static get DELTA_X() {
+    if (this.LINKS) {
+      return BASE_DELTA_X;
+    } else {
+      return BASE_DELTA_X;
+    }
+  }
+
+  static get DELTA_Y() {
+    if (this.LINKS) {
+      return BASE_DELTA_Y;
+    } else {
+      return 0.5*BASE_DELTA_Y;
+    }
+  }
+
   static LayoutMonosaccharide(renderable,monosaccharide,position,parent_position) {
-    return calculate_position(renderable,monosaccharide,position,parent_position);
+    return calculate_position.call(this,renderable,monosaccharide,position,parent_position);
   }
 
   static PerformLayout(renderable) {
@@ -213,5 +232,7 @@ let CondensedLayout = class {
     return layout;
   }
 };
+
+CondensedLayout.LINKS = true;
 
 export default CondensedLayout;

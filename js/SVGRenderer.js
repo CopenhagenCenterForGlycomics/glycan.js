@@ -237,15 +237,15 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     if (position.z !== 1) {
       zindices.push({ z: position.z, icon: icon });
     }
-
-    if ( ! current.linkage ) {
-      current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
-    } else {
-      current.linkage.parentNode.removeChild(current.linkage);
-      current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
-      // Do nothing
+    if (this[layout_engine].LINKS) {
+      if ( ! current.linkage ) {
+        current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
+      } else {
+        current.linkage.parentNode.removeChild(current.linkage);
+        current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
+        // Do nothing
+      }
     }
-
     let rotate_angle = 0;
     if (position.rotate) {
       rotate_angle = position.rotate;
