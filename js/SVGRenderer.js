@@ -138,7 +138,7 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   return label;
 };
 
-const render_linkage = function(child_pos,parent_pos,child,parent,canvas) {
+const render_linkage = function(child_pos,parent_pos,child,parent,canvas, show_labels = true) {
   if ( ! parent_pos ) {
     return;
   }
@@ -153,8 +153,9 @@ const render_linkage = function(child_pos,parent_pos,child,parent,canvas) {
   let line = group.line(...positions);
   line.setAttribute('stroke-width',str(SCALE/100));
   line.setAttribute('stroke','#333');
-
-  render_link_label(child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
+  if ( show_labels ) {
+    render_link_label(child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
+  }
   return group.element;
 };
 
@@ -237,14 +238,13 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     if (position.z !== 1) {
       zindices.push({ z: position.z, icon: icon });
     }
-    if (this[layout_engine].LINKS) {
-      if ( ! current.linkage ) {
-        current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
-      } else {
-        current.linkage.parentNode.removeChild(current.linkage);
-        current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container );
-        // Do nothing
-      }
+    let show_labels = this[layout_engine].LINKS == true;
+    if ( ! current.linkage ) {
+      current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
+    } else {
+      current.linkage.parentNode.removeChild(current.linkage);
+      current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
+      // Do nothing
     }
     let rotate_angle = 0;
     if (position.rotate) {
