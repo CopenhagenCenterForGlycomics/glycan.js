@@ -35,7 +35,6 @@ let comparator = (a,b) => {
 // We rewrite the sequence to
 // get rid of the placeholder Root
 // root monosaccharide.
-// FIXME - Add in skip flags for monosaccharides?
 
 let rewrite_sequence = base => {
   return class extends base {
