@@ -13,6 +13,9 @@ const attachment_tag = Symbol('attachment');
 let identifier_comparator = (a,b) => a.identifier === b.identifier;
 
 let comparator = (a,b) => {
+  if ( ! a || ! b ) {
+    return false;
+  }
   if (a.identifier === '*' || b.identifier === '*') {
     return true;
   }
@@ -133,7 +136,12 @@ class Reaction extends Sugar {
 
   // Move to a container class with positive and negative assertions
   tagSubstrateResidues(sugar,tag=Symbol('substrate')) {
-    find_sugar_substrates.call(this,sugar).forEach( res => res.setTag(tag) );
+    let test_result = find_sugar_substrates.call(this,sugar);
+    if (this.negative) {
+      let without_delta = filter_delta_exists.call(this,test_result,sugar);
+      test_result = test_result.filter( res => without_delta.indexOf(res) < 0 );
+    }
+    test_result.forEach( res => res.setTag(tag) );
     return tag;
   }
 
