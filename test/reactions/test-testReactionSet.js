@@ -1,7 +1,7 @@
 /*global QUnit*/
 
 import Reaction from '../../js/Reaction';
-import ReactionSet from '../../js/ReactionSet';
+import { ReactionSet } from '../../js/ReactionSet';
 
 import Sugar from '../../js/Sugar';
 
