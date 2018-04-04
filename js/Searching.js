@@ -6,8 +6,6 @@ const module_string='glycanjs:searching';
 
 const log = debug(module_string);
 
-const wildcard_symbol = Symbol('wildcard');
-
 let flatten = array => [].concat.apply([], array);
 
 let onlyUnique = function(value, index, self) {
@@ -54,7 +52,7 @@ let match_fixed_paths = function(sugar,pattern,comparator) {
   return wanted_roots;
 };
 
-let map_leaf_originals = function(trees) {
+let map_leaf_originals = function(trees,wildcard_symbol) {
   let result = new WeakMap();
   for (let tree of trees) {
     for (let leaf of tree.leaves()) {
@@ -71,6 +69,8 @@ let map_leaf_originals = function(trees) {
 };
 
 let match_wildcard_paths = function(sugar,pattern,comparator) {
+  const wildcard_symbol = Symbol('wildcard');
+
   log.info('Wildcard matching',sugar.sequence,pattern.sequence);
   let wildcard_residues = pattern.composition().filter( res => res.identifier === '*' );
 
@@ -109,7 +109,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
     log.info('Wildcard for root tree is ',wildcard,wildcard.parent ? wildcard.parent.identifier : '(No root)');
   });
   // Grab the original leaves for the root match subtrees
-  let root_trees_by_leaf_original = map_leaf_originals(root_trees);
+  let root_trees_by_leaf_original = map_leaf_originals(root_trees,wildcard_symbol);
   let result = wildcard_subtrees.map( subtree_set => {
     return subtree_set.map( subtree => {
       let roots = match_fixed_paths(sugar,subtree, comparator);
