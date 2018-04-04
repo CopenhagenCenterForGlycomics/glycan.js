@@ -3,9 +3,18 @@ const reactions = Symbol('reactions');
 
 const reactionset = Symbol('reactionset');
 
+import * as debug from 'debug-any-level';
+
+const module_string='glycanjs:reactionset';
+
+const log = debug(module_string);
+
 let clean_tags = (tag) => { return res => res.setTag(tag,null); };
 
 let not_in_array = (array) => { return el => array.indexOf(el) < 0; };
+
+let only_unique = (v, i, s) => s.indexOf(v) === i;
+
 
 let match_root_original = (res) => { return tree => tree.root.original === res; };
 
@@ -118,11 +127,66 @@ class ReactionGroup {
     }
     return reaction;
   }
+  tagSubstrateResidues(sugar,reactions=this.reactions,tag=Symbol('substrate')) {
+    for (let reaction of reactions) {
+      reaction.tagSubstrateResidues(sugar,tag);
+    }
+    return tag;
+  }
+  supportsLinkageAt(sugar,donor,linkage,substrate) {
+    let possible_linkages = [];
+    let possible_anomers = [];
+    let donor_filtered = this.reactions.filter( reaction => {
+      let donor_res = reaction.delta.root.children[0];
+      let reac_linkage = reaction.delta.root.linkageOf(donor_res);
+      possible_linkages.push(reac_linkage);
+      possible_anomers.push(donor_res.anomer);
+      return (donor_res.identifier === donor);
+    });
 
-  supportLinkages(sugar) {
+    possible_anomers = possible_anomers.filter(only_unique);
+    possible_linkages = possible_linkages.filter(only_unique);
+
+    log.info('Remaining reactions after filtering by donor',donor_filtered.length);
+
+    // If there isn't a linkage specified - what are the possible
+    // linkages that this reaction set supports
+
+    if ( donor_filtered.length < 1 || typeof linkage === 'undefined' ) {
+      return donor_filtered.length > 0 ? { anomer: possible_anomers, linkage: possible_linkages } : { anomer:[], linkage: [] };
+    }
+
+    // If there is a linkage - filter the reactions down to the
+    // reactions that support the linkage we want
+
+    let linkage_filtered = donor_filtered.filter( reaction => {
+      let donor_res = reaction.delta.root.children[0];
+      let reac_linkage = reaction.delta.root.linkageOf(donor_res);
+      return (reac_linkage === 0 || reac_linkage === linkage);
+    });
+
+    log.info('Remaining reactions after filtering by linkage',linkage_filtered.length);
+
+    if ( linkage_filtered.length < 1 || typeof substrate === 'undefined' ) {
+      return linkage_filtered.length > 0 ? { anomer: possible_anomers, linkage: [ linkage ] } : { anomer: ['a','b'], linkage: [] };
+    }
+
+    let supported_tag = this.tagSubstrateResidues(sugar,linkage_filtered);
+    let supported = sugar.composition_for_tag(supported_tag);
+
+    log.info('Total residues that are possible substrates',supported.length);
+
+    if (supported.indexOf(substrate) >= 0 ) {
+      return { anomer: possible_anomers, linkage: [ linkage ], substrate: [ substrate ]};
+    } else {
+      return { anomer: possible_anomers, linkage: [], substrate: [] };
+    }
+  }
+
+  supportLinkages(sugar,reactions=this.reactions) {
     let symbol_map = {};
     let with_support = Symbol('with_support');
-    for ( let reaction of this.reactions ) {
+    for ( let reaction of reactions ) {
       symbol_map[ reaction ] = symbol_map[ reaction ] || { substrate: Symbol('substrate'), residue: Symbol('residue') };
       reaction.tagSubstrateResidues(sugar,symbol_map[reaction].substrate);
       let attachments = sugar.composition_for_tag(symbol_map[reaction].substrate);
