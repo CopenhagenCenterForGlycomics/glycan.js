@@ -79,6 +79,7 @@ let parseReaction = (sugar) => {
 };
 
 let find_sugar_substrates = function(sugar) {
+  // The attachment tag is part of the reaction
   let substrates = sugar.match_sugar_pattern(this,comparator) || [];
   return substrates.map( match => match.composition_for_tag(attachment_tag)[0].original );
 };
