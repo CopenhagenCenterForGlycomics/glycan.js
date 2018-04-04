@@ -121,14 +121,19 @@ class ReactionGroup {
 
   supportLinkages(sugar) {
     let symbol_map = {};
+    let with_support = Symbol('with_support');
     for ( let reaction of this.reactions ) {
-      symbol_map[ reaction ] = symbol_map[ reaction ] || Symbol('substrate');
-      reaction.tagSubstrateResidues(sugar,symbol_map[reaction]);
-      let attachments = sugar.composition_for_tag(symbol_map[reaction]);
+      symbol_map[ reaction ] = symbol_map[ reaction ] || { substrate: Symbol('substrate'), residue: Symbol('residue') };
+      reaction.tagSubstrateResidues(sugar,symbol_map[reaction].substrate);
+      let attachments = sugar.composition_for_tag(symbol_map[reaction].substrate);
       let trees = filter_with_delta.call(reaction,attachments,sugar);
       let supported = trees.map( tree => tree[0].root.children[0].original );
-      console.log(supported.map( res => [res.identifier, res.parent.identifier, res.depth ] ));
+      for (let residue of supported) {
+        residue.setTag(symbol_map[reaction].residue);
+        residue.setTag(with_support);
+      }
     }
+    return with_support;
   }
 
 }

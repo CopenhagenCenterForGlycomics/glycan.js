@@ -31,8 +31,10 @@ QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = search_sequence;
-  reactiongroup.supportLinkages(test_sugar);
-  assert.ok(reactionset.worksOn(test_sugar));
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.ok(supported.length === 1);
+  assert.ok(supported.map( res => res.identifier ).join(',') === 'New');
 });
 
 QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
@@ -53,7 +55,9 @@ QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = search_sequence;
-  reactiongroup.supportLinkages(test_sugar);
-  assert.ok(reactionset.worksOn(test_sugar));
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.ok(supported.length === 3);
+  assert.ok(supported.map( res => res.identifier ).join(',') === 'New,New,New');
 });
 
