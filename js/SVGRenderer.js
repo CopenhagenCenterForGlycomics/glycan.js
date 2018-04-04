@@ -328,8 +328,9 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
 
   if ( ! container.laidOut ) {
-    container.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
-    canvas.canvas.setAttribute('viewBox',`${SCALE*min_x} ${SCALE*min_y} ${SCALE*width} ${SCALE*height}`);
+    let padding = 2;
+    container.setAttribute('viewBox',`${SCALE*(min_x-padding/2)} ${SCALE*(min_y-padding/2)} ${SCALE*(width+padding)} ${SCALE*(height+padding)}`);
+    canvas.canvas.setAttribute('viewBox',`${SCALE*(min_x-padding/2)} ${SCALE*(min_y-padding/2)} ${SCALE*(width+padding)} ${SCALE*(height+padding)}`);
     container.laidOut = true;
   }
   return container;
