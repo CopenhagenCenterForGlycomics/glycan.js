@@ -13,7 +13,6 @@ QUnit.test( 'Reads out locations on a simple sugar for individual monosaccharide
   sugar.sequence = 'Gal(b1-3)GlcNAc';
   let locations = sugar.composition().map( res => [ res.identifier, sugar.location_for_monosaccharide(res) ] );
   assert.deepEqual(locations,[ ['GlcNAc','y1a'],['Gal','y2a'] ]);
-  console.log();
 });
 
 
