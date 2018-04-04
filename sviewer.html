@@ -15,6 +15,12 @@
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
 }
+g.tagged {
+	filter: url(#membrane);
+}
+g.tagged line {
+	stroke-width: 5;
+}
 .palette div {
 	height: 100%;
 }
@@ -49,6 +55,33 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1000 1000" width="0" height="0">
+	<defs>
+    <filter id="membrane" filterUnits="objectBoundingBox">
+      <feColorMatrix mode="matrix" in="SourceGraphic" values="0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 1 0" result="blacksource"/>
+      <feGaussianBlur in="blacksource" stdDeviation="3" result="blur" />
+      <feColorMatrix mode="matrix" in="blur" values="0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 0 0
+                                                     0 0 0 20 -3" result="contrastup"/>
+
+      <feColorMatrix mode="matrix" in="contrastup" values="0 0 0 0 0.8
+                                                     0 0 0 0 0.8
+                                                     0 0 0 0 0.9
+                                                     0 0 0 1 0" result="googrey"/>
+      <feMorphology operator="dilate" in="googrey" radius="15"/>
+          <feColorMatrix mode="matrix" values="0 0 0 0 0.6
+0 0 0 0 0.6
+0 0 0 0 0.9
+0 0 0 1 0" result="outeroutline"/>
+      <feComposite in2="outeroutline" in="googrey" result="gooback"/>
+      <feComposite in2="gooback" in="SourceGraphic"/>
+	</filter>
+	</defs>
+</svg>
 	<form id="new_linkage">
 	<x-piemenu id="anomer_menu" >
   <label><span>a</span><input name="anomer" value="a" type="radio"></label>
@@ -106,6 +139,9 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	let clear_sequences = function() {
 		document.getElementById('output').innerHTML = '';
 	};
+
+	const tag_symbol = Symbol('tageroony');
+
 	let append_sequence = function(seq) {
 		if ( ! seq ) {
 			return;
@@ -113,13 +149,21 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		console.log(seq);
 		let sug = new Glycan.IupacSugar();
 		sug.sequence = seq;
+		sug.root.setTag(tag_symbol);
+		sug.root.children[0].setTag(tag_symbol);
+		if (sug.root.children[0].children.length > 0) {
+			sug.root.children[0].children[0].setTag(tag_symbol);
+		}
 		let output = document.createElement('div');
 		output.style.width = '150px';
 		output.style.height = '150px';
 		output.style.float = 'left';
 		document.getElementById('output').appendChild(output);
-		Glycan.FishEyeLayout.LINKS = true;
+		Glycan.FishEyeLayout.LINKS = false;
 		let renderer = new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
+
+		renderer.groupTag = tag_symbol;
+
 		renderer.addSugar(sug);
 
 		let last_req = null;

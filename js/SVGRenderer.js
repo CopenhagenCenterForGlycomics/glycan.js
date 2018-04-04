@@ -20,6 +20,8 @@ const rendered_sugars_symbol = Symbol('rendered_sugars');
 
 const rendered_symbol = Symbol('rendered_elements');
 
+const group_tag_symbol = Symbol('group_tag');
+
 const ROTATE = false;
 
 let SCALE = 100;
@@ -207,9 +209,23 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     container.setAttributeNS(null,'pointer-events','none');
     this.rendered.set(sugar,container);
   }
+
+  if (this.groupTag && ! container.tagGroup) {
+    container.tagGroup = container.group();
+    container.tagGroup.element.setAttribute('class','tagged');
+  }
+
+  // Move all nodes out of the group
+  if (container.tagGroup) {
+    for (let el of container.tagGroup.element.childNodes) {
+      container.appendChild(el);
+    }
+  }
+
   if (new_residues.length < 1) {
     return;
   }
+
   let zindices = [];
 
   for (let residue of new_residues) {
@@ -261,7 +277,21 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     container.sendToFront(zindex.icon);
   }
 
+  if (this.groupTag) {
+    let els_to_render = [];
+    for (let residue of sugar.composition_for_tag(this.groupTag) ) {
+      let rendered_els = this.rendered.get(residue);
+      if (rendered_els.linkage) {
+        container.tagGroup.appendChild(rendered_els.linkage);
+      }
+      els_to_render.push(rendered_els.residue);
+    }
+    for (let el of els_to_render) {
+      container.tagGroup.appendChild(el);
+    }
 
+
+  }
 
   let min_x = Math.min(...xvals)-1;
   let min_y = Math.min(...yvals)-1;
@@ -341,6 +371,15 @@ class SVGRenderer {
   get rendered() {
     return this[rendered_symbol];
   }
+
+  set groupTag(tag) {
+    this[group_tag_symbol] = tag;
+  }
+
+  get groupTag() {
+    return this[group_tag_symbol];
+  }
+
   addSugar(sugar) {
     this[rendered_sugars_symbol].push(sugar);
   }
