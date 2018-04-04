@@ -21,7 +21,7 @@ let onlyUnique = function(value, index, self) {
   return self.indexOf(value) === index;
 };
 
-let has_tag = (tag,res) => res.tags[tag];
+let has_tag = (tag,res) => res.getTag(tag);
 
 export default class Sugar {
   constructor() {

@@ -49,6 +49,7 @@ class ReactionSet {
     for (let residue of find_sugar_substrates.call(this,sugar)) {
       residue.setTag(tag);
     }
+    return tag;
   }
 
   worksOn(sugar) {

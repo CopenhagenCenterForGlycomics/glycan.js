@@ -242,21 +242,16 @@ export default class Monosaccharide {
     return tag_symbol;
   }
 
-  get tags() {
+  getTag(tag) {
     if ( ! this[tags_symbol]) {
-      return Object.freeze({});
+      return;
     }
-    let result = {};
-    for (let tag of Object.getOwnPropertySymbols(this[tags_symbol])) {
-      result[tag] = this[tags_symbol][tag];
-    }
-    Object.freeze(result);
-    return result;
+    return this[tags_symbol][tag];
   }
 
   copyTagsFrom(residue) {
     this[tags_symbol] = this[tags_symbol] || {};
-    for (const tag of Object.getOwnPropertySymbols(residue.tags)) {
+    for (const tag of Object.getOwnPropertySymbols(residue[tags_symbol] || {})) {
       this[tags_symbol][tag] = residue[tags_symbol][tag];
     }
   }

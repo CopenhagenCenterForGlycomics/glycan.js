@@ -58,7 +58,7 @@ let map_leaf_originals = function(trees) {
   let result = new WeakMap();
   for (let tree of trees) {
     for (let leaf of tree.leaves()) {
-      if (leaf.tags[wildcard_symbol]) {
+      if (leaf.getTag(wildcard_symbol)) {
         log.info('Wildcard position is',leaf.original.identifier);
         result.set(leaf.original,tree);
         if (leaf.parent) {
