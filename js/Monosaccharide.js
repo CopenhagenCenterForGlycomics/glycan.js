@@ -9,6 +9,60 @@ let tags_symbol = Symbol('tags');
 const unknown_count_symbol = Symbol('unknown_count');
 const MAX_KNOWN_LINKAGE = 100;
 
+const only_unique = (v, i, s) => s.indexOf(v) === i;
+
+
+const leaves_of_residue = function(residue) {
+  if (residue.children.length == 0) {
+    return [residue];
+  }
+  return Array.concat.apply([],residue.children.map(leaves_of_residue));
+};
+
+const get_path_to_root = function(roots,residue) {
+  let result = [residue];
+  while ( roots.indexOf(result[0]) < 0 ) {
+    result.unshift( result[0].parent );
+  }
+  return result;
+};
+
+const residue_sorter = function(a,b) {
+  if (a.parent.linkageOf(a) !== b.parent.linkageOf(b)) {
+    return a.parent.linkageOf(a) - b.parent.linkageOf(b);
+  }
+  if (a.identifier !== b.identifier) {
+    return (a.identifier.toUpperCase() < b.identifier.toUpperCase() ? -1 : 1);
+  }
+  return 0;
+};
+
+const path_sorter = function(path_a,path_b) {
+  let path_a_loop = [].concat(path_a);
+  let path_b_loop = [].concat(path_b);
+
+  while ( path_a_loop.length > 0 && path_b_loop.length > 0 ) {
+    let a = path_a_loop.shift();
+    let b = path_b_loop.shift();
+    let res = residue_sorter(a,b);
+    if (res) {
+      return res;
+    }
+  }
+  // We want the longest path length, therefore -1 * diff
+  return -1*(path_a_loop.length - path_b_loop.length);
+};
+
+const reorder_kids = function(children) {
+  let leaves = [];
+  for (let child of children) {
+    leaves = leaves.concat(leaves_of_residue(child));
+  }
+  let paths = leaves.map( get_path_to_root.bind(null,children) );
+  let sorted_kids = paths.sort(path_sorter);
+  return sorted_kids.map( path => path[0] ).filter( only_unique );
+};
+
 /*   We basically want a barebones Monosacharide class that uses
   some common set of identifiers for each of the monosaccharide
   units. We can then mixin things like mass and sequence
@@ -102,6 +156,31 @@ export default class Monosaccharide {
     return this.parent.children.filter(mono => mono !== self);
   }
 
+  balance(ascend=true) {
+    let child_order = reorder_kids(this.children);
+    this[unknown_count_symbol] = 0;
+    let unknown_count = 0;
+    for (let child of child_order) {
+      if (linkage_map.get(child) > MAX_KNOWN_LINKAGE) {
+        unknown_count += 1;
+        linkage_map.set(child,MAX_KNOWN_LINKAGE+1+unknown_count);
+      }
+    }
+    this[unknown_count_symbol] = unknown_count;
+    children_map.set(this,child_order);
+    let parent = this;
+    if ( ! ascend ) {
+      return;
+    }
+    while (parent && parent.parent) {
+      let parent_link = parent.parent.linkageOf(parent);
+      if (parent.parent.child_linkages.get(parent_link).length > 0) {
+        parent.parent.balance(false);
+      }
+      parent = parent.parent;
+    }
+  }
+
   // child linkages
 
   // methods:
@@ -171,6 +250,9 @@ export default class Monosaccharide {
       kids.splice(kids.indexOf(child),1);
       linkage_map.delete(child);
       child[parent_symbol] = null;
+      if (new_linkage <= 0) {
+        this[unknown_count_symbol] -= 1;
+      }
     };
 
     let target_matcher = (kid) => target ? (kid === target) : true;

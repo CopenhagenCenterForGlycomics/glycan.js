@@ -15,7 +15,6 @@ let not_in_array = (array) => { return el => array.indexOf(el) < 0; };
 
 let only_unique = (v, i, s) => s.indexOf(v) === i;
 
-
 let match_root_original = (res) => { return tree => tree.root.original === res; };
 
 let identifier_comparator = (a,b) => a.identifier === b.identifier;
