@@ -208,6 +208,8 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     container.setAttributeNS(GLYCANJSNS,'glycanjs:sequence',sugar.sequence);
     container.setAttributeNS(null,'pointer-events','none');
     this.rendered.set(sugar,container);
+  } else {
+    container.setAttributeNS(GLYCANJSNS,'glycanjs:sequence',sugar.sequence);
   }
 
   if (this.groupTag && ! container.tagGroup) {
@@ -366,9 +368,11 @@ class SVGRenderer {
     // window.requestAnimationFrame(looper);
 
   }
+
   get element() {
     return this[canvas_symbol];
   }
+
   get rendered() {
     return this[rendered_symbol];
   }
@@ -384,6 +388,7 @@ class SVGRenderer {
   addSugar(sugar) {
     this[rendered_sugars_symbol].push(sugar);
   }
+
   refresh() {
     cleanup_residues.bind(this)(Array.prototype.concat(...this[rendered_sugars_symbol].map(sug => sug.composition())));
     for (let sugar of this[rendered_sugars_symbol]) {
