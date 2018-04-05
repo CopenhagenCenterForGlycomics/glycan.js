@@ -3,7 +3,7 @@ export {default as Monosaccharide} from './Monosaccharide';
 export {default as Reaction} from './Reaction';
 import * as CondensedIupac from './CondensedIupac';
 export { CondensedIupac };
-import * as SVGElement from './SVGElement';
+import * as SVGElement from './SVGelement';
 export { SVGElement };
 
 export {default as CondensedLayout} from './CondensedLayout';
