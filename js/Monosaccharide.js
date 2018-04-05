@@ -71,7 +71,7 @@ export default class Monosaccharide {
   // This should spit out an immutable array - force usage of the api
   // to add/remove children.
   get children() {
-    return children_map.get(this) || [];
+    return Object.freeze([].concat(children_map.get(this) || []));
   }
 
   get child_linkages() {
