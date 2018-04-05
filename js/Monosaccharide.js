@@ -186,6 +186,10 @@ export default class Monosaccharide {
   // methods:
   // add child
   addChild(linkage,child) {
+    if ((typeof linkage) !== 'number') {
+      throw new Error('Linkage must be number');
+    }
+
     if (linkage > MAX_KNOWN_LINKAGE) {
       throw new Error(`Cannot set defined linkage greater than ${MAX_KNOWN_LINKAGE}`);
     }

@@ -392,7 +392,9 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 				console.log(residue.identifier);
 				let new_mono = new Glycan.Monosaccharide('NeuAc');
 				new_mono.anomer = document.getElementById('new_linkage').anomer.value;
-				residue.addChild(document.getElementById('new_linkage').linkage.value,new_mono);
+				new_mono.parent_linkage = 1;
+				residue.addChild(parseInt(document.getElementById('new_linkage').linkage.value),new_mono);
+				residue.balance();
 				residue.renderer.refresh();
 				enableDropResidue(residue.renderer,new_mono);
 				delete document.getElementById('new_linkage').residue;
