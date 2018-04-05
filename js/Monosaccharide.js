@@ -67,10 +67,6 @@ export default class Monosaccharide {
   get parent() {
     return this[parent_symbol];
   }
-  // This should be a tristate variable a/b/?
-  set parent(parent) {
-    this[parent_symbol] = parent;
-  }
 
   // This should spit out an immutable array - force usage of the api
   // to add/remove children.
@@ -159,7 +155,7 @@ export default class Monosaccharide {
     // When you clear this, you don't
     // have any strong references to this monosaccharide
     // and all its kids, so they will get GC'ed
-    child.parent = this;
+    child[parent_symbol] = this;
 
     // jshint +W027
 
@@ -174,7 +170,7 @@ export default class Monosaccharide {
     let remover = (child) => {
       kids.splice(kids.indexOf(child),1);
       linkage_map.delete(child);
-      child.parent = null;
+      child[parent_symbol] = null;
     };
 
     let target_matcher = (kid) => target ? (kid === target) : true;
