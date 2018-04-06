@@ -154,6 +154,10 @@ class PieMenu extends WrapHTML {
   }
 }
 
+PieMenu.ChainForm = function(form) {
+  Object.getOwnPropertyNames(form.elements).filter( name => ! name.match(/[0-9]+/) );
+};
+
 customElements.define('x-piemenu',PieMenu);
 
 export default PieMenu;
