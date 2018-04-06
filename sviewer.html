@@ -16,6 +16,14 @@
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
 }
+#output svg {
+	width: 100%;
+	height: 100%;
+}
+#output {
+	position: absolute;
+	height: 50%;
+}
 g.tagged {
 	filter: url(#membrane);
 }
@@ -41,6 +49,7 @@ x-piemenu {
 	pointer-events: none;
 	width: 150px;
 	height: 150px;
+	z-index: 1;
 }
 x-piemenu[active] label {
 	pointer-events: all;
@@ -56,27 +65,26 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 </style>
 </head>
 <body>
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1000 1000" width="0" height="0">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0" height="0">
 	<defs>
     <filter id="membrane" filterUnits="objectBoundingBox">
       <feColorMatrix mode="matrix" in="SourceGraphic" values="0 0 0 0 0
                                                      0 0 0 0 0
                                                      0 0 0 0 0
                                                      0 0 0 1 0" result="blacksource"/>
-      <feGaussianBlur in="blacksource" stdDeviation="3" result="blur" />
+      <feGaussianBlur in="blacksource" stdDeviation="10" result="blur" />
       <feColorMatrix mode="matrix" in="blur" values="0 0 0 0 0
                                                      0 0 0 0 0
                                                      0 0 0 0 0
-                                                     0 0 0 20 -3" result="contrastup"/>
-
-      <feColorMatrix mode="matrix" in="contrastup" values="0 0 0 0 0.8
+                                                     0 0 0 30 -3" result="contrastup"/>
+      <feColorMatrix mode="matrix" in="contrastup" values="0 0 0 0 0.9
                                                      0 0 0 0 0.8
-                                                     0 0 0 0 0.9
-                                                     0 0 0 1 0" result="googrey"/>
-      <feMorphology operator="dilate" in="googrey" radius="15"/>
-          <feColorMatrix mode="matrix" values="0 0 0 0 0.6
-0 0 0 0 0.6
-0 0 0 0 0.9
+                                                     0 0 0 0 0.8
+                                                     0 0 0 0.6 0" result="googrey"/>
+      <feMorphology operator="dilate" in="googrey" radius="2"/>
+      <feColorMatrix mode="matrix" values="0 0 0 0 1
+0 0 0 0 0.2
+0 0 0 0 0.2
 0 0 0 1 0" result="outeroutline"/>
       <feComposite in2="outeroutline" in="googrey" result="gooback"/>
       <feComposite in2="gooback" in="SourceGraphic"/>
@@ -98,6 +106,8 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	</x-piemenu>
 	</form>
 	<pre id="seqs" style="display: none;">
+	</pre>
+	<pre style="display:none;">
 		NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc
 		Gal(b1-3)[GlcNAc(b1-4)]GalNAc
 		NeuAc(a2-6)[Fuc(a1-4)]Gal(b1-4)GlcNAc(b1-3)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-2)Gal(b1-4)Glc
@@ -134,11 +144,9 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		  // console.log(document.getElementById('dragsource').style.transform);
 	      ticking = false;
 	    });
-	     
 	    ticking = true;
 
 	  }
-	  
 	});
 
 	let clear_sequences = function() {
@@ -147,9 +155,14 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 
 	const tag_symbol = Symbol('tageroony');
 
+	let global_renderer;
+
 	let append_sequence = function(seq) {
 		if ( ! seq ) {
 			return;
+		}
+		if ( ! global_renderer ) {
+			global_renderer = new Glycan.SVGRenderer(document.getElementById('output'),Glycan.FishEyeLayout);
 		}
 		console.log(seq);
 		let sug = new Glycan.IupacSugar();
@@ -159,13 +172,8 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		if (sug.root.children[0].children.length > 0) {
 			sug.root.children[0].children[0].setTag(tag_symbol);
 		}
-		let output = document.createElement('div');
-		output.style.width = '150px';
-		output.style.height = '150px';
-		output.style.float = 'left';
-		document.getElementById('output').appendChild(output);
-		Glycan.FishEyeLayout.LINKS = true;
-		let renderer = new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
+		Glycan.FishEyeLayout.LINKS = false;
+		let renderer = global_renderer;//= new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
 
 		renderer.groupTag = tag_symbol;
 
@@ -247,9 +255,10 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		// 	renderer.refresh();
 		// },1000);
 		renderer.refresh();
+		renderer.scaleToFit();
 		sug.composition().map( enableDropResidue.bind(null,renderer) );
-		output.firstChild.style.width = '100%';
-		output.firstChild.style.height = '100%';
+		// output.firstChild.style.width = '100%';
+		// output.firstChild.style.height = '100%';
 	};
 	let load_all_seqs = function() {
 		clear_sequences();
@@ -283,17 +292,6 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		for (let kid of menu.children) {
 			kid.classList.remove('hover');
 		}
-	};
-
-	let svgPosition = function(el) {
-		let point = el.ownerSVGElement.createSVGPoint();
-		let el_bbox = el.getTransformedBB();
-		point.x = (el_bbox.x + 0.5*el_bbox.width);
-		point.y = (el_bbox.y + 0.5*el_bbox.height);
-		console.log(el_bbox,point);
-		let transformed = point.matrixTransform(el.ownerSVGElement.getScreenCTM());
-		console.log(transformed);
-		return { top: transformed.y, left: transformed.x };
 	};
 
 	enableDropResidue = function(renderer,residue) {
@@ -401,6 +399,7 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 				residue.addChild(parseInt(document.getElementById('new_linkage').linkage.value),new_mono);
 				residue.balance();
 				residue.renderer.refresh();
+				residue.renderer.scaleToFit();
 				enableDropResidue(residue.renderer,new_mono);
 				delete document.getElementById('new_linkage').residue;
 				last_linkage = null;
