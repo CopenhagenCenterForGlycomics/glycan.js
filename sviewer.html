@@ -20,9 +20,13 @@
 	width: 100%;
 	height: 100%;
 }
+#existing {
+	display: none;
+}
 #output {
 	position: absolute;
-	height: 50%;
+	height: 80%;
+	width: 80%;
 }
 g.tagged {
 	filter: url(#membrane);
@@ -40,8 +44,10 @@ body {
   /* Disables pull-to-refresh but allows overscroll glow effects. */
   /*overscroll-behavior-y: contain;*/
 /*  position: fixed;
-*/  overflow: hidden;
+*/
+	overflow: hidden;
 }
+
 x-piemenu {
 	position: absolute;
 	top: 0px;
@@ -50,7 +56,10 @@ x-piemenu {
 	width: 150px;
 	height: 150px;
 	z-index: 1;
+	--end-angle: 60;
+	--start-angle: -60;
 }
+
 x-piemenu[active] label {
 	pointer-events: all;
 }
@@ -62,6 +71,25 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	background: #6052E2;
 	color: #ffffff;
 }
+
+@media only screen
+  and (min-device-width: 320px)
+  and (max-device-width: 480px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+	x-piemenu {
+		--end-angle: 135;
+		--start-angle: 35;
+		--icon-position-ratio: 0.1;
+		width: 200px;
+		height: 200px;
+	}
+
+	x-piemenu button, x-piemenu label {
+		font-family: sans-serif;
+		font-size: 12px;
+	}
+}
+
 </style>
 </head>
 <body>
@@ -92,7 +120,7 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	</defs>
 </svg>
 	<form id="new_linkage">
-	<x-piemenu id="anomer_menu" >
+	<x-piemenu id="anomer_menu">
   <label><span>a</span><input name="anomer" value="a" type="radio"></label>
   <label><span>b</span><input name="anomer" value="b" type="radio"></label>
   <label><span>?</span><input name="anomer" value="?" type="radio"></label>
@@ -116,8 +144,10 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 		Fuc(a1-2)[NeuAc(a2-3)]GalNAc(b1-4)GlcNAc(b1-2)GalNAc(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
-	<div class="palette" style="position: absolute; top: 0px; left: 0px; background-color: black; right: 0px; height: 50px;">
-	<div draggable="true" id="dragsource" style="-webkit-user-drag: element; width: 50px; height: 50px;">
+	<div class="palette" style="position: absolute; top: 0px; left: 0px; background-color: black; right: 0px; height: 50px; z-index: 1;">
+	<div style="width: 50px; height: 50px; background: #fff; float: left;">
+	</div>
+	<div draggable="true" id="dragsource" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac"</use>
 	</svg>
@@ -332,6 +362,12 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 				last_linkage = null;
 				anomer_chooser.removeAttribute('active');
 				linkage_chooser.setAttribute('active',true);
+				let left_pos = Math.round(ev.pageX)-0.5*linkage_chooser.getBoundingClientRect().width;
+				let top_pos = Math.round(ev.pageY)-0.5*linkage_chooser.getBoundingClientRect().height;
+				let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
+				linkage_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
+				linkage_chooser.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
+
 				unselectMenu(linkage_chooser);
 			},700);
 		});

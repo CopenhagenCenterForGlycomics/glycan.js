@@ -1,4 +1,4 @@
-/* globals document,HTMLElement,customElements */
+/* globals document,HTMLElement,customElements,window */
 'use strict';
 
 import * as debug from 'debug-any-level';
@@ -19,6 +19,10 @@ tmpl.innerHTML = `
       position: relative;
       filter: drop-shadow(0px 5px 5px rgba(0,0,0,0.5));
       transform: scale(0.99);
+      --start-angle: -60;
+      --end-angle: 60;
+      --notch-ratio: 0.075;
+      --icon-position-ratio: 0.2;
     }
     :host([active]) {
       transform: scale(1);
@@ -63,24 +67,30 @@ const upgrade_elements = function(slot) {
   let start_angle = -60;
   let end_angle = 60;
 
+  let actual_style = window.getComputedStyle(this);
+
+  start_angle = parseInt(actual_style.getPropertyValue('--start-angle'));
+  end_angle = parseInt(actual_style.getPropertyValue('--end-angle'));
+
   let all_weights = all_items.map( item => parseInt(item.getAttribute('weight') || '1') );
   let sum_weights = all_weights.reduce((acc, val) => acc + val,0);
-  let max_weight = Math.max(...all_weights);
   let base_delta = (end_angle - start_angle) / sum_weights;
   angle = start_angle;
   let delta = base_delta;
-  const notch = 0.075;
-  console.log(max_weight);
+  const notch = parseFloat(actual_style.getPropertyValue('--notch-ratio'));
   if (items.length > 0) {
     this.sectorpath.setAttribute('d',`M0.5,0.5 m${notch},0 l${0.5-notch},0 A0.5,0.5 0 0,0 ${ang(0.5+0.5*Math.cos(Math.PI/180*delta))},${ang(0.5-0.5*Math.sin(Math.PI/180*delta))} L${ang(0.5+(notch)*Math.cos(Math.PI/180*delta))},${ang(0.5-(notch)*Math.sin(Math.PI/180*delta))} A0.5,0.5 0 0,1 ${0.5+notch},0.5 z`);
   }
 
-
+  const icon_min_ratio = parseFloat(actual_style.getPropertyValue('--icon-position-ratio'));
 
   for(let item of all_items) {
     delta = base_delta * parseInt(item.getAttribute('weight') || '1');
-    let icon_x_offset = str(50+(100*Math.cos((Math.PI/180)*delta*0.5)*(0.5 - 0.2)));
-    let icon_y_offset = str(50+(100*Math.sin((Math.PI/180)*delta*0.5)*(0.5 - 0.2)));
+    let icon_min = icon_min_ratio;
+    let icon_max = 0.5;
+
+    let icon_x_offset = str(50+(100*Math.cos((Math.PI/180)*delta*0.5)*(icon_max - icon_min)));
+    let icon_y_offset = str(50+(100*Math.sin((Math.PI/180)*delta*0.5)*(icon_max - icon_min)));
 
     if (item.firstChild && item.firstChild.setAttribute) {
       item.firstChild.style.bottom = `calc(${icon_y_offset}% - 0px)`;
