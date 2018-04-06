@@ -141,12 +141,12 @@ label[draggable] input {
 	<div style="width: 50px; height: 50px; background: #fff; float: left;">
 	</div>
 	<form id="new_linkage">
-	<x-piemenu id="anomer_menu">
+	<x-piemenu name="anomer" id="anomer_menu">
   <label><span>a</span><input name="anomer" value="a" type="radio"></label>
   <label><span>b</span><input name="anomer" value="b" type="radio"></label>
   <label><span>?</span><input name="anomer" value="?" type="radio"></label>
 	</x-piemenu>
-	<x-piemenu id="linkage_menu">
+	<x-piemenu name="linkage" id="linkage_menu">
   <label><span>2</span><input name="linkage" value="2" type="radio"></label>
   <label><span>3</span><input name="linkage" value="3" type="radio"></label>
   <label><span>4</span><input name="linkage" value="4" type="radio"></label>
@@ -159,13 +159,23 @@ label[draggable] input {
 	</svg>
 	<input name="donor" value="NeuAc" type="radio">
 	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#gal"</use>
+	</svg>
+	<input name="donor" value="Gal" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#galnac"</use>
+	</svg>
+	<input name="donor" value="GalNAc" type="radio">
+	</label>
+
 	</form>
 	</div>
 	<textarea id="seq" style="display: none;" >NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc</textarea>
 	<div id="output">
-	</div>
-	<div>
-<svg id="existing" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-375 -550 625 800" xmlns:glycanjs="https://glycocode.com/glycanjs" style="width: 100%; height: 300px;"><g glycanjs:sequence="NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc" pointer-events="none" viewBox="-375 -550 625 800"><g glycanjs:location="y3a"><text x="-53.1" y="-187.5" font-size="33.0" dominant-baseline="hanging" text-anchor="end" style="font-family: Helvetica, Verdana, Arial, sans-serif;"><tspan dy="0">α3</tspan></text><line x1="-125.0" y1="-150.0" x2="0.0" y2="-150.0" stroke-width="1.0" stroke="#333"></line></g><g glycanjs:location="y2a"><text x="10.0" y="-90.0" font-size="33.0" dominant-baseline="hanging" style="font-family: Helvetica, Verdana, Arial, sans-serif;"><tspan dy="0">β4</tspan></text><line x1="0.0" y1="-150.0" x2="0.0" y2="0.0" stroke-width="1.0" stroke="#333"></line></g><g glycanjs:location="y3b"><text x="10.0" y="-240.0" font-size="33.0" dominant-baseline="hanging" style="font-family: Helvetica, Verdana, Arial, sans-serif;"><tspan dy="0">β?</tspan></text><line x1="0.0" y1="-300.0" x2="0.0" y2="-150.0" stroke-width="1.0" stroke="#333"></line></g><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glca" glycanjs:identifier="GlcA" glycanjs:location="y3b" glycanjs:parent="y2a" transform=" translate(-50.0,-350.0) scale(100.0,100.0)" style="pointer-events: all;"></use><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#gal" glycanjs:identifier="Gal" glycanjs:location="y2a" glycanjs:parent="y1a" transform=" translate(-50.0,-200.0) scale(100.0,100.0)" style="pointer-events: all;"></use><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac" glycanjs:identifier="NeuAc" glycanjs:location="y3a" glycanjs:parent="y2a" transform=" translate(-175.0,-200.0) scale(100.0,100.0)" style="pointer-events: all;"></use><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#fuc" glycanjs:identifier="Fuc" glycanjs:location="y1a" glycanjs:parent="" transform=" translate(-50.0,-50.0) scale(100.0,100.0)" style="pointer-events: all;"></use></g><svg xmlns:xlink="http://www.w3.org/1999/xlink"></svg></svg>
 	</div>
 
 <script type="text/javascript">
@@ -271,32 +281,9 @@ label[draggable] input {
 			});
 		});
 
-		// setInterval(function() {
-		// 	if ( Math.floor(Math.random()*10) >= 5 ) {
-		// 		if (sug.composition().length < 3) {
-		// 			return;
-		// 		}
-		// 		let removed = sug.leaves()[0];
-		// 		removed.parent.removeChild(removed.parent.linkageOf(removed),removed);
-		// 	} else {
-		// 		let residues = sug.composition();
-		// 		let targ = residues[Math.floor(Math.random()*residues.length)];
-		// 		if (targ.identifier === 'Fuc' || targ.identifier === 'NeuAc') {
-		// 			return;
-		// 		}
-		// 		let new_res = new Glycan.Monosaccharide('Gal');
-		// 		new_res.anomer = 'a';
-		// 		new_res.parent_link = 1;
-		// 		targ.addChild(4,new_res);
-		// 		targ = new_res;
-		// 	}
-		// 	renderer.refresh();
-		// },1000);
 		renderer.refresh();
 		renderer.scaleToFit();
 		sug.composition().map( enableDropResidue.bind(null,renderer) );
-		// output.firstChild.style.width = '100%';
-		// output.firstChild.style.height = '100%';
 	};
 	let load_all_seqs = function() {
 		clear_sequences();
@@ -307,24 +294,22 @@ label[draggable] input {
 		append_sequence(document.getElementById('seq').value);
 
 	};
-	document.getElementById('new_linkage').addEventListener('dragstart', function (evt) {
-		evt.stopPropagation();
-		// If we'd like to prevent dragging because of some condition,
-		// we'd simply call preventDefault() and be done here
-		evt.target.click();
-	});
 
-	document.getElementById('new_linkage').addEventListener('dragend', (evt) => {
-		document.getElementById('linkage_menu').removeAttribute('active');
-		document.getElementById('anomer_menu').removeAttribute('active');
-		delete document.getElementById('new_linkage').residue;
-		document.getElementById('new_linkage').reset();
-	});
-
-	unselectMenu = function(menu) {
-		for (let kid of menu.children) {
-			kid.classList.remove('hover');
-		}
+	show_anomer = function(residue,ev) {
+		let anomer_chooser = document.getElementById('anomer_menu');
+		let form = document.getElementById('new_linkage');
+		console.log("Setting target to ",residue.identifier);
+		delete form.active_residue;
+		form.residue = residue;
+		anomer_chooser.removeAttribute('active');
+		let target_pos = ev.target.getBoundingClientRect();
+		let left_pos = -0.5*anomer_chooser.getBoundingClientRect().width + target_pos.left + (target_pos.width / 2) + window.scrollX;
+		let top_pos = -0.5*anomer_chooser.getBoundingClientRect().height + target_pos.top + (target_pos.height / 2) + window.scrollY;
+		let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
+		anomer_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
+		anomer_chooser.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
+		anomer_chooser.setAttribute('active',true);
+		anomer_chooser.clear();
 	};
 
 	enableDropResidue = function(renderer,residue) {
@@ -332,131 +317,16 @@ label[draggable] input {
 		let target = renderer.rendered.get(residue).residue;
 		target.style.pointerEvents = 'all';
 		let anomer_chooser = document.getElementById('anomer_menu');
-		let linkage_chooser = document.getElementById('linkage_menu');
-		let last_anomer = null;
-		let anomer_timeout = null;
-		if (! anomer_chooser.wired ) {
-		anomer_chooser.addEventListener('dragenter', (ev) => {
-			let targ = ev.target;
-			if ( ! (targ instanceof HTMLLabelElement) ) {
-				return;
-			}
-			if (targ === last_anomer) {
-				return;
-			}
-			last_anomer = targ;
-			for (let sib of targ.parentNode.children) {
-				if (sib !== targ) {
-					sib.classList.remove('hover');
-				} else {
-					sib.classList.add('hover');
-				}
-			}
-			if (anomer_timeout) {
-				// Also clear this out for a dragend or a dragleave
-				clearTimeout(anomer_timeout);
-			}
-			anomer_timeout = setTimeout( () => {
-				if ( ! last_anomer ) {
-					return;
-				}
-				last_anomer.click();
-				last_anomer = null;
-				last_linkage = null;
-				anomer_chooser.removeAttribute('active');
-				linkage_chooser.setAttribute('active',true);
-				let left_pos = Math.round(ev.pageX)-0.5*linkage_chooser.getBoundingClientRect().width;
-				let top_pos = Math.round(ev.pageY)-0.5*linkage_chooser.getBoundingClientRect().height;
-				let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
-				linkage_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
-				linkage_chooser.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
+		let form = document.getElementById('new_linkage');
 
-				unselectMenu(linkage_chooser);
-			},700);
-		});
-		anomer_chooser.addEventListener('dragleave', (ev) => {
-			if (ev.relatedTarget !== anomer_chooser) {
-				return;
-			}
-			console.log("Left the anomer chooser");
-			last_anomer = null;
-			last_linkage = null;
-			delete document.getElementById('new_linkage').residue;
-
-			anomer_chooser.removeAttribute('active');
-		});
-
-		}
-		let last_linkage = null;
-		let linkage_timeout = null;
-		if (! linkage_chooser.wired) {
-			linkage_chooser.addEventListener('dragleave', (ev) => {
-				if (ev.relatedTarget !== linkage_chooser) {
-					return;
-				}
-				console.log("Left the linkage chooser");
-				last_anomer = null;
-				last_linkage = null;
-				delete document.getElementById('new_linkage').residue;
-				linkage_chooser.removeAttribute('active');
-			});
-
-			linkage_chooser.addEventListener('dragover', (ev) => {
-				ev.preventDefault();
-			});
-			linkage_chooser.addEventListener('dragenter', (ev) => {
-				ev.preventDefault();
-				let targ = ev.target;
-				if ( ! (targ instanceof HTMLLabelElement) ) {
-					return;
-				}
-				if (targ === last_linkage) {
-					return;
-				}
-				last_linkage = targ;
-				for (let sib of targ.parentNode.children) {
-					if (sib !== targ) {
-						sib.classList.remove('hover');
-					} else {
-						sib.classList.add('hover');
-					}
-				}
-				if (linkage_timeout) {
-					// Also clear this out for a dragend or a dragleave
-					clearTimeout(linkage_timeout);
-				}
-				last_linkage.click();
-			});
-
-			linkage_chooser.addEventListener('drop', (ev) => {
-				let residue = document.getElementById('new_linkage').residue;
-				// console.log(JSON.stringify([...new FormData(document.getElementById('new_linkage'))]));
-				console.log(residue.identifier);
-				let new_mono = new Glycan.Monosaccharide('NeuAc');
-				new_mono.anomer = document.getElementById('new_linkage').anomer.value;
-				new_mono.parent_linkage = 1;
-				residue.addChild(parseInt(document.getElementById('new_linkage').linkage.value),new_mono);
-				residue.balance();
-				residue.renderer.refresh();
-				residue.renderer.scaleToFit();
-				enableDropResidue(residue.renderer,new_mono);
-				delete document.getElementById('new_linkage').residue;
-				last_linkage = null;
-				last_anomer = null;
-			},{capture: false});
-
-		}
-		anomer_chooser.wired = true;
-		linkage_chooser.wired = true;
 		target.addEventListener('dragleave', (ev) => {
-			let target_form = document.getElementById('new_linkage');
-			console.log("Leaving ",residue.identifier);
-			delete target_form.active_residue;
-			clearTimeout(target_form.residue_timeout);
+			delete form.active_residue;
+			clearTimeout(form.residue_timeout);
 		});
+		target.addEventListener('click', show_anomer.bind(null,residue) );
 		target.addEventListener('dragenter', (ev) => {
-			let target_form = document.getElementById('new_linkage');
-			let last_residue = target_form.active_residue;
+			let last_residue = form.active_residue;
+
 			if (last_residue === residue) {
 				return;
 			}
@@ -464,34 +334,32 @@ label[draggable] input {
 			// We should wait for a drag over at least 300 ms after
 			// to set the target
 			last_residue = residue;
-			target_form.active_residue = residue;
+			form.active_residue = residue;
 
-			if (target_form.residue_timeout) {
-				clearTimeout(target_form.residue_timeout);
+			if (form.residue_timeout) {
+				clearTimeout(form.residue_timeout);
 			}
 
-			target_form.residue_timeout = setTimeout(() => {
-				console.log("Setting target to ",residue.identifier);
-				delete target_form.active_residue;
-				target_form.residue = residue;
-				linkage_chooser.removeAttribute('active');
-				anomer_chooser.removeAttribute('active');
-				let target_pos = ev.target.getBoundingClientRect();
-				let left_pos = -0.5*anomer_chooser.getBoundingClientRect().width + target_pos.left + (target_pos.width / 2) + window.scrollX;
-				let top_pos = -0.5*anomer_chooser.getBoundingClientRect().height + target_pos.top + (target_pos.height / 2) + window.scrollY;
-				let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
-				anomer_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
-				anomer_chooser.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
-				linkage_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
-				linkage_chooser.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
-				anomer_chooser.setAttribute('active',true);
-				unselectMenu(anomer_chooser);
-			},500);
+			form.residue_timeout = setTimeout(show_anomer.bind(null,residue,ev),500);
 		});
 	};
 
 	window.onload = function() {
 		new Glycan.DragManager(document.body);
+		new Glycan.DraggableForm(document.getElementById('new_linkage'));
+		document.getElementById('new_linkage').addEventListener('submit', function(ev) {
+			let new_res = new Glycan.Monosaccharide(this.donor.value);
+			new_res.anomer = this.anomer.value;
+			new_res.parent_linkage = this.donor.value.match(/Neu(Gc|Ac)/) ? 2 : 1;
+			this.residue.addChild(parseInt(this.linkage.value),new_res);
+			this.residue.balance();
+			this.residue.renderer.refresh();
+			enableDropResidue(this.residue.renderer,new_res);
+			this.residue.renderer.scaleToFit();
+			console.log(this.residue.renderer.sugars[0].sequence);
+			this.reset();
+		});
+
 		load_all_seqs();
 		document.getElementById('seq').onchange = function() {
 			load_all_seqs();

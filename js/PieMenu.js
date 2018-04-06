@@ -152,6 +152,13 @@ class PieMenu extends WrapHTML {
     upgrade_elements.bind(this)(slot);
     // ShadyCSS.styleElement(this);
   }
+
+  clear() {
+    for (let kid of this.children) {
+      kid.classList.remove('hover');
+    }
+    Array.from( this.querySelectorAll('input:checked'), input => input.checked = false );
+  }
 }
 
 PieMenu.ChainForm = function(form) {

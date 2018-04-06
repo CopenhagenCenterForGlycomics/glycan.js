@@ -9,4 +9,5 @@ export {default as LinkageLayout} from './LinkageLayout';
 export {default as FishEyeLayout} from './FishEyeLayout';
 export {default as SVGRenderer} from './SVGRenderer';
 export {default as PieMenu} from './PieMenu';
+export {default as DraggableForm} from './DraggableForm';
 export {default as DragManager} from './DragManager';
