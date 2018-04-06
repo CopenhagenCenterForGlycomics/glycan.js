@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes,shrink-to-fit=no"/>
 	<title>Sviewer</title>
 	<script type="text/javascript" src="webcomponents-lite.js"></script>
@@ -115,6 +116,10 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	<textarea id="seq" style="display: none;" >NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc</textarea>
 	<div id="output">
 	</div>
+	<div>
+<svg id="existing" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-375 -550 625 800" xmlns:glycanjs="https://glycocode.com/glycanjs" style="width: 100%; height: 300px;"><g glycanjs:sequence="NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc" pointer-events="none" viewBox="-375 -550 625 800"><g glycanjs:location="y3a"><text x="-53.1" y="-187.5" font-size="33.0" dominant-baseline="hanging" text-anchor="end" style="font-family: Helvetica, Verdana, Arial, sans-serif;"><tspan dy="0">α3</tspan></text><line x1="-125.0" y1="-150.0" x2="0.0" y2="-150.0" stroke-width="1.0" stroke="#333"></line></g><g glycanjs:location="y2a"><text x="10.0" y="-90.0" font-size="33.0" dominant-baseline="hanging" style="font-family: Helvetica, Verdana, Arial, sans-serif;"><tspan dy="0">β4</tspan></text><line x1="0.0" y1="-150.0" x2="0.0" y2="0.0" stroke-width="1.0" stroke="#333"></line></g><g glycanjs:location="y3b"><text x="10.0" y="-240.0" font-size="33.0" dominant-baseline="hanging" style="font-family: Helvetica, Verdana, Arial, sans-serif;"><tspan dy="0">β?</tspan></text><line x1="0.0" y1="-300.0" x2="0.0" y2="-150.0" stroke-width="1.0" stroke="#333"></line></g><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glca" glycanjs:identifier="GlcA" glycanjs:location="y3b" glycanjs:parent="y2a" transform=" translate(-50.0,-350.0) scale(100.0,100.0)" style="pointer-events: all;"></use><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#gal" glycanjs:identifier="Gal" glycanjs:location="y2a" glycanjs:parent="y1a" transform=" translate(-50.0,-200.0) scale(100.0,100.0)" style="pointer-events: all;"></use><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac" glycanjs:identifier="NeuAc" glycanjs:location="y3a" glycanjs:parent="y2a" transform=" translate(-175.0,-200.0) scale(100.0,100.0)" style="pointer-events: all;"></use><use x="0.0" y="0.0" width="1.0" height="1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#fuc" glycanjs:identifier="Fuc" glycanjs:location="y1a" glycanjs:parent="" transform=" translate(-50.0,-50.0) scale(100.0,100.0)" style="pointer-events: all;"></use></g><svg xmlns:xlink="http://www.w3.org/1999/xlink"></svg></svg>
+	</div>
+
 <script type="text/javascript">
 	let ticking = false;
 	window.addEventListener('scroll', function(e) {

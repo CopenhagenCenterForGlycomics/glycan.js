@@ -28,9 +28,11 @@ class SVGCanvas {
     this.canvas.appendChild(element);
   }
 
-  group() {
-    let a_g = this.canvas.ownerDocument.createElementNS(SVGNS,'g');
-    this.appendChild(a_g);
+  group(a_g) {
+    if ( ! a_g ) {
+      a_g = this.canvas.ownerDocument.createElementNS(SVGNS,'g');
+      this.appendChild(a_g);
+    }
     return Object.create(this,{
       appendChild: { value: el => a_g.appendChild(el) },
       setAttribute: { value: (name,val) => a_g.setAttribute(name,val) },

@@ -57,6 +57,11 @@ const handle_events = function(svg,event) {
 };
 
 const calculate_moved_residues = function(layout,residue) {
+  if (! layout ) {
+    // We don't have a layout specified, so we
+    // should skip moving any residues around!
+    return false;
+  }
   let current = this[layout_cache].get(residue);
   let updated = layout.get(residue);
   if ( ! current ) {
@@ -192,6 +197,10 @@ const cleanup_residues = function(active_residues) {
 };
 
 const layout_sugar = function(sugar,layout_engine) {
+  if ( ! layout_engine ) {
+    log.info('No layout engine specified, skipping layout');
+    return;
+  }
   log.info('Laying out',sugar.sequence);
   let layout = layout_engine.PerformLayout(sugar);
   return layout;
@@ -230,7 +239,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
   let zindices = [];
 
-  for (let residue of new_residues) {
+  for (let residue of (layout ? new_residues : [])) {
 
     let position = layout.get(residue);
     xvals.push(position.x);
@@ -264,6 +273,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
       // Do nothing
     }
+    if (current.linkage) {
+      current.linkage.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
+    }
+
     let rotate_angle = 0;
     if (position.rotate) {
       rotate_angle = position.rotate;
@@ -340,13 +353,15 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
 class SVGRenderer {
   constructor(container,layout) {
-    this[container_symbol] = container;
-    this[layout_engine] = layout;
-    this[layout_cache] = new WeakMap();
-    this[canvas_symbol] = new SVGCanvas(container);
-    this[canvas_symbol].canvas.setAttribute('viewBox','-30 -60 60 100');
-    this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
-    wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this,this[canvas_symbol].canvas), {passive:true, capture: false } );
+    if (container && layout) {
+      this[container_symbol] = container;
+      this[layout_engine] = layout;
+      this[layout_cache] = new WeakMap();
+      this[canvas_symbol] = new SVGCanvas(container);
+      this[canvas_symbol].canvas.setAttribute('viewBox','-30 -60 60 100');
+      this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
+      wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this,this[canvas_symbol].canvas), {passive:true, capture: false } );
+    }
     this[rendered_sugars_symbol] = [];
     this[rendered_symbol] = new Map();
     // let counter = 0;
@@ -369,6 +384,38 @@ class SVGRenderer {
 
   }
 
+  static fromSVGElement(element,sugar_class) {
+    let renderer = new SVGRenderer();
+
+    renderer[container_symbol] = element.parentNode;
+    renderer[canvas_symbol] = new SVGCanvas(element);
+
+    wire_canvas_events(element, handle_events.bind(renderer,element), { passive:true, capture:false } );
+    let sugar_elements = element.querySelectorAll('g[glycanjs\\:sequence]');
+    for (let group of sugar_elements) {
+      let sugar = new sugar_class();
+      sugar.sequence = group.getAttribute('glycanjs:sequence');
+      renderer[rendered_sugars_symbol].push(sugar);
+      renderer.rendered.set(sugar,renderer[canvas_symbol].group(group));
+      for (let icon of group.querySelectorAll('use[glycanjs\\:location]')) {
+        let rendered_data = { residue: icon };
+        if (icon.parentNode !== group) {
+          group.appendChild(icon);
+        }
+        renderer.rendered.set( sugar.locate_monosaccharide(icon.getAttribute('glycanjs:location')), rendered_data );
+      }
+      for (let link of group.querySelectorAll('g[glycanjs\\:location]')) {
+        if (link.parentNode !== group) {
+          group.appendChild(link);
+          renderer[canvas_symbol].sendToBack(link);
+        }
+        let rendered_data = renderer.rendered.get( sugar.locate_monosaccharide(link.getAttribute('glycanjs:location')) );
+        rendered_data.linkage = link;
+      }
+    }
+    return renderer;
+  }
+
   get element() {
     return this[canvas_symbol];
   }
@@ -387,6 +434,10 @@ class SVGRenderer {
 
   addSugar(sugar) {
     this[rendered_sugars_symbol].push(sugar);
+  }
+
+  get sugars() {
+    return Object.freeze([].concat( this[rendered_sugars_symbol] ));
   }
 
   refresh() {
