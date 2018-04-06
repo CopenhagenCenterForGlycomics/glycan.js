@@ -341,13 +341,6 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     return container;
   }
 
-
-  if ( ! container.laidOut ) {
-    let padding = 2;
-    container.setAttribute('viewBox',`${SCALE*(min_x-padding/2)} ${SCALE*(min_y-padding/2)} ${SCALE*(width+padding)} ${SCALE*(height+padding)}`);
-    canvas.canvas.setAttribute('viewBox',`${SCALE*(min_x-padding/2)} ${SCALE*(min_y-padding/2)} ${SCALE*(width+padding)} ${SCALE*(height+padding)}`);
-    container.laidOut = true;
-  }
   return container;
 };
 
@@ -358,7 +351,6 @@ class SVGRenderer {
       this[layout_engine] = layout;
       this[layout_cache] = new WeakMap();
       this[canvas_symbol] = new SVGCanvas(container);
-      this[canvas_symbol].canvas.setAttribute('viewBox','-30 -60 60 100');
       this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
       wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this,this[canvas_symbol].canvas), {passive:true, capture: false } );
     }
@@ -447,6 +439,19 @@ class SVGRenderer {
       let modified_residues = FULL_REFRESH ? sugar.composition() : sugar.composition().filter(calculate_moved_residues.bind(this,layout));
       render_sugar.bind(this)(sugar, layout,modified_residues);
     }
+  }
+
+  scaleToFit() {
+    const PADDING=1;
+    let svg = this[canvas_symbol].canvas;
+    let bb=svg.getBBox();
+    let bbx=bb.x-(SCALE*PADDING);
+    let bby=bb.y-(SCALE*PADDING);
+    let bbw=bb.width+(2*SCALE*PADDING);
+    let bbh=bb.height+(2*SCALE*PADDING);
+    let vb=[bbx,bby,bbw,bbh];
+    svg.setAttribute('viewBox', vb.join(' ') );
+    svg.setAttribute('preserveAspectRatio','xMidYMid meet');
   }
 }
 
