@@ -28,13 +28,13 @@ tmpl.innerHTML = `
       transform: scale(1);
     }
     :host *::slotted(*) {
-      display: block;
       background: #eee;
       border: 0;
       color: black;
       position: absolute;
       top: 0;
       left: 0;
+      transform: scale(0.001);
       width: 100%;
       height: 100%;
       -webkit-clip-path: url(#sectorWeight1);

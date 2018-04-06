@@ -72,6 +72,13 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	color: #ffffff;
 }
 
+label[draggable] {
+	display: block;
+}
+label[draggable] input {
+	/*display: none;*/
+}
+
 @media only screen
   and (min-device-width: 320px)
   and (max-device-width: 480px)
@@ -119,20 +126,6 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	</filter>
 	</defs>
 </svg>
-	<form id="new_linkage">
-	<x-piemenu id="anomer_menu">
-  <label><span>a</span><input name="anomer" value="a" type="radio"></label>
-  <label><span>b</span><input name="anomer" value="b" type="radio"></label>
-  <label><span>?</span><input name="anomer" value="?" type="radio"></label>
-	</x-piemenu>
-	<x-piemenu id="linkage_menu">
-  <label><span>2</span><input name="linkage" value="2" type="radio"></label>
-  <label><span>3</span><input name="linkage" value="3" type="radio"></label>
-  <label><span>4</span><input name="linkage" value="4" type="radio"></label>
-  <label><span>6</span><input name="linkage" value="6" type="radio"></label>
-  <label><span>8</span><input name="linkage" value="8" type="radio"></label>
-	</x-piemenu>
-	</form>
 	<pre id="seqs" style="display: none;">
 	</pre>
 	<pre style="display:none;">
@@ -147,11 +140,26 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	<div class="palette" style="position: absolute; top: 0px; left: 0px; background-color: black; right: 0px; height: 50px; z-index: 1;">
 	<div style="width: 50px; height: 50px; background: #fff; float: left;">
 	</div>
-	<div draggable="true" id="dragsource" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<form id="new_linkage">
+	<x-piemenu id="anomer_menu">
+  <label><span>a</span><input name="anomer" value="a" type="radio"></label>
+  <label><span>b</span><input name="anomer" value="b" type="radio"></label>
+  <label><span>?</span><input name="anomer" value="?" type="radio"></label>
+	</x-piemenu>
+	<x-piemenu id="linkage_menu">
+  <label><span>2</span><input name="linkage" value="2" type="radio"></label>
+  <label><span>3</span><input name="linkage" value="3" type="radio"></label>
+  <label><span>4</span><input name="linkage" value="4" type="radio"></label>
+  <label><span>6</span><input name="linkage" value="6" type="radio"></label>
+  <label><span>8</span><input name="linkage" value="8" type="radio"></label>
+	</x-piemenu>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac"</use>
 	</svg>
-	</div>
+	<input name="donor" value="NeuAc" type="radio">
+	</label>
+	</form>
 	</div>
 	<textarea id="seq" style="display: none;" >NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc</textarea>
 	<div id="output">
@@ -169,8 +177,8 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	    window.requestAnimationFrame(function() {
 		  let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
 	      let top = window.scrollY;
-	      document.getElementById('dragsource').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
-		  document.getElementById('dragsource').parentNode.style.transform = `scale(${zoom}) translate(${window.scrollX}px,${top}px)`;
+	      document.getElementById('new_linkage').style.transformOrigin = `${window.scrollX}px ${top}px`;
+		  document.getElementById('new_linkage').style.transform = `scale(${zoom}) translate(${window.scrollX}px,${top}px)`;
 		  // console.log(document.getElementById('dragsource').style.transform);
 	      ticking = false;
 	    });
@@ -299,23 +307,18 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 		append_sequence(document.getElementById('seq').value);
 
 	};
-
-	document.getElementById('dragsource').addEventListener('dragstart', function (evt) {
+	document.getElementById('new_linkage').addEventListener('dragstart', function (evt) {
 		evt.stopPropagation();
 		// If we'd like to prevent dragging because of some condition,
 		// we'd simply call preventDefault() and be done here
-		if (false) {
-		  evt.preventDefault();
-		  return;
-		}
-		evt.data.residue = 'NeuAc';
-		evt.data.visited = [];
+		evt.target.click();
 	});
 
-	document.getElementById('dragsource').addEventListener('dragend', (evt) => {
+	document.getElementById('new_linkage').addEventListener('dragend', (evt) => {
 		document.getElementById('linkage_menu').removeAttribute('active');
 		document.getElementById('anomer_menu').removeAttribute('active');
 		delete document.getElementById('new_linkage').residue;
+		document.getElementById('new_linkage').reset();
 	});
 
 	unselectMenu = function(menu) {
@@ -485,20 +488,6 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 				unselectMenu(anomer_chooser);
 			},500);
 		});
-	};
-
-	makeDragTarget = function(element) {
-		element.style.pointerEvents = 'all';
-		element.addEventListener('dragover', ev => ev.preventDefault() );
-		element.addEventListener('dragenter', (ev) => {
-			ev.preventDefault();
-			if (ev.data.visited.indexOf(element.getAttribute('glycanjs:identifier')) < 0) {
-				ev.data.visited.push(element.getAttribute('glycanjs:identifier'));
-			}
-		});
-		element.addEventListener('drop', (ev) => {
-			console.log(ev.data);
-		},{capture: false, passive: true});
 	};
 
 	window.onload = function() {

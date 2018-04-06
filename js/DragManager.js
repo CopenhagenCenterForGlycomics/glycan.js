@@ -69,7 +69,7 @@ const dragstart_event = function(e) {
   e.dataTransfer.dropEffect = 'copy';
 
   let target = e.target;
-  var event = new Event('dragstart',{bubbles: false});
+  var event = new Event('dragstart',{bubbles: true});
   event.dataTransfer = { types: [ drag_id ] };
   event.data = { };
   this.drags.set(drag_id,event.data);
