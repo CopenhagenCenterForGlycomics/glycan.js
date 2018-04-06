@@ -1,4 +1,4 @@
-/* globals document,HTMLLabelElement,HTMLInputElement,window,Event */
+/* globals HTMLLabelElement,HTMLInputElement,Event */
 'use strict';
 
 import {default as PieMenu} from './PieMenu';
@@ -98,12 +98,13 @@ const wire_menu_events = (piemenu) => {
         return;
       }
 
-      nextmenu.setAttribute('active',true);
       let left_pos = Math.round(ev.pageX)-0.5*nextmenu.getBoundingClientRect().width;
       let top_pos = Math.round(ev.pageY)-0.5*nextmenu.getBoundingClientRect().height;
-      let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
+      // let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
+      let zoom = 1;
       nextmenu.style.transformOrigin = `${left_pos}px ${top_pos}px`;
-      nextmenu.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
+      nextmenu.style.transform = ev.isTrusted ? piemenu.style.transform : `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
+      nextmenu.setAttribute('active',true);
       nextmenu.clear();
       console.log(targ,targ.checked);
     },{capture: false});

@@ -305,7 +305,8 @@ label[draggable] input {
 		let target_pos = ev.target.getBoundingClientRect();
 		let left_pos = -0.5*anomer_chooser.getBoundingClientRect().width + target_pos.left + (target_pos.width / 2) + window.scrollX;
 		let top_pos = -0.5*anomer_chooser.getBoundingClientRect().height + target_pos.top + (target_pos.height / 2) + window.scrollY;
-		let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
+		// let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
+		let zoom = 1;
 		anomer_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
 		anomer_chooser.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
 		anomer_chooser.setAttribute('active',true);
