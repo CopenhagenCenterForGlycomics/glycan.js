@@ -71,6 +71,9 @@ const wire_menu_events = (piemenu) => {
         var event = new Event('click',{bubbles: true});
         event.pageX = ev.pageX;
         event.pageY = ev.pageY;
+        event.clientX = ev.clientX;
+        event.clientY = ev.clientY;
+
         last_selected.control.dispatchEvent(event);
 
         last_selected = null;
@@ -88,7 +91,7 @@ const wire_menu_events = (piemenu) => {
       }
 
       clearTimeout(selection_timeout);
-
+      let sizing = piemenu.getBoundingClientRect();
       piemenu.removeAttribute('active');
 
       let nextmenu = piemenu.nextElementSibling;
@@ -98,8 +101,8 @@ const wire_menu_events = (piemenu) => {
         return;
       }
 
-      let left_pos = Math.round(ev.pageX)-0.5*nextmenu.getBoundingClientRect().width;
-      let top_pos = Math.round(ev.pageY)-0.5*nextmenu.getBoundingClientRect().height;
+      let left_pos = Math.round(ev.pageX)-0.5*sizing.width;
+      let top_pos = Math.round(ev.pageY)-0.5*sizing.height;
       // let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
       let zoom = 1;
       nextmenu.style.transformOrigin = `${left_pos}px ${top_pos}px`;
@@ -118,6 +121,8 @@ const wire_menu_events = (piemenu) => {
       var event = new Event('click',{bubbles: true});
       event.pageX = ev.pageX;
       event.pageY = ev.pageY;
+      event.clientX = ev.clientX;
+      event.clientY = ev.clientY;
 
       last_selected.control.dispatchEvent(event);
     });
