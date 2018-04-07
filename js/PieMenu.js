@@ -92,12 +92,19 @@ const upgrade_elements = function(slot) {
     let icon_x_offset = str(50+(100*Math.cos((Math.PI/180)*delta*0.5)*(icon_max - icon_min)));
     let icon_y_offset = str(50+(100*Math.sin((Math.PI/180)*delta*0.5)*(icon_max - icon_min)));
 
+    let icon_width = parseInt(actual_style.getPropertyValue('--icon-size').replace('px',''));
+
     if (item.firstChild && item.firstChild.setAttribute) {
-      item.firstChild.style.bottom = `calc(${icon_y_offset}% - 0px)`;
-      item.firstChild.style.left = `calc(${icon_x_offset}% + 0px)`;
+      item.firstChild.style.bottom = `calc(${icon_y_offset}% - ${icon_width/2}px)`;
+      item.firstChild.style.left = `calc(${icon_x_offset}% - ${icon_width/2}px)`;
       item.firstChild.style.position  ='absolute';
       item.firstChild.style.transform = `rotate(${str(angle)}deg)`;
       item.firstChild.style.pointerEvents = 'none';
+      item.firstChild.style.display = 'table-cell';
+      item.firstChild.style.verticalAlign = 'middle';
+      item.firstChild.style.textAlign = 'center';
+      item.firstChild.style.width = `${icon_width}px`;
+      item.firstChild.style.height = `${icon_width}px`;
     }
     if (! item.style) {
       continue;
