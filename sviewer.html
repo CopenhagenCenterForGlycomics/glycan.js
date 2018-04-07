@@ -80,7 +80,7 @@ label[draggable] {
 	display: block;
 }
 label[draggable] input {
-	/*display: none;*/
+	display: none;
 }
 
 @media only screen
@@ -276,7 +276,10 @@ label[draggable] input {
 
 			Glycan.FishEyeLayout.focus = [ ev.svgX, ev.svgY ];
 			let [min_x,min_y,width,height] = renderer.element.canvas.getAttribute('viewBox').split(' ').map( val => parseFloat(val) );
-			Glycan.FishEyeLayout.zoom = Math.floor(height / 100);
+			let vp_zoom = parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
+			let candidate_zoom = parseFloat((vp_zoom * vp_zoom * 3).toFixed(2));
+			console.log(candidate_zoom);
+			Glycan.FishEyeLayout.zoom = candidate_zoom < 0.1 ? 0.1 : candidate_zoom;
 			Glycan.FishEyeLayout.lock_residues = true;
 			if (last_req) {
 				cancelAnimationFrame(last_req);
@@ -332,6 +335,9 @@ label[draggable] input {
 		});
 		target.addEventListener('click', show_anomer.bind(null,residue) );
 		target.addEventListener('dragenter', (ev) => {
+			if (form.residue === residue) {
+				return;
+			}
 			let last_residue = form.active_residue;
 
 			if (last_residue === residue) {
