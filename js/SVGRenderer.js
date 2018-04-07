@@ -22,7 +22,7 @@ const rendered_symbol = Symbol('rendered_elements');
 
 const group_tag_symbol = Symbol('group_tag');
 
-const ROTATE = false;
+const ROTATE = true;
 
 let SCALE = 100;
 
@@ -352,6 +352,10 @@ class SVGRenderer {
       this[layout_cache] = new WeakMap();
       this[canvas_symbol] = new SVGCanvas(container);
       this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
+      if (ROTATE) {
+        this[canvas_symbol].canvas.style.transform = 'rotate(-90deg)';
+      }
+
       wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this,this[canvas_symbol].canvas), {passive:true, capture: false } );
     }
     this[rendered_sugars_symbol] = [];

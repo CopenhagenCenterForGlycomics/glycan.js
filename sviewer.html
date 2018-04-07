@@ -229,7 +229,7 @@ label[draggable] input {
 	</label>
 	</form>
 	</div>
-	<textarea id="seq" style="display: none;" >NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc</textarea>
+	<textarea id="seq" style="display: none;" >Xyl</textarea>
 	<div id="output">
 	</div>
 
@@ -271,11 +271,11 @@ label[draggable] input {
 		let sug = new Glycan.IupacSugar();
 		sug.sequence = seq;
 		sug.root.setTag(tag_symbol);
-		sug.root.children[0].setTag(tag_symbol);
-		if (sug.root.children[0].children.length > 0) {
-			sug.root.children[0].children[0].setTag(tag_symbol);
-		}
-		Glycan.FishEyeLayout.LINKS = false;
+		// sug.root.children[0].setTag(tag_symbol);
+		// if (sug.root.children[0].children.length > 0) {
+		// 	sug.root.children[0].children[0].setTag(tag_symbol);
+		// }
+		Glycan.FishEyeLayout.LINKS = true;
 		let renderer = global_renderer;//= new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
 
 		renderer.groupTag = tag_symbol;
