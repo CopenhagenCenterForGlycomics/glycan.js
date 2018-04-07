@@ -11,6 +11,13 @@ const wire_form_enddrag = (form) => {
   });
 };
 
+const clear_menus = (form) => {
+  let menus = form.querySelectorAll('x-piemenu');
+  for (let menu of menus) {
+    menu.removeAttribute('active');
+  }
+};
+
 const wire_form_reset = (form) => {
   console.log('Wiring reset',form);
   form.addEventListener('submit', (evt) => {
@@ -18,17 +25,12 @@ const wire_form_reset = (form) => {
   },{capture: false});
 
   form.addEventListener('reset', () => {
-    console.log('Hiding menus');
-    let menus = form.querySelectorAll('x-piemenu');
-    for (let menu of menus) {
-      menu.removeAttribute('active');
-    }
+    clear_menus(form);
   });
 };
 
 const wire_menu_events = (piemenu) => {
   let last_selected = null;
-  let selection_timeout = null;
   piemenu.addEventListener('dragenter', (ev) => {
 
       let targ = ev.target;
@@ -48,9 +50,9 @@ const wire_menu_events = (piemenu) => {
         }
       }
 
-      if (selection_timeout) {
+      if (piemenu.parentNode.menu_timeout) {
         // Also clear this out for a dragend or a dragleave
-        clearTimeout(selection_timeout);
+        clearTimeout(piemenu.parentNode.menu_timeout);
       }
 
       let nextmenu = piemenu.ownerDocument.getElementById(piemenu.getAttribute('data-next'));
@@ -58,7 +60,7 @@ const wire_menu_events = (piemenu) => {
         return;
       }
 
-      selection_timeout = setTimeout( () => {
+      piemenu.parentNode.menu_timeout = setTimeout( () => {
 
         if ( ! last_selected ) {
           return;
@@ -87,7 +89,7 @@ const wire_menu_events = (piemenu) => {
         ev.preventDefault();        
       }
 
-      clearTimeout(selection_timeout);
+      clearTimeout(piemenu.parentNode.menu_timeout);
       let sizing = piemenu.getBoundingClientRect();
       piemenu.removeAttribute('active');
       let nextmenu = piemenu.ownerDocument.getElementById(piemenu.getAttribute('data-next'));
@@ -104,7 +106,6 @@ const wire_menu_events = (piemenu) => {
       nextmenu.style.transform = ev.isTrusted ? piemenu.style.transform : `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
       nextmenu.setAttribute('active',true);
       nextmenu.clear();
-      console.log(targ,targ.checked);
     },{capture: false});
 
     piemenu.addEventListener('drop', (ev) => {
@@ -152,6 +153,9 @@ class DraggableForm {
   constructor(form) {
     wire_events_form(form);
     upgrade_piemenus(form);
+    form.clear = () => {
+      clear_menus(form);
+    };
   }
 }
 

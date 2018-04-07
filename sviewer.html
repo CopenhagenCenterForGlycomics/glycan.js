@@ -241,15 +241,17 @@ label[draggable] input {
 					document.getElementById('linkage_menu').removeAttribute('active');
 					delete document.getElementById('new_linkage').residue;
 				},100);
+				return;
 			}
-
-			Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
-			if (last_req) {
-				cancelAnimationFrame(last_req);
-			}
-			last_req = requestAnimationFrame(function() {
-				renderer.refresh();
-			});
+			// return;
+			// console.log("Dragleave reset focus",ev);
+			// Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
+			// if (last_req) {
+			// 	cancelAnimationFrame(last_req);
+			// }
+			// last_req = requestAnimationFrame(function() {
+			// 	renderer.refresh();
+			// });
 		});
 		document.body.addEventListener('dragend', (ev) => {
 			setTimeout(() =>{
@@ -278,7 +280,6 @@ label[draggable] input {
 			let [min_x,min_y,width,height] = renderer.element.canvas.getAttribute('viewBox').split(' ').map( val => parseFloat(val) );
 			let vp_zoom = parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
 			let candidate_zoom = parseFloat((vp_zoom * vp_zoom * 3).toFixed(2));
-			console.log(candidate_zoom);
 			Glycan.FishEyeLayout.zoom = candidate_zoom < 0.1 ? 0.1 : candidate_zoom;
 			Glycan.FishEyeLayout.lock_residues = true;
 			if (last_req) {
@@ -306,6 +307,7 @@ label[draggable] input {
 	show_anomer = function(residue,ev) {
 		let anomer_chooser = document.getElementById('anomer_menu');
 		let form = document.getElementById('new_linkage');
+		form.clear && form.clear();
 		console.log("Setting target to ",residue.identifier);
 		delete form.active_residue;
 		form.residue = residue;
@@ -331,7 +333,7 @@ label[draggable] input {
 
 		target.addEventListener('dragleave', (ev) => {
 			delete form.active_residue;
-			clearTimeout(form.residue_timeout);
+			// clearTimeout(form.menu_timeout);
 		});
 		target.addEventListener('click', show_anomer.bind(null,residue) );
 		target.addEventListener('dragenter', (ev) => {
@@ -349,11 +351,11 @@ label[draggable] input {
 			last_residue = residue;
 			form.active_residue = residue;
 
-			if (form.residue_timeout) {
-				clearTimeout(form.residue_timeout);
+			if (form.menu_timeout) {
+				clearTimeout(form.menu_timeout);
 			}
 
-			form.residue_timeout = setTimeout(show_anomer.bind(null,residue,ev),500);
+			form.menu_timeout = setTimeout(show_anomer.bind(null,residue,ev),500);
 		});
 	};
 
