@@ -1,8 +1,6 @@
 /* globals HTMLLabelElement,HTMLInputElement,Event */
 'use strict';
 
-import {default as PieMenu} from './PieMenu';
-
 const wire_form_startdrag = (form) => {
   form.addEventListener('dragstart', evt => { evt.stopPropagation(); evt.target.click(); });
 };
@@ -55,9 +53,8 @@ const wire_menu_events = (piemenu) => {
         clearTimeout(selection_timeout);
       }
 
-      let nextmenu = piemenu.nextElementSibling;
-
-      if (! nextmenu || ! (nextmenu instanceof PieMenu )) {
+      let nextmenu = piemenu.ownerDocument.getElementById(piemenu.getAttribute('data-next'));
+      if (! nextmenu ) {
         return;
       }
 
@@ -93,9 +90,8 @@ const wire_menu_events = (piemenu) => {
       clearTimeout(selection_timeout);
       let sizing = piemenu.getBoundingClientRect();
       piemenu.removeAttribute('active');
-
-      let nextmenu = piemenu.nextElementSibling;
-      if (! nextmenu || ! (nextmenu instanceof PieMenu )) {
+      let nextmenu = piemenu.ownerDocument.getElementById(piemenu.getAttribute('data-next'));
+      if (! nextmenu ) {
         var event = new Event('submit',{bubbles: true});
         piemenu.parentNode.dispatchEvent(event);
         return;
@@ -103,7 +99,6 @@ const wire_menu_events = (piemenu) => {
 
       let left_pos = Math.round(ev.pageX)-0.5*sizing.width;
       let top_pos = Math.round(ev.pageY)-0.5*sizing.height;
-      // let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
       let zoom = 1;
       nextmenu.style.transformOrigin = `${left_pos}px ${top_pos}px`;
       nextmenu.style.transform = ev.isTrusted ? piemenu.style.transform : `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
