@@ -76,6 +76,10 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	color: #ffffff;
 }
 
+label.checked {
+	background: #faa;
+}
+
 label[draggable] {
 	display: block;
 }
@@ -408,6 +412,26 @@ label[draggable] input {
 	window.onload = function() {
 		new Glycan.DragManager(document.body);
 		new Glycan.DraggableForm(document.getElementById('new_linkage'));
+		document.getElementById('new_linkage').addEventListener('change', function(ev) {
+			if (ev.target && ev.target.parentNode instanceof HTMLLabelElement) {
+				let targ = ev.target;
+				if (targ.name !== 'donor') {
+					return;
+				}
+				for (let sib of this[targ.name]) {
+					if (sib === targ) {
+						sib.parentNode.classList.add('checked');
+					} else {
+						sib.parentNode.classList.remove('checked');
+					}
+				}
+			}
+		});
+		document.getElementById('new_linkage').addEventListener('reset', function(ev) {
+			for (let sib of this['donor']) {
+				sib.parentNode.classList.remove('checked');
+			}
+		});
 		document.getElementById('new_linkage').addEventListener('submit', function(ev) {
 			let new_res = new Glycan.Monosaccharide(this.donor.value);
 			new_res.anomer = this.anomer.value;
