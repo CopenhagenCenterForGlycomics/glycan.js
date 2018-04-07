@@ -41,9 +41,9 @@ g.tagged line {
 }
 body {
   margin: 0px;
-  margin-top: 40px;
+/*  margin-top: 40px;
   margin-left: 20px;
-  /* Disables pull-to-refresh but allows overscroll glow effects. */
+*/  /* Disables pull-to-refresh but allows overscroll glow effects. */
   /*overscroll-behavior-y: contain;*/
 /*  position: fixed;
 */
@@ -307,14 +307,14 @@ label[draggable] input {
 		delete form.active_residue;
 		form.residue = residue;
 		anomer_chooser.removeAttribute('active');
+		let zoom = parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
 		let target_pos = ev.target.getBoundingClientRect();
+		let vals = { top: target_pos.top ,left: target_pos.left ,width: target_pos.width ,height: target_pos.height };
 		let anomer_size = anomer_chooser.getBoundingClientRect();
-		let left_pos = (-0.5*anomer_size.width) + target_pos.left + (target_pos.width / 2) + window.scrollX;
-		let top_pos = (-0.5*anomer_size.height) + target_pos.top + (target_pos.height / 2) + window.scrollY;
-		// let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
-		let zoom = 1;
+		let left_pos = ((vals.left + 0.5*vals.width - 0.5*anomer_size.width)/zoom).toFixed(2);
+		let top_pos = ((vals.top+0.5*vals.height  - 0.5*anomer_size.height)/zoom).toFixed(2);
 		anomer_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
-		anomer_chooser.style.transform = `scale(${zoom}) translate(${left_pos}px,${top_pos}px)`;
+		anomer_chooser.style.transform = `scale(1) translate(${left_pos}px,${top_pos}px)`;
 		anomer_chooser.setAttribute('active',true);
 		anomer_chooser.clear();
 	};
