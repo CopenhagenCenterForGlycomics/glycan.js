@@ -23,6 +23,7 @@ tmpl.innerHTML = `
       --end-angle: 60;
       --notch-ratio: 0.075;
       --icon-position-ratio: 0.2;
+      --sectorid: url(#sectorWeight1);
     }
     :host([active]) {
       transform: scale(1);
@@ -37,8 +38,8 @@ tmpl.innerHTML = `
       transform: scale(0.001);
       width: 100%;
       height: 100%;
-      -webkit-clip-path: url(#sectorWeight1);
-      clip-path: url(#sectorWeight1);
+      -webkit-clip-path: var(--sectorid);
+      clip-path: var(--sectorid);
     }
   </style>
   <style id="angles">
@@ -78,6 +79,7 @@ const upgrade_elements = function(slot) {
   angle = start_angle;
   let delta = base_delta;
   const notch = parseFloat(actual_style.getPropertyValue('--notch-ratio'));
+  this.sectorpath.parentNode.setAttribute('id','sectors'+all_items.length);
   if (items.length > 0) {
     this.sectorpath.setAttribute('d',`M0.5,0.5 m${notch},0 l${0.5-notch},0 A0.5,0.5 0 0,0 ${ang(0.5+0.5*Math.cos(Math.PI/180*delta))},${ang(0.5-0.5*Math.sin(Math.PI/180*delta))} L${ang(0.5+(notch)*Math.cos(Math.PI/180*delta))},${ang(0.5-(notch)*Math.sin(Math.PI/180*delta))} A0.5,0.5 0 0,1 ${0.5+notch},0.5 z`);
   }
@@ -155,9 +157,17 @@ class PieMenu extends WrapHTML {
       console.log(this.hoverstyles);
     }
     let slot = shadowRoot.getElementById('items');
-    slot.addEventListener('slotchange', upgrade_elements.bind(this,slot));
     upgrade_elements.bind(this)(slot);
     // ShadyCSS.styleElement(this);
+  }
+
+  connectedCallback() {
+    let slot = this.shadowRoot.getElementById('items');
+    slot.addEventListener('slotchange', upgrade_elements.bind(this,slot));
+    slot.addEventListener('slotchange', () => {
+      this.style.setProperty('--sectorid','url(#'+this.sectorpath.parentNode.getAttribute('id')+')');
+    });
+
   }
 
   clear() {
