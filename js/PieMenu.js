@@ -86,7 +86,7 @@ const upgrade_elements = function(slot) {
 
   const icon_min_ratio = parseFloat(actual_style.getPropertyValue('--icon-position-ratio'));
 
-  for(let item of all_items) {
+  for(let item of all_items.reverse()) {
     delta = base_delta * parseInt(item.getAttribute('weight') || '1');
     let icon_min = icon_min_ratio;
     let icon_max = 0.5;

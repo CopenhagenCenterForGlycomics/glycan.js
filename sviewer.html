@@ -27,8 +27,8 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	height: 80%;
-	width: 80%;
+	height: 95%;
+	width: 95%;
 }
 g.tagged {
 	filter: url(#membrane);
@@ -142,13 +142,12 @@ label[draggable] input {
 		Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 		Fuc(a1-2)[NeuAc(a2-3)]GalNAc(b1-4)GlcNAc(b1-2)GalNAc(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
-	<div class="palette" style="position: absolute; top: 0px; left: 0px; background-color: black; right: 0px; height: 50px; z-index: 1;">
-	<div style="width: 50px; height: 50px; background: #fff; float: left;">
-	</div>
+	<div class="palette" style="position: absolute; top: 0px; left: 0px; right: 0px; z-index: 1; background: #eee;">
 	<form id="new_linkage">
+	<div style="width: 50px; height: 50px; float: left;"></div>
 	<x-piemenu name="anomer" id="anomer_menu" data-next="linkage_menu">
-  <label><span>a</span><input name="anomer" value="a" type="radio"></label>
-  <label><span>b</span><input name="anomer" value="b" type="radio"></label>
+  <label><span>α</span><input name="anomer" value="a" type="radio"></label>
+  <label><span>β</span><input name="anomer" value="b" type="radio"></label>
   <label><span>?</span><input name="anomer" value="?" type="radio"></label>
 	</x-piemenu>
 	<x-piemenu name="linkage" id="linkage_menu">
@@ -176,7 +175,54 @@ label[draggable] input {
 	</svg>
 	<input name="donor" value="GalNAc" type="radio">
 	</label>
-
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#man"</use>
+	</svg>
+	<input name="donor" value="Man" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glcnac"</use>
+	</svg>
+	<input name="donor" value="glcnac" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neugc"</use>
+	</svg>
+	<input name="donor" value="neugc" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glc"</use>
+	</svg>
+	<input name="donor" value="Glc" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glca"</use>
+	</svg>
+	<input name="donor" value="GlcA" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#idoa"</use>
+	</svg>
+	<input name="donor" value="IdoA" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#xyl"</use>
+	</svg>
+	<input name="donor" value="Xyl" type="radio">
+	</label>
+	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<svg width="100%" height="100%" viewBox="0 0 100 100">
+		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#fuc"</use>
+	</svg>
+	<input name="donor" value="Fuc" type="radio">
+	</label>
 	</form>
 	</div>
 	<textarea id="seq" style="display: none;" >NeuAc(a2-3)[GlcA(b1-?)]Gal(b1-4)Fuc</textarea>
@@ -192,8 +238,8 @@ label[draggable] input {
 	    window.requestAnimationFrame(function() {
 		  let zoom = (window.innerWidth / document.documentElement.clientWidth).toFixed(2);
 	      let top = window.scrollY;
-	      document.getElementById('new_linkage').style.transformOrigin = `${window.scrollX}px ${top}px`;
-		  document.getElementById('new_linkage').style.transform = `scale(${zoom}) translate(${window.scrollX}px,${top}px)`;
+	      document.getElementById('new_linkage').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
+		  document.getElementById('new_linkage').parentNode.style.transform = `scale(${zoom}) translate(${window.scrollX}px,${top}px)`;
 		  // console.log(document.getElementById('dragsource').style.transform);
 	      ticking = false;
 	    });
