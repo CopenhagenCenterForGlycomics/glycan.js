@@ -244,7 +244,6 @@ label[draggable] input {
 	      let top = window.scrollY;
 	      document.getElementById('new_linkage').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
 		  document.getElementById('new_linkage').parentNode.style.transform = `scale(${zoom}) translate(${window.scrollX}px,${top}px)`;
-		  // console.log(document.getElementById('dragsource').style.transform);
 	      ticking = false;
 	    });
 	    ticking = true;
@@ -271,12 +270,8 @@ label[draggable] input {
 		let sug = new Glycan.IupacSugar();
 		sug.sequence = seq;
 		sug.root.setTag(tag_symbol);
-		// sug.root.children[0].setTag(tag_symbol);
-		// if (sug.root.children[0].children.length > 0) {
-		// 	sug.root.children[0].children[0].setTag(tag_symbol);
-		// }
 		Glycan.FishEyeLayout.LINKS = true;
-		let renderer = global_renderer;//= new Glycan.SVGRenderer(output,Glycan.FishEyeLayout);
+		let renderer = global_renderer;
 
 		renderer.groupTag = tag_symbol;
 
@@ -287,27 +282,14 @@ label[draggable] input {
 		renderer.element.canvas.addEventListener('dragleave', (ev) => {
 			if (ev.relatedTarget === renderer.element.canvas) {
 				setTimeout(() =>{
-					document.getElementById('anomer_menu').removeAttribute('active');
-					document.getElementById('linkage_menu').removeAttribute('active');
-					delete document.getElementById('new_linkage').residue;
+					document.getElementById('new_linkage').reset();
 				},100);
 				return;
 			}
-			// return;
-			// console.log("Dragleave reset focus",ev);
-			// Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
-			// if (last_req) {
-			// 	cancelAnimationFrame(last_req);
-			// }
-			// last_req = requestAnimationFrame(function() {
-			// 	renderer.refresh();
-			// });
 		});
 		document.body.addEventListener('dragend', (ev) => {
 			setTimeout(() =>{
-				document.getElementById('anomer_menu').removeAttribute('active');
-				document.getElementById('linkage_menu').removeAttribute('active');
-				delete document.getElementById('new_linkage').residue;
+				document.getElementById('new_linkage').reset();
 			},100);
 
 			Glycan.FishEyeLayout.focus = [ -1000, -1000 ];
@@ -320,9 +302,7 @@ label[draggable] input {
 		});
 
 		renderer.element.canvas.addEventListener('dragover', (ev) => {
-			if (
-			document.getElementById('linkage_menu').hasAttribute('active') ||
-			document.getElementById('anomer_menu').hasAttribute('active') ) {
+			if (document.querySelectorAll('x-piemenu[active').length > 0) {
 				return;
 			}
 
@@ -346,7 +326,6 @@ label[draggable] input {
 	};
 	let load_all_seqs = function() {
 		clear_sequences();
-		console.log("Here");
 		for (let seq of document.getElementById('seqs').textContent.split('\n')) {
 			append_sequence(seq.trim());
 		}
@@ -378,27 +357,25 @@ label[draggable] input {
 		residue.renderer = renderer;
 		let target = renderer.rendered.get(residue).residue;
 		target.style.pointerEvents = 'all';
-		let anomer_chooser = document.getElementById('anomer_menu');
 		let form = document.getElementById('new_linkage');
 
 		target.addEventListener('dragleave', (ev) => {
 			delete form.active_residue;
-			// clearTimeout(form.menu_timeout);
 		});
 		target.addEventListener('click', show_anomer.bind(null,residue) );
 		target.addEventListener('dragenter', (ev) => {
 			if (form.residue === residue) {
 				return;
 			}
-			let last_residue = form.active_residue;
 
-			if (last_residue === residue) {
+			if (form.active_residue === residue) {
 				return;
 			}
 
+			form.clear();
+
 			// We should wait for a drag over at least 300 ms after
 			// to set the target
-			last_residue = residue;
 			form.active_residue = residue;
 
 			if (form.menu_timeout) {
@@ -428,9 +405,12 @@ label[draggable] input {
 			}
 		});
 		document.getElementById('new_linkage').addEventListener('reset', function(ev) {
+			delete this.residue;
+
 			for (let sib of this['donor']) {
 				sib.parentNode.classList.remove('checked');
 			}
+
 		});
 		document.getElementById('new_linkage').addEventListener('submit', function(ev) {
 			let new_res = new Glycan.Monosaccharide(this.donor.value);
