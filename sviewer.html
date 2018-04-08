@@ -282,7 +282,9 @@ label[draggable] input {
 		renderer.element.canvas.addEventListener('dragleave', (ev) => {
 			if (ev.relatedTarget === renderer.element.canvas) {
 				setTimeout(() =>{
-					document.getElementById('new_linkage').reset();
+					document.getElementById('new_linkage').clear();
+					delete document.getElementById('new_linkage').active_residue;
+					delete document.getElementById('new_linkage').residue;
 				},100);
 				return;
 			}
@@ -302,7 +304,7 @@ label[draggable] input {
 		});
 
 		renderer.element.canvas.addEventListener('dragover', (ev) => {
-			if (document.querySelectorAll('x-piemenu[active').length > 0) {
+			if (document.querySelectorAll('x-piemenu[active]').length > 0) {
 				return;
 			}
 
