@@ -254,10 +254,11 @@ label[draggable] input {
 		  let zoom = parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
 	      let top = window.scrollY;
 	      document.getElementById('new_linkage').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
-	      if (zoom < 0.8 && document.getElementById('new_linkage').parentNode.getBoundingClientRect().top < 0) {
-		      top -= ((25 - 5) / zoom);
+	      if (zoom < 0.8 && document.getElementById('new_linkage').parentNode.parentNode.getBoundingClientRect().top < 0) {
+		      top -= document.getElementById('new_linkage').parentNode.parentNode.offsetTop/zoom;
 	      }
 		  document.getElementById('new_linkage').parentNode.style.transform = `scale(${zoom}) translate(${window.scrollX}px,${top}px)`;
+		  document.getElementById('new_linkage').parentNode.style.width = (100/zoom)+'%';
 	      ticking = false;
 	    });
 	    ticking = true;
