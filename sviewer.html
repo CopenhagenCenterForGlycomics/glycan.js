@@ -27,8 +27,8 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	height: 95%;
-	width: 95%;
+	height: 100%;
+	width: 100%;
 }
 g.tagged {
 	filter: url(#membrane);
@@ -82,9 +82,18 @@ label.checked {
 
 label[draggable] {
 	display: block;
+	width: 25px;
+	height: 25px;
 }
 label[draggable] input {
 	display: none;
+}
+
+#widget {
+	border: solid red 1px;
+	width: 50%;
+	position: absolute;
+	height: 50%;
 }
 
 @media only screen
@@ -146,9 +155,10 @@ label[draggable] input {
 		Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 		Fuc(a1-2)[NeuAc(a2-3)]GalNAc(b1-4)GlcNAc(b1-2)GalNAc(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
+	<div id="widget">
 	<div class="palette" style="position: absolute; top: 0px; left: 0px; right: 0px; z-index: 1; background: #eee;">
 	<form id="new_linkage">
-	<div style="width: 50px; height: 50px; float: left;"></div>
+	<div style="float: left;"></div>
 	<x-piemenu name="anomer" id="anomer_menu" data-next="linkage_menu">
   <label><span>α</span><input name="anomer" value="a" type="radio"></label>
   <label><span>β</span><input name="anomer" value="b" type="radio"></label>
@@ -161,67 +171,67 @@ label[draggable] input {
   <label><span>6</span><input name="linkage" value="6" type="radio"></label>
   <label><span>8</span><input name="linkage" value="8" type="radio"></label>
 	</x-piemenu>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac"</use>
 	</svg>
 	<input name="donor" value="NeuAc" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#gal"</use>
 	</svg>
 	<input name="donor" value="Gal" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#galnac"</use>
 	</svg>
 	<input name="donor" value="GalNAc" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#man"</use>
 	</svg>
 	<input name="donor" value="Man" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glcnac"</use>
 	</svg>
 	<input name="donor" value="glcnac" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neugc"</use>
 	</svg>
 	<input name="donor" value="neugc" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glc"</use>
 	</svg>
 	<input name="donor" value="Glc" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#glca"</use>
 	</svg>
 	<input name="donor" value="GlcA" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#idoa"</use>
 	</svg>
 	<input name="donor" value="IdoA" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#xyl"</use>
 	</svg>
 	<input name="donor" value="Xyl" type="radio">
 	</label>
-	<label draggable="true" style="-webkit-user-drag: element; width: 50px; height: 50px; float: left;">
+	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#fuc"</use>
 	</svg>
@@ -231,6 +241,7 @@ label[draggable] input {
 	</div>
 	<textarea id="seq" style="display: none;" >Xyl</textarea>
 	<div id="output">
+	</div>
 	</div>
 
 <script type="text/javascript">
