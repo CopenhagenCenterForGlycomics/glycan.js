@@ -7,7 +7,7 @@
 	<script type="text/javascript" src="webcomponents-lite.js"></script>
 	<script type="text/javascript" src="node_modules/babel-polyfill/dist/polyfill.js"></script>
 	<script type="text/javascript" src="dragdroptouch.js"></script>
- 	<script type="text/javascript" src="glycan-bundle.js"></script>
+	<script type="text/javascript" src="glycan-bundle.js"></script>
 
  <style type="text/css">
 #output svg * {
@@ -120,27 +120,27 @@ label[draggable] input {
 <body>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0" height="0">
 	<defs>
-    <filter id="membrane" filterUnits="objectBoundingBox">
-      <feColorMatrix mode="matrix" in="SourceGraphic" values="0 0 0 0 0
-                                                     0 0 0 0 0
-                                                     0 0 0 0 0
-                                                     0 0 0 1 0" result="blacksource"/>
-      <feGaussianBlur in="blacksource" stdDeviation="10" result="blur" />
-      <feColorMatrix mode="matrix" in="blur" values="0 0 0 0 0
-                                                     0 0 0 0 0
-                                                     0 0 0 0 0
-                                                     0 0 0 30 -3" result="contrastup"/>
-      <feColorMatrix mode="matrix" in="contrastup" values="0 0 0 0 0.9
-                                                     0 0 0 0 0.8
-                                                     0 0 0 0 0.8
-                                                     0 0 0 0.6 0" result="googrey"/>
-      <feMorphology operator="dilate" in="googrey" radius="2"/>
-      <feColorMatrix mode="matrix" values="0 0 0 0 1
+	<filter id="membrane" filterUnits="objectBoundingBox">
+	  <feColorMatrix mode="matrix" in="SourceGraphic" values="0 0 0 0 0
+													 0 0 0 0 0
+													 0 0 0 0 0
+													 0 0 0 1 0" result="blacksource"/>
+	  <feGaussianBlur in="blacksource" stdDeviation="10" result="blur" />
+	  <feColorMatrix mode="matrix" in="blur" values="0 0 0 0 0
+													 0 0 0 0 0
+													 0 0 0 0 0
+													 0 0 0 30 -3" result="contrastup"/>
+	  <feColorMatrix mode="matrix" in="contrastup" values="0 0 0 0 0.9
+													 0 0 0 0 0.8
+													 0 0 0 0 0.8
+													 0 0 0 0.6 0" result="googrey"/>
+	  <feMorphology operator="dilate" in="googrey" radius="2"/>
+	  <feColorMatrix mode="matrix" values="0 0 0 0 1
 0 0 0 0 0.2
 0 0 0 0 0.2
 0 0 0 1 0" result="outeroutline"/>
-      <feComposite in2="outeroutline" in="googrey" result="gooback"/>
-      <feComposite in2="gooback" in="SourceGraphic"/>
+	  <feComposite in2="outeroutline" in="googrey" result="gooback"/>
+	  <feComposite in2="gooback" in="SourceGraphic"/>
 	</filter>
 	</defs>
 </svg>
@@ -248,22 +248,25 @@ label[draggable] input {
 	let ticking = false;
 	window.addEventListener('scroll', function(e) {
 
-	  if (!ticking) {
+	if (!ticking) {
 
-	    window.requestAnimationFrame(function() {
-		  let zoom = parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
-	      let top = window.scrollY;
-	      document.getElementById('new_linkage').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
-	      if (zoom < 0.8 && document.getElementById('new_linkage').parentNode.parentNode.getBoundingClientRect().top < 0) {
-		      top -= document.getElementById('new_linkage').parentNode.parentNode.offsetTop/zoom;
-	      }
-		  document.getElementById('new_linkage').parentNode.style.transform = `scale(${zoom}) translate(${window.scrollX}px,${top}px)`;
-		  document.getElementById('new_linkage').parentNode.style.width = (100/zoom)+'%';
-	      ticking = false;
-	    });
-	    ticking = true;
-
-	  }
+		window.requestAnimationFrame(function() {
+			let zoom = parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
+			let top = window.scrollY;
+			let left = window.scrollX;
+			document.getElementById('new_linkage').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
+			if (zoom < 0.8 && document.getElementById('new_linkage').parentNode.parentNode.getBoundingClientRect().top < 0) {
+				top -= document.getElementById('new_linkage').parentNode.parentNode.offsetTop/zoom;
+				left -= document.getElementById('new_linkage').parentNode.parentNode.offsetLeft/zoom;
+				document.getElementById('new_linkage').parentNode.style.width = (50/zoom)+'%';
+			} else {
+				document.getElementById('new_linkage').parentNode.style.width='100%';
+			}
+			document.getElementById('new_linkage').parentNode.style.transform = `scale(${zoom}) translate(${left}px,${top}px)`;
+			ticking = false;
+		});
+		ticking = true;
+	}
 	});
 
 	let clear_sequences = function() {
