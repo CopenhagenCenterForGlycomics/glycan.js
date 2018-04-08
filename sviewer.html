@@ -255,8 +255,7 @@ label[draggable] input {
 			let top = window.scrollY;
 			let left = window.scrollX;
 			document.getElementById('new_linkage').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
-			if (zoom < 0.8 && document.getElementById('new_linkage').parentNode.parentNode.getBoundingClientRect().top < 0) {
-				top -= document.getElementById('new_linkage').parentNode.parentNode.offsetTop/zoom;
+			if (zoom < 0.8) {
 				left -= document.getElementById('new_linkage').parentNode.parentNode.offsetLeft/zoom;
 				document.getElementById('new_linkage').parentNode.style.width = (50/zoom)+'%';
 			} else {
@@ -365,8 +364,12 @@ label[draggable] input {
 		let target_pos = ev.target.getBoundingClientRect();
 		let vals = { top: target_pos.top ,left: target_pos.left ,width: target_pos.width ,height: target_pos.height };
 		let anomer_size = anomer_chooser.getBoundingClientRect();
-		let left_pos = ((vals.left + 0.5*vals.width - 0.5*anomer_size.width)/zoom).toFixed(2);
-		let top_pos = ((vals.top+0.5*vals.height  - 0.5*anomer_size.height)/zoom).toFixed(2);
+		let palette_top = (anomer_chooser.parentNode.getBoundingClientRect().top/zoom);
+		let palette_left = (anomer_chooser.parentNode.getBoundingClientRect().left/zoom);
+
+		let left_pos = (((vals.left + 0.5*vals.width - 0.5*anomer_size.width)/zoom) - palette_left).toFixed(2);
+		let top_pos = (((vals.top+0.5*vals.height  - 0.5*anomer_size.height)/zoom) - palette_top).toFixed(2);
+
 		anomer_chooser.style.transformOrigin = `${left_pos}px ${top_pos}px`;
 		anomer_chooser.style.transform = `scale(1) translate(${left_pos}px,${top_pos}px)`;
 		anomer_chooser.setAttribute('active',true);
