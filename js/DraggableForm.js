@@ -50,9 +50,9 @@ const wire_menu_events = (piemenu) => {
         }
       }
 
-      if (piemenu.parentNode.menu_timeout) {
+      if (piemenu.form.menu_timeout) {
         // Also clear this out for a dragend or a dragleave
-        clearTimeout(piemenu.parentNode.menu_timeout);
+        clearTimeout(piemenu.form.menu_timeout);
       }
 
       let nextmenu = piemenu.ownerDocument.getElementById(piemenu.getAttribute('data-next'));
@@ -60,7 +60,7 @@ const wire_menu_events = (piemenu) => {
         return;
       }
 
-      piemenu.parentNode.menu_timeout = setTimeout( () => {
+      piemenu.form.menu_timeout = setTimeout( () => {
 
         if ( ! last_selected ) {
           return;
@@ -89,13 +89,13 @@ const wire_menu_events = (piemenu) => {
         ev.preventDefault();        
       }
 
-      clearTimeout(piemenu.parentNode.menu_timeout);
+      clearTimeout(piemenu.form.menu_timeout);
       let sizing = piemenu.getBoundingClientRect();
       piemenu.removeAttribute('active');
       let nextmenu = piemenu.ownerDocument.getElementById(piemenu.getAttribute('data-next'));
       if (! nextmenu ) {
         var event = new Event('submit',{bubbles: true});
-        piemenu.parentNode.dispatchEvent(event);
+        piemenu.form.dispatchEvent(event);
         return;
       }
       let vp_zoom = 1/parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
@@ -140,6 +140,7 @@ const wire_menu_events = (piemenu) => {
 const upgrade_piemenus = (form) => {
   let menus = form.querySelectorAll('x-piemenu');
   for (let menu of menus) {
+    menu.form = form;
     wire_menu_events(menu);
   }
 };

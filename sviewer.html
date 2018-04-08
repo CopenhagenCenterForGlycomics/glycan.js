@@ -36,8 +36,12 @@ g.tagged {
 g.tagged line {
 	stroke-width: 5;
 }
-.palette div {
-	height: 100%;
+#widget .palette {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	background: #eee;
 }
 body {
   margin: 0px;
@@ -57,7 +61,7 @@ x-piemenu {
 	pointer-events: none;
 	width: 150px;
 	height: 150px;
-	z-index: 1;
+	z-index: 2;
 	--end-angle: 60;
 	--start-angle: -60;
 	--icon-size: 10px;
@@ -94,7 +98,29 @@ label[draggable] input {
 	width: 50%;
 	position: absolute;
 	height: 50%;
+	left: 10%;
 }
+
+#widget div.widget_contents {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	width: 100%;
+	height: 100%;
+}
+
+#widget .pie_parent {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	border: solid blue 1px;
+}
+
 
 @media only screen
   and (min-device-width: 320px)
@@ -156,21 +182,12 @@ label[draggable] input {
 		Fuc(a1-2)[NeuAc(a2-3)]GalNAc(b1-4)GlcNAc(b1-2)GalNAc(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
 	<div id="widget">
-	<div class="palette" style="position: absolute; top: 0px; left: 0px; right: 0px; z-index: 1; background: #eee;">
+	<div class="widget_contents" >
+	<div id="output">
+	</div>
 	<form id="new_linkage">
 	<div style="float: left;"></div>
-	<x-piemenu name="anomer" id="anomer_menu" data-next="linkage_menu">
-  <label><span>α</span><input name="anomer" value="a" type="radio"></label>
-  <label><span>β</span><input name="anomer" value="b" type="radio"></label>
-  <label><span>?</span><input name="anomer" value="?" type="radio"></label>
-	</x-piemenu>
-	<x-piemenu name="linkage" id="linkage_menu">
-  <label><span>2</span><input name="linkage" value="2" type="radio"></label>
-  <label><span>3</span><input name="linkage" value="3" type="radio"></label>
-  <label><span>4</span><input name="linkage" value="4" type="radio"></label>
-  <label><span>6</span><input name="linkage" value="6" type="radio"></label>
-  <label><span>8</span><input name="linkage" value="8" type="radio"></label>
-	</x-piemenu>
+	<div class="palette">
 	<label draggable="true" style="-webkit-user-drag: element; float: left;">
 	<svg width="100%" height="100%" viewBox="0 0 100 100">
 		<use x="0.0" y="0.0" width="100" height="100" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sugars.svg#neuac"</use>
@@ -237,11 +254,24 @@ label[draggable] input {
 	</svg>
 	<input name="donor" value="Fuc" type="radio">
 	</label>
+	</div>
+	<div class="pie_parent">
+	<x-piemenu name="anomer" id="anomer_menu" data-next="linkage_menu">
+  <label><span>α</span><input name="anomer" value="a" type="radio"></label>
+  <label><span>β</span><input name="anomer" value="b" type="radio"></label>
+  <label><span>?</span><input name="anomer" value="?" type="radio"></label>
+	</x-piemenu>
+	<x-piemenu name="linkage" id="linkage_menu">
+  <label><span>2</span><input name="linkage" value="2" type="radio"></label>
+  <label><span>3</span><input name="linkage" value="3" type="radio"></label>
+  <label><span>4</span><input name="linkage" value="4" type="radio"></label>
+  <label><span>6</span><input name="linkage" value="6" type="radio"></label>
+  <label><span>8</span><input name="linkage" value="8" type="radio"></label>
+	</x-piemenu>
+	</div>
 	</form>
 	</div>
 	<textarea id="seq" style="display: none;" >Xyl</textarea>
-	<div id="output">
-	</div>
 	</div>
 
 <script type="text/javascript">
@@ -254,14 +284,24 @@ label[draggable] input {
 			let zoom = parseFloat((window.innerWidth / document.documentElement.clientWidth).toFixed(2));
 			let top = window.scrollY;
 			let left = window.scrollX;
-			document.getElementById('new_linkage').parentNode.style.transformOrigin = `${window.scrollX}px ${top}px`;
-			if (zoom < 0.8) {
-				left -= document.getElementById('new_linkage').parentNode.parentNode.offsetLeft/zoom;
-				document.getElementById('new_linkage').parentNode.style.width = (50/zoom)+'%';
+			let palette = document.querySelector('#widget .palette');
+			palette.style.transformOrigin = `${window.scrollX}px ${top}px`;
+			let widget_pos = palette.parentNode.parentNode.getBoundingClientRect();
+			if (widget_pos.top < 0 && widget_pos.left < 0) {
+				palette.style.position = 'fixed';
 			} else {
-				document.getElementById('new_linkage').parentNode.style.width='100%';
+				palette.style.position = 'absolute';
 			}
-			document.getElementById('new_linkage').parentNode.style.transform = `scale(${zoom}) translate(${left}px,${top}px)`;
+
+			if (zoom < 0.8) {
+				left -= palette.parentNode.parentNode.offsetLeft/zoom;
+				palette.style.width = (50/zoom)+'%';
+			} else {
+				palette.style.width='100%';
+			}
+			palette.style.transform = `scale(${zoom}) translate(${left}px,${top}px)`;
+			document.querySelector('#widget .pie_parent').style.transformOrigin = `${window.scrollX}px ${top}px`;
+			document.querySelector('#widget .pie_parent').style.transform = `scale(${zoom}) translate(${left}px,${top}px)`;
 			ticking = false;
 		});
 		ticking = true;
