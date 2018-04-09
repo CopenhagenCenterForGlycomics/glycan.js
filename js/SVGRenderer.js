@@ -190,7 +190,9 @@ const cleanup_residues = function(active_residues) {
     if (! active.has(res)) {
       let elements = this.rendered.get(res);
       elements.residue.parentNode.removeChild(elements.residue);
-      elements.linkage.parentNode.removeChild(elements.linkage);
+      if (elements.linkage) {
+        elements.linkage.parentNode.removeChild(elements.linkage);
+      }
       this.rendered.delete(res);
     }
   }
