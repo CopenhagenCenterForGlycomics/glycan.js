@@ -8,6 +8,5 @@ export {default as SugarAwareLayout} from './SugarAwareLayout';
 export {default as LinkageLayout} from './LinkageLayout';
 export {default as FishEyeLayout} from './FishEyeLayout';
 export {default as SVGRenderer} from './SVGRenderer';
-export {default as PieMenu} from './DragMenus/PieMenu';
-export {default as DraggableForm} from './DragMenus/DraggableForm';
-export {default as DragManager} from './DragMenus/DragManager';
+
+export * from 'DragMenus';
