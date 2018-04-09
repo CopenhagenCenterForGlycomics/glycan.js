@@ -2,7 +2,7 @@
   "name": "glycan.js",
   "version": "0.0.1",
   "description": "A tiny library for drawing glycans",
-  "main": "./dist/index.js",
+  "main": "./js/index.js",
   "directories": {
     "test": "test"
   },
@@ -38,6 +38,9 @@
     "start": "npm run-script build-watch-web & npm run-script server",
     "lint": "jshint .",
     "validate": "npm ls"
+  },
+  "browserify": {
+    "transform": ["babelify"]
   },
   "repository": {
     "type": "git",
