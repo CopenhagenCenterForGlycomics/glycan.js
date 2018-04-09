@@ -10,48 +10,78 @@
 	<script type="text/javascript" src="glycan-bundle.js"></script>
 
  <style type="text/css">
-#output svg * {
-  -moz-transition: all 0.5s ease-in-out;
-  -o-transition: all 0.5s ease-in-out;
-  -webkit-transition: all 0.5s ease-in-out;
-  transition: all 0.5s ease-in-out;
+
+body {
+  margin: 0px;
+  overflow: hidden;
 }
-#output svg {
+
+#widget[resizeable] .widget_contents > div > svg {
+	width: calc(100% - 5px);
+	height: calc(100% - 5px);
+}
+
+#widget .widget_contents > div > svg {
+	width: 100%;
+	height: 100%;
+	pointer-events: auto;
+}
+
+#widget .widget_contents > div > svg * {
+	-moz-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+	-webkit-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+}
+
+#widget .widget_contents > div > svg {
+	-moz-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+	-webkit-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+}
+
+#widget .widget_contents {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
 	width: 100%;
 	height: 100%;
 }
-#existing {
-	display: none;
+
+#widget .pie_parent {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
 }
-#output {
+
+#widget .widget_contents > div {
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	height: 100%;
 	width: 100%;
 }
-g.tagged {
-	filter: url(#membrane);
-}
-g.tagged line {
-	stroke-width: 5;
-}
+
 #widget .palette {
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	right: 0px;
 	background: #eee;
+	pointer-events: auto;
 }
-body {
-  margin: 0px;
-/*  margin-top: 40px;
-  margin-left: 20px;
-*/  /* Disables pull-to-refresh but allows overscroll glow effects. */
-  /*overscroll-behavior-y: contain;*/
-/*  position: fixed;
-*/
-	overflow: hidden;
+
+g.tagged {
+	filter: url(#membrane);
+}
+g.tagged line {
+	stroke-width: 5;
 }
 
 x-piemenu {
@@ -80,45 +110,31 @@ x-piemenu button.hover, x-piemenu label.hover, x-piemenu button:hover, x-piemenu
 	color: #ffffff;
 }
 
-label.checked {
+#widget .palette label.checked {
 	background: #faa;
 }
 
-label[draggable] {
+#widget .palette label[draggable] {
 	display: block;
 	width: 25px;
 	height: 25px;
 }
-label[draggable] input {
+#widget .palette label[draggable] input {
 	display: none;
 }
 
 #widget {
-	border: solid red 1px;
 	width: 50%;
-	position: absolute;
+	position: relative;
 	height: 50%;
+	min-height: 300px;
 	left: 10%;
-}
-
-#widget div.widget_contents {
-	position: absolute;
-	left: 0px;
-	right: 0px;
-	top: 0px;
-	bottom: 0px;
-	width: 100%;
-	height: 100%;
-}
-
-#widget .pie_parent {
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	width: 100%;
-	height: 100%;
 	pointer-events: none;
-	border: solid blue 1px;
+}
+
+#widget[resizeable] {
+	resize: both;
+	overflow: auto;
 }
 
 
@@ -181,7 +197,7 @@ label[draggable] input {
 		Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 		Fuc(a1-2)[NeuAc(a2-3)]GalNAc(b1-4)GlcNAc(b1-2)GalNAc(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-3)]Gal(b1-3)GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-2)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc
 	</pre>
-	<div id="widget">
+	<div resizeable="true" id="widget">
 	<div class="widget_contents" >
 	<div id="output">
 	</div>
@@ -285,6 +301,7 @@ label[draggable] input {
 			let top = window.scrollY;
 			let left = window.scrollX;
 			let palette = document.querySelector('#widget .palette');
+			let pie_parent = document.querySelector('#widget .pie_parent');
 			palette.style.transformOrigin = `${window.scrollX}px ${top}px`;
 			let widget_pos = palette.parentNode.parentNode.getBoundingClientRect();
 			if (widget_pos.top < 0 && widget_pos.left < 0) {
@@ -300,8 +317,8 @@ label[draggable] input {
 				palette.style.width='100%';
 			}
 			palette.style.transform = `scale(${zoom}) translate(${left}px,${top}px)`;
-			document.querySelector('#widget .pie_parent').style.transformOrigin = `${window.scrollX}px ${top}px`;
-			document.querySelector('#widget .pie_parent').style.transform = `scale(${zoom}) translate(${left}px,${top}px)`;
+			pie_parent.style.transformOrigin = `${window.scrollX}px ${top}px`;
+			pie_parent.style.transform = `scale(${zoom}) translate(${left}px,${top}px)`;
 			ticking = false;
 		});
 		ticking = true;
@@ -335,6 +352,13 @@ label[draggable] input {
 		renderer.addSugar(sug);
 
 		let last_req = null;
+
+		renderer.element.canvas.addEventListener('click', (ev) => {
+			if (ev.target !== renderer.element.canvas) {
+				return;
+			}
+			document.getElementById('new_linkage').clear();
+		});
 
 		renderer.element.canvas.addEventListener('dragleave', (ev) => {
 			if (ev.relatedTarget === renderer.element.canvas) {
