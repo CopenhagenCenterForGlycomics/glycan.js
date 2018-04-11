@@ -84,6 +84,9 @@ export default class Sugar {
   // FIXME to use a well defined traversal alogirthm (DFS or BFS)
   composition(root=this.root) {
     let self = this;
+    if ( ! root ) {
+      return [];
+    }
     let return_value = [ [root] ].concat(root.children.map(child => self.composition(child)));
     return return_value.reduce( (a,b) => a.concat(b) );
   }
@@ -123,6 +126,9 @@ export default class Sugar {
   }
 
   *breadth_first_traversal(start=this.root,visitor=(x)=>x) {
+    if (! start) {
+      return;
+    }
     let queue = [];
     queue.push(start);
     while (queue.length > 0) {

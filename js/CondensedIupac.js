@@ -123,6 +123,9 @@ let link_expander = function(links) {
 
 let write_sequence = function(start=this.root) {
   let self = this;
+  if ( ! start ) {
+    return;
+  }
   let child_sequence = ''+[].concat.apply([],[...start.child_linkages].map(link_expander)).map( kid => write_sequence.call(self,kid[1])+write_link(kid[0])+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   return child_sequence+write_monosaccharide(start)+write_linkage(start);
 };

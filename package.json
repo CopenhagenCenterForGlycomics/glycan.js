@@ -49,7 +49,6 @@
   "author": "",
   "license": "TBD",
   "pre-commit": [
-    "jshint-pre-commit",
-    "validate"
+    "jshint-pre-commit"
   ]
 }
