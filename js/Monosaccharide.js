@@ -16,7 +16,7 @@ const leaves_of_residue = function(residue) {
   if (residue.children.length == 0) {
     return [residue];
   }
-  return Array.concat.apply([],residue.children.map(leaves_of_residue));
+  return Array.prototype.concat.apply([],residue.children.map(leaves_of_residue));
 };
 
 const get_path_to_root = function(roots,residue) {

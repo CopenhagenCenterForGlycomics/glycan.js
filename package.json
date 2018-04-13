@@ -24,7 +24,6 @@
     "promise-polyfill": "^2.0.2",
     "qunit": "^0.7.6",
     "qunitjs": "^1.18.0",
-    "DragMenus" : "hirenj/DragMenus",
     "watchify": "^3.9.0"
   },
   "scripts": {
