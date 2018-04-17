@@ -22,7 +22,7 @@ const rendered_symbol = Symbol('rendered_elements');
 
 const group_tag_symbol = Symbol('group_tag');
 
-const ROTATE = false;
+const ROTATE = true;
 
 let SCALE = 100;
 
@@ -134,13 +134,6 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     label.setAttribute('text-anchor','end');
   }
 
-  if (ROTATE) {
-    label.setAttribute('transform',`rotate(90,${xcoord},${ycoord})`);
-    label.setAttribute('text-anchor','start');
-    if (xpos >= 0) {
-    label.setAttribute('dominant-baseline','auto');
-    }
-  }
   canvas.sendToBack(label);
   return label;
 };
@@ -244,6 +237,13 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   for (let residue of (layout ? new_residues : [])) {
 
     let position = layout.get(residue);
+    let xval = position.x;
+    let yval = position.y;
+    if (ROTATE) {
+      position.x = yval;
+      position.y = -1*xval;
+    }
+
     xvals.push(position.x);
     xvals.push(position.x+position.width);
     yvals.push(position.y);
@@ -284,7 +284,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       rotate_angle = position.rotate;
     }
     if (ROTATE) {
-      rotate_angle += 90;
+      rotate_angle -= 90;
     }
 
     update_icon_position(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
@@ -354,9 +354,6 @@ class SVGRenderer {
       this[layout_cache] = new WeakMap();
       this[canvas_symbol] = new SVGCanvas(container);
       this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
-      if (ROTATE) {
-        this[canvas_symbol].canvas.style.transform = 'rotate(-90deg)';
-      }
 
       wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this,this[canvas_symbol].canvas), {passive:true, capture: false } );
     }
