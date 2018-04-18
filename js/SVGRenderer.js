@@ -22,7 +22,7 @@ const rendered_symbol = Symbol('rendered_elements');
 
 const group_tag_symbol = Symbol('group_tag');
 
-const ROTATE = false;
+const ROTATE = true;
 
 let SCALE = 100;
 
@@ -48,12 +48,11 @@ const handle_events = function(svg,event) {
     pt.x=event.clientX;
     pt.y=event.clientY;
     let transformed = pt.matrixTransform(svg.getScreenCTM().inverse());
-    event.svgX = transformed.x / SCALE;
-    event.svgY = transformed.y / SCALE;
+    let xpos = transformed.x / SCALE;
+    let ypos = transformed.y / SCALE;
+    event.svgX = ROTATE ? ((-1*ypos) + 1) : xpos;
+    event.svgY = ROTATE ? xpos : ypos;
   }
-  // if (event.type !== 'mousemove') {
-  //   console.log(event.type,event.target,event);
-  // }
 };
 
 const calculate_moved_residues = function(layout,residue) {
@@ -253,7 +252,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     let yval = position.y;
     if (ROTATE) {
       position.x = yval;
-      position.y = -1*xval;
+      position.y = -1*xval - position.width;
     }
 
     xvals.push(position.x);
