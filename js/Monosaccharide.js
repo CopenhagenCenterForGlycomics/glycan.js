@@ -1,5 +1,7 @@
 'use strict';
 
+const LINKAGES = { 'O' : -100, 'N' : -200 };
+
 let anomer_symbol = Symbol('anomer');
 let identifier_symbol = Symbol('identifier');
 let parent_linkage_symbol = Symbol('parent_linkage');
@@ -75,6 +77,9 @@ let linkage_map = new WeakMap();
 let children_map = new WeakMap();
 
 export default class Monosaccharide {
+  static get LINKAGES() {
+    return LINKAGES;
+  }
   constructor(identifier) {
     if ( ! identifier ) {
       throw new Error('Missing identifier');
@@ -194,7 +199,7 @@ export default class Monosaccharide {
       throw new Error(`Cannot set defined linkage greater than ${MAX_KNOWN_LINKAGE}`);
     }
 
-    if (linkage <= 0) {
+    if (linkage == 0) {
       this[unknown_count_symbol] = (this[unknown_count_symbol] || 0);
       let unknown_count =  this[unknown_count_symbol];
       this[unknown_count_symbol] = unknown_count+1;
@@ -254,7 +259,7 @@ export default class Monosaccharide {
       kids.splice(kids.indexOf(child),1);
       linkage_map.delete(child);
       child[parent_symbol] = null;
-      if (new_linkage <= 0) {
+      if (new_linkage == 0) {
         this[unknown_count_symbol] -= 1;
       }
     };

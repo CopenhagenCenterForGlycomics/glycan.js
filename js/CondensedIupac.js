@@ -1,11 +1,25 @@
 
+import Monosaccharide from './Monosaccharide';
+
+
 let follow_bold_branch, create_bold_tree;
 
 let write_link = link => {
+  if (link < 0) {
+    if (link === Monosaccharide.LINKAGES.O) {
+      return 'O';
+    }
+    if( link === Monosaccharide.LINKAGES.N) {
+      return 'N';
+    }
+  }
   return link <= 0 ? '?' : ''+link;
 };
 
 let parse_link = link_string => {
+  if (Monosaccharide.LINKAGES[link_string]) {
+    return Monosaccharide.LINKAGES[link_string];
+  }
   return link_string == '?' ? 0 : parseInt(link_string);
 };
 

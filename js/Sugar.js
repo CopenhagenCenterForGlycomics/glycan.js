@@ -63,16 +63,6 @@ export default class Sugar {
       return root;
     }
     return depth_residues[branch];
-/*
-    let linkage_paths = this.paths(this.root,depth_residues)
-                            .map( path => path.filter( res => res.parent )
-                                              .map( res => { return { res: res , link: res.parent.linkageOf(res) }; } )
-                                )
-                            .filter( linkages => linkages.length > 0 );
-    let linkage_strings = linkage_paths.map( linkages => { return { leaf: linkages[0].res, value: linkages.map( link => link.link ).reverse().join('')  }; } );
-    let sorted_linkages = linkage_strings.sort( (a,b) => a.value.localeCompare(b.value) );
-    return sorted_linkages[branch] ? sorted_linkages[branch].leaf : null;
-*/
   }
 
   location_for_monosaccharide(residue) {
