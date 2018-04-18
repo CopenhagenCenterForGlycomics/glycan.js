@@ -22,7 +22,7 @@ const rendered_symbol = Symbol('rendered_elements');
 
 const group_tag_symbol = Symbol('group_tag');
 
-const ROTATE = true;
+const ROTATE = false;
 
 let SCALE = 100;
 
@@ -76,8 +76,8 @@ const calculate_moved_residues = function(layout,residue) {
      current.z === updated.z ));
 };
 
-const get_long_axis_size = res => res.height;
-const get_short_axis_size = res => res.width;
+const get_long_axis_size = res => ROTATE ? res.width : res.height;
+const get_short_axis_size = res => ROTATE ? res.height : res.width;
 
 
 const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
@@ -91,14 +91,16 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
                                              parent_pos.x+parent_pos.width/2,
                                              parent_pos.y+parent_pos.height/2];
 
-  let long_axis = child_cy - parent_cy;
-  let long_axis_size = child_pos.height + parent_pos.height;
-  let short_axis = child_cx - parent_cx;
-  let short_axis_base = parent_cx;
-  let long_axis_base = child_pos.y;
+  let long_axis = ROTATE ? child_cx - parent_cx : child_cy - parent_cy;
+  let short_axis = ROTATE ? child_cy - parent_cy : child_cx - parent_cx;
 
-  let short_axis_direction = child_pos.x - parent_pos.x;
-  let long_axis_direction = child_pos.y - parent_pos.y;
+  let long_axis_size = get_long_axis_size(child_pos) + get_long_axis_size(parent_pos);
+
+  let short_axis_base = ROTATE ? parent_cy : parent_cx;
+  let long_axis_base = ROTATE ? child_pos.x : child_pos.y;
+
+  let short_axis_direction = ROTATE ? child_pos.y - parent_pos.y : child_pos.x - parent_pos.x;
+  let long_axis_direction = ROTATE ? child_pos.x - parent_pos.x : child_pos.y - parent_pos.y;
 
   let gradient = short_axis /
                  long_axis;
@@ -134,11 +136,14 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
       long_axis_coord = SCALE/4;
     }
   }
-  let label = canvas.text( short_axis_coord, long_axis_coord, fancy_anomer+linkage);
+  let label = canvas.text( ROTATE ? long_axis_coord : short_axis_coord, ROTATE ? short_axis_coord : long_axis_coord, fancy_anomer+linkage);
   label.setAttribute('font-size',str(Math.floor(SCALE/3)));
   label.setAttribute('dominant-baseline','hanging');
-  if (short_axis_pos < 0) {
+  if (! ROTATE && short_axis_pos < 0) {
     label.setAttribute('text-anchor','end');
+  }
+  if (ROTATE && short_axis_pos < 0) {
+    label.removeAttribute('dominant-baseline');
   }
 
   canvas.sendToBack(label);
