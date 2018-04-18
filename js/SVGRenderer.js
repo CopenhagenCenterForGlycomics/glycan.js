@@ -22,7 +22,7 @@ const rendered_symbol = Symbol('rendered_elements');
 
 const group_tag_symbol = Symbol('group_tag');
 
-const ROTATE = true;
+const rotate_symbol = Symbol('rotate');
 
 let SCALE = 100;
 
@@ -43,6 +43,7 @@ const wire_canvas_events = function(canvas,callback) {
 };
 
 const handle_events = function(svg,event) {
+  const ROTATE = this.rotate;
   if (event.clientX) {
     var pt=svg.createSVGPoint();
     pt.x=event.clientX;
@@ -75,11 +76,18 @@ const calculate_moved_residues = function(layout,residue) {
      current.z === updated.z ));
 };
 
-const get_long_axis_size = res => ROTATE ? res.width : res.height;
-const get_short_axis_size = res => ROTATE ? res.height : res.width;
+const generic_long_axis_size = (res) => res.height;
+const generic_short_axis_size = (res) => res.width;
 
 
 const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
+
+  const ROTATE = this.rotate;
+
+  let get_long_axis_size = ROTATE ? generic_short_axis_size : generic_long_axis_size;
+  let get_short_axis_size = ROTATE ? generic_long_axis_size : generic_short_axis_size;
+
+
   let fancy_anomer = '?';
   if (anomer === 'b') { fancy_anomer = '\u03B2'; }
   if (anomer === 'a') { fancy_anomer = '\u03B1'; }
@@ -165,7 +173,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,canvas, show_l
   line.setAttribute('stroke-width',str(SCALE/100));
   line.setAttribute('stroke','#333');
   if ( show_labels ) {
-    render_link_label(child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
+    render_link_label.call(this,child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
   }
   return group.element;
 };
@@ -217,6 +225,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   let yvals = [];
   let container = this.rendered.get(sugar);
   const canvas = this.element;
+  const ROTATE = this.rotate;
 
   if ( ! container ) {
     container = canvas.group();
@@ -280,10 +289,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     }
     let show_labels = this[layout_engine].LINKS == true;
     if ( ! current.linkage ) {
-      current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
+      current.linkage = render_linkage.call(this, position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
     } else {
       current.linkage.parentNode.removeChild(current.linkage);
-      current.linkage = render_linkage( position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
+      current.linkage = render_linkage.call(this, position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
       // Do nothing
     }
     if (current.linkage) {
@@ -467,6 +476,19 @@ class SVGRenderer {
     svg.setAttribute('viewBox', vb.join(' ') );
     svg.setAttribute('preserveAspectRatio','xMidYMid meet');
   }
+
+  get horizontal() {
+    return this[rotate_symbol];
+  }
+
+  set horizontal(flag) {
+    if (flag) {
+      this[rotate_symbol] = true;
+    } else {
+      this[rotate_symbol] = false;
+    }
+  }
+
 }
 
 
