@@ -76,6 +76,10 @@ const calculate_moved_residues = function(layout,residue) {
      current.z === updated.z ));
 };
 
+const get_long_axis_size = res => res.height;
+const get_short_axis_size = res => res.width;
+
+
 const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   let fancy_anomer = '?';
   if (anomer === 'b') { fancy_anomer = '\u03B2'; }
@@ -87,50 +91,53 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
                                              parent_pos.x+parent_pos.width/2,
                                              parent_pos.y+parent_pos.height/2];
 
-  let gradient = (child_cx -
-                 parent_cx) /
-                 (child_cy -
-                 parent_cy);
+  let long_axis = child_cy - parent_cy;
+  let long_axis_size = child_pos.height + parent_pos.height;
+  let short_axis = child_cx - parent_cx;
+  let short_axis_base = parent_cx;
+  let long_axis_base = child_pos.y;
+
+  let short_axis_direction = child_pos.x - parent_pos.x;
+  let long_axis_direction = child_pos.y - parent_pos.y;
+
+  let gradient = short_axis /
+                 long_axis;
 
   if (! isFinite(gradient)) {
     gradient = -1;
-    if (child_pos.x > parent_pos.x) {
+    if (short_axis_direction > 0) {
       gradient = 1;
     }
   }
 
-  let residue_distance = child_cy - parent_cy;
+  let residue_distance = long_axis;
 
   let child_distance = residue_distance*0.75;
 
-  if (Math.abs(residue_distance) >= (child_pos.height + parent_pos.height)/2 ) {
-    residue_distance -= (child_pos.height + parent_pos.height)/2;
-    child_distance = residue_distance*0.75 + parent_pos.height/2;
+  if (Math.abs(residue_distance) >= (long_axis_size/2) ) {
+    residue_distance -= long_axis_size/2;
+    child_distance = residue_distance*0.75 + get_long_axis_size(parent_pos)/2;
   } else if (residue_distance == 0) {
-    child_distance = 0.425*Math.abs(child_cx - parent_cx);
+    child_distance = 0.425*Math.abs(short_axis);
   }
-  let xpos = ( gradient * child_distance );
-  if (xpos === 0) {
-    xpos += child_pos.width/10;
-  }
-  let xcoord = SCALE*(xpos + parent_cx);
-  let ycoord = 0;
-  if ((child_pos.y + 1.1*child_pos.height) < parent_pos.y) {
-    ycoord = SCALE*(child_pos.y + 1.1 * child_pos.height);
-  } else {
-    ycoord = SCALE*(child_pos.y + 1*child_pos.height);
+  let short_axis_pos = ( gradient * child_distance );
+  if (short_axis_pos === 0) {
+    short_axis_pos += get_short_axis_size(child_pos)/10;
   }
 
-  if (child_pos.y === parent_pos.y) {
-    ycoord = SCALE*(child_pos.y + child_pos.height/8);
-    if ( ycoord > SCALE/4 ) {
-      ycoord = SCALE/4;
+  let short_axis_coord = SCALE*(short_axis_base + short_axis_pos);
+  let long_axis_coord = SCALE*(long_axis_base + 1*get_long_axis_size(child_pos));
+
+  if (long_axis_direction === 0) {
+    long_axis_coord = SCALE*(long_axis_base + get_long_axis_size(child_pos)/8);
+    if ( long_axis_coord > SCALE/4 ) {
+      long_axis_coord = SCALE/4;
     }
   }
-  let label = canvas.text( xcoord, ycoord, fancy_anomer+linkage);
+  let label = canvas.text( short_axis_coord, long_axis_coord, fancy_anomer+linkage);
   label.setAttribute('font-size',str(Math.floor(SCALE/3)));
   label.setAttribute('dominant-baseline','hanging');
-  if (xpos < 0) {
+  if (short_axis_pos < 0) {
     label.setAttribute('text-anchor','end');
   }
 
