@@ -29,7 +29,7 @@
   "scripts": {
     "jshint-pre-commit": "./scripts/jshint-pre-commit.sh",
     "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
-    "build": "./node_modules/babel-cli/bin/babel.js js -d dist",
+    "build": "./node_modules/babel-cli/bin/babel.js js -d dist/js && ./node_modules/babel-cli/bin/babel.js lib -d dist/lib",
     "build-watch": "./node_modules/babel-cli/bin/babel.js lib js --watch -d dist",
     "build-web": "./node_modules/browserify/bin/cmd.js js/glycan.js -o glycan-bundle.js -t [ babelify --presets [ env ] ] -v",
     "build-watch-web": "./node_modules/watchify/bin/cmd.js js/glycan.js -o glycan-bundle.js -t [ babelify --presets [ env ] ] -v",
