@@ -93,6 +93,9 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   if (anomer === 'a') { fancy_anomer = '\u03B1'; }
 
   linkage = linkage || '?';
+  if (linkage < 0) {
+    linkage='';
+  }
   let [child_cx,child_cy,parent_cx,parent_cy] = [child_pos.x+child_pos.width/2,
                                              child_pos.y+child_pos.height/2,
                                              parent_pos.x+parent_pos.width/2,

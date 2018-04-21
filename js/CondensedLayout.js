@@ -53,6 +53,13 @@ let calculate_position = function(sugar,item,position={dx:0,dy:0,r:0.5},parent_p
   return position;
 };
 
+let derive_position_glycoconjugate = (position) => {
+  position.x = -1*position.r;
+  position.y = BASE_DELTA_Y;
+  position.width = 2*position.r;
+  position.height = 2*position.r;
+};
+
 let derive_position = (position,parent_position) => {
   position.x = -1*position.r;
   position.y = -1*position.r;
@@ -105,6 +112,10 @@ let check_overlaps = (positions) => {
 };
 
 let derive_item_position = (layout,item) => {
+  if ( ! item.parent && item.children.length == 1 && item.linkageOf(item.children[0]) < 0) {
+    derive_position_glycoconjugate(layout.get(item),item.identifier);
+    return { position: layout.get(item), item: item };
+  }
   derive_position(layout.get(item),item.parent ? layout.get(item.parent) : null );
   log.info('Position for',item.identifier,layout.get(item).x,layout.get(item).y);
   return { position: layout.get(item), item: item };

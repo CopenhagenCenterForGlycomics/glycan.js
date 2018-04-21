@@ -1,6 +1,7 @@
 export {default as Sugar} from './Sugar';
 export {default as Monosaccharide} from './Monosaccharide';
 export {default as Reaction} from './Reaction';
+export * from './ReactionSet';
 import * as CondensedIupac from './CondensedIupac';
 export { CondensedIupac };
 export {default as CondensedLayout} from './CondensedLayout';
