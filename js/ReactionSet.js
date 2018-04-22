@@ -183,19 +183,22 @@ class ReactionGroup {
   }
 
   supportLinkages(sugar,reactions=this.reactions) {
-    let symbol_map = {};
+    let symbol_map = new WeakMap();
     let with_support = Symbol('with_support');
     for ( let reaction of reactions ) {
-      symbol_map[ reaction ] = symbol_map[ reaction ] || { substrate: Symbol('substrate'), residue: Symbol('residue') };
-      reaction.tagSubstrateResidues(sugar,symbol_map[reaction].substrate);
-      let attachments = sugar.composition_for_tag(symbol_map[reaction].substrate);
+      if ( ! symbol_map.has( reaction )) {
+        symbol_map.set( reaction, { substrate: Symbol('substrate'), residue: Symbol('residue') });
+      }
+      reaction.tagSubstrateResidues(sugar,symbol_map.get(reaction).substrate);
+      let attachments = sugar.composition_for_tag(symbol_map.get(reaction).substrate);
       let trees = filter_with_delta.call(reaction,attachments,sugar);
       let supported = trees.map( tree => tree[0].root.children[0].original );
       for (let residue of supported) {
-        residue.setTag(symbol_map[reaction].residue);
+        residue.setTag(symbol_map.get(reaction).residue);
         residue.setTag(with_support);
       }
     }
+    this.map = symbol_map;
     return with_support;
   }
 
