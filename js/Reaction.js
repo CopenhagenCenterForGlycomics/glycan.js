@@ -24,7 +24,11 @@ let comparator = (a,b) => {
   let same_linkage = false;
 
   if ( a.parent && b.parent ) {
-    same_linkage = a.parent.linkageOf(a) === b.parent.linkageOf(b);
+    if (a.parent.linkageOf(a) === 0 || b.parent.linkageOf(b) === 0) {
+      same_linkage = true;
+    } else {
+      same_linkage = a.parent.linkageOf(a) === b.parent.linkageOf(b);
+    }
   }
 
   if ( ! a.parent && ! b.parent ) {
@@ -170,5 +174,7 @@ class Reaction extends Sugar {
 
 
 }
+
+Reaction.Comparator = comparator;
 
 export default Reaction;

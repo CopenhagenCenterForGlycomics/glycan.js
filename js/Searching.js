@@ -106,7 +106,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
   log.info('Sequences of root sequence matched',root_trees.map( rt => rt.sequence ));
   root_trees.forEach( rt => {
     let wildcard = rt.composition_for_tag(wildcard_symbol)[0];
-    log.info('Wildcard for root tree is ',wildcard,wildcard.parent ? wildcard.parent.identifier : '(No root)');
+    log.info('Wildcard for root tree is',wildcard,'with parent',wildcard.parent ? wildcard.parent.identifier : '(No root)');
   });
   // Grab the original leaves for the root match subtrees
   let root_trees_by_leaf_original = map_leaf_originals(root_trees,wildcard_symbol);
