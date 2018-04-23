@@ -192,8 +192,12 @@ class ReactionGroup {
       reaction.tagSubstrateResidues(sugar,symbol_map.get(reaction).substrate);
       let attachments = sugar.composition_for_tag(symbol_map.get(reaction).substrate);
       let trees = filter_with_delta.call(reaction,attachments,sugar);
-      let supported = trees.map( tree => tree[0].root.children[0].original );
-      for (let residue of supported) {
+      let supported = trees.map( tree => {
+        let tree_root = tree[0];
+        let part_supported = tree_root.composition(tree_root.root.children[0]);
+        return part_supported.map( res => res.original );
+      });
+      for (let residue of [].concat.apply([], supported)) {
         residue.setTag(symbol_map.get(reaction).residue);
         residue.setTag(with_support);
       }

@@ -351,9 +351,9 @@ QUnit.test( 'FKTN/FKRP first step works' , function( assert ) {
   test_sugar.sequence = end_sequence;
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
-  assert.equal(supported.length,1);
-  assert.deepEqual(supported.map( res => res.identifier ),Array(1).fill('P'));
-  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y5a']);
+  assert.equal(supported.length,2);
+  assert.deepEqual(supported.map( res => res.identifier ),['P','Rbo']);
+  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y5a','y6a']);
 });
 
 QUnit.test( 'FKTN/FKRP second step works' , function( assert ) {
@@ -364,9 +364,9 @@ QUnit.test( 'FKTN/FKRP second step works' , function( assert ) {
   test_sugar.sequence = end_sequence;
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
-  assert.equal(supported.length,1);
-  assert.deepEqual(supported.map( res => res.identifier ),Array(1).fill('P'));
-  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y7a']);
+  assert.equal(supported.length,2);
+  assert.deepEqual(supported.map( res => res.identifier ),['P','Rbo']);
+  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y7a','y8a']);
 });
 
 
@@ -430,7 +430,7 @@ QUnit.test( 'Dystroglycan group works' , function( assert ) {
   let supported = test_sugar.composition_for_tag(dystroglycan_group.supportLinkages(test_sugar));
 
   assert.deepEqual(supported.map( res => parseInt(test_sugar.location_for_monosaccharide(res).replace(/[^\d]/,'')) ).sort( (a,b) => a - b ),
-    [3,4,5,7,9,10,11,12,13,14,15,16]);
+    [3,4,5,6,7,8,9,10,11,12,13,14,15,16]);
 });
 
 QUnit.test( 'LARGE1 group works' , function( assert ) {
