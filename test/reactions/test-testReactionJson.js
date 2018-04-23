@@ -10,7 +10,7 @@ import {IO as Iupac} from '../../js/CondensedIupac';
 class IupacReaction extends Iupac(Reaction) {}
 class IupacSugar extends Iupac(Sugar) {}
 
-const MGAT5B = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-6)}@y5b\"';
+const MGAT5B = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-6)}@y5b\"'];
 const CHSY1 = ['GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GlcA(b1-3)}@y7a\"',
                'GlcA(b1-3)GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GalNAc(b1-4)}@y8a\"'
               ];
@@ -26,6 +26,36 @@ const DERMATAN_SEQUENCE = 'GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1
 const CHONDROITIN_SEQUENCE = 'GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
 
 const NLINKED_CORE = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-6)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+
+const ALL_REACTIONS = { MGAT5B: MGAT5B,CHSY1: CHSY1,EXT1: EXT1, CSGALNACT1: CSGALNACT1 };
+
+const ALL_REACTION_GROUPS = Object.keys(ALL_REACTIONS).map( gene => {
+  let reactionseqs = ALL_REACTIONS[gene];
+
+  let reactionset = new ReactionSet();
+
+  for (let reaction_seq of reactionseqs) {
+    let reaction = new IupacReaction();
+    reaction.sequence = reaction_seq;
+    reactionset.addReactionRule(reaction);
+  }
+
+  let reactiongroup = new ReactionGroup();
+
+  reactiongroup.addReactionSet(reactionset);
+
+  reactiongroup.gene = gene;
+
+  return reactiongroup;
+});
+
+let genes_working_on_sugar = (sugar) => {
+  return ALL_REACTION_GROUPS.filter( group => {
+    let test_sugar = sugar.clone();
+    return test_sugar.composition_for_tag(group.supportLinkages(test_sugar)).length > 0;
+  }).map( group => group.gene );
+};
+
 
 let make_reaction_group = (reaction_seq) => {
   let reaction = new IupacReaction();
@@ -48,12 +78,14 @@ QUnit.module('Test that we can execute ReactionSets', {
 QUnit.test( 'MGAT5B works' , function( assert ) {
   let end_sequence = NLINKED_CORE;
 
-  let reactiongroup = make_reaction_group(MGAT5B);
+  let reactiongroup = make_reaction_group(MGAT5B[0]);
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
 
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['MGAT5B']);
 
   assert.ok(supported.length === 1);
   assert.deepEqual(supported.map( res => res.identifier ),Array(1).fill('GlcNAc'));
@@ -66,6 +98,8 @@ QUnit.test( 'CHSY1 works for GlcA extension' , function( assert ) {
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
+
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['CHSY1','CSGALNACT1']);
 
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
@@ -81,6 +115,8 @@ QUnit.test( 'CHSY1 works for GalNAc extension only' , function( assert ) {
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
 
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['CHSY1','CSGALNACT1']);
+
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
   assert.equal(supported.length,2);
@@ -94,6 +130,8 @@ QUnit.test( 'CSGALNACT1 works for GalNAc init' , function( assert ) {
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
+
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['CHSY1','CSGALNACT1']);
 
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
@@ -110,6 +148,8 @@ QUnit.test( 'EXT1 works on GlcA chain extension' , function( assert ) {
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
 
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['EXT1']);
+
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
   assert.equal(supported.length,2);
@@ -124,6 +164,8 @@ QUnit.test( 'EXT1 works on GlcNAc initiation' , function( assert ) {
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
 
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['EXT1']);
+
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
   assert.equal(supported.length,1);
@@ -137,6 +179,8 @@ QUnit.test( 'EXT1 works on GlcNAc chain extension' , function( assert ) {
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
+
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['EXT1']);
 
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
