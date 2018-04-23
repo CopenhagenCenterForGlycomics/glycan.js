@@ -90,10 +90,10 @@ QUnit.test( 'We can check if a group supports an operation' , function( assert )
   assert.deepEqual(result.anomer,['b']);
   assert.deepEqual(result.linkage,[4,5]);
   result = reactiongroup.supportsLinkageAt(test_sugar,'New',4);
-  assert.deepEqual(result.anomer,['b']);
-  assert.deepEqual(result.linkage,[4]);
+  assert.deepEqual(result.anomer,[]);
+  assert.deepEqual(result.linkage,[]);
   result = reactiongroup.supportsLinkageAt(test_sugar,'New',4,test_sugar.leaves()[0].parent);
-  assert.deepEqual(result.anomer,['b']);
+  assert.deepEqual(result.anomer,[]);
   assert.deepEqual(result.linkage,[]);
   assert.deepEqual(result.substrate,[]);
 });

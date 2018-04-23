@@ -35,7 +35,7 @@ for (let gene of Object.keys(reactions) ) {
 }
 
 let test_sugar = new IupacSugar();
-test_sugar.sequence = 'GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
+test_sugar.sequence = 'Xyl(b1-O)Ser';
 
 //'GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
 
@@ -49,7 +49,7 @@ for (let matched of matched_residues) {
   console.log(test_sugar.location_for_monosaccharide(matched));
 }
 
-console.log(reaction_group.supportsLinkageAt(test_sugar));
+console.log(reaction_group.supportsLinkageAt(test_sugar,'Gal',undefined,test_sugar.root.children[0]));
 
 // for (let reac of reaction_group.reactions) {
 //   for (let matched of matched_residues) {

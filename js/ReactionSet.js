@@ -1,9 +1,11 @@
 
+import Reaction from './Reaction';
+
+import * as debug from 'debug-any-level';
+
 const reactions = Symbol('reactions');
 
 const reactionset = Symbol('reactionset');
-
-import * as debug from 'debug-any-level';
 
 const module_string='glycanjs:reactionset';
 
@@ -126,9 +128,38 @@ class ReactionSet {
   }
 }
 
+const create_reaction = (reaction_class,reac) => {
+  if (reac.length < 1) {
+    return;
+  }
+  let set = new ReactionSet();
+  for ( let seq of reac ) {
+    let reac_obj = new reaction_class();
+    reac_obj.sequence = seq;
+    set.addReactionRule(reac_obj);
+  }
+  return set;
+};
+
 class ReactionGroup {
   constructor() {
     this[reactionset] = [];
+  }
+
+  static groupFromJSON(json,sugarclass) {
+    let reaction_group = new this();
+    const reaction_class = Reaction.CopyIO(new sugarclass());
+
+    for (let gene of Object.keys(json) ) {
+      if (json[gene].reactions.length > 0) {
+        for (let set of json[gene].reactions.map( create_reaction.bind(null,reaction_class) )) {
+          if (set) {
+            reaction_group.addReactionSet(set);
+          }
+        }
+      }
+    }
+    return reaction_group;
   }
 
   get reactions() {
@@ -188,6 +219,8 @@ class ReactionGroup {
       return matching_donor;
     });
 
+    let filtered_reactions = donor_filtered;
+
     possible_anomers = possible_anomers.filter(only_unique);
     possible_linkages = possible_linkages.filter(only_unique);
 
@@ -196,34 +229,48 @@ class ReactionGroup {
     // If there isn't a linkage specified - what are the possible
     // linkages that this reaction set supports
 
-    if ( donor_filtered.length < 1 || typeof linkage === 'undefined' ) {
+    if ( donor_filtered.length < 1 || (typeof linkage === 'undefined' && typeof substrate === 'undefined') ) {
       return donor_filtered.length > 0 ? { anomer: possible_anomers, linkage: possible_linkages } : { anomer:[], linkage: [] };
     }
 
     // If there is a linkage - filter the reactions down to the
     // reactions that support the linkage we want
 
-    let linkage_filtered = donor_filtered.filter( reaction => {
-      let donor_res = reaction.delta.root.children[0];
-      let reac_linkage = reaction.delta.root.linkageOf(donor_res);
-      return (reac_linkage === 0 || reac_linkage === linkage);
-    });
+    if (typeof linkage !== 'undefined') {
+      let linkage_filtered = filtered_reactions.filter( reaction => {
+        let donor_res = reaction.delta.root.children[0];
+        let reac_linkage = reaction.delta.root.linkageOf(donor_res);
+        return (reac_linkage === 0 || reac_linkage === linkage);
+      });
 
-    log.info('Remaining reactions after filtering by linkage',linkage_filtered.length);
+      filtered_reactions = linkage_filtered;
 
-    if ( linkage_filtered.length < 1 || typeof substrate === 'undefined' ) {
-      return linkage_filtered.length > 0 ? { anomer: possible_anomers, linkage: [ linkage ] } : { anomer: ['a','b'], linkage: [] };
+      log.info('Remaining reactions after filtering by linkage',linkage_filtered.length);
+      if ( linkage_filtered.length < 1 ) {
+        return linkage_filtered.length > 0 ? { anomer: possible_anomers, linkage: [ linkage ] } : { anomer: ['a','b'], linkage: [] };
+      }
     }
 
-    let supported_tag = this.tagAvailableSubstrateResidues(sugar,linkage_filtered);
-    let supported = sugar.composition_for_tag(supported_tag);
+    possible_linkages = [];
+    possible_anomers = [];
 
-    log.info('Total residues that are possible substrates',supported.length);
+    for (let reaction of filtered_reactions) {
+      let substrates = sugar.composition_for_tag(reaction.tagAvailableSubstrateResidues(sugar));
+      if (substrates.indexOf(substrate) >= 0) {
+        let donor_res = reaction.delta.root.children[0];
+        let reac_linkage = reaction.delta.root.linkageOf(donor_res);
+        possible_linkages.push(reac_linkage);
+        possible_anomers.push(donor_res.anomer);
+      }
+    }
 
-    if (supported.indexOf(substrate) >= 0 ) {
-      return { anomer: possible_anomers, linkage: [ linkage ], substrate: [ substrate ]};
+    possible_anomers = possible_anomers.filter(only_unique);
+    possible_linkages = possible_linkages.filter(only_unique);
+
+    if (possible_linkages.length > 0 && possible_anomers.length > 0 && substrate) {
+      return { anomer: possible_anomers, linkage: possible_linkages, substrate: [ substrate ]};
     } else {
-      return { anomer: possible_anomers, linkage: [], substrate: [] };
+      return { anomer: possible_anomers, linkage: possible_linkages, substrate: [] };
     }
   }
 
