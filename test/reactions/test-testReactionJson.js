@@ -25,6 +25,25 @@ const EXT1 = [  'GlcNAc(a1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{
 
 const CSGALNACT1 = ['GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GalNAc(b1-4)}@y5a\"'];
 
+const POMGNT2 = ['Man(a1-O)Ser+\"{GlcNAc(b1-4)}@y2a\"'];
+const B3GALNT2 = ['GlcNAc(b1-4)Man(a1-O)Ser+\"{GalNAc(b1-3)}@y3a\"'];
+const B4GAT1 = ['Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{GlcA(b1-3)}@y9a\"'];
+
+const LARGE1 = [
+'Xyl(a1-3)GlcA(b1-3)*(u?-?)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{GlcA(b1-3)}@y13a\"',
+'GlcA(b1-3)*(u?-?)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Xyl(a1-3)}@y12a\"',
+'Xyl(a1-3)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{GlcA(b1-3)}@y11a\"',
+'GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Xyl(a1-3)}@y10a\"'
+];
+
+const FKTN = [
+'GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Rbo(u5-1)P(u1-3)}@y4a\"',
+'Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Rbo(u5-1)P(u1-1)}@y6a\"'
+];
+
+const TMEM5 = ['Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Xyl(b1-4)}@y8a\"'];
+
+
 const DERMATAN_SEQUENCE = 'GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
 const CHONDROITIN_SEQUENCE = 'GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
 
@@ -34,7 +53,20 @@ const NLINKED_TETRATENNARY = 'GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-2)[G
 
 const NLINKED_CORE = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
 
-const ALL_REACTIONS = { MGAT2: MGAT2, MGAT4A: MGAT4A, MGAT5: MGAT5,CHSY1: CHSY1,EXT1: EXT1, CSGALNACT1: CSGALNACT1 };
+const MATRIGLYCAN_SEQUENCE = 'GlcA(b1-3)Xyl(a1-3)GlcA(b1-3)Xyl(a1-3)GlcA(b1-3)Xyl(a1-3)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser';
+
+const ALL_REACTIONS = { MGAT2: MGAT2,
+                        MGAT4A: MGAT4A,
+                        MGAT5: MGAT5,
+                        CHSY1: CHSY1,
+                        EXT1: EXT1,
+                        CSGALNACT1: CSGALNACT1,
+                        POMGNT2: POMGNT2,
+                        B3GALNT2: B3GALNT2,
+                        B4GAT1: B4GAT1,
+                        LARGE1: LARGE1,
+                        FKTN: FKTN,
+                        TMEM5: TMEM5 };
 
 const ALL_REACTION_GROUPS = Object.keys(ALL_REACTIONS).map( gene => {
   let reactionseqs = ALL_REACTIONS[gene];
@@ -55,6 +87,16 @@ const ALL_REACTION_GROUPS = Object.keys(ALL_REACTIONS).map( gene => {
 
   return reactiongroup;
 });
+
+let dystroglycan_group = new ReactionGroup();
+
+dystroglycan_group.addReactionSet(ALL_REACTION_GROUPS.filter( r => r.gene === 'POMGNT2')[0].reactions[0]);
+dystroglycan_group.addReactionSet(ALL_REACTION_GROUPS.filter( r => r.gene === 'B3GALNT2')[0].reactions[0]);
+dystroglycan_group.addReactionSet(ALL_REACTION_GROUPS.filter( r => r.gene === 'B4GAT1')[0].reactions[0]);
+dystroglycan_group.addReactionSet(ALL_REACTION_GROUPS.filter( r => r.gene === 'LARGE1')[0].reactions[0]);
+dystroglycan_group.addReactionSet(ALL_REACTION_GROUPS.filter( r => r.gene === 'FKTN')[0].reactions[0]);
+dystroglycan_group.addReactionSet(ALL_REACTION_GROUPS.filter( r => r.gene === 'TMEM5')[0].reactions[0]);
+
 
 let genes_working_on_sugar = (sugar) => {
   return ALL_REACTION_GROUPS.filter( group => {
@@ -220,4 +262,70 @@ QUnit.test( 'EXT1 works on GlcNAc chain extension' , function( assert ) {
   assert.equal(supported.length,2);
   assert.deepEqual(supported.map( res => res.identifier ),Array(2).fill('GlcNAc'));
   assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y8a','y10a']);
+});
+
+QUnit.test( 'LARGE1 init works for Xyl' , function( assert ) {
+  let end_sequence = MATRIGLYCAN_SEQUENCE;
+  let reactiongroup = make_reaction_group(LARGE1[3]);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = end_sequence;
+
+  let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+
+  assert.equal(supported.length,1);
+  assert.deepEqual(supported.map( res => res.identifier ),Array(1).fill('Xyl'));
+  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y11a']);
+});
+
+QUnit.test( 'LARGE1 extension works for GlcA' , function( assert ) {
+  let end_sequence = MATRIGLYCAN_SEQUENCE;
+  let reactiongroup = make_reaction_group(LARGE1[0]);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = end_sequence;
+
+  let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+
+  assert.equal(supported.length,2);
+  assert.deepEqual(supported.map( res => res.identifier ),Array(2).fill('GlcA'));
+  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y14a','y16a']);
+});
+
+
+QUnit.test( 'LARGE1 extension works for Xyl' , function( assert ) {
+  let end_sequence = MATRIGLYCAN_SEQUENCE;
+  let reactiongroup = make_reaction_group(LARGE1[1]);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = end_sequence;
+
+  let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+
+  assert.equal(supported.length,2);
+  assert.deepEqual(supported.map( res => res.identifier ),Array(2).fill('Xyl'));
+  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y13a','y15a']);
+});
+
+QUnit.test( 'LARGE1 init works for GlcA' , function( assert ) {
+  let end_sequence = MATRIGLYCAN_SEQUENCE;
+  let reactiongroup = make_reaction_group(LARGE1[2]);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = end_sequence;
+
+  let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+
+  assert.equal(supported.length,1);
+  assert.deepEqual(supported.map( res => res.identifier ),Array(1).fill('GlcA'));
+  assert.deepEqual(supported.map( mono => test_sugar.location_for_monosaccharide(mono)), ['y12a']);
+});
+
+QUnit.test( 'Dystroglycan pathway works' , function( assert ) {
+  let end_sequence = MATRIGLYCAN_SEQUENCE;
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = end_sequence;
+
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['POMGNT2','B3GALNT2','B4GAT1','LARGE1','FKTN','TMEM5']);
 });
