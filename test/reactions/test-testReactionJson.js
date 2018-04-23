@@ -10,7 +10,10 @@ import {IO as Iupac} from '../../js/CondensedIupac';
 class IupacReaction extends Iupac(Reaction) {}
 class IupacSugar extends Iupac(Sugar) {}
 
-const MGAT5B = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-6)}@y5b\"'];
+
+const MGAT2 = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-2)}@y5b\"'];
+const MGAT4A = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-4)}@y5a\"'];
+const MGAT5 = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-6)}@y5b\"'];
 const CHSY1 = ['GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GlcA(b1-3)}@y7a\"',
                'GlcA(b1-3)GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GalNAc(b1-4)}@y8a\"'
               ];
@@ -25,9 +28,13 @@ const CSGALNACT1 = ['GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GalNAc(b1-4)}@y
 const DERMATAN_SEQUENCE = 'GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
 const CHONDROITIN_SEQUENCE = 'GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
 
-const NLINKED_CORE = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-6)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+const NLINKED_BIANTENNARY = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-6)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
 
-const ALL_REACTIONS = { MGAT5B: MGAT5B,CHSY1: CHSY1,EXT1: EXT1, CSGALNACT1: CSGALNACT1 };
+const NLINKED_TETRATENNARY = 'GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-2)[GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+
+const NLINKED_CORE = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+
+const ALL_REACTIONS = { MGAT2: MGAT2, MGAT4A: MGAT4A, MGAT5: MGAT5,CHSY1: CHSY1,EXT1: EXT1, CSGALNACT1: CSGALNACT1 };
 
 const ALL_REACTION_GROUPS = Object.keys(ALL_REACTIONS).map( gene => {
   let reactionseqs = ALL_REACTIONS[gene];
@@ -75,22 +82,48 @@ let make_reaction_group = (reaction_seq) => {
 QUnit.module('Test that we can execute ReactionSets', {
 });
 
-QUnit.test( 'MGAT5B works' , function( assert ) {
-  let end_sequence = NLINKED_CORE;
+QUnit.test( 'MGAT5 works' , function( assert ) {
+  let end_sequence = NLINKED_BIANTENNARY;
 
-  let reactiongroup = make_reaction_group(MGAT5B[0]);
+  let reactiongroup = make_reaction_group(MGAT5[0]);
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = end_sequence;
 
   let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
 
-  assert.deepEqual(genes_working_on_sugar(test_sugar),['MGAT5B']);
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['MGAT5']);
 
   assert.ok(supported.length === 1);
   assert.deepEqual(supported.map( res => res.identifier ),Array(1).fill('GlcNAc'));
   assert.equal(test_sugar.location_for_monosaccharide(supported[0]), 'y6b' );
 });
+
+QUnit.test( 'Tetra branching works' , function( assert ) {
+  let end_sequence = NLINKED_TETRATENNARY;
+
+  let reactiongroup = make_reaction_group(MGAT5[0]);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = end_sequence;
+
+  let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+
+  assert.deepEqual(genes_working_on_sugar(test_sugar),['MGAT2','MGAT4A','MGAT5']);
+
+  assert.ok(supported.length === 1);
+  assert.deepEqual(supported.map( res => res.identifier ),Array(1).fill('GlcNAc'));
+  assert.equal(test_sugar.location_for_monosaccharide(supported[0]), 'y6d' );
+});
+
+QUnit.test( 'Tetra branching doesnt work on core' , function( assert ) {
+  let end_sequence = NLINKED_CORE;
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = end_sequence;
+  assert.deepEqual(genes_working_on_sugar(test_sugar),[]);
+});
+
 
 QUnit.test( 'CHSY1 works for GlcA extension' , function( assert ) {
   let end_sequence = CHONDROITIN_SEQUENCE;
