@@ -49,7 +49,7 @@ for (let matched of matched_residues) {
   console.log(test_sugar.location_for_monosaccharide(matched));
 }
 
-console.log(reaction_group.supportsLinkageAt(test_sugar,'NeuAc',8,test_sugar.locate_monosaccharide('y10a')));
+console.log(reaction_group.supportsLinkageAt(test_sugar));
 
 // for (let reac of reaction_group.reactions) {
 //   for (let matched of matched_residues) {

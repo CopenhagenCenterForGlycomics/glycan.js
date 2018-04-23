@@ -150,6 +150,14 @@ class Reaction extends Sugar {
     return tag;
   }
 
+  tagAvailableSubstrateResidues(sugar,tag=Symbol('substrate')) {
+    let test_result = find_sugar_substrates.call(this,sugar);
+    let without_delta = filter_delta_exists.call(this,test_result,sugar);
+    test_result = test_result.filter( res => without_delta.indexOf(res) < 0 );
+    test_result.forEach( res => res.setTag(tag) );
+    return tag;
+  }
+
   worksOn(sugar) {
     let test_result = find_sugar_substrates.call(this,sugar);
     if ( test_result.length < 1 ) {
