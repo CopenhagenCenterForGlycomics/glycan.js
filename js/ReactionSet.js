@@ -138,9 +138,12 @@ class ReactionGroup {
     let donor_filtered = this.reactions.filter( reaction => {
       let donor_res = reaction.delta.root.children[0];
       let reac_linkage = reaction.delta.root.linkageOf(donor_res);
-      possible_linkages.push(reac_linkage);
-      possible_anomers.push(donor_res.anomer);
-      return (donor_res.identifier === donor);
+      let matching_donor = (! donor || (donor_res.identifier === donor));
+      if (matching_donor) {
+        possible_linkages.push(reac_linkage);
+        possible_anomers.push(donor_res.anomer);
+      }
+      return matching_donor;
     });
 
     possible_anomers = possible_anomers.filter(only_unique);
