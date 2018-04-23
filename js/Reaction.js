@@ -8,7 +8,6 @@ let reaction_position = Symbol('reaction_position');
 let reaction_position_string = Symbol('reaction_position_string');
 
 const validate_location = (sugar,location) => sugar.locate_monosaccharide(location);
-const attachment_tag = Symbol('attachment');
 
 let identifier_comparator = (a,b) => a.identifier === b.identifier;
 
@@ -79,13 +78,14 @@ let parseReaction = (sugar) => {
     throw new Error('Cannot locate attachment point');
   }
   sugar[ reaction_position_string ] = location;
-  sugar[ reaction_position ].setTag(attachment_tag);
+  sugar.attachment_tag = Symbol('attachment');
+  sugar[ reaction_position ].setTag(sugar.attachment_tag);
 };
 
 let find_sugar_substrates = function(sugar) {
   // The attachment tag is part of the reaction
   let substrates = sugar.match_sugar_pattern(this,comparator) || [];
-  return substrates.map( match => match.composition_for_tag(attachment_tag)[0].original );
+  return substrates.map( match => match.composition_for_tag(this.attachment_tag)[0].original );
 };
 
 let execute = function(sugar) {
