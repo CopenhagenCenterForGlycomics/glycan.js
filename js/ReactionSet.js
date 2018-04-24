@@ -253,6 +253,7 @@ class ReactionGroup {
 
     possible_linkages = [];
     possible_anomers = [];
+    let possible_anomer_linkages = [];
 
     for (let reaction of filtered_reactions) {
       let substrates = sugar.composition_for_tag(reaction.tagAvailableSubstrateResidues(sugar));
@@ -261,6 +262,7 @@ class ReactionGroup {
         let reac_linkage = reaction.delta.root.linkageOf(donor_res);
         possible_linkages.push(reac_linkage);
         possible_anomers.push(donor_res.anomer);
+        possible_anomer_linkages.push(donor_res.anomer+reac_linkage);
       }
     }
 
@@ -268,7 +270,7 @@ class ReactionGroup {
     possible_linkages = possible_linkages.filter(only_unique);
 
     if (possible_linkages.length > 0 && possible_anomers.length > 0 && substrate) {
-      return { anomer: possible_anomers, linkage: possible_linkages, substrate: [ substrate ]};
+      return { anomer: possible_anomers, linkage: possible_linkages, anomerlinks: possible_anomer_linkages , substrate: [ substrate ]};
     } else {
       return { anomer: possible_anomers, linkage: possible_linkages, substrate: [] };
     }
