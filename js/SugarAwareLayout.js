@@ -29,12 +29,25 @@ class SugarAwareLayout extends CondensedLayout {
 
       return position;
     }
+    if (res.siblings.length == 1 && (res.identifier === 'P')) {
+      position.dy = 0;
+      position.dx = res.parent.linkageOf(res) >= 0 ? DELTA_X : -1 * DELTA_X;
+      if (this.LINKS) {
+        position.dx += (((position.dx < 0) ? -1 : 1)*DELTA_X)/4;
+      }
+      return position;
+    }
 
     if (res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0 &&
         res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) >= 0 ).length <= 1
         ) {
       position.dx = 0;
     }
+
+    if (res.siblings.length == 1 && res.siblings[0].identifier === 'P') {
+      position.dx = 0;
+    }
+
     if (res.identifier === 'Man' && res.siblings.length > 0) {
       let sibling_spreads = res.siblings.map( sib => layout.get(sib) ).filter( lay => lay ).map( lay => lay.spread ).filter( x => x );
       if (position.spread) {
