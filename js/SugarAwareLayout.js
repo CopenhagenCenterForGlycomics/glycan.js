@@ -38,6 +38,14 @@ class SugarAwareLayout extends CondensedLayout {
       return position;
     }
 
+    if (res.siblings.length == 1 && (res.identifier === 'GlcNAc' && res.siblings[0].identifier == 'GlcNAc')) {
+      if (res.parent.linkageOf(res) === 3) {
+        position.dx = 0;
+      }
+      return position;
+    }
+
+
     if (res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0 &&
         res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) >= 0 ).length <= 1
         ) {

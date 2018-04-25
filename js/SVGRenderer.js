@@ -24,7 +24,7 @@ const group_tag_symbol = Symbol('group_tag');
 
 const rotate_symbol = Symbol('rotate');
 
-let SCALE = 100;
+const SCALE = 100;
 
 const PRECISION = 1;
 
@@ -400,6 +400,20 @@ class SVGRenderer {
 
     // window.requestAnimationFrame(looper);
 
+  }
+
+  get LayoutEngine() {
+    return this[layout_engine];
+  }
+
+  set LayoutEngine(engine) {
+    this[layout_engine] = engine;
+    return this[layout_engine];
+  }
+
+
+  static get GLOBAL_SCALE() {
+    return SCALE;
   }
 
   static fromSVGElement(element,sugar_class) {

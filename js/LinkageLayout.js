@@ -15,6 +15,9 @@ let identifier_comparator = (a,b) => {
 const NLINKED_CORE = new IupacSugar();
 NLINKED_CORE.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
 
+const OLINKED_CORE = new IupacSugar();
+OLINKED_CORE.sequence = 'Gal(b1-3)GalNAc';
+
 
 class LinkageLayout extends SugarAwareLayout {
   static LayoutMonosaccharide(sugar,res,position,parent_position,layout) {
@@ -33,6 +36,19 @@ class LinkageLayout extends SugarAwareLayout {
     let matches = sugar.match_sugar_pattern(NLINKED_CORE, identifier_comparator );
     if (matches.length > 0) {
       if (matches[0].composition().map( traced => traced.original ).indexOf(res) >= 0) {
+        return position;
+      }
+    }
+    matches = sugar.match_sugar_pattern(OLINKED_CORE, identifier_comparator );
+    if (matches.length > 0) {
+      if (res.identifier === 'GlcNAc' && res.parent.linkageOf(res) === 3 && res.siblings.length === 0) {
+        return position;
+      }
+      let in_core = matches[0].composition().map( traced => traced.original );
+      if (in_core.indexOf(res) >= 0) {
+        return position;
+      }
+      if (res.siblings.filter( sib => in_core.indexOf(sib) >= 0 ).length > 0) {
         return position;
       }
     }
