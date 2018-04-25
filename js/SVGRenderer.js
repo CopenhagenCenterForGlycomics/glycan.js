@@ -423,20 +423,29 @@ class SVGRenderer {
     renderer[canvas_symbol] = new SVGCanvas(element);
 
     wire_canvas_events(element, handle_events.bind(renderer,element), { passive:true, capture:false } );
-    let sugar_elements = element.querySelectorAll('g[glycanjs\\:sequence]');
+    let sugar_elements = element.querySelectorAll('g');
     for (let group of sugar_elements) {
+      if (! group.hasAttribute('glycanjs:sequence')) {
+        continue;
+      }
       let sugar = new sugar_class();
       sugar.sequence = group.getAttribute('glycanjs:sequence');
       renderer[rendered_sugars_symbol].push(sugar);
       renderer.rendered.set(sugar,renderer[canvas_symbol].group(group));
-      for (let icon of group.querySelectorAll('use[glycanjs\\:location]')) {
+      for (let icon of group.querySelectorAll('use')) {
+        if ( ! icon.hasAttribute('glycanjs:location') ) {
+          continue;
+        }
         let rendered_data = { residue: icon };
         if (icon.parentNode !== group) {
           group.appendChild(icon);
         }
         renderer.rendered.set( sugar.locate_monosaccharide(icon.getAttribute('glycanjs:location')), rendered_data );
       }
-      for (let link of group.querySelectorAll('g[glycanjs\\:location]')) {
+      for (let link of group.querySelectorAll('g')) {
+        if ( ! link.hasAttribute('glycanjs:location') ) {
+          continue;
+        }
         if (link.parentNode !== group) {
           group.appendChild(link);
           renderer[canvas_symbol].sendToBack(link);

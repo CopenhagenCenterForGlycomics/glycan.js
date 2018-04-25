@@ -276,9 +276,8 @@ class ReactionGroup {
     }
   }
 
-  supportLinkages(sugar,reactions=this.reactions) {
+  supportLinkages(sugar,reactions=this.reactions,with_support=Symbol('with_support')) {
     let symbol_map = new WeakMap();
-    let with_support = Symbol('with_support');
     for ( let reaction of reactions ) {
       if ( ! symbol_map.has( reaction )) {
         symbol_map.set( reaction, { substrate: Symbol('substrate'), residue: Symbol('residue') });
