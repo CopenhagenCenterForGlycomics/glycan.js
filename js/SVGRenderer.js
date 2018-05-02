@@ -227,6 +227,9 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   let xvals = [];
   let yvals = [];
   let container = this.rendered.get(sugar);
+
+  const symbolpath = this.symbolpath || 'sugars.svg';
+
   const canvas = this.element;
   const ROTATE = this.rotate;
 
@@ -277,7 +280,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     let current = this.rendered.get(residue);
 
     if ( ! current ) {
-      icon = container.use(`sugars.svg#${residue.identifier.toLowerCase()}`,0,0,1,1);
+      icon = container.use(`${symbolpath}#${residue.identifier.toLowerCase()}`,0,0,1,1);
       icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
       icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
       icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');
