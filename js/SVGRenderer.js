@@ -148,12 +148,12 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   }
   let label = canvas.text( ROTATE ? long_axis_coord : short_axis_coord, ROTATE ? short_axis_coord : long_axis_coord, fancy_anomer+linkage);
   label.setAttribute('font-size',str(Math.floor(SCALE/3)));
-  label.setAttribute('dominant-baseline','hanging');
+  label.firstChild.setAttribute('dy','0.75em');
   if (! ROTATE && short_axis_pos < 0) {
     label.setAttribute('text-anchor','end');
   }
   if (ROTATE && short_axis_pos < 0) {
-    label.removeAttribute('dominant-baseline');
+    label.firstChild.setAttribute('dy','0em');
   }
 
   canvas.sendToBack(label);

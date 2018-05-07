@@ -52,6 +52,16 @@ class SVGCanvas {
     return a_use;
   }
 
+  rect(x,y,width,height) {
+    let a_rect = this.canvas.ownerDocument.createElementNS(SVGNS,'rect');
+    a_rect.setAttribute('x', str(x));
+    a_rect.setAttribute('y', str(y));
+    a_rect.setAttribute('width', str(width));
+    a_rect.setAttribute('height', str(height));
+    this.appendChild(a_rect);
+    return a_rect;
+  }
+
   line(x,y,x2,y2) {
     let a_line = this.canvas.ownerDocument.createElementNS(SVGNS,'line');
     a_line.setAttribute('x1', str(x));
