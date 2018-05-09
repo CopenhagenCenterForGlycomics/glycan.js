@@ -133,6 +133,25 @@ export default class Sugar {
     }
   }
 
+  *depth_first_traversal(start=this.root,visitor=(x)=>x) {
+    if ( ! start) {
+      return;
+    }
+    let stack = [];
+    stack.push(start);
+    while (stack.length > 0) {
+      let curr = stack.shift();
+      let children = curr.children;
+
+      stack = children.concat(stack);
+
+      let visited = visitor ? visitor(curr) : curr;
+      if (visited) {
+        yield visited;
+      }
+    }
+  }
+
   // Math functions
   // FIXME - Compare by block - run the closure across the sugar,
   //      given a traversal algorithm
