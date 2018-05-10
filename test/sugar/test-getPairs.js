@@ -20,27 +20,42 @@ let get_first_sibling = (node) => {
   return null;
 };
 
-let get_residue_pairs = (sugar) => {
+// class foobar {
+//   constructor() {
+
+//   }
+//   *generator() {
+
+//   }
+// };
+
+let get_residue_pairs = function*(sugar) {
   let node_order = [...sugar.depth_first_traversal()];
-  console.log('Node order',node_order.map( res => res.identifier ));
   let curridx = 0;
   while (curridx < node_order.length) {
     let curr = node_order[curridx];
     let next_sibling = get_first_sibling(curr);
     if ( ! next_sibling ) {
-      console.log('No next sibling for',curr.identifier);
       next_sibling = curr;
-    } else {
-      console.log('Next sibling for',curr.identifier,'is',next_sibling.identifier);
     }
     let endidx = node_order.indexOf(next_sibling);
     let reducing_end_pairs = node_order.slice(curridx+1,endidx);
     let nonreducing_pairs = node_order.slice(endidx === curridx ? (endidx + 1) : endidx);
     if (endidx === curridx) {
-      console.log('Pair',curr.identifier,'with',nonreducing_pairs.map( res => res.identifier ),'(reducing)');
+      for (let res of nonreducing_pairs) {
+        yield { root: curr, chord: [ curr, res ] };
+      }
+     // console.log('Pair',curr.identifier,'with',nonreducing_pairs.map( res => res.identifier ),'(reducing)');
     } else {
-      console.log('Pair',curr.identifier,'with',reducing_end_pairs.map( res => res.identifier ),'(reducing)');
-      console.log('Pair',curr.identifier,'with',nonreducing_pairs.map( res => res.identifier ));      
+      for (let res of nonreducing_pairs) {
+        yield { root: sugar.root, chord: [ curr, res ] };
+      }
+      for (let res of reducing_end_pairs) {
+        yield { root: curr, chord: [ curr, res ] };
+      }
+
+      // console.log('Pair',curr.identifier,'with',reducing_end_pairs.map( res => res.identifier ),'(reducing)');
+      // console.log('Pair',curr.identifier,'with',nonreducing_pairs.map( res => res.identifier ));      
     }
     curridx += 1;
   }
@@ -76,13 +91,65 @@ FG
 
 */
 
+const RE_PAIRS = `AB
+AC
+AD
+AE
+AF
+AG
+AH
+AI
+AJ
+BC
+BD
+BE
+BF
+BG
+BH
+BI
+BJ
+CD
+CE
+CF
+DE
+GH
+GI
+GJ
+IJ`;
+
+const NONRE_PAIRS = `CG
+CH
+CI
+CJ
+DF
+DG
+DH
+DI
+DJ
+EF
+EG
+EH
+EI
+EJ
+FG
+FH
+FI
+FJ
+HI
+HJ`;
+
 QUnit.module('Test that we can clone sugars', {
 });
 
 QUnit.test( 'Depth first search traversal works' , function( assert ) {
   let sugar = new IupacSugar();
-  sugar.sequence = 'E(a1-3)D(a1-2)[F(a1-4)]C(a1-2)[G(a1-3)]B(a1-2)A';
-  get_residue_pairs(sugar);
+  sugar.sequence = 'E(a1-3)D(a1-2)[F(a1-4)]C(a1-2)[H(a1-2)[J(a1-2)I(a1-3)]G(a1-3)]B(a1-2)A';
   let mapped = [...sugar.depth_first_traversal()].map( res => res.identifier );
-  assert.deepEqual(mapped,['A','B','C','D','E','F','G'],'More complex dfs works');
+  assert.deepEqual(mapped,['A','B','C','D','E','F','G','H','I','J'],'More complex dfs works');
+
+  let pairs = [...get_residue_pairs(sugar)];
+  let reducing_end_pairs = pairs.filter( chord => chord.root !== sugar.root || chord.chord[0] === sugar.root ).map( chord => chord.chord[0].identifier+''+chord.chord[1].identifier );
+  let nonreducing_end_pairs = pairs.filter( chord => chord.root === sugar.root && chord.chord[0] !== sugar.root ).map( chord => chord.chord[0].identifier+''+chord.chord[1].identifier );
+  assert.deepEqual(reducing_end_pairs,RE_PAIRS.split('\n'));
+  assert.deepEqual(nonreducing_end_pairs,NONRE_PAIRS.split('\n'));
 });
