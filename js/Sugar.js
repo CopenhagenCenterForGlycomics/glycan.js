@@ -1,7 +1,7 @@
 'use strict';
 import Monosaccharide from './Monosaccharide';
 
-import Tracer from './Tracing';
+import { Tracer } from './Tracing';
 
 import Searcher from './Searching';
 

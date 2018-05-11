@@ -48,7 +48,8 @@ class TracedMonosaccharide extends Monosaccharide {
 }
 
 let initialise_sugar = function(target,wanted) {
-  target.root = new TracedMonosaccharide(wanted);
+  let mono_class = target.constructor.Monosaccharide;
+  target.root = new mono_class(wanted);
   return target;
 };
 
@@ -72,6 +73,25 @@ let attach_via_cloning = (result_sugar,attachment,mapped_list,template_residue,c
 
 let residues_in_mapping = (sugar,mapped_list) => {
   return sugar.composition().filter( residue => mapped_list.indexOf(residue.original) >= 0 );
+};
+
+let trace_into_class = function(sugar,ResultClass) {
+  let traced = initialise_sugar(new ResultClass(),sugar.root);
+  let mapping = {};
+  mapping[ sugar.root ] = traced.root;
+  for (let residue of sugar.breadth_first_traversal()) {
+    if ( residue === sugar.root ) {
+      continue;
+    }
+    let wrapped_child = new ResultClass.Monosaccharide(residue);
+    wrapped_child = Object.assign(wrapped_child,residue);
+
+    mapping[ residue ] = wrapped_child;
+
+    mapping[ residue.parent ].addChild(residue.parent.linkageOf(residue),wrapped_child);
+
+  }
+  return traced;
 };
 
 let trace_sugar = function(ResultClass,search,search_root,template,comparator) {
@@ -169,4 +189,4 @@ class Tracer {
   }
 }
 
-export default Tracer;
+export { Tracer, trace_into_class, TracedMonosaccharide };
