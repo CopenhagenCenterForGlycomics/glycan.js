@@ -5,6 +5,8 @@ import Tracer from './Tracing';
 
 import Searcher from './Searching';
 
+import get_residue_chords from './residue_chords';
+
 let root_symbol = Symbol('root');
 
 let getPropertyDescriptor = function(object,descriptor) {
@@ -152,21 +154,14 @@ export default class Sugar {
     }
   }
 
+  *chords(n=2) {
+    yield *get_residue_chords(this,n);
+  }
+
   // Math functions
-  // FIXME - Compare by block - run the closure across the sugar,
-  //      given a traversal algorithm
   // FIXME - Union - Create a union sugar from two sugars
   // FIXME - Subtract - Get residues that aren't common
 
-  // Search methods
-  // FIXME - Find residue by linkage path
-  // FIXME - Find residue by linkage and residue identifier pair path
-  //      Specify the start residues to start looking from.
-  //      Allow wildcards for the residue identifier
-
-  // Traversal methods
-  // FIXME - Depth first traversal
-  // FIXME - Node to root traversal
   *residues_to_root(start=this.root) {
     yield start;
     while(start.parent) {

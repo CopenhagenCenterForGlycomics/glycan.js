@@ -5,93 +5,28 @@ import {IO as Iupac} from '../../js/CondensedIupac';
 
 class IupacSugar extends Iupac(Sugar) {}
 
+const RE_1 = `A
+B
+C
+D
+E
+F
+G
+H
+I
+J`;
 
-let get_first_sibling = (node) => {
-  let curr = node;
-  while (curr.parent) {
-    let curr_siblings = curr.parent.children;
-    let next_sibling = curr_siblings[ curr_siblings.indexOf(curr) + 1 ];
-    if (next_sibling) {
-      return next_sibling;
-    } else {
-      curr = curr.parent;
-    }
-  }
-  return null;
-};
+const NONRE_1 = `B
+C
+D
+E
+F
+G
+H
+I
+J`;
 
-// class foobar {
-//   constructor() {
-
-//   }
-//   *generator() {
-
-//   }
-// };
-
-let get_residue_pairs = function*(sugar) {
-  let node_order = [...sugar.depth_first_traversal()];
-  let curridx = 0;
-  while (curridx < node_order.length) {
-    let curr = node_order[curridx];
-    let next_sibling = get_first_sibling(curr);
-    if ( ! next_sibling ) {
-      next_sibling = curr;
-    }
-    let endidx = node_order.indexOf(next_sibling);
-    let reducing_end_pairs = node_order.slice(curridx+1,endidx);
-    let nonreducing_pairs = node_order.slice(endidx === curridx ? (endidx + 1) : endidx);
-    if (endidx === curridx) {
-      for (let res of nonreducing_pairs) {
-        yield { root: curr, chord: [ curr, res ] };
-      }
-     // console.log('Pair',curr.identifier,'with',nonreducing_pairs.map( res => res.identifier ),'(reducing)');
-    } else {
-      for (let res of nonreducing_pairs) {
-        yield { root: sugar.root, chord: [ curr, res ] };
-      }
-      for (let res of reducing_end_pairs) {
-        yield { root: curr, chord: [ curr, res ] };
-      }
-
-      // console.log('Pair',curr.identifier,'with',reducing_end_pairs.map( res => res.identifier ),'(reducing)');
-      // console.log('Pair',curr.identifier,'with',nonreducing_pairs.map( res => res.identifier ));      
-    }
-    curridx += 1;
-  }
-};
-
-/*
-
-Reduing end pairs:
-AB
-AC
-AD
-AE
-AF
-AG
-BC
-BD
-BE
-BF
-BG
-CD
-CE
-CF
-DE
-
-
-Non-reducing pairs
-CG
-DF
-DG
-EF
-EG
-FG
-
-*/
-
-const RE_PAIRS = `AB
+const RE_2 = `AB
 AC
 AD
 AE
@@ -117,7 +52,7 @@ GI
 GJ
 IJ`;
 
-const NONRE_PAIRS = `CG
+const NONRE_2 = `CG
 CH
 CI
 CJ
@@ -138,18 +73,106 @@ FJ
 HI
 HJ`;
 
+const RE_3 = `ACG
+ACH
+ACI
+ACJ
+ADF
+ADG
+ADH
+ADI
+ADJ
+AEF
+AEG
+AEH
+AEI
+AEJ
+AFG
+AFH
+AFI
+AFJ
+AHI
+AHJ
+BCG
+BCH
+BCI
+BCJ
+BDF
+BDG
+BDH
+BDI
+BDJ
+BEF
+BEG
+BEH
+BEI
+BEJ
+BFG
+BFH
+BFI
+BFJ
+BHI
+BHJ
+CDF
+CEF
+GHI
+GHJ`;
+
+const NONRE_3 = `CHI
+CHJ
+DFG
+DFH
+DFI
+DFJ
+DHI
+DHJ
+EFG
+EFH
+EFI
+EFJ
+EHI
+EHJ
+FHI
+FHJ`;
+
 QUnit.module('Test that we can clone sugars', {
 });
 
-QUnit.test( 'Depth first search traversal works' , function( assert ) {
+QUnit.test( 'Generating single chords works' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'E(a1-3)D(a1-2)[F(a1-4)]C(a1-2)[H(a1-2)[J(a1-2)I(a1-3)]G(a1-3)]B(a1-2)A';
   let mapped = [...sugar.depth_first_traversal()].map( res => res.identifier );
   assert.deepEqual(mapped,['A','B','C','D','E','F','G','H','I','J'],'More complex dfs works');
 
-  let pairs = [...get_residue_pairs(sugar)];
-  let reducing_end_pairs = pairs.filter( chord => chord.root !== sugar.root || chord.chord[0] === sugar.root ).map( chord => chord.chord[0].identifier+''+chord.chord[1].identifier );
-  let nonreducing_end_pairs = pairs.filter( chord => chord.root === sugar.root && chord.chord[0] !== sugar.root ).map( chord => chord.chord[0].identifier+''+chord.chord[1].identifier );
-  assert.deepEqual(reducing_end_pairs,RE_PAIRS.split('\n'));
-  assert.deepEqual(nonreducing_end_pairs,NONRE_PAIRS.split('\n'));
+  let pairs = [...sugar.chords(1)];
+  let reducing_end_pairs = pairs.filter( chord => chord.root !== sugar.root || chord.chord[0] === sugar.root ).map( chord => chord.chord.map( r => r.identifier ).join('') );
+  let nonreducing_end_pairs = pairs.filter( chord => chord.root === sugar.root && chord.chord[0] !== sugar.root ).map( chord => chord.chord.map( r => r.identifier ).join('') );
+  assert.deepEqual(reducing_end_pairs,RE_1.split('\n'));
+  assert.deepEqual(nonreducing_end_pairs,NONRE_1.split('\n'));
+});
+
+QUnit.test( 'Generating double chords works' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'E(a1-3)D(a1-2)[F(a1-4)]C(a1-2)[H(a1-2)[J(a1-2)I(a1-3)]G(a1-3)]B(a1-2)A';
+  let mapped = [...sugar.depth_first_traversal()].map( res => res.identifier );
+  assert.deepEqual(mapped,['A','B','C','D','E','F','G','H','I','J'],'More complex dfs works');
+
+  let pairs = [...sugar.chords(2)];
+  let reducing_end_pairs = pairs.filter( chord => chord.root !== sugar.root || chord.chord[0] === sugar.root ).map( chord => chord.chord.map( r => r.identifier ).join('') );
+  let nonreducing_end_pairs = pairs.filter( chord => chord.root === sugar.root && chord.chord[0] !== sugar.root ).map( chord => chord.chord.map( r => r.identifier ).join('') );
+  assert.deepEqual(reducing_end_pairs,(RE_1+'\n'+RE_2).split('\n'));
+  assert.deepEqual(nonreducing_end_pairs,(NONRE_1+'\n'+NONRE_2).split('\n'));
+});
+
+QUnit.test( 'Generating triple chords works' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'E(a1-3)D(a1-2)[F(a1-4)]C(a1-2)[H(a1-2)[J(a1-2)I(a1-3)]G(a1-3)]B(a1-2)A';
+  let mapped = [...sugar.depth_first_traversal()].map( res => res.identifier );
+  assert.deepEqual(mapped,['A','B','C','D','E','F','G','H','I','J'],'More complex dfs works');
+
+  let pairs = [...sugar.chords(3)];
+  let reducing_end_pairs = pairs.filter( chord => chord.root !== sugar.root || chord.chord[0] === sugar.root ).map( chord => chord.chord.map( r => r.identifier ).join('') );
+  let nonreducing_end_pairs = pairs.filter( chord => chord.root === sugar.root && chord.chord[0] !== sugar.root ).map( chord => chord.chord.map( r => r.identifier ).join('') );
+  assert.deepEqual(reducing_end_pairs,(RE_1+'\n'+RE_2+'\n'+RE_3).split('\n'));
+  assert.deepEqual(nonreducing_end_pairs,(NONRE_1+'\n'+NONRE_2+'\n'+NONRE_3).split('\n'));
 });
