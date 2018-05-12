@@ -3,6 +3,94 @@ import { trace_into_class, TracedMonosaccharide } from './Tracing';
 
 const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
 
+// const C = 12;
+const H = 1.0078250;
+const O = 15.9949146;
+// const H2O = H*2 + O;
+
+// const UNDERIVATISED = Symbol('underivatised');
+// const PERMETHYLATED = Symbol('permethylated');
+
+// const MONOISOTOPICMASS = Symbol('monoisotopicmass');
+// const AVERAGEMASS = Symbol('averagemass');
+
+const AFRAG_MASS = {
+  UNDERIVATISED : {
+    MONOISOTOPICMASS: 0,
+    AVERAGEMASS: 1
+  },
+  PERMETHYLATED : {
+    MONOISOTOPICMASS: 2,
+    AVERAGEMASS: 3
+  }
+};
+
+const aFragMass = {
+  'Hex' : {
+    '0,2' : [120.0422584,120.10512,162.0892084,162.18576],
+    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
+    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
+    '1,5' : [134.0579084,134.132,190.1205084,190.23952],
+    '3,5' : [74.0367792,74.07944,102.0680792,102.1332],
+    '0,4' : [60.0211292,60.05256,74.0367792,74.07944],
+    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
+  },
+  'HexNAc' : {
+    '0,2' : [120.0422584,120.10512,162.0892084,162.18576],
+    '1,3' : [101.0476782,101.10512,129.0789782,129.15888],
+    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
+    '1,5' : [175.0844574,175.18456,231.1470574,231.29208],
+    '3,5' : [74.0367792,74.07944,102.0680792,102.1332],
+    '0,4' : [60.0211292,60.05256,74.0367792,74.07944],
+    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
+  },
+  'Pent' : {
+    '0,2' : [90.0316938,90.07884,118.0629938,118.1326],
+    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
+    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
+    '1,5' : [104.0473438,104.10572,146.0942938,146.18636],
+    '3,5' : [44.0262146,44.05316,58.0418646,58.08004],
+    '0,4' : [30.0105646,30.02628,30.0105646,30.02628],
+    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
+  },
+  'dHex' : {
+    '0,2' : [104.0473438,104.10572,132.0786438,132.15948],
+    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
+    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
+    '1,5' : [118.0629938,118.1326,160.1099438,160.21324],
+    '3,5' : [58.0418646,58.08004,72.0575146,72.10692],
+    '0,4' : [44.0262146,44.05316,44.0262146,44.05316],
+    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
+  },
+  'HexA' : {
+    '0,2' : [134.021523,134.08864,176.068473,176.16928],
+    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
+    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
+    '1,5' : [148.037173,148.11552,204.099773,204.22304],
+    '3,5' : [88.0160438,88.06296,116.0473438,116.11672],
+    '0,4' : [74.0003938,74.03608,88.0160438,88.06296],
+    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
+  },
+  'NeuAc' : {
+    '0,2' : [221.0899366,221.21024,305.1838366,305.37152],
+    '1,3' : [44.0262146,44.05316,58.0418646,58.08004],
+    '2,4' : [101.0476782,101.10512,143.0946282,143.18576],
+    '1,5' : [219.110672,219.23772,303.204572,303.399],
+    '3,5' : [163.0844574,163.17356,233.1627074,233.30796],
+    '0,4' : [120.0422584,120.10512,162.0892084,162.18576],
+    '3,4' : [59.0371136,59.06784,87.0684136,87.1216],
+  },
+  'NeuGc' : {
+    '0,2' : [237.0848512,237.20964,307.1631012,307.34404],
+    '1,3' : [44.0262146,44.05316,58.0418646,58.08004],
+    '2,4' : [117.0425928,117.10452,145.0738928,145.15828],
+    '1,5' : [235.1055866,235.23712,305.1838366,305.37152],
+    '3,5' : [179.079372,179.17296,235.141972,235.28048],
+    '0,4' : [120.0422584,120.10512,162.0892084,162.18576],
+    '3,4' : [75.0320282,75.06724,89.0476782,89.09412],
+  }
+};
+
 
 const is_linkage_retained = (link,type) => {
   if ( ! type ) {
@@ -16,7 +104,7 @@ const is_linkage_retained = (link,type) => {
     let i = parseInt(positions[1]);
     let j = parseInt(positions[2]);
     let reducing = positions[3] === 'x';
-    let retained_test_res = retained_test(link,i,j);
+    let retained_test_res = retained_test(link > 5 ? 5 : link ,i,j);
     return reducing ? retained_test_res : ! retained_test_res;
   }
 };
@@ -32,9 +120,10 @@ const children_with_fragment = (parent_type,children) => {
       let i = parseInt(positions[1]);
       let j = parseInt(positions[2]);
       let reducing = positions[3] === 'x';
+
       surviving_kids = surviving_kids.filter( res => {
         let link = res.parent.linkageOf(res);
-        let retained_test_res = retained_test(link,i,j);
+        let retained_test_res = retained_test(link > 5 ? 5: link,i,j);
         return reducing ? retained_test_res : ! retained_test_res;
       });
     }
@@ -59,6 +148,53 @@ class FragmentResidue extends TracedMonosaccharide {
       return;
     }
     return super.parent;
+  }
+  get mass() {
+    let cross_type;
+    let fragmass = 0;
+    if ( this.type ) {
+      cross_type = this.type.match(/(\d,\d)-([ax])/);
+      if (cross_type) {
+        let ends = cross_type[1];
+        let fragtype = cross_type[2];
+        let proto;
+        if (super.identifier == 'Gal') {
+          proto = 'Hex';
+        }
+        if (super.identifier === 'GalNAc') {
+          proto = 'HexNAc';
+        }
+        if (super.identifier === 'GlcA') {
+          proto = 'HexA';
+        }
+        if (super.identifier === 'GlcNAc') {
+          proto = 'HexNAc';
+        }
+        if (super.identifier === 'Man') {
+          proto = 'Hex';
+        }
+        fragmass = aFragMass[proto][ends][ AFRAG_MASS.UNDERIVATISED.MONOISOTOPICMASS ];
+        if (fragtype === 'a') {
+          return fragmass;
+        }
+      }
+    }
+    if (super.identifier === 'Gal') {
+      return 162.05282 - fragmass;
+    }
+    if (super.identifier === 'GalNAc') {
+      return 203.07937 - fragmass;
+    }
+    if (super.identifier === 'GlcA') {
+      return 176.0321 - fragmass;
+    }
+    if (super.identifier === 'GlcNAc') {
+      return 203.07937 - fragmass;
+    }
+    if (super.identifier === 'Man') {
+      return 162.05282 - fragmass;
+    }
+    throw new Error('Unknown '+super.identifier);
   }
 }
 
@@ -106,6 +242,34 @@ let Fragmentable = (base) => class extends base {
 
   get type() {
     return this.typestring;
+  }
+
+  get mass() {
+    let base_mass = this.composition().map( res => res.mass ).reduce((s, v) => s + v );
+    let R = H;
+    let result_mass = base_mass;
+    for (let type of this.type.split('/')) {
+      if (type.match(/^y/)) {
+        result_mass += H;
+      }
+      if (type.match(/^b/)) {
+        result_mass += R - H;
+      }
+      if (type.match(/^z/)) {
+        result_mass += 0 - O - H;
+      }
+      if (type.match(/^c/)) {
+        result_mass += O + H + R;
+      }
+      if (type.match(/^\d,\d-x/)) {
+        result_mass += R;
+      }
+    }
+    if (this.type.match(/^[yz]/) || this.type.match(/^\d,\d-x/)) {
+      result_mass += O + R;
+    }
+    result_mass += -1 * (this.type.split('/').length - 1) * R;
+    return result_mass;
   }
 
 };

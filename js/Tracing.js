@@ -76,20 +76,18 @@ let residues_in_mapping = (sugar,mapped_list) => {
 };
 
 let trace_into_class = function(sugar,ResultClass) {
-  let traced = initialise_sugar(new ResultClass(),sugar.root);
-  let mapping = {};
-  mapping[ sugar.root ] = traced.root;
+  let mapping = new Map();
+  let traced = new ResultClass();
+  traced.root = new ResultClass.Monosaccharide(sugar.root);
+  mapping.set( sugar.root , traced.root);
   for (let residue of sugar.breadth_first_traversal()) {
     if ( residue === sugar.root ) {
       continue;
     }
     let wrapped_child = new ResultClass.Monosaccharide(residue);
     wrapped_child = Object.assign(wrapped_child,residue);
-
-    mapping[ residue ] = wrapped_child;
-
-    mapping[ residue.parent ].addChild(residue.parent.linkageOf(residue),wrapped_child);
-
+    mapping.set(residue,wrapped_child);
+    mapping.get(residue.parent).addChild(residue.parent.linkageOf(residue),wrapped_child);
   }
   return traced;
 };
