@@ -217,7 +217,9 @@ class FragmentResidue extends TracedMonosaccharide {
         if (super.identifier === 'Man') {
           proto = 'Hex';
         }
-        fragmass = aFragMass[proto][ends][ AFRAG_MASS.UNDERIVATISED.MONOISOTOPICMASS ];
+        if ( proto ) {
+          fragmass = aFragMass[proto][ends][ AFRAG_MASS.UNDERIVATISED.MONOISOTOPICMASS ];
+        }
         if (fragtype === 'a') {
           return fragmass;
         }
