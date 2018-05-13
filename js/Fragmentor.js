@@ -3,7 +3,7 @@ import { trace_into_class, TracedMonosaccharide } from './Tracing';
 
 const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
 
-// const C = 12;
+const C = 12;
 const H = 1.0078250;
 const O = 15.9949146;
 // const H2O = H*2 + O;
@@ -107,6 +107,50 @@ const is_linkage_retained = (link,type) => {
     let retained_test_res = retained_test(link > 5 ? 5 : link ,i,j);
     return reducing ? retained_test_res : ! retained_test_res;
   }
+};
+
+const rewrite_linear = (type) => {
+  let base = type.substring(5);
+  let start = type.substring(0,5);
+  let newstart = start;
+  switch (start) {
+    case '1,1-e':
+      newstart = '1,5-a';
+      break;
+    case '2,2-e':
+      newstart = '0,2-a';
+      break;
+    case '3,3-e':
+      newstart = '3,5-a';
+      break;
+    case '4,4-e':
+    case '5,5-e':
+      newstart = '0,4-a';
+      break;
+    case '1,3-e':
+      newstart = '1,3-a';
+      break;
+    case '2,4-e':
+      newstart = '2,4-a';
+      break;
+    case '3,5-e':
+      newstart = '3,4-a';
+      break;
+    case '1,1-w':
+      newstart = '1,5-x';
+      break;
+    case '2,2-w':
+      newstart = '0,2-x';
+      break;
+    case '3,3-w':
+      newstart = '3,5-x';
+      break;
+    case '4,4-w':
+    case '5,5-w':
+      newstart = '0,4-x';
+      break;
+  }
+  return `${newstart}${base}`;
 };
 
 const children_with_fragment = (parent_type,children) => {
@@ -235,6 +279,9 @@ let Fragmentable = (base) => class extends base {
     }
     let fragtypes = type.split('/');
     for (let i = 0; i < fragtypes.length; i++) {
+      if (fragtypes[i].match(/-[ew]/)) {
+        fragtypes[i] = rewrite_linear(fragtypes[i]);
+      }
       this.chordResidues[i].type = fragtypes[i];
     }
     this.typestring = type;
@@ -261,14 +308,32 @@ let Fragmentable = (base) => class extends base {
       if (type.match(/^c/)) {
         result_mass += O + H + R;
       }
-      if (type.match(/^\d,\d-x/)) {
+      if (type.match(/^\d,\d-[xw]/)) {
         result_mass += R;
       }
     }
-    if (this.type.match(/^[yz]/) || this.type.match(/^\d,\d-x/)) {
+
+    let linear_base;
+    linear_base = this.type.match(/(\d,\d-[ew])/);
+    linear_base = linear_base ? linear_base[1] : null;
+
+    switch (linear_base) {
+      case '1,1-e': result_mass += 0 + O; break;
+      case '3,3-e': result_mass += 0 + O; break;
+      case '5,5-e': result_mass += 0 - O - 2 * H - C; break;
+      case '3,5-e': result_mass += 0 + 2 * H + C; break;
+      case '1,1-w': result_mass += 0 - 2 * H - O; break;
+      case '2,2-w': result_mass += 0 - 2 * H; break;
+      case '3,3-w': result_mass += 0 - 2 * H - O; break;
+      case '4,4-w': result_mass += 0 - 2 * H; break;
+      case '5,5-w': result_mass += 0 + O + C + H; break;
+    }
+
+    if (this.type.match(/^[yz]/) || this.type.match(/^\d,\d-[xw]/)) {
       result_mass += O + R;
     }
     result_mass += -1 * (this.type.split('/').length - 1) * R;
+
     return result_mass;
   }
 
@@ -277,10 +342,10 @@ let Fragmentable = (base) => class extends base {
 let get_coordinate = (coords,max_depth,type,idx) => {
   let [ depth, height ] = coords[idx].split('');
   depth = parseInt(depth);
-  if (type.match(/(^[bc]|-a)/)) {
+  if (type.match(/(^[bc]|-a|-e)/)) {
     depth = 1 + max_depth - depth;
   }
-  if (type.match(/(^[yz]|-x)/)) {
+  if (type.match(/(^[yz]|-x|-w)/)) {
     depth = depth - 1;
   }
   return type+depth+height;
@@ -322,9 +387,16 @@ class Fragmentor {
         base_types.push( nonreducing_types );
       }
       const all_types = base_types.concat(new Array(chord.chord.length - 1).fill( reducing_types ));
+      if (chord.chord.indexOf(target.root) >= 0) {
+        if (is_reducing_end(target,chord)) {
+          all_types[ chord.chord.indexOf(target.root) ] = all_types[ chord.chord.indexOf(target.root) ].concat([ '1,1-w','2,2-w', '3,3-w', '4,4-w', '5,5-w' ]);
+        } else {
+          all_types[ chord.chord.indexOf(target.root) ] = all_types[ chord.chord.indexOf(target.root) ].concat([ '1,1-e','2,2-e', '3,3-e', '4,4-e', '5,5-e', '3,5-e','1,3-e','2,4-e']);
+        }
+      }
       let types = cartesian.apply(null,all_types);
       let coordinates = chord.chord.map(get_coord_for_res.bind(null,target));
-      let coords = get_coordinate.bind(null,coordinates,max_depth);
+      let coords = get_coordinate.bind(null,coordinates,max_depth);      
       for (let type of types) {
         if ( ! Array.isArray(type) ){
           type = [type];
@@ -342,6 +414,14 @@ class Fragmentor {
         }
         yield fragment;
       }
+    }
+
+    for (let type of [ '3,5-x','1,3-x','1,5-x','2,4-x','0,2-x','0,4-x', '1,1-w','2,2-w', '3,3-w', '4,4-w', '5,5-w' ]) {
+      let fragment = fragment_template.clone();
+      fragment.type = null;
+      fragment.chord = { root: target.root, chord: [ target.root ] };
+      fragment.type = type+'0a';
+      yield fragment;
     }
   }
 }
