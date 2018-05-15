@@ -1,12 +1,13 @@
 
 import { trace_into_class, TracedMonosaccharide } from './Tracing';
 
-const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
+import { C as CSYMB, H as HSYMB, O as OSYMB, MASSES, Mass } from './Mass';
 
-const C = 12;
-const H = 1.0078250;
-const O = 15.9949146;
-// const H2O = H*2 + O;
+const C = MASSES.get(CSYMB);
+const H = MASSES.get(HSYMB);
+const O = MASSES.get(OSYMB);
+
+const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
 
 // const UNDERIVATISED = Symbol('underivatised');
 // const PERMETHYLATED = Symbol('permethylated');
@@ -181,12 +182,6 @@ class FragmentResidue extends TracedMonosaccharide {
     let all_children = super.children;
     return children_with_fragment( this.type, all_children );
   }
-  get identifier() {
-    if (this.type && this.type.match(/-[ax]/)) {
-      return super.identifier + '#' + this.type;
-    }
-    return super.identifier;
-  }
   get parent() {
     if ((this.type || '').match(/(^[bc]|-a)/)) {
       return;
@@ -201,22 +196,7 @@ class FragmentResidue extends TracedMonosaccharide {
       if (cross_type) {
         let ends = cross_type[1];
         let fragtype = cross_type[2];
-        let proto;
-        if (super.identifier == 'Gal') {
-          proto = 'Hex';
-        }
-        if (super.identifier === 'GalNAc') {
-          proto = 'HexNAc';
-        }
-        if (super.identifier === 'GlcA') {
-          proto = 'HexA';
-        }
-        if (super.identifier === 'GlcNAc') {
-          proto = 'HexNAc';
-        }
-        if (super.identifier === 'Man') {
-          proto = 'Hex';
-        }
+        let proto = this.original.proto;
         if ( proto ) {
           fragmass = aFragMass[proto][ends][ AFRAG_MASS.UNDERIVATISED.MONOISOTOPICMASS ];
         }
@@ -225,22 +205,7 @@ class FragmentResidue extends TracedMonosaccharide {
         }
       }
     }
-    if (super.identifier === 'Gal') {
-      return 162.05282 - fragmass;
-    }
-    if (super.identifier === 'GalNAc') {
-      return 203.07937 - fragmass;
-    }
-    if (super.identifier === 'GlcA') {
-      return 176.0321 - fragmass;
-    }
-    if (super.identifier === 'GlcNAc') {
-      return 203.07937 - fragmass;
-    }
-    if (super.identifier === 'Man') {
-      return 162.05282 - fragmass;
-    }
-    throw new Error('Unknown '+super.identifier);
+    return this.original.mass - fragmass;
   }
 }
 
@@ -372,6 +337,9 @@ const retains_residue = (composition,res) => {
 
 class Fragmentor {
   static *fragment(target,depth=2) {
+    if ( ! (target instanceof Mass) ) {
+      throw new Error('Sugar object class does not derive from Mass class');
+    }
     const base = target.constructor;
     const Fragment = Fragmentable(base);
 
@@ -398,7 +366,7 @@ class Fragmentor {
       }
       let types = cartesian.apply(null,all_types);
       let coordinates = chord.chord.map(get_coord_for_res.bind(null,target));
-      let coords = get_coordinate.bind(null,coordinates,max_depth);      
+      let coords = get_coordinate.bind(null,coordinates,max_depth);
       for (let type of types) {
         if ( ! Array.isArray(type) ){
           type = [type];

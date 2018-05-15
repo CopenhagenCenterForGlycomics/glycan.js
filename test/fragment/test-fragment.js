@@ -2,13 +2,15 @@
 
 import Sugar from '../../js/Sugar';
 
+import { Mass } from '../../js/Mass';
+
 import Fragmentor from '../../js/Fragmentor';
 
 import {IO as Iupac} from '../../js/CondensedIupac';
 
 const FRAGMENTS = require('./fragments');
 
-class IupacSugar extends Iupac(Sugar) {}
+class IupacSugar extends Mass(Iupac(Sugar)) {}
 
 QUnit.module('Test that we can clone sugars', {
 });
