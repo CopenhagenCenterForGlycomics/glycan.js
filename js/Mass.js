@@ -209,8 +209,11 @@ const composition_to_mass = (composition) => {
 
 const get_mass_for = (identifier) => {
   let def = MONOSACCHARIDES[ identifier ];
-  if (def.type) {
+  if (def && def.type) {
     def = MONOSACCHARIDES[ def.type ];
+  }
+  if ( ! def ) {
+    return 0;
   }
   return composition_to_mass(def.composition);
 };
