@@ -1,7 +1,7 @@
 
 import { trace_into_class, TracedMonosaccharide } from './Tracing';
 
-import { C as CSYMB, H as HSYMB, O as OSYMB, MASSES, Mass } from './Mass';
+import { C as CSYMB, H as HSYMB, O as OSYMB, MASSES } from './Mass';
 
 const C = MASSES.get(CSYMB);
 const H = MASSES.get(HSYMB);
@@ -337,7 +337,7 @@ const retains_residue = (composition,res) => {
 
 class Fragmentor {
   static *fragment(target,depth=2) {
-    if ( ! (target instanceof Mass) ) {
+    if ( ! (target.mass) ) {
       throw new Error('Sugar object class does not derive from Mass class');
     }
     const base = target.constructor;

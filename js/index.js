@@ -24,3 +24,5 @@ export { LinkageLayoutFishEye as LinkageLayoutFishEye };
 export {default as SVGRenderer} from './SVGRenderer';
 
 export {default as Fragmentor } from './Fragmentor';
+
+export {Mass as Mass } from './Mass';
