@@ -8,6 +8,8 @@ const module_string='glycanjs:renderer';
 
 const log = debug(module_string);
 
+const canvas_symbol = Symbol('canvas');
+
 const layout_cache = Symbol('cached_layout');
 
 const layout_engine = Symbol('layout');
@@ -27,8 +29,6 @@ const PRECISION = 1;
 const FULL_REFRESH = true;
 
 const str = (num) => num.toFixed(PRECISION);
-
-const GLYCANJSNS = '';
 
 const calculate_moved_residues = function(layout,residue) {
   if (! layout ) {
@@ -119,21 +119,14 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
       long_axis_coord = SCALE/4;
     }
   }
-  let label = canvas.text( ROTATE ? long_axis_coord : short_axis_coord, ROTATE ? short_axis_coord : long_axis_coord, fancy_anomer+linkage);
-  label.setAttribute('font-size',str(Math.floor(SCALE/3)));
-  label.firstChild.setAttribute('dy','0.75em');
-  if (! ROTATE && short_axis_pos < 0) {
-    label.setAttribute('text-anchor','end');
-  }
-  if (ROTATE && short_axis_pos < 0) {
-    label.firstChild.setAttribute('dy','0em');
-  }
+
+  let label = this.renderLinkageLabel( ROTATE ? long_axis_coord : short_axis_coord, ROTATE ? short_axis_coord : long_axis_coord, fancy_anomer+linkage );
 
   canvas.sendToBack(label);
   return label;
 };
 
-const render_linkage = function(child_pos,parent_pos,child,parent,canvas, show_labels = true) {
+const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,show_labels = true) {
   if ( ! parent_pos ) {
     return;
   }
@@ -144,10 +137,9 @@ const render_linkage = function(child_pos,parent_pos,child,parent,canvas, show_l
       SCALE*(parent_pos.y + parent_pos.height / 2)
   ];
   let group = canvas.group();
-  canvas.sendToBack(group.element);
-  let line = group.line(...positions);
-  line.setAttribute('stroke-width',str(SCALE/100));
-  line.setAttribute('stroke','#333');
+  canvas.sendToBack(group);
+  group.line(...positions, { 'stroke-width': str(SCALE/100), 'stroke': '#333' });
+
   if ( show_labels ) {
     render_link_label.call(this,child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
   }
@@ -172,10 +164,7 @@ const cleanup_residues = function(active_residues) {
     }
     if (! active.has(res)) {
       let elements = this.rendered.get(res);
-      elements.residue.parentNode.removeChild(elements.residue);
-      if (elements.linkage) {
-        elements.linkage.parentNode.removeChild(elements.linkage);
-      }
+      this.removeRendered(elements);
       this.rendered.delete(res);
     }
   }
@@ -196,35 +185,12 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   let yvals = [];
   let container = this.rendered.get(sugar);
 
-  const symbolpath = this.symbolpath || 'sugars.svg';
-
-  const canvas = this.element;
   const ROTATE = this.rotate;
 
-  // Setup container
+  // Setup container and set up tagging
 
-  if ( ! container ) {
-    container = canvas.group();
-    container.setAttributeNS(GLYCANJSNS,'glycanjs:sequence',sugar.sequence);
-    container.setAttributeNS(null,'pointer-events','none');
-    this.rendered.set(sugar,container);
-  } else {
-    container.setAttributeNS(GLYCANJSNS,'glycanjs:sequence',sugar.sequence);
-  }
+  container = this.setupContainer(container,sugar);
 
-  // Setup tags
-
-  if (this.groupTag && ! container.tagGroup) {
-    container.tagGroup = container.group();
-    container.tagGroup.element.setAttribute('class','tagged');
-  }
-
-  // Move all nodes out of the group
-  if (container.tagGroup) {
-    for (let el of container.tagGroup.element.childNodes) {
-      container.appendChild(el);
-    }
-  }
 
   if (new_residues.length < 1) {
     return;
@@ -253,11 +219,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
     if ( ! current ) {
       // Render icon
-
-      icon = container.use(`${symbolpath}#${residue.identifier.toLowerCase()}`,0,0,1,1);
-      icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
-      icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
-      icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');
+      icon = this.renderIcon( container, residue, sugar );
       current = { residue: icon, linkage: null };
       this.rendered.set(residue, current);
     } else {
@@ -268,20 +230,13 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       zindices.push({ z: position.z, icon: icon });
     }
     let show_labels = this[layout_engine].LINKS == true;
-    if ( ! current.linkage ) {
-      current.linkage = render_linkage.call(this, position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
-    } else {
+    if ( current.linkage ) {
       // Remove linkage
-
-      current.linkage.parentNode.removeChild(current.linkage);
-
-      // Render linkage
-      current.linkage = render_linkage.call(this, position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, container, show_labels );
+      this.removeRendered({linkage: current.linkage });
     }
 
-    if (current.linkage) {
-      current.linkage.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
-    }
+    // Render linkage
+    current.linkage = render_linkage.call(this, position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, sugar, container, show_labels );
 
     let rotate_angle = 0;
     if (position.rotate) {
@@ -298,7 +253,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     container.sendToFront(zindex.icon);
   }
 
-  if (this.groupTag) {
+  if (this.groupTag && container.tagGroup) {
     let els_to_render = [];
     for (let residue of sugar.composition_for_tag(this.groupTag) ) {
       let rendered_els = this.rendered.get(residue);
@@ -325,24 +280,6 @@ class Renderer {
     }
     this[rendered_sugars_symbol] = [];
     this[rendered_symbol] = new Map();
-    // let counter = 0;
-    // let before,now,fps;
-    // before=Date.now();
-    // fps=0;
-    // let looper = () => {
-    //   now=Date.now();
-    //   fps=Math.round(1000/(now-before));
-    //   before=now;
-
-    //   counter += Math.PI/50;
-    //   SCALE = 100 + 90*Math.cos(counter);
-    //   this.refresh(true);
-    //   window.requestAnimationFrame(looper);
-    //   // console.log(fps);
-    // };
-
-    // window.requestAnimationFrame(looper);
-
   }
 
   get LayoutEngine() {
@@ -357,6 +294,10 @@ class Renderer {
 
   static get GLOBAL_SCALE() {
     return SCALE;
+  }
+
+  get element() {
+    return this[canvas_symbol];
   }
 
   get rendered() {
@@ -386,6 +327,18 @@ class Renderer {
       let modified_residues = FULL_REFRESH ? sugar.composition() : sugar.composition().filter(calculate_moved_residues.bind(this,layout));
       render_sugar.bind(this)(sugar, layout,modified_residues);
     }
+  }
+
+  setupContainer() {
+  }
+
+  removeRendered() {
+  }
+
+  renderIcon() {
+  }
+
+  renderLinkageLabel() {
   }
 
   get horizontal() {
