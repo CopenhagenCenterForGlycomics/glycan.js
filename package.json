@@ -1,6 +1,7 @@
 {
   "name": "glycan.js",
   "version": "0.0.1",
+
   "description": "A tiny library for drawing glycans",
   "main": "./js/index.js",
   "directories": {
