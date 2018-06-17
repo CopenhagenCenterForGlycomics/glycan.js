@@ -138,8 +138,7 @@ class SVGRenderer extends Renderer {
     return container;
   }
 
-  renderLinkageLabel(x,y,text,ROTATE,short_axis_pos) {
-    let canvas = this.element;
+  renderLinkageLabel(canvas,x,y,text,ROTATE,short_axis_pos) {
     let label = canvas.text( x, y, text );
     label.setAttribute('font-size',str(Math.floor(SCALE/3)));
     label.firstChild.setAttribute('dy','0.75em');
@@ -154,14 +153,16 @@ class SVGRenderer extends Renderer {
   }
 
   removeRendered(elements) {
-    elements.residue.parentNode.removeChild(elements.residue);
+    if (elements.residue) {
+      elements.residue.parentNode.removeChild(elements.residue);
+    }
     if (elements.linkage) {
       elements.linkage.parentNode.removeChild(elements.linkage);
     }
   }
 
   renderIcon(container,residue,sugar) {
-    let icon = container.use(`${this.constructor.SYMBOLSOURCE}#${residue.identifier.toLowerCase()}`,0,0,1,1);
+    let icon = container.use(`${this.symbolpath || this.constructor.SYMBOLSOURCE}#${residue.identifier.toLowerCase()}`,0,0,1,1);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');

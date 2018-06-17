@@ -120,7 +120,8 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     }
   }
 
-  let label = this.renderLinkageLabel( ROTATE ? long_axis_coord : short_axis_coord,
+  let label = this.renderLinkageLabel( canvas,
+                                       ROTATE ? long_axis_coord : short_axis_coord,
                                        ROTATE ? short_axis_coord : long_axis_coord,
                                        fancy_anomer+linkage,
                                        ROTATE,
