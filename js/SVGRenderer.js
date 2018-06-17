@@ -19,6 +19,12 @@ const GLYCANJSNS = 'https://glycocode.com/glycanjs';
 
 const supported_events = 'mousemove mousedown mouseup click touchstart touchend touchmove drop dragover';
 
+const PRECISION = 1;
+
+let SYMBOLPATH = 'sugars.svg';
+
+const str = (num) => num.toFixed(PRECISION);
+
 const wire_canvas_events = function(canvas,callback) {
   for (let target of supported_events.split(' ')) {
     canvas.addEventListener( target, callback, { passive: true, capture: true } );
@@ -51,6 +57,14 @@ class SVGRenderer extends Renderer {
       wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
     }
 
+  }
+
+  static set SYMBOLSOURCE(url) {
+    SYMBOLPATH = url;
+  }
+
+  static get SYMBOLSOURCE() {
+    return SYMBOLPATH;
   }
 
 
@@ -124,6 +138,21 @@ class SVGRenderer extends Renderer {
     return container;
   }
 
+  renderLinkageLabel(x,y,text,ROTATE,short_axis_pos) {
+    let canvas = this.element;
+    let label = canvas.text( x, y, text );
+    label.setAttribute('font-size',str(Math.floor(SCALE/3)));
+    label.firstChild.setAttribute('dy','0.75em');
+
+    if (! ROTATE && short_axis_pos < 0) {
+      label.setAttribute('text-anchor','end');
+    }
+    if (ROTATE && short_axis_pos < 0) {
+      label.firstChild.setAttribute('dy','0em');
+    }
+    return label;
+  }
+
   removeRendered(elements) {
     elements.residue.parentNode.removeChild(elements.residue);
     if (elements.linkage) {
@@ -132,10 +161,11 @@ class SVGRenderer extends Renderer {
   }
 
   renderIcon(container,residue,sugar) {
-    let icon = container.use(`${this.symbolpath}#${residue.identifier.toLowerCase()}`,0,0,1,1);
+    let icon = container.use(`${this.constructor.SYMBOLSOURCE}#${residue.identifier.toLowerCase()}`,0,0,1,1);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');
+    return icon;
   }
 
   scaleToFit() {

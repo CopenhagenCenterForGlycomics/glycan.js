@@ -10,36 +10,34 @@
     "debug-any-level": "^0.3.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-polyfill": "^6.7.4",
+    "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.6.0",
-    "babelify": "^7.2.0",
-    "browserify": "^12.0.1",
     "jshint": "^2.8.0",
     "karma": "^0.12.36",
-    "karma-browserify": "^4.4.2",
     "karma-chrome-launcher": "^2.2.0",
     "karma-qunit": "^0.1.4",
+    "karma-webpack": "^3.0.0",
     "precommit-hook": "^3.0.0",
-    "promise-polyfill": "^2.0.2",
     "qunit": "^0.7.6",
     "qunitjs": "^1.18.0",
-    "watchify": "^3.9.0"
+    "webpack": "^4.5.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^3.1.4"
   },
   "scripts": {
     "jshint-pre-commit": "./scripts/jshint-pre-commit.sh",
     "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
-    "build": "./node_modules/babel-cli/bin/babel.js js -d dist/js && ./node_modules/babel-cli/bin/babel.js lib -d dist/lib",
-    "build-watch": "./node_modules/babel-cli/bin/babel.js lib js --watch -d dist",
-    "build-web": "./node_modules/browserify/bin/cmd.js js/glycan.js -o glycan-bundle.js -t [ babelify --presets [ env ] ] -v",
-    "build-watch-web": "./node_modules/watchify/bin/cmd.js js/glycan.js -o glycan-bundle.js -t [ babelify --presets [ env ] ] -v",
-    "server": "python -m SimpleHTTPServer",
-    "start": "npm run-script build-watch-web & npm run-script server",
+    "build-web": "./node_modules/.bin/webpack -d",
+    "build-watch-web": "./node_modules/.bin/webpack --watch",
+    "server": "python ./scripts/simplehttpserver",
+    "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
     "lint": "jshint .",
     "validate": "npm ls"
   },
   "browserify": {
-    "transform": ["babelify"]
+    "transform": [
+      "babelify"
+    ]
   },
   "repository": {
     "type": "git",

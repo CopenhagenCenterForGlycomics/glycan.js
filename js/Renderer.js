@@ -120,7 +120,11 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     }
   }
 
-  let label = this.renderLinkageLabel( ROTATE ? long_axis_coord : short_axis_coord, ROTATE ? short_axis_coord : long_axis_coord, fancy_anomer+linkage );
+  let label = this.renderLinkageLabel( ROTATE ? long_axis_coord : short_axis_coord,
+                                       ROTATE ? short_axis_coord : long_axis_coord,
+                                       fancy_anomer+linkage,
+                                       ROTATE,
+                                       short_axis_coord );
 
   canvas.sendToBack(label);
   return label;
@@ -191,13 +195,11 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
   container = this.setupContainer(container,sugar);
 
-
   if (new_residues.length < 1) {
     return;
   }
 
   let zindices = [];
-
   for (let residue of (layout ? new_residues : [])) {
 
     let position = layout.get(residue);
@@ -268,7 +270,6 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
 
   }
-
   return container;
 };
 
