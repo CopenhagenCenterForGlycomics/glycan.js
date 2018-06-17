@@ -138,6 +138,12 @@ class SVGRenderer extends Renderer {
     return container;
   }
 
+  renderLinkageGroup(canvas,sugar,residue) {
+    let group = canvas.group();
+    group.element.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
+    return group;
+  }
+
   renderLinkageLabel(canvas,x,y,text,ROTATE,short_axis_pos) {
     let label = canvas.text( x, y, text );
     label.setAttribute('font-size',str(Math.floor(SCALE/3)));

@@ -120,6 +120,8 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     }
   }
 
+  console.log(fancy_anomer+linkage,ROTATE,short_axis_coord);
+
   let label = this.renderLinkageLabel( canvas,
                                        ROTATE ? long_axis_coord : short_axis_coord,
                                        ROTATE ? short_axis_coord : long_axis_coord,
@@ -141,7 +143,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
       SCALE*(parent_pos.x + parent_pos.width / 2),
       SCALE*(parent_pos.y + parent_pos.height / 2)
   ];
-  let group = canvas.group();
+  let group = this.renderLinkageGroup(canvas,sugar,child);
   canvas.sendToBack(group);
   group.line(...positions, { 'stroke-width': str(SCALE/100), 'stroke': '#333' });
 
