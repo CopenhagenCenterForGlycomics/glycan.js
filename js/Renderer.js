@@ -127,7 +127,7 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
                                        ROTATE ? short_axis_coord : long_axis_coord,
                                        fancy_anomer+linkage,
                                        ROTATE,
-                                       short_axis_coord );
+                                       short_axis_pos );
 
   canvas.sendToBack(label);
   return label;
