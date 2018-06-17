@@ -11,8 +11,6 @@ const log = debug(module_string);
 
 const container_symbol = Symbol('document_container');
 
-const canvas_symbol = Symbol('canvas');
-
 const rendered_sugars_symbol = Symbol('rendered_sugars');
 
 const SCALE = 100;
@@ -48,9 +46,9 @@ class SVGRenderer extends Renderer {
 
     if (container && layout) {
       this[container_symbol] = container;
-      this[canvas_symbol] = new SVGCanvas(container);
-      this[canvas_symbol].canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
-      wire_canvas_events(this[canvas_symbol].canvas, handle_events.bind(this,this[canvas_symbol].canvas), {passive:true, capture: false } );
+      this.element = new SVGCanvas(container);
+      this.element.canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
+      wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
     }
 
   }
@@ -64,7 +62,7 @@ class SVGRenderer extends Renderer {
     let renderer = new SVGRenderer();
 
     renderer[container_symbol] = element.parentNode;
-    renderer[canvas_symbol] = new SVGCanvas(element);
+    renderer.element = new SVGCanvas(element);
 
     wire_canvas_events(element, handle_events.bind(renderer,element), { passive:true, capture:false } );
     let sugar_elements = element.querySelectorAll('g');
@@ -75,7 +73,7 @@ class SVGRenderer extends Renderer {
       let sugar = new sugar_class();
       sugar.sequence = group.getAttribute('glycanjs:sequence');
       renderer[rendered_sugars_symbol].push(sugar);
-      renderer.rendered.set(sugar,renderer[canvas_symbol].group(group));
+      renderer.rendered.set(sugar,renderer.element.group(group));
       for (let icon of group.querySelectorAll('use')) {
         if ( ! icon.hasAttribute('glycanjs:location') ) {
           continue;
@@ -92,7 +90,7 @@ class SVGRenderer extends Renderer {
         }
         if (link.parentNode !== group) {
           group.appendChild(link);
-          renderer[canvas_symbol].sendToBack(link);
+          renderer.element.sendToBack(link);
         }
         let rendered_data = renderer.rendered.get( sugar.locate_monosaccharide(link.getAttribute('glycanjs:location')) );
         rendered_data.linkage = link;
@@ -142,7 +140,7 @@ class SVGRenderer extends Renderer {
 
   scaleToFit() {
     const PADDING=1;
-    let svg = this[canvas_symbol].canvas;
+    let svg = this.element.canvas;
     let bb=svg.getBBox();
     let bbx=bb.x-(SCALE*PADDING);
     let bby=bb.y-(SCALE*PADDING);

@@ -300,6 +300,12 @@ class Renderer {
     return this[canvas_symbol];
   }
 
+  set element(el) {
+    this[canvas_symbol] = el;
+    return this[canvas_symbol];
+  }
+
+
   get rendered() {
     return this[rendered_symbol];
   }
