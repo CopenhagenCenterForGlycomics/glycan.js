@@ -1,13 +1,13 @@
 {
   "name": "glycan.js",
   "version": "0.0.1",
-
   "description": "A tiny library for drawing glycans",
   "main": "./js/index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
+    "babel-core": "^6.26.3",
     "debug-any-level": "^0.3.0"
   },
   "devDependencies": {

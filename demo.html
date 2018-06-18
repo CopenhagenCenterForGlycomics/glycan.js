@@ -11,10 +11,10 @@
 	</div>
 	<script type="text/javascript">
 	window.onload = function() {
-		let renderer = new Glycan.SVGRenderer(document.getElementById('container'),Glycan.SugarAwareLayout);
+		let renderer = new Glycan.CanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayout);
 		console.log(renderer);
 		let sug = new Glycan.IupacSugar();
-		sug.sequence = 'Gal(b1-3)GlcNAc';
+		sug.sequence = 'NeuAc(a2-8)NeuAc(a2-8)NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-8)NeuAc(a2-8)NeuAc(a2-3)Gal(b1-6)]GalNAc';
 		renderer.addSugar(sug);
 		renderer.refresh();
 		renderer.scaleToFit();

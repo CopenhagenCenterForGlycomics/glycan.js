@@ -175,6 +175,16 @@ class SVGRenderer extends Renderer {
     return icon;
   }
 
+  setIconPosition(element,x,y,width,height,rotate) {
+    let rotate_str = '';
+    if (rotate !== 0) {
+      rotate_str = `rotate(${str(rotate)},${str(x + width/2)},${str(y + height/2)})`;
+    }
+
+    let transform = `${rotate_str} translate(${str(x)},${str(y)}) scale(${str(width)},${str(height)})`;
+    element.setAttribute('transform',transform);
+  }
+
   scaleToFit() {
     const PADDING=1;
     let svg = this.element.canvas;

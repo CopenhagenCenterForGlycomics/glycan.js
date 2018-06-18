@@ -151,16 +151,6 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
   return group.element;
 };
 
-const update_icon_position = function(element,x,y,width,height,rotate) {
-  let rotate_str = '';
-  if (rotate !== 0) {
-    rotate_str = `rotate(${str(rotate)},${str(x + width/2)},${str(y + height/2)})`;
-  }
-
-  let transform = `${rotate_str} translate(${str(x)},${str(y)}) scale(${str(width)},${str(height)})`;
-  element.setAttribute('transform',transform);
-};
-
 const cleanup_residues = function(active_residues) {
   let active = new Set(active_residues);
   for (let res of this.rendered.keys()) {
@@ -249,7 +239,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       rotate_angle -= 90;
     }
 
-    update_icon_position(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
+    this.setIconPosition(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
   }
 
   for (let zindex of zindices.sort( (a,b) => a.z - b.z ) ) {
