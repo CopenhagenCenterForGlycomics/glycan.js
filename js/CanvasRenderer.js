@@ -1,9 +1,14 @@
-/*global document,fetch*/
+/*global document,fetch,DOMPoint,DOMMatrixReadOnly*/
 'use strict';
+
+import { Tween, autoPlay, onTick } from 'es6-tween';
+
 import * as debug from 'debug-any-level';
 
 import Renderer from './Renderer';
 import Canvas from './CanvasCanvas';
+
+import CanvasMouse from '../lib/canvas-mouse';
 
 const module_string='glycanjs:canvasrenderer';
 
@@ -11,7 +16,7 @@ const container_symbol = Symbol('document_container');
 
 let SYMBOLPATH = 'sugars.svg';
 
-const SCALE = 1;
+const SCALE = 100;
 
 const log = debug(module_string);
 
@@ -42,6 +47,18 @@ const get_bounding_boxes = function(renderobj,boundaries={x:[],y:[]}) {
   return boundaries;
 };
 
+class CanvasMatrix extends DOMMatrixReadOnly {
+  applyToPoint(x,y) {
+    let dompt = new DOMPoint(x,y);
+    let inverted = dompt.matrixTransform(this);
+    return inverted;
+  }
+  inverse() {
+    let mtrx = super.inverse();
+    return new CanvasMatrix(mtrx);
+  }
+}
+
 const perform_rendering = function(canvas,renderobj) {
   if (renderobj.torender) {
     for (let el of renderobj.torender) {
@@ -53,6 +70,32 @@ const perform_rendering = function(canvas,renderobj) {
     renderobj.render(canvas);
   }
 };
+
+const render = function(canvas,renderobj) {
+  let coords = get_bounding_boxes(renderobj);
+  let min_x = Math.min(...coords.x);
+  let max_x = Math.max(...coords.x);
+  let min_y = Math.min(...coords.y);
+  let max_y = Math.max(...coords.y);
+
+  canvas.width = (max_x - min_x);
+  canvas.height = (max_y - min_y);
+
+  let ctx = canvas.getContext('2d');
+
+  let scale = 1;
+
+  ctx.setTransform(scale,0,0,scale,-1*min_x,-1*min_y);
+
+  canvas.cm = new CanvasMouse(ctx, {
+    handleScale: true,
+    handleTransforms: true,
+    matrix: new CanvasMatrix([scale,0,0,scale,-1*min_x,-1*min_y])
+  });
+
+  perform_rendering(canvas,renderobj);
+};
+
 
 const import_icons = function(sugarpath) {
   let icons = document.createElement('svg');
@@ -69,15 +112,51 @@ const import_icons = function(sugarpath) {
   });
 };
 
+const TweenMap = new WeakMap();
+
+const supported_events = 'mousemove mousedown mouseup click touchstart touchend touchmove drop dragover';
+
+const wire_canvas_events = function(canvas,callback) {
+  for (let target of supported_events.split(' ')) {
+    canvas.addEventListener( target, callback, { passive: true, capture: true } );
+  }
+};
+
+const handle_events = function(canvas,event) {
+  const ROTATE = this.rotate;
+  if (event.clientX) {
+    let transformed = canvas.cm.getPos(event);
+    let xpos = transformed.x / SCALE;
+    let ypos = transformed.y / SCALE;
+    event.sugarX = ROTATE ? ((-1*ypos) + 1) : xpos;
+    event.sugarY = ROTATE ? xpos : ypos;
+  }
+};
+
 
 class CanvasRenderer extends Renderer {
   constructor(container,layout) {
     log('CanvasRenderer');
     super(container,layout);
 
+    autoPlay(true);
+
+    this.iconset = new Set();
+
+    onTick( () => {
+      for (let icon of this.iconset) {
+        if (! icon.rendered ) {
+          render(this.element.canvas,this.element);
+          return;
+        }
+      }
+    });
+
+
     if (container) {
       this[container_symbol] = container;
       this.element = new Canvas(container);
+      wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
     }
     this.ready = import_icons.call(this,this.symbolpath || this.constructor.SYMBOLSOURCE);
   }
@@ -137,11 +216,33 @@ class CanvasRenderer extends Renderer {
   }
 
   setIconPosition(icon,x,y,width,height,rotate) {
-    icon.x = x;
-    icon.y = y;
-    icon.width = width;
-    icon.height = height;
-    icon.rotate = rotate;
+    if ( ! TweenMap.get(icon) ) {
+      TweenMap.set(icon,new Tween(icon));
+    }
+    let tween = TweenMap.get(icon);
+    let timing = 200;
+    icon.rendered = false;
+
+    if (icon.x === x && icon.y === y && icon.width === width && icon.height === height) {
+      icon.rendered = true;
+      return;
+    }
+
+    if ( ! this.iconset.has(icon) ) {
+      this.iconset.add(icon);
+      icon.x = x;
+      icon.y = y;
+      icon.width = width;
+      icon.height = height;
+      icon.rotate = rotate;
+      timing = 0;
+      icon.rendered = true;
+    }
+    tween.to({x: x, y: y, width: width, height: height, rotate: rotate },timing)
+    .on('complete', (icon) => {
+      icon.rendered = true;
+    })
+    .start();
   }
 
   renderIcon(container,residue) {
@@ -156,18 +257,7 @@ class CanvasRenderer extends Renderer {
   refresh() {
     this.ready.then( () => {
       super.refresh();
-      let coords = get_bounding_boxes(this.element);
-      let min_x = Math.min(...coords.x);
-      let max_x = Math.max(...coords.x);
-      let min_y = Math.min(...coords.y);
-      let max_y = Math.max(...coords.y);
-      this.element.canvas.setAttribute('width',(max_x - min_x)+'px');
-      this.element.canvas.setAttribute('height',(max_y - min_y)+'px');
-
-      let ctx = this.element.canvas.getContext('2d');
-      ctx.scale(0.5,0.5);
-      ctx.translate(-1*min_x,-1*min_y);
-      perform_rendering(this.element.canvas,this.element);
+      render(this.element.canvas,this.element);
     });
   }
 

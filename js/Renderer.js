@@ -148,7 +148,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
   if ( show_labels ) {
     render_link_label.call(this,child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
   }
-  return group.element;
+  return group;
 };
 
 const cleanup_residues = function(active_residues) {
@@ -223,6 +223,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       zindices.push({ z: position.z, icon: icon });
     }
     let show_labels = this[layout_engine].LINKS == true;
+
     if ( current.linkage ) {
       // Remove linkage
       this.removeRendered({linkage: current.linkage });

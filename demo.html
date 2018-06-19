@@ -11,10 +11,24 @@
 	</div>
 	<script type="text/javascript">
 	window.onload = function() {
-		let renderer = new Glycan.CanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayout);
+		let renderer = new Glycan.CanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
+		Glycan.SugarAwareLayoutFishEye.lock_residues = true;
+
+		renderer.element.canvas.addEventListener('mousemove', (ev) => {
+			Glycan.SugarAwareLayoutFishEye.focus =[ ev.sugarX, ev.sugarY ];
+			renderer.refresh();
+		});
 		console.log(renderer);
 		let sug = new Glycan.IupacSugar();
 		sug.sequence = 'NeuAc(a2-8)NeuAc(a2-8)NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-8)NeuAc(a2-8)NeuAc(a2-3)Gal(b1-6)]GalNAc';
+		setTimeout(() => {
+			let new_res = new Glycan.Monosaccharide('GlcNAc');
+			new_res.anomer = 'b';
+			new_res.parent_linkage = 1;
+			sug.root.addChild(4,new_res);
+			sug.root.balance();
+			renderer.refresh();
+		},3000);
 		renderer.addSugar(sug);
 		renderer.refresh();
 		renderer.scaleToFit();

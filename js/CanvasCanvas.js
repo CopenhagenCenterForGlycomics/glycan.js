@@ -36,6 +36,10 @@ class RenderTree {
     return el;
   }
 
+  remove(el) {
+    this.torender.splice(this.torender.indexOf(el),1);
+  }
+
 }
 
 const render_text = function(canvas){
@@ -58,15 +62,24 @@ const render_line = function(canvas){
   ctx.stroke();
 };
 
+const ICONS_CACHE = new Map();
+
 const render_icon = function(canvas) {
   let ctx = canvas.getContext('2d');
+  var image =  ICONS_CACHE.get(this.src);
 
-  var image = new Image();
-  image.onload = () => {
-    ctx.drawImage(image, this.x, this.y);
-  };
-  image.src = this.src;
+  if ( ! image ) {
+    image = new Image();
+    image.src = this.src;
+    image.loaded = new Promise((resolve) => {
+      image.addEventListener('load',resolve );
+    });
+  }
 
+  ICONS_CACHE.set(this.src,image);
+  image.loaded.then( () => {
+    ctx.drawImage(image, this.x, this.y,this.width,this.height);
+  });
 };
 
 class Canvas extends RenderTree {
