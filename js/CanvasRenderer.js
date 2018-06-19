@@ -226,8 +226,17 @@ class CanvasRenderer extends Renderer {
       this.element = new Canvas(canvas);
       wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
     }
-    this.ready = import_icons.call(this,this.symbolpath || this.constructor.SYMBOLSOURCE);
   }
+
+  set symbolpath(path) {
+    this.ready = import_icons.call(this,path);
+    this.symbpath = path;
+  }
+
+  get symbolpath() {
+    return this.symbpath;
+  }
+
 
   static set SYMBOLSOURCE(url) {
     SYMBOLPATH = url;

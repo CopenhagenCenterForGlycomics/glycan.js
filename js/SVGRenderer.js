@@ -163,7 +163,11 @@ class SVGRenderer extends Renderer {
       elements.residue.parentNode.removeChild(elements.residue);
     }
     if (elements.linkage) {
-      elements.linkage.parentNode.removeChild(elements.linkage);
+      if (elements.linkage.element) {
+        elements.linkage.element.parentNode.removeChild(elements.linkage.element);
+      } else {
+        elements.linkage.parentNode.removeChild(elements.linkage);
+      }
     }
   }
 
