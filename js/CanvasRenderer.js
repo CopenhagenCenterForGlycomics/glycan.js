@@ -1,4 +1,4 @@
-/*global document,fetch,DOMPoint,DOMMatrixReadOnly*/
+/*global document,fetch*/
 'use strict';
 
 import { Tween, autoPlay, onTick } from 'es6-tween';
@@ -47,15 +47,27 @@ const get_bounding_boxes = function(renderobj,boundaries={x:[],y:[]}) {
   return boundaries;
 };
 
-class CanvasMatrix extends DOMMatrixReadOnly {
+class CanvasMatrix {
+  constructor(vals) {
+    this._mat = document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGMatrix();
+    this._mat.a = vals[0];
+    this._mat.b = vals[1];
+    this._mat.c = vals[2];
+    this._mat.d = vals[3];
+    this._mat.e = vals[4];
+    this._mat.f = vals[5];
+  }
   applyToPoint(x,y) {
-    let dompt = new DOMPoint(x,y);
-    let inverted = dompt.matrixTransform(this);
+    let dompt = document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGPoint();
+    dompt.x = x;
+    dompt.y = y;
+    let inverted = dompt.matrixTransform(this._mat);
     return inverted;
   }
   inverse() {
-    let mtrx = super.inverse();
-    return new CanvasMatrix(mtrx);
+    let mtrx = this._mat.inverse();
+    let vals = [mtrx.a,mtrx.b,mtrx.c,mtrx.d,mtrx.e,mtrx.f];
+    return new CanvasMatrix(vals);
   }
 }
 
