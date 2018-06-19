@@ -4,6 +4,8 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes,shrink-to-fit=no"/>
 	<title>Sviewer</title>
+	<script src="https://cdn.jsdelivr.net/gh/pshihn/workly/dist/workly.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/roughjs@2.2.0/dist/rough.umd.min.js"></script>
 	<script type="text/javascript" src="/sviewer.bundle.js"></script>
 </head>
 <body>
@@ -11,8 +13,10 @@
 	</div>
 	<script type="text/javascript">
 	window.onload = function() {
-		let renderer = new Glycan.CanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
+		let renderer = new Glycan.RoughCanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
 		Glycan.SugarAwareLayoutFishEye.lock_residues = true;
+		Glycan.SugarAwareLayoutFishEye.LINKS = false;
+
 
 		renderer.element.canvas.addEventListener('mousemove', (ev) => {
 			Glycan.SugarAwareLayoutFishEye.focus =[ ev.sugarX, ev.sugarY ];
@@ -20,12 +24,12 @@
 		});
 		console.log(renderer);
 		let sug = new Glycan.IupacSugar();
-		sug.sequence = 'NeuAc(a2-8)NeuAc(a2-8)NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-8)NeuAc(a2-8)NeuAc(a2-3)Gal(b1-6)]GalNAc';
+		sug.sequence = 'NeuAc(a2-3)Gal(b1-3)GalNAc';
 		setTimeout(() => {
 			let new_res = new Glycan.Monosaccharide('GlcNAc');
 			new_res.anomer = 'b';
 			new_res.parent_linkage = 1;
-			sug.root.addChild(4,new_res);
+			sug.root.addChild(6,new_res);
 			sug.root.balance();
 			renderer.refresh();
 		},3000);

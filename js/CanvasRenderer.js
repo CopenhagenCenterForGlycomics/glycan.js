@@ -108,6 +108,56 @@ const render = function(canvas,renderobj) {
   perform_rendering(canvas,renderobj);
 };
 
+const populate_path = (element) => {
+  let path = {};
+  path.fill = element.getAttribute('fill');
+  if (element.getAttribute('stroke-width') && parseFloat(element.getAttribute('stroke-width')) > 0) {
+    path.stroke = element.getAttribute('stroke');
+  }
+  if (element.getAttribute('transform')) {
+    let [match_str,angle,cx,cy] = element.getAttribute('transform').match(/rotate\((\d+),(\d+),(\d+)\)/);
+    if (match_str.length > 0) {
+      path.rotate = { angle, cx, cy };
+    }
+  }
+  return path;
+};
+
+const extract_paths = (symbol) => {
+  let paths = [];
+  for (let path of symbol.querySelectorAll('path')) {
+    let a_path = populate_path(path);
+    a_path.d = path.getAttribute('d');
+    paths.push(a_path);
+  }
+  for (let path of symbol.querySelectorAll('circle')) {
+    let a_path = populate_path(path);
+    a_path.cx = parseFloat(path.getAttribute('cx'));
+    a_path.cy = parseFloat(path.getAttribute('cy'));
+    a_path.r = parseFloat(path.getAttribute('r'));
+    paths.push(a_path);
+  }
+
+  for (let path of symbol.querySelectorAll('rect')) {
+    let a_path = populate_path(path);
+    let x = path.getAttribute('x');
+    let y = path.getAttribute('y');
+    let x2 = parseFloat(path.getAttribute('x'))+parseFloat(path.getAttribute('width'));
+    let y2 = parseFloat(path.getAttribute('y'))+parseFloat(path.getAttribute('height'));
+
+    a_path.d = `M${x},${y} ${x2},${y} ${x2},${y2} ${x},${y2} z`;
+    paths.push(a_path);
+  }
+
+  for (let path of symbol.querySelectorAll('polyline')) {
+    let a_path = populate_path(path);
+    a_path.d = 'M'+path.getAttribute('points')+'Z';
+    paths.push(a_path);
+  }
+
+  return paths;
+};
+
 
 const import_icons = function(sugarpath) {
   let icons = document.createElement('svg');
@@ -118,8 +168,9 @@ const import_icons = function(sugarpath) {
   .then( () => {
     for (let symbol of icons.querySelectorAll('defs symbol')) {
       let symboltext = symbol.innerHTML.replace(/#/g,'%23');
+      let paths = extract_paths(symbol);
       let svg_text = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="100px" height="100px">${symboltext}</svg>`;
-      this.symbols[symbol.getAttribute('id')] = svg_text;
+      this.symbols[symbol.getAttribute('id')] = { svg: svg_text, paths };
     }
   });
 };
@@ -167,7 +218,12 @@ class CanvasRenderer extends Renderer {
 
     if (container) {
       this[container_symbol] = container;
-      this.element = new Canvas(container);
+      log.info('Creating canvas element');
+      let canvas = container.ownerDocument.createElement('canvas');
+      canvas.setAttribute('width','1px');
+      canvas.setAttribute('height','1px');
+      container.appendChild(canvas);
+      this.element = new Canvas(canvas);
       wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
     }
     this.ready = import_icons.call(this,this.symbolpath || this.constructor.SYMBOLSOURCE);
@@ -259,7 +315,8 @@ class CanvasRenderer extends Renderer {
 
   renderIcon(container,residue) {
     let icon = container.use(residue.identifier,0,0,1,1);
-    icon.src = this.symbols[residue.identifier.toLowerCase()];
+    icon.src = this.symbols[residue.identifier.toLowerCase()].svg;
+    icon.paths = this.symbols[residue.identifier.toLowerCase()].paths;
     return icon;
   }
 

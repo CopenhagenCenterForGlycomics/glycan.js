@@ -1,12 +1,6 @@
 /*global Image*/
 'use strict';
 
-import * as debug from 'debug-any-level';
-
-const module_string='glycanjs:canvascanvas';
-
-const log = debug(module_string);
-
 const torender = Symbol('torender');
 
 class RenderTree {
@@ -83,15 +77,10 @@ const render_icon = function(canvas) {
 };
 
 class Canvas extends RenderTree {
-  constructor(container) {
+  constructor(canvas) {
     super();
-    if ( container ) {
-      log.info('Creating canvas element');
-      this.canvas = this.createElement('canvas',container.ownerDocument);
-      this.canvas.setAttribute('width','500px');
-      this.canvas.setAttribute('height','500px');
-      container.appendChild(this.canvas);
-
+    if ( canvas ) {
+      this.canvas = canvas;
     }
   }
 
