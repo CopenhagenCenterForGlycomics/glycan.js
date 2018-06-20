@@ -18,12 +18,14 @@ const draw_path = (path,ctx,rc) => {
 
   if (path.d) {
     if (path.fill !== 'none') {
+      rc.path(path.d,{ fill: '#fff', stroke: '#fff', roughness: 0, fillStyle: 'solid', strokeWidth: 0 });
       rc.path(path.d,{ fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
     } else {
       rc.path(path.d,{ roughness: 2 });
     }
   }
   if (path.cx) {
+    rc.circle(path.cx,path.cy,2*path.r, {fill: '#fff', stroke: '#fff', roughness: 0, fillStyle: 'solid' , strokeWidth: 0 });
     rc.circle(path.cx,path.cy,2*path.r, {fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
   }
   if (path.rotate) {
@@ -57,11 +59,22 @@ const render_icon = function(canvas) {
   }
 };
 
+const render_line = function(canvas){
+  let rc = rough.canvas(canvas);
+  rc.line(this.x,this.y,this.x2,this.y2, {roughness: 2 });
+};
+
+
 class RoughCanvas extends Canvas {
   use(ref,x,y,width,height) {
     let icon = { icon: ref, x, y, width, height, render: render_icon };
     this.appendChild(icon);
     return icon;
+  }
+  line(x,y,x2,y2,options={}) {
+    let a_line = {x,y,x2,y2,options, render: render_line};
+    this.appendChild(a_line);
+    return a_line;
   }
   group(a_g) {
     if ( ! a_g ) {
