@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "debug-any-level": "^0.3.0",
-    "es6-tween": "^5.2.4"
+    "es6-tween": "^5.2.4",
+    "roughjs": "^2.2.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

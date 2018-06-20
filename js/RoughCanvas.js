@@ -1,13 +1,13 @@
-/*global window*/
 'use strict';
 
 import Canvas from './CanvasCanvas';
+
+import rough from 'roughjs';
 
 const render_icon = function(canvas) {
   let ctx = canvas.getContext('2d');
 
   if (this.paths && this.paths.length > 0) {
-    let rough = window.rough;
     ctx.save();
     ctx.translate(this.x,this.y);
     ctx.scale(this.width/100,this.height/100);

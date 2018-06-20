@@ -4,7 +4,6 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes,shrink-to-fit=no"/>
 	<title>Sviewer</title>
-	<script src="https://cdn.jsdelivr.net/npm/roughjs@2.2.0/dist/rough.umd.min.js"></script>
 	<script type="text/javascript" src="/sviewer.bundle.js"></script>
 </head>
 <body>
@@ -13,6 +12,7 @@
 	<script type="text/javascript">
 	window.onload = function() {
 		let renderer = new Glycan.RoughCanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
+		renderer.symbolpath = 'sugars.svg';
 		Glycan.SugarAwareLayoutFishEye.lock_residues = true;
 		Glycan.SugarAwareLayoutFishEye.LINKS = false;
 
