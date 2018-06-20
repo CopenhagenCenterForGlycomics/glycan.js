@@ -17,7 +17,11 @@ const draw_path = (path,ctx,rc) => {
   }
 
   if (path.d) {
-    rc.path(path.d,{ fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
+    if (path.fill !== 'none') {
+      rc.path(path.d,{ fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
+    } else {
+      rc.path(path.d,{ roughness: 2 });
+    }
   }
   if (path.cx) {
     rc.circle(path.cx,path.cy,2*path.r, {fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });

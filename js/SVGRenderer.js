@@ -40,8 +40,8 @@ const handle_events = function(svg,event) {
     let transformed = pt.matrixTransform(svg.getScreenCTM().inverse());
     let xpos = transformed.x / SCALE;
     let ypos = transformed.y / SCALE;
-    event.svgX = ROTATE ? ((-1*ypos) + 1) : xpos;
-    event.svgY = ROTATE ? xpos : ypos;
+    event.sugarX = ROTATE ? ((-1*ypos) + 1) : xpos;
+    event.sugarY = ROTATE ? xpos : ypos;
   }
 };
 
