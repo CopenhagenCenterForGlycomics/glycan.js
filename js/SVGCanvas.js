@@ -103,6 +103,9 @@ class SVGCanvas {
   }
 
   sendToFront(element) {
+    if (element.element) {
+      element = element.element;
+    }
     let parent = element.parentNode;
     parent.insertBefore(element,null);
     return element;

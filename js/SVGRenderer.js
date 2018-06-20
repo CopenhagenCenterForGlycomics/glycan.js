@@ -92,7 +92,7 @@ class SVGRenderer extends Renderer {
         if ( ! icon.hasAttribute('glycanjs:location') ) {
           continue;
         }
-        let rendered_data = { residue: icon };
+        let rendered_data = { residue: { element: icon } };
         if (icon.parentNode !== group) {
           group.appendChild(icon);
         }
@@ -160,7 +160,7 @@ class SVGRenderer extends Renderer {
 
   removeRendered(elements) {
     if (elements.residue) {
-      elements.residue.parentNode.removeChild(elements.residue);
+      elements.residue.element.parentNode.removeChild(elements.residue.element);
     }
     if (elements.linkage) {
       if (elements.linkage.element) {
@@ -176,17 +176,17 @@ class SVGRenderer extends Renderer {
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');
-    return icon;
+    return {element: icon };
   }
 
-  setIconPosition(element,x,y,width,height,rotate) {
+  setIconPosition(icon,x,y,width,height,rotate) {
     let rotate_str = '';
     if (rotate !== 0) {
       rotate_str = `rotate(${str(rotate)},${str(x + width/2)},${str(y + height/2)})`;
     }
 
     let transform = `${rotate_str} translate(${str(x)},${str(y)}) scale(${str(width)},${str(height)})`;
-    element.setAttribute('transform',transform);
+    icon.element.setAttribute('transform',transform);
   }
 
   scaleToFit() {

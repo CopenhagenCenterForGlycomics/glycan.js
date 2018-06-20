@@ -1,4 +1,4 @@
-/*global document,fetch*/
+/*global document,fetch,Event*/
 'use strict';
 
 import { Tween, autoPlay, onTick } from 'es6-tween';
@@ -199,6 +199,36 @@ const handle_events = function(canvas,event) {
   }
 };
 
+const inside_icon = (x,y,icon) => {
+  x = x * SCALE;
+  y = y * SCALE;
+  return (x >= icon.x && x <= (icon.x + icon.width)) &&
+    (y >= icon.y && y <= (icon.y + icon.height));
+};
+
+const proxy_bounds = (x,y) => {
+  return { left: x, top: y, width: 0, height: 0 };
+};
+
+const retarget_event = function(ev) {
+  let inside_icons = [...this.iconset].filter(inside_icon.bind(null,ev.sugarX,ev.sugarY));
+  let target_type = ev.type;
+  for (let icon of inside_icons) {
+    if (icon.element) {
+      ev.stopImmediatePropagation();
+
+      let new_ev = new Event(target_type,{bubbles: false});
+      icon.element.getBoundingClientRect = proxy_bounds.bind(null,ev.clientX,ev.clientY);
+      icon.element.dispatchEvent(new_ev);
+
+      if (target_type === 'dragover' && this.last_dragenter !== icon ) {
+        new_ev = new Event('dragenter',{bubbles: false});
+        icon.element.dispatchEvent(new_ev);
+      }
+      return;
+    }
+  }
+};
 
 class CanvasRenderer extends Renderer {
   constructor(container,layout) {
@@ -228,6 +258,9 @@ class CanvasRenderer extends Renderer {
       container.appendChild(canvas);
       this.element = new Canvas(canvas);
       wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
+      for (let ev of ['click','dragover']) {
+        this.element.canvas.addEventListener(ev,retarget_event.bind(this),{ capture: true });
+      }
     }
   }
 
@@ -289,6 +322,9 @@ class CanvasRenderer extends Renderer {
   removeRendered(elements) {
     if (elements.residue) {
       elements.residue.parent.remove(elements.residue);
+      if (elements.residue.element) {
+        elements.residue.element.parentNode.removeChild(elements.residue.element);
+      }
     }
     if (elements.linkage) {
       elements.linkage.parent.remove(elements.linkage);
@@ -329,6 +365,8 @@ class CanvasRenderer extends Renderer {
     let icon = container.use(residue.identifier,0,0,1,1);
     icon.src = this.symbols[residue.identifier.toLowerCase()].svg;
     icon.paths = this.symbols[residue.identifier.toLowerCase()].paths;
+    icon.element = this.element.canvas.ownerDocument.createElement('button');
+    this.element.canvas.appendChild(icon.element);
     return icon;
   }
 
