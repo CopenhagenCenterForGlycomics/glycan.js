@@ -214,15 +214,15 @@ const retarget_event = function(ev) {
   let inside_icons = [...this.iconset].filter(inside_icon.bind(null,ev.sugarX,ev.sugarY));
   let target_type = ev.type;
   for (let icon of inside_icons) {
-    if (icon.element) {
+    if (icon.hasElement()) {
       ev.stopImmediatePropagation();
 
-      let new_ev = new Event(target_type,{bubbles: false});
+      let new_ev = new Event(target_type,{bubbles: true});
       icon.element.getBoundingClientRect = proxy_bounds.bind(null,ev.clientX,ev.clientY);
       icon.element.dispatchEvent(new_ev);
 
       if (target_type === 'dragover' && this.last_dragenter !== icon ) {
-        new_ev = new Event('dragenter',{bubbles: false});
+        new_ev = new Event('dragenter',{bubbles: true});
         icon.element.dispatchEvent(new_ev);
       }
       return;
@@ -365,8 +365,17 @@ class CanvasRenderer extends Renderer {
     let icon = container.use(residue.identifier,0,0,1,1);
     icon.src = this.symbols[residue.identifier.toLowerCase()].svg;
     icon.paths = this.symbols[residue.identifier.toLowerCase()].paths;
-    icon.element = this.element.canvas.ownerDocument.createElement('button');
-    this.element.canvas.appendChild(icon.element);
+    let canvas = this.element.canvas;
+    Object.defineProperty(icon, 'element', {
+      get: function() {
+        if ( ! this._element ) {
+          this._element = canvas.ownerDocument.createElement('button');
+          canvas.appendChild(this._element);
+        }
+        return this._element;
+      }
+    });
+    icon.hasElement = () => '_element' in icon;
     return icon;
   }
 
@@ -374,7 +383,7 @@ class CanvasRenderer extends Renderer {
   }
 
   refresh() {
-    this.ready.then( () => {
+    return this.ready.then( () => {
       super.refresh();
       render(this.element.canvas,this.element);
     });

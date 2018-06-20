@@ -326,6 +326,7 @@ class Renderer {
       let modified_residues = FULL_REFRESH ? sugar.composition() : sugar.composition().filter(calculate_moved_residues.bind(this,layout));
       render_sugar.bind(this)(sugar, layout,modified_residues);
     }
+    return Promise.resolve();
   }
 
   setupContainer() {
