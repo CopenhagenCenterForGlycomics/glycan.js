@@ -2,9 +2,30 @@
 
 // https://www.html5rocks.com/en/tutorials/canvas/performance/#toc-pre-render
 
+const CACHED_ICONS = new WeakMap();
+
 import Canvas from './CanvasCanvas';
 
 import rough from 'roughjs';
+
+const draw_path = (path,ctx,rc) => {
+  if (path.rotate) {
+    ctx.save();
+    ctx.translate(path.rotate.cx,path.rotate.cy);
+    ctx.rotate(path.rotate.angle);
+    ctx.translate(-1*path.rotate.cx,-1*path.rotate.cy);
+  }
+
+  if (path.d) {
+    rc.path(path.d,{ fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
+  }
+  if (path.cx) {
+    rc.circle(path.cx,path.cy,2*path.r, {fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
+  }
+  if (path.rotate) {
+    ctx.restore();
+  }
+};
 
 const render_icon = function(canvas) {
   let ctx = canvas.getContext('2d');
@@ -13,26 +34,21 @@ const render_icon = function(canvas) {
     ctx.save();
     ctx.translate(this.x,this.y);
     ctx.scale(this.width/100,this.height/100);
-    let rc = rough.canvas(canvas);
-    for(let path of this.paths) {
 
-      if (path.rotate) {
-        ctx.save();
-        ctx.translate(path.rotate.cx,path.rotate.cy);
-        ctx.rotate(path.rotate.angle);
-        ctx.translate(-1*path.rotate.cx,-1*path.rotate.cy);
+    if ( ! CACHED_ICONS.has(this) ) {
+      let offscreen = canvas.ownerDocument.createElement('canvas');
+      offscreen.width = 100;
+      offscreen.height = 100;
+      let offscreen_ctx = offscreen.getContext('2d');
+      let rc = rough.canvas(offscreen);
+      for(let path of this.paths) {
+        draw_path(path,offscreen_ctx,rc);
       }
-
-      if (path.d) {
-        rc.path(path.d,{ fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
-      }
-      if (path.cx) {
-        rc.circle(path.cx,path.cy,2*path.r, {fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
-      }
-      if (path.rotate) {
-        ctx.restore();
-      }
+      CACHED_ICONS.set(this,offscreen);
     }
+
+    ctx.drawImage(CACHED_ICONS.get(this),0,0);
+
     ctx.restore();
   }
 };

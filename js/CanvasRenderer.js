@@ -43,6 +43,7 @@ const get_bounding_boxes = function(renderobj,boundaries={x:[],y:[]}) {
   }
   if (renderobj.text) {
     extend_boundaries(boundaries,[renderobj.x,renderobj.y]);
+    extend_boundaries(boundaries,[renderobj.x,renderobj.y]);
   }
   return boundaries;
 };
@@ -85,10 +86,12 @@ const perform_rendering = function(canvas,renderobj) {
 
 const render = function(canvas,renderobj) {
   let coords = get_bounding_boxes(renderobj);
-  let min_x = Math.min(...coords.x);
-  let max_x = Math.max(...coords.x);
-  let min_y = Math.min(...coords.y);
-  let max_y = Math.max(...coords.y);
+  coords.x = coords.x.map( (val,idx,arr) => { if ((idx % 2) === 0) { return 0.5*(val + arr[idx+1]); } }).filter( x => typeof x !== 'undefined');
+  coords.y = coords.y.map( (val,idx,arr) => { if ((idx % 2) === 0) { return 0.5*(val + arr[idx+1]); } }).filter( x => typeof x !== 'undefined');
+  let min_x = Math.min(...coords.x)-100;
+  let max_x = Math.max(...coords.x)+100;
+  let min_y = Math.min(...coords.y)-100;
+  let max_y = Math.max(...coords.y)+100;
 
   canvas.width = (max_x - min_x);
   canvas.height = (max_y - min_y);
