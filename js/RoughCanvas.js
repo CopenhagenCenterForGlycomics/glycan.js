@@ -1,5 +1,7 @@
 'use strict';
 
+// https://www.html5rocks.com/en/tutorials/canvas/performance/#toc-pre-render
+
 import Canvas from './CanvasCanvas';
 
 import rough from 'roughjs';
