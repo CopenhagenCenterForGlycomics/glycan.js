@@ -61,7 +61,7 @@ const render_icon = function(canvas) {
 
 const render_line = function(canvas){
   let rc = rough.canvas(canvas);
-  rc.line(this.x,this.y,this.x2,this.y2, {roughness: 2 });
+  rc.line(this.x,this.y,this.x2,this.y2, {roughness: 3 });
 };
 
 
