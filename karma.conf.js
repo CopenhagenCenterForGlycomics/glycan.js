@@ -10,9 +10,9 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['qunit','browserify'],
+    frameworks: ['qunit'],
 
-    plugins: ['karma-qunit','karma-browserify','karma-chrome-launcher'],
+    plugins: ['karma-qunit','karma-webpack','karma-chrome-launcher'],
 
     browserify : {
       debug: true,
@@ -42,10 +42,10 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'js/**/*.js' : ['browserify'],
-        'lib/**/*.js' : ['browserify'],
-        'test/**/test.js' : ['browserify'],
-        'test/**/test-*.js' : ['browserify']
+        'js/**/*.js' : ['webpack'],
+        'lib/**/*.js' : ['webpack'],
+        'test/**/test.js' : ['webpack'],
+        'test/**/test-*.js' : ['webpack']
     },
 
 

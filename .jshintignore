@@ -1,2 +1,3 @@
 node_modules
 webcomponents-lite.js
+lib/canvas-mouse.js

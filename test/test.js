@@ -1,4 +1,4 @@
-/*global QUnit,Promise,window*/
+/*global QUnit*/
 
 import * as debug from 'debug-any-level';
 
@@ -26,10 +26,6 @@ if (!Function.prototype.bind) {
 
     return fBound;
   };
-}
-
-if ( ! window.Promise ) {
-    window.Promise = require('promise-polyfill');
 }
 
 if ( QUnit.config && QUnit.config.debug ) {

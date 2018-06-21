@@ -22,6 +22,9 @@ export { SugarAwareLayoutFishEye as SugarAwareLayoutFishEye };
 export { LinkageLayoutFishEye as LinkageLayoutFishEye };
 
 export {default as SVGRenderer} from './SVGRenderer';
+export {default as CanvasRenderer} from './CanvasRenderer';
+export {default as RoughCanvasRenderer} from './RoughCanvasRenderer';
+
 
 export {default as Fragmentor } from './Fragmentor';
 

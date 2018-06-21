@@ -7,6 +7,4 @@ let Iupac = Glycan.CondensedIupac.IO;
 
 class IupacSugar extends Iupac(Glycan.Sugar) {}
 
-Glycan.IupacSugar = IupacSugar;
-
-window.Glycan = Glycan;
+window.Glycan = Object.assign({ IupacSugar },Glycan);

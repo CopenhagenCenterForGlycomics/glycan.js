@@ -62,12 +62,15 @@ class SVGCanvas {
     return a_rect;
   }
 
-  line(x,y,x2,y2) {
+  line(x,y,x2,y2,options={}) {
     let a_line = this.canvas.ownerDocument.createElementNS(SVGNS,'line');
     a_line.setAttribute('x1', str(x));
     a_line.setAttribute('y1', str(y));
     a_line.setAttribute('x2', str(x2));
     a_line.setAttribute('y2', str(y2));
+    for (let key of Object.keys(options)) {
+      a_line.setAttribute(key,options[key]);
+    }
     this.appendChild(a_line);
     return a_line;
   }
@@ -91,12 +94,18 @@ class SVGCanvas {
 
 
   sendToBack(element) {
+    if (element.element) {
+      element = element.element;
+    }
     let parent = element.parentNode;
     parent.insertBefore(element,parent.firstChild);
     return element;
   }
 
   sendToFront(element) {
+    if (element.element) {
+      element = element.element;
+    }
     let parent = element.parentNode;
     parent.insertBefore(element,null);
     return element;

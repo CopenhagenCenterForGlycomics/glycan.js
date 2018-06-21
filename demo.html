@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes,shrink-to-fit=no"/>
+	<title>Sviewer</title>
+	<script type="text/javascript" src="/sviewer.bundle.js"></script>
+</head>
+<body>
+	<div id="container">
+	</div>
+	<script type="text/javascript">
+	window.onload = function() {
+		let renderer = new Glycan.RoughCanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
+		renderer.symbolpath = 'sugars.svg';
+		Glycan.SugarAwareLayoutFishEye.lock_residues = true;
+		Glycan.SugarAwareLayoutFishEye.LINKS = false;
+
+
+		renderer.element.canvas.addEventListener('mousemove', (ev) => {
+			Glycan.SugarAwareLayoutFishEye.focus =[ ev.sugarX, ev.sugarY ];
+			renderer.refresh();
+		});
+		console.log(renderer);
+		let sug = new Glycan.IupacSugar();
+		sug.sequence = 'NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-4)Man';
+		setTimeout(() => {
+			let new_res = new Glycan.Monosaccharide('GlcNAc');
+			new_res.anomer = 'b';
+			new_res.parent_linkage = 1;
+			sug.root.addChild(6,new_res);
+			sug.root.balance();
+			renderer.refresh();
+		},3000);
+		renderer.addSugar(sug);
+		renderer.refresh();
+		renderer.scaleToFit();
+	}
+	</script>
+</body>
+</html>
