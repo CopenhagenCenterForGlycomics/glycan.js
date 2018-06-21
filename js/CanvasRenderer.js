@@ -158,6 +158,17 @@ const extract_paths = (symbol) => {
     paths.push(a_path);
   }
 
+  for (let path of symbol.querySelectorAll('text')) {
+    let a_path = populate_path(path);
+    a_path.fontSize = path.getAttribute('font-size');
+    a_path.text = path.textContent;
+    let x = path.getAttribute('x');
+    let y = path.getAttribute('y');
+    a_path.x = x;
+    a_path.y = y;
+    paths.push(a_path);
+  }
+
   return paths;
 };
 

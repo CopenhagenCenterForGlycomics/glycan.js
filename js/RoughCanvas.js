@@ -28,6 +28,12 @@ const draw_path = (path,ctx,rc) => {
     rc.circle(path.cx,path.cy,2*path.r, {fill: '#fff', stroke: '#fff', roughness: 0, fillStyle: 'solid' , strokeWidth: 0 });
     rc.circle(path.cx,path.cy,2*path.r, {fill: path.fill, roughness: 2, fillStyle: 'cross-hatch' });
   }
+  if (path.fontSize) {
+    ctx.font = `${path.fontSize}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(path.text,path.x, path.y);
+  }
+
   if (path.rotate) {
     ctx.restore();
   }
