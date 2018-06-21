@@ -1,11 +1,11 @@
 module.exports = {
   entry: {
-    'sviewer': [ './js/glycan.js' ],
+    'glycan': [ './js/glycan.js' ],
   },
   devtool: 'source-map',
   mode: 'development',
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name]-bundle.js',
     path: __dirname + '/dist'
   },
   module: {
