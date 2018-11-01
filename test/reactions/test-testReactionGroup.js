@@ -4,6 +4,7 @@ import Reaction from '../../js/Reaction';
 import { ReactionSet, ReactionGroup } from '../../js/ReactionSet';
 
 import Sugar from '../../js/Sugar';
+import Monosaccharide from '../../js/Monosaccharide';
 
 import {IO as Iupac} from '../../js/CondensedIupac';
 
@@ -96,4 +97,29 @@ QUnit.test( 'We can check if a group supports an operation' , function( assert )
   assert.deepEqual(result.anomer,[]);
   assert.deepEqual(result.linkage,[]);
   assert.deepEqual(result.substrate,[]);
+});
+
+
+QUnit.test( 'Test if we can add in N links' , function( assert ) {
+  let base_sequence = 'Asn';
+  let search_sequence = 'Asn';
+  let delta_sequence = 'GlcNAc(b1-N)';
+  let position = 'y1a';
+  let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
+  let reactionset = new ReactionSet();
+
+  let reaction = new IupacReaction();
+  reaction.sequence = sequence;
+  reactionset.addReactionRule(reaction);
+
+  let reactiongroup = new ReactionGroup();
+
+  reactiongroup.addReactionSet(reactionset);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+
+  let result = reactiongroup.supportsLinkageAt(test_sugar,'GlcNAc');
+  assert.deepEqual(result.anomer,['b']);
+  assert.deepEqual(result.linkage,[Monosaccharide.LINKAGES.N]);
 });
