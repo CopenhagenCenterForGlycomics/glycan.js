@@ -6,7 +6,7 @@ const CACHED_ICONS = new WeakMap();
 
 import Canvas from './CanvasCanvas';
 
-import rough from 'roughjs';
+import rough from 'roughjs/dist/rough.umd.js';
 
 const draw_path = (path,ctx,rc) => {
   if (path.rotate) {
