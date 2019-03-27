@@ -63,9 +63,9 @@ jobs:
         - restore_cache:
             key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
 
-      - run:
-          name: Show generated files
-          command: ls -1 dist
+        - run:
+            name: Show generated files
+            command: ls -1 dist
 
         # Install AWS cli
         - run:
