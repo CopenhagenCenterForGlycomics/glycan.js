@@ -80,9 +80,9 @@ jobs:
         - run:
             name: Deploy to S3
             command: |
-                aws --region us-east-1 s3 sync dist/glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js --delete
-                aws --region us-east-1 s3 sync dist/glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js-$CIRCLE_BRANCH --delete
-                aws --region us-east-1 s3 sync dist/glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js-$CIRCLE_SHA1 --delete
+                aws --region us-east-1 s3 cp dist/glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js
+                aws --region us-east-1 s3 cp dist/glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js-$CIRCLE_BRANCH
+                aws --region us-east-1 s3 cp dist/glycan-bundle.js s3://glycanjsbuilds/glycan-bundle.js-$CIRCLE_SHA1
 
 workflows:
     version: 2
