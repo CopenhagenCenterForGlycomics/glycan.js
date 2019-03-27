@@ -32,10 +32,15 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-        
+
       # run tests!
       - run: npm test
       - run: npm run-script build-web
+
+      - run:
+          name: Show generated files
+          command: ls -1 dist
+
 
       # Cache the dist folder for the deploy job
       - save_cache:
@@ -57,6 +62,11 @@ jobs:
         # dist folder that needs to be deployed
         - restore_cache:
             key: v1-dist-{{ .Environment.CIRCLE_BRANCH }}-{{ .Environment.CIRCLE_SHA1 }}
+
+      - run:
+          name: Show generated files
+          command: ls -1 dist
+
         # Install AWS cli
         - run:
             name: Install aws cli
