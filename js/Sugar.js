@@ -40,6 +40,13 @@ export default class Sugar {
     return Monosaccharide;
   }
 
+  freeze() {
+    Object.freeze(this);
+    for (let res of this.breadth_first_traversal()) {
+      Object.freeze(res);
+    }
+  }
+
   // FIXME - Matching residues (given a prototype, which residues match)
 
   // Positional description

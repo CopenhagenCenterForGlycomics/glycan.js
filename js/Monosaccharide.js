@@ -162,6 +162,9 @@ export default class Monosaccharide {
   }
 
   balance(ascend=true) {
+    if (Object.isFrozen(this)) {
+      throw new TypeError('Cannot balance child ordering of frozen monosaccharide');
+    }
     let child_order = reorder_kids(this.children);
     this[unknown_count_symbol] = 0;
     let unknown_count = 0;
@@ -191,6 +194,10 @@ export default class Monosaccharide {
   // methods:
   // add child
   addChild(linkage,child) {
+    if (Object.isFrozen(this) || Object.isFrozen(child)) {
+      throw new TypeError('Cannot add child on frozen monosaccharide');
+    }
+
     if ((typeof linkage) !== 'number') {
       throw new Error('Linkage must be number');
     }
@@ -252,6 +259,9 @@ export default class Monosaccharide {
   // remove child
   removeChild(new_linkage,target) {
     var self = this;
+    if (Object.isFrozen(self)) {
+      throw new TypeError('Cannot remove child on frozen monosaccharide');
+    }
 
     var kids = children_map.get(self);
 
@@ -274,6 +284,10 @@ export default class Monosaccharide {
   }
 
   replaceChild(child,new_child,override_position) {
+    if (Object.isFrozen(this) || Object.isFrozen(new_child) || Object.isFrozen(child)) {
+      throw new TypeError('Cannot replace child on frozen monosaccharide');
+    }
+
     let position = this.linkageOf(child);
     let parent_pos = child.parent_linkage;
     let anomer = child.anomer;
@@ -299,6 +313,10 @@ export default class Monosaccharide {
   }
 
   graft(child) {
+    if (Object.isFrozen(this) || Object.isFrozen(child)) {
+      throw new TypeError('Cannot graft child on frozen monosaccharide');
+    }
+
     let old_parent = child.parent;
     let linkage = old_parent.linkageOf(child);
     old_parent.removeChild(linkage,child);
