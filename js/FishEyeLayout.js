@@ -1,4 +1,4 @@
-import * as debug from 'debug-any-level';
+import debug from './Debug';
 
 import SugarAwareLayout from './SugarAwareLayout';
 

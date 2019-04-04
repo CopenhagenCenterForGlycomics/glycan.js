@@ -3,7 +3,7 @@
 
 import { Tween, autoPlay, onTick } from 'es6-tween';
 
-import * as debug from 'debug-any-level';
+import debug from './Debug';
 
 import Renderer from './Renderer';
 import Canvas from './CanvasCanvas';

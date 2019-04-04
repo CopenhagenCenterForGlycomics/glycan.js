@@ -3,12 +3,14 @@
   "version": "0.0.1",
   "description": "A tiny library for drawing glycans",
   "main": "./js/index.js",
+  "module": "./js/main.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
     "debug-any-level": "^0.3.0",
     "es6-tween": "^5.4.1",
+    "esm": "3.2.20",
     "roughjs": "^3.1.0"
   },
   "devDependencies": {

@@ -1,5 +1,6 @@
 'use strict';
-import * as debug from 'debug-any-level';
+
+import debug from './Debug';
 
 import Monosaccharide from './Monosaccharide';
 

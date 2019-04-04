@@ -1,7 +1,7 @@
 
 import Reaction from './Reaction';
 
-import * as debug from 'debug-any-level';
+import debug from './Debug';
 
 const reactions = Symbol('reactions');
 

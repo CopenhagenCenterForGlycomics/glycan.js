@@ -1,6 +1,6 @@
 'use strict';
 
-import * as debug from 'debug-any-level';
+import debug from './Debug';
 
 const module_string='glycanjs:svgcanvas';
 
