@@ -127,6 +127,7 @@ class Reaction extends Sugar {
   set comment(comment) {
     this[comment_symbol] = comment;
     parseReaction(this);
+    this.freeze();
   }
   get comment() {
     return this[comment_symbol];
