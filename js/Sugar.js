@@ -3,7 +3,7 @@ import Monosaccharide from './Monosaccharide';
 
 import { Tracer } from './Tracing';
 
-import Searcher from './Searching';
+import { CachingSearcher } from './Searching';
 
 import get_residue_chords from './residue_chords';
 
@@ -25,6 +25,8 @@ let onlyUnique = function(value, index, self) {
 
 let has_tag = (tag,res) => res.getTag(tag);
 
+const frozen_sequence_symbol = Symbol('frozen_sequence');
+
 export default class Sugar {
   constructor() {
   }
@@ -41,10 +43,14 @@ export default class Sugar {
   }
 
   freeze() {
-    Object.freeze(this);
     for (let res of this.breadth_first_traversal()) {
       Object.freeze(res);
     }
+    this[frozen_sequence_symbol] = this.sequence;
+    Object.defineProperty(this,'sequence', {
+      get: () => this[frozen_sequence_symbol]
+    });
+    Object.freeze(this);
   }
 
   // FIXME - Matching residues (given a prototype, which residues match)
@@ -112,7 +118,7 @@ export default class Sugar {
   }
 
   match_sugar_pattern(pattern,comparator) {
-    let return_roots = Searcher.search(this,pattern,comparator);
+    let return_roots = CachingSearcher.search(this,pattern,comparator);
     if (pattern.composition().map( res => res.identifier).filter( id => id === '*').length > 0) {
       return return_roots;
     }

@@ -6,7 +6,6 @@ let anomer_symbol = Symbol('anomer');
 let identifier_symbol = Symbol('identifier');
 let parent_linkage_symbol = Symbol('parent_linkage');
 let parent_symbol = Symbol('parent');
-let tags_symbol = Symbol('tags');
 
 const unknown_count_symbol = Symbol('unknown_count');
 const MAX_KNOWN_LINKAGE = 100;
@@ -75,6 +74,7 @@ const reorder_kids = function(children) {
 
 let linkage_map = new WeakMap();
 let children_map = new WeakMap();
+let tag_map = new WeakMap();
 
 export default class Monosaccharide {
   static get LINKAGES() {
@@ -337,8 +337,10 @@ export default class Monosaccharide {
   }
 
   setTag(tagname,value) {
-    this[tags_symbol] = this[tags_symbol] || {};
-    let tag_set = this[tags_symbol];
+    if (! tag_map.has(this) ) {
+      tag_map.set(this, {});
+    }
+    let tag_set = tag_map.get(this);
     let tag_symbol = (typeof tagname === 'symbol') ? tagname : Symbol(tagname);
     tag_set[tag_symbol] = (typeof value !== 'undefined') ? value : true;
     if (value === null) {
@@ -348,16 +350,21 @@ export default class Monosaccharide {
   }
 
   getTag(tag) {
-    if ( ! this[tags_symbol]) {
+    if (! tag_map.has(this) ) {
       return;
     }
-    return this[tags_symbol][tag];
+    let tag_set = tag_map.get(this);
+    return tag_set[tag];
   }
 
   copyTagsFrom(residue) {
-    this[tags_symbol] = this[tags_symbol] || {};
-    for (const tag of Object.getOwnPropertySymbols(residue[tags_symbol] || {})) {
-      this[tags_symbol][tag] = residue[tags_symbol][tag];
+    if (! tag_map.has(this) ) {
+      tag_map.set(this, {});
+    }
+    let tag_set = tag_map.get(this);
+
+    for (const tag of Object.getOwnPropertySymbols(tag_map.get(residue) || {})) {
+      tag_set[tag] = tag_map.get(residue)[tag];
     }
   }
 

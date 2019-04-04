@@ -1,6 +1,7 @@
 'use strict';
 
 import debug from './Debug';
+import MixedTupleMap from '../lib/MixedTupleMap';
 
 const module_string='glycanjs:searching';
 
@@ -154,9 +155,9 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
 class Searcher {
   static search(source,pattern,comparator) {
     if (pattern.composition().filter( res => res.identifier === '*' ).length > 0) {
-      return Searcher.search_wildcard_paths(source,pattern,comparator);
+      return this.search_wildcard_paths(source,pattern,comparator);
     }
-    return Searcher.search_fixed_paths(source,pattern,comparator);
+    return this.search_fixed_paths(source,pattern,comparator);
   }
   static search_wildcard_paths(source,pattern,comparator) {
     return match_wildcard_paths(source,pattern,comparator);
@@ -167,4 +168,43 @@ class Searcher {
 
 }
 
-export default Searcher;
+const cache_symbol = Symbol('cache_symbol');
+
+const WILDCARD = { type: 'wildcard'};
+const FIXED = { type: 'fixed'};
+
+class CachingSearcher extends Searcher {
+
+  static get Cache() {
+    if ( ! this[cache_symbol] ) {
+      this[cache_symbol] = new MixedTupleMap();
+    }
+    return this[cache_symbol];
+  }
+
+  static search_wildcard_paths(source,pattern,comparator) {
+    if (! Object.isFrozen(source) || ! Object.isFrozen(pattern) ) {
+      return super.search_wildcard_paths(source,pattern,comparator);
+    }
+    const tuple = [ source, pattern, comparator, WILDCARD ];
+
+    if (this.Cache.has(tuple)) {
+      return this.Cache.get(tuple);
+    }
+    this.Cache.set(tuple, super.search_wildcard_paths(source,pattern,comparator));
+    return this.Cache.get( tuple );
+  }
+  static search_fixed_paths(source,pattern,comparator) {
+    if (! Object.isFrozen(source) || ! Object.isFrozen(pattern) ) {
+      return super.search_fixed_paths(source,pattern,comparator);
+    }
+    const tuple = [ source, pattern, comparator, FIXED ];
+    if (this.Cache.has(tuple)) {
+      return this.Cache.get(tuple);
+    }
+    this.Cache.set(tuple,  super.search_fixed_paths(source,pattern,comparator));
+    return this.Cache.get( tuple );
+  }
+}
+
+export { CachingSearcher, Searcher };
