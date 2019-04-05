@@ -111,6 +111,17 @@ class SVGRenderer extends Renderer {
     return renderer;
   }
 
+  resetTags() {
+    for (let sugar of this.sugars) {
+      let container = this.rendered.get(sugar);
+      if (container.tagGroup) {
+        for (let el of [...container.tagGroup.element.childNodes]) {
+          container.appendChild(el);
+        }
+      }
+    }
+  }
+
   setupContainer(container,sugar) {
     const canvas = this.element;
 

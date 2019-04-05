@@ -304,6 +304,9 @@ class Renderer {
   }
 
   set groupTag(tag) {
+    if ( tag !== this[group_tag_symbol]) {
+      this.resetTags();
+    }
     this[group_tag_symbol] = tag;
   }
 
@@ -330,6 +333,9 @@ class Renderer {
   }
 
   setupContainer() {
+  }
+
+  resetTags() {
   }
 
   removeRendered() {
