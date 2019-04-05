@@ -257,7 +257,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       els_to_render.push(rendered_els.residue);
     }
     for (let el of els_to_render) {
-      container.tagGroup.appendChild(el);
+      container.tagGroup.appendChild(el.element);
     }
 
 

@@ -11,8 +11,6 @@ const log = debug(module_string);
 
 const container_symbol = Symbol('document_container');
 
-const rendered_sugars_symbol = Symbol('rendered_sugars');
-
 const SCALE = 100;
 
 const GLYCANJSNS = 'https://glycocode.com/glycanjs';
@@ -86,7 +84,7 @@ class SVGRenderer extends Renderer {
       }
       let sugar = new sugar_class();
       sugar.sequence = group.getAttribute('glycanjs:sequence');
-      renderer[rendered_sugars_symbol].push(sugar);
+      renderer.addSugar(sugar);
       renderer.rendered.set(sugar,renderer.element.group(group));
       for (let icon of group.querySelectorAll('use')) {
         if ( ! icon.hasAttribute('glycanjs:location') ) {
