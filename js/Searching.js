@@ -172,6 +172,7 @@ const cache_symbol = Symbol('cache_symbol');
 
 const WILDCARD = { type: 'wildcard'};
 const FIXED = { type: 'fixed'};
+const COMPOSITION = { type: 'composition'};
 
 class CachingSearcher extends Searcher {
 
@@ -180,6 +181,25 @@ class CachingSearcher extends Searcher {
       this[cache_symbol] = new MixedTupleMap();
     }
     return this[cache_symbol];
+  }
+
+  static search(source,pattern,comparator) {
+    if (! Object.isFrozen(source) || ! Object.isFrozen(pattern) ) {
+      return super.search(source,pattern,comparator);
+    }
+    if (! this.Cache.has([source, COMPOSITION])) {
+      this.Cache.set([source, COMPOSITION], source.composition().map( res => res.identifier));
+    }
+    if (! this.Cache.has([pattern, COMPOSITION])) {
+      this.Cache.set([pattern,COMPOSITION], pattern.composition().map( res => res.identifier ));
+    }
+    let pattern_composition = this.Cache.get([pattern,COMPOSITION]);
+    let source_composition = this.Cache.get([source,COMPOSITION]);
+    let composition_match = pattern_composition.every( res => res === '*' || source_composition.find( source_res => source_res === res ) !== null );
+    if ( ! composition_match ) {
+      return [];
+    }
+    return super.search(source,pattern,comparator);
   }
 
   static search_wildcard_paths(source,pattern,comparator) {

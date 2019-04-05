@@ -128,14 +128,20 @@ class ReactionSet {
   }
 }
 
-const create_reaction = (reaction_class,reac) => {
+const create_reaction = (reaction_class,cache,reac) => {
   if (reac.length < 1) {
     return;
   }
   let set = new ReactionSet();
   for ( let seq of reac ) {
-    let reac_obj = new reaction_class();
-    reac_obj.sequence = seq;
+    let reac_obj = null;
+    if (cache.has(seq)) {
+      reac_obj = cache.get(seq);
+    } else {
+      reac_obj = new reaction_class();
+      reac_obj.sequence = seq;
+      cache.set(seq,reac_obj);
+    }
     set.addReactionRule(reac_obj);
   }
   return set;
@@ -149,10 +155,11 @@ class ReactionGroup {
   static groupFromJSON(json,sugarclass) {
     let reaction_group = new this();
     const reaction_class = Reaction.CopyIO(new sugarclass());
+    const reaction_cache = new Map();
 
     for (let gene of Object.keys(json) ) {
       if (json[gene].reactions.length > 0) {
-        for (let set of json[gene].reactions.map( create_reaction.bind(null,reaction_class) )) {
+        for (let set of json[gene].reactions.map( create_reaction.bind(null,reaction_class,reaction_cache) )) {
           if (set) {
             reaction_group.addReactionSet(set);
           }
