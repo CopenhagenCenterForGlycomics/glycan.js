@@ -9,7 +9,12 @@ module.exports = {
     path: __dirname + '/dist'
   },
   module: {
-    rules: [{
+    rules: [
+    {
+      test: /sugars\.svg$/,
+      use: 'raw-loader'
+    },
+    {
       test: /\.js$/,
       use: {
         loader: 'babel-loader',

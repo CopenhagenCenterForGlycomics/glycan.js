@@ -19,7 +19,9 @@ const supported_events = 'mousemove mousedown mouseup click touchstart touchend 
 
 const PRECISION = 1;
 
-let SYMBOLPATH = 'sugars.svg';
+const isNodejs = () => { return typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node !== 'undefined'; };
+
+const SYMBOLS_DEF = ( ! isNodejs() ) ? require('!raw-loader!../sugars.svg').default : '';
 
 const str = (num) => num.toFixed(PRECISION);
 
@@ -57,12 +59,8 @@ class SVGRenderer extends Renderer {
 
   }
 
-  static set SYMBOLSOURCE(url) {
-    SYMBOLPATH = url;
-  }
-
-  static get SYMBOLSOURCE() {
-    return SYMBOLPATH;
+  static get SYMBOLS() {
+    return SYMBOLS_DEF;
   }
 
 
@@ -181,7 +179,7 @@ class SVGRenderer extends Renderer {
   }
 
   renderIcon(container,residue,sugar) {
-    let icon = container.use(`${this.symbolpath || this.constructor.SYMBOLSOURCE}#${residue.identifier.toLowerCase()}`,0,0,1,1);
+    let icon = container.use(`#${residue.identifier.toLowerCase()}`,0,0,1,1);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');

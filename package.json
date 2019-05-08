@@ -24,6 +24,7 @@
     "karma-webpack": "^3.0.5",
     "precommit-hook": "^3.0.0",
     "qunit": "^2.9.2",
+    "raw-loader": "^2.0.0",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"
