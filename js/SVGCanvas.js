@@ -15,7 +15,8 @@ const str = (num) => num.toFixed(PRECISION);
 class SVGCanvas {
   constructor(container) {
     log.info('Creating canvas element');
-    this.canvas = this.createElement('svg',container.ownerDocument);
+    let is_defs = container.nodeName === 'DEFS';
+    this.canvas = this.createElement(is_defs ? 'symbol' : 'svg',container.ownerDocument);
     this.canvas.setAttribute('xmlns:xlink','http://www.w3.org/1999/xlink');
     container.appendChild(this.canvas);
   }

@@ -19,6 +19,8 @@ const supported_events = 'mousemove mousedown mouseup click touchstart touchend 
 
 const PRECISION = 1;
 
+const DEFAULT_PADDING= { side: 1, top: 1 };
+
 const isNodejs = () => { return typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node !== 'undefined'; };
 
 const SYMBOLS_DEF = ( ! isNodejs() ) ? require('../sugars.svg').default : '';
@@ -179,7 +181,8 @@ class SVGRenderer extends Renderer {
   }
 
   renderIcon(container,residue,sugar) {
-    let icon = container.use(`#${residue.identifier.toLowerCase()}`,0,0,1,1);
+    let symbol_prefix = this.icon_prefix ? `${this.icon_prefix}_` : '';
+    let icon = container.use(`#${symbol_prefix}${residue.identifier.toLowerCase()}`,0,0,1,1);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');
@@ -196,14 +199,13 @@ class SVGRenderer extends Renderer {
     icon.element.setAttribute('transform',transform);
   }
 
-  scaleToFit() {
-    const PADDING=1;
+  scaleToFit(padding=DEFAULT_PADDING) {
     let svg = this.element.canvas;
     let bb=svg.getBBox();
-    let bbx=bb.x-(SCALE*PADDING);
-    let bby=bb.y-(SCALE*PADDING);
-    let bbw=bb.width+(2*SCALE*PADDING);
-    let bbh=bb.height+(2*SCALE*PADDING);
+    let bbx=bb.x-(SCALE*padding.side);
+    let bby=bb.y-(SCALE*padding.top);
+    let bbw=bb.width+(2*SCALE*padding.side);
+    let bbh=bb.height+(2*SCALE*padding.top);
     let vb=[bbx,bby,bbw,bbh];
     svg.setAttribute('viewBox', vb.join(' ') );
     svg.setAttribute('preserveAspectRatio','xMidYMid meet');
