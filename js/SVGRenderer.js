@@ -21,7 +21,7 @@ const PRECISION = 1;
 
 const isNodejs = () => { return typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node !== 'undefined'; };
 
-const SYMBOLS_DEF = ( ! isNodejs() ) ? require('!raw-loader!../sugars.svg').default : '';
+const SYMBOLS_DEF = ( ! isNodejs() ) ? require('../sugars.svg').default : '';
 
 const str = (num) => num.toFixed(PRECISION);
 
