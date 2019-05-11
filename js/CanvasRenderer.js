@@ -203,13 +203,12 @@ const wire_canvas_events = function(canvas,callback) {
 };
 
 const handle_events = function(canvas,event) {
-  const ROTATE = this.rotate;
   if (event.clientX) {
     let transformed = canvas.cm.getPos(event);
     let xpos = transformed.x / SCALE;
     let ypos = transformed.y / SCALE;
-    event.sugarX = ROTATE ? ((-1*ypos) + 1) : xpos;
-    event.sugarY = ROTATE ? xpos : ypos;
+    event.sugarX = xpos;
+    event.sugarY = ypos;
   }
 };
 
