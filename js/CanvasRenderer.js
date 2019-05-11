@@ -1,4 +1,4 @@
-/*global document,fetch,Event*/
+/*global document,Event*/
 'use strict';
 
 import { Tween, autoPlay, onTick } from 'es6-tween';
@@ -14,7 +14,9 @@ const module_string='glycanjs:canvasrenderer';
 
 const container_symbol = Symbol('document_container');
 
-let SYMBOLPATH = 'sugars.svg';
+const isNodejs = () => { return typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node !== 'undefined'; };
+
+const SYMBOLS_DEF = ( ! isNodejs() ) ? require('../sugars.svg').default : '';
 
 const SCALE = 100;
 
@@ -93,12 +95,14 @@ const render = function(canvas,renderobj) {
   let min_y = Math.min(...coords.y)-100;
   let max_y = Math.max(...coords.y)+100;
 
-  canvas.width = (max_x - min_x);
-  canvas.height = (max_y - min_y);
+  let scale = 1;
+
+  canvas.width = scale*(max_x - min_x);
+  canvas.height = scale*(max_y - min_y);
 
   let ctx = canvas.getContext('2d');
 
-  let scale = 1;
+
 
   ctx.setTransform(scale,0,0,scale,-1*min_x,-1*min_y);
 
@@ -173,12 +177,11 @@ const extract_paths = (symbol) => {
 };
 
 
-const import_icons = function(sugarpath) {
+const import_icons = function() {
   let icons = document.createElement('svg');
   this.symbols = {};
-  return fetch(sugarpath)
-  .then((response) => response.text())
-  .then( (xml) => icons.innerHTML = xml )
+  return Promise.resolve()
+  .then( () => icons.innerHTML = SYMBOLS_DEF )
   .then( () => {
     for (let symbol of icons.querySelectorAll('defs symbol')) {
       let symboltext = symbol.innerHTML.replace(/#/g,'%23');
@@ -259,6 +262,7 @@ class CanvasRenderer extends Renderer {
       }
     });
 
+    this.ready = import_icons.call(this);
 
     if (container) {
       this[container_symbol] = container;
@@ -275,22 +279,8 @@ class CanvasRenderer extends Renderer {
     }
   }
 
-  set symbolpath(path) {
-    this.ready = import_icons.call(this,path);
-    this.symbpath = path;
-  }
-
-  get symbolpath() {
-    return this.symbpath;
-  }
-
-
-  static set SYMBOLSOURCE(url) {
-    SYMBOLPATH = url;
-  }
-
-  static get SYMBOLSOURCE() {
-    return SYMBOLPATH;
+  static get SYMBOLS() {
+    return SYMBOLS_DEF;
   }
 
   static get GLOBAL_SCALE() {
