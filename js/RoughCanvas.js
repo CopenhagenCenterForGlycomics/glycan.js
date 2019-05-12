@@ -58,8 +58,9 @@ const render_icon = function(canvas) {
       }
       CACHED_ICONS.set(this,offscreen);
     }
-
-    ctx.drawImage(CACHED_ICONS.get(this),0,0);
+    ctx.translate(50,50);
+    ctx.rotate(Math.PI / 180 * this.rotate );
+    ctx.drawImage(CACHED_ICONS.get(this),-50,-50);
 
     ctx.restore();
   }
