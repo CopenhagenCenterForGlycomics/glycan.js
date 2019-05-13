@@ -15,7 +15,13 @@ Red  #ed1c24
 -->
   <defs>
     <symbol id="hexnac_base" viewBox="0 0 100 100">
-      <rect x="10" y="10" width="80" height="80" />
+      <rect x="10" y="10" width="80" height="80" style="fill: var(--fill-colour); stroke: var(--stroke-colour); stroke-width: var(--stroke-width);" />
+    </symbol>
+    <symbol id="hex_base" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" style="fill: var(--fill-colour); stroke: var(--stroke-colour); stroke-width: var(--stroke-width);"/>
+    </symbol>
+    <symbol id="sia_base" viewBox="0 0 100 100">
+      <rect x="17" y="17" transform="rotate(45,50,50)" width="66" height="66" style="fill: var(--fill-colour); stroke: var(--stroke-colour); stroke-width: var(--stroke-width);"/>
     </symbol>
     <symbol id="hexnac" viewBox="0 0 100 100">
       <rect x="10" y="10" width="80" height="80" fill="#fff" stroke-width="3" stroke="#000"/>
@@ -25,9 +31,6 @@ Red  #ed1c24
     </symbol>
     <symbol id="glcnac" viewBox="0 0 100 100">
       <rect x="10" y="10" width="80" height="80" fill="#0090bc" stroke-width="1" stroke="#000"/>
-    </symbol>
-    <symbol id="light_galnac" viewBox="0 0 100 100">
-      <rect x="10" y="10" width="80" height="80" fill="#ffffB3" stroke-width="10" stroke="#a6a635"/>
     </symbol>
     <symbol id="man" viewBox="0 0 100 100">
       <circle cx="50" cy="50" fill="#00a651" r="40" stroke-width="1" stroke="#000"/>
