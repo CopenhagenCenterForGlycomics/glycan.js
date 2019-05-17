@@ -58,7 +58,6 @@ let map_leaf_originals = function(trees,wildcard_symbol) {
   for (let tree of trees) {
     for (let leaf of tree.leaves()) {
       if (leaf.getTag(wildcard_symbol)) {
-        log.info('Wildcard position is',leaf.original.identifier);
         result.set(leaf.original,tree);
         if (leaf.parent) {
           result.set(leaf.parent.original,tree);
@@ -89,14 +88,15 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
     wildcard.setTag(wildcard_symbol,true);
   });
 
+  log.info('Root sugar for wildcard matching',root_sugar.sequence);
+  log.info('We have',wildcard_subtrees.length,'wildcard subtrees to ensure matches for');
   wildcard_subtrees.forEach( subtree_set => subtree_set.forEach( subtree => {
     let mono_class = subtree.constructor.Monosaccharide;
     let new_root = new mono_class('*');
     new_root.addChild(subtree.linkage,subtree.root);
     subtree.root = new_root;
-    log.info('Subtree search',subtree.sequence);
+    log.info('Wildcard subtree sequence:',subtree.sequence);
   }));
-  log.info('Wildcard matching root',sugar.sequence,root_sugar.sequence);
   let root_result = match_fixed_paths(sugar,root_sugar, comparator);
 
   // Get a set of subtrees for the matches
@@ -104,17 +104,19 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
   let root_trees = flatten(root_result.map( root => {
     return sugar.trace(root_sugar, root, comparator);
   }));
-  log.info('Sequences of root sequence matched',root_trees.map( rt => rt.sequence ));
+  log.info('RESULTS from matching Root sugar, total of',root_trees.length,'trees matched');
   root_trees.forEach( rt => {
+    log.info('RESULT Root sugar match sequence',rt.sequence);
     let wildcard = rt.composition_for_tag(wildcard_symbol)[0];
-    log.info('Wildcard for root tree is',wildcard,'with parent',wildcard.parent ? wildcard.parent.identifier : '(No root)');
+    log.info('The residue acting as wildcard is',wildcard,'with parent',wildcard.parent ? wildcard.parent.identifier : '(No root)');
   });
   // Grab the original leaves for the root match subtrees
   let root_trees_by_leaf_original = map_leaf_originals(root_trees,wildcard_symbol);
   let result = wildcard_subtrees.map( subtree_set => {
     return subtree_set.map( subtree => {
       let roots = match_fixed_paths(sugar,subtree, comparator);
-      log.info('Subtree match roots',subtree.linkage,subtree.sequence,roots.map( r => r.identifier ));
+      log.info('For subtree',subtree.sequence,'we matched roots',roots.map( r => r.identifier ));
+      log.info('We should be able to match each of these roots with a Root sugar match');
       roots = roots.filter(root => ((! root.parent) || subtree.parent_link == 0 || (root.parent.linkageOf(root) == subtree.parent_link)) )
                    .map( root => {
                       let parents = [...sugar.residues_to_root(root)];
@@ -125,7 +127,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
                       }
                    })
                    .filter( r => r );
-      log.info('Subtrees that are a parent of a root match',roots);
+      log.info('Subtrees that are a parent of a root match',roots.map( r => r.identifier ));
       let result_trees = roots.map( root_pair => {
         let subtree_results = sugar.trace(subtree, root_pair.root, comparator );
         let traced_parent = root_trees_by_leaf_original.get(root_pair.parent_leaf);
