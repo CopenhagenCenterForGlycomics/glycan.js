@@ -2,6 +2,8 @@
 // Generated on Mon Apr 20 2015 22:29:04 GMT+0200 (CEST)
 const webpack = require('./webpack.config.js');
 
+webpack.devtool = 'inline-source-map';
+webpack.mode = 'development';
 
 const DEFAULT_TEST_FILES = [
       'lib/**/*.js',
@@ -30,7 +32,7 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['qunit'],
 
-    plugins: ['karma-qunit','karma-webpack','karma-chrome-launcher'],
+    plugins: ['karma-qunit','karma-webpack','karma-chrome-launcher','karma-sourcemap-loader'],
 
     browserify : {
       debug: true,
@@ -56,10 +58,10 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'js/**/*.js' : ['webpack'],
-        'lib/**/*.js' : ['webpack'],
-        'test/**/test.js' : ['webpack'],
-        'test/**/test-*.js' : ['webpack']
+        'js/**/*.js' : ['webpack','sourcemap'],
+        'lib/**/*.js' : ['webpack','sourcemap'],
+        'test/**/test.js' : ['webpack','sourcemap'],
+        'test/**/test-*.js' : ['webpack','sourcemap']
     },
 
 

@@ -85,7 +85,10 @@ let parseReaction = (sugar) => {
 let find_sugar_substrates = function(sugar) {
   // The attachment tag is part of the reaction
   let substrates = sugar.match_sugar_pattern(this,comparator) || [];
-  return substrates.map( match => match.composition_for_tag(this.attachment_tag)[0].original );
+  return substrates.map( match => {
+    let first_tagged = match.composition_for_tag(this.attachment_tag)[0] || {};
+    return first_tagged.original;
+  }).filter( r => r );
 };
 
 let execute = function(sugar) {

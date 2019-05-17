@@ -21,6 +21,7 @@
     "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-qunit": "^3.0.0",
+    "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
     "precommit-hook": "^3.0.0",
     "qunit": "^2.9.2",

@@ -77,7 +77,7 @@ QUnit.test( 'Make reaction matching less specific' , function( assert ) {
 
 //   let test_sugar = new IupacSugar();
 
-//   test_sugar.sequence = 'Gal(b1-3)GlcNAc(b1-3)*' ;
+//   test_sugar.sequence = 'Gal(b1-3)GlcNAc(b1-3)*(u1-?)*' ;
 
 //   assert.ok(test_sugar.composition_for_tag(group.supportLinkages(test_sugar)).length > 0,'Can support');
 
