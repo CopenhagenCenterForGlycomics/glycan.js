@@ -2,6 +2,23 @@
 // Generated on Mon Apr 20 2015 22:29:04 GMT+0200 (CEST)
 const webpack = require('./webpack.config.js');
 
+
+const DEFAULT_TEST_FILES = [
+      'lib/**/*.js',
+      'js/**/*.js',
+      'test/test.js'
+    ];
+
+// karma.conf.js
+function getSpecs(specList) {
+    if (specList) {
+        return [].concat(DEFAULT_TEST_FILES).concat(specList.split(','));
+    } else {
+        return [].concat(DEFAULT_TEST_FILES).concat('test/**/test-*.js');
+    }
+}
+
+
 module.exports = function(config) {
   config.set({
 
@@ -23,13 +40,7 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     // Load in our transpiled files first, to make sure
     // that the polyfills are loaded, ready for the tests.
-    files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
-      'lib/**/*.js',
-      'js/**/*.js',
-      'test/test.js',
-      'test/**/test-*.js'
-    ],
+    files: getSpecs(process.env.KARMA_SPECS),
 
     client: {
         qunit: { debug: process.env.DEBUG }
