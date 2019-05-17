@@ -1,5 +1,6 @@
 // Karma configuration
 // Generated on Mon Apr 20 2015 22:29:04 GMT+0200 (CEST)
+const webpack = require('./webpack.config.js');
 
 module.exports = function(config) {
   config.set({
@@ -39,6 +40,7 @@ module.exports = function(config) {
         'js/index.js'
     ],
 
+    webpack,
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
