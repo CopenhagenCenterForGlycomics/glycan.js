@@ -60,25 +60,25 @@ QUnit.test( 'Make reaction matching less specific' , function( assert ) {
 });
 
 
-// QUnit.test( 'Reaction matching less specific with a wildcard' , function( assert ) {
-//   let base_sequence = 'GlcNAc(b1-3)*(u1-?)Specific';
-//   let delta_sequence = 'Gal(b1-3)';
-//   let position = 'y2a';
-//   let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
-//   let reaction = new IupacReaction();
-//   reaction.sequence = sequence;
-//   let reactionset = new ReactionSet();
+QUnit.test( 'Reaction matching less specific with a wildcard' , function( assert ) {
+  let base_sequence = 'GlcNAc(b1-3)*(u1-?)Specific';
+  let delta_sequence = 'Gal(b1-3)';
+  let position = 'y3a';
+  let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
+  let reaction = new IupacReaction();
+  reaction.sequence = sequence;
+  let reactionset = new ReactionSet();
 
-//   reactionset.addReactionRule(reaction);
+  reactionset.addReactionRule(reaction);
 
-//   let group = new ReactionGroup();
+  let group = new ReactionGroup();
 
-//   group.addReactionSet(reactionset);
+  group.addReactionSet(reactionset);
 
-//   let test_sugar = new IupacSugar();
+  let test_sugar = new IupacSugar();
 
-//   test_sugar.sequence = 'Gal(b1-3)GlcNAc(b1-3)*(u1-?)*' ;
+  test_sugar.sequence = 'Gal(b1-3)GlcNAc(b1-3)*(u1-?)*' ;
 
-//   assert.ok(test_sugar.composition_for_tag(group.supportLinkages(test_sugar)).length > 0,'Can support');
+  assert.ok(test_sugar.composition_for_tag(group.supportLinkages(test_sugar)).length > 0,'Can support with placeholders');
 
-// });
+});

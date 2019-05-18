@@ -56,11 +56,14 @@ let match_fixed_paths = function(sugar,pattern,comparator) {
 let map_leaf_originals = function(trees,wildcard_symbol) {
   let result = new WeakMap();
   for (let tree of trees) {
+    log.info('For a Root tree match',tree.sequence,'we are finding wildcard leaves');
     for (let leaf of tree.leaves()) {
       if (leaf.getTag(wildcard_symbol)) {
         result.set(leaf.original,tree);
+        log.info('Adding leaf',leaf.original.identifier,' to tree mapping');
         if (leaf.parent) {
           result.set(leaf.parent.original,tree);
+          log.info('Adding leaf parent',leaf.parent.original.identifier,' to tree mapping');
         }
       }
     }
@@ -119,6 +122,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       log.info('We should be able to match each of these roots with a Root sugar match');
       roots = roots.filter(root => ((! root.parent) || subtree.parent_link == 0 || (root.parent.linkageOf(root) == subtree.parent_link)) )
                    .map( root => {
+                      log.info('The parents of ',root.identifier,root.parent,' are being checked for being leaves of any root tree');
                       let parents = [...sugar.residues_to_root(root)];
                       for (let parent of parents) {
                         if (root_trees_by_leaf_original.get(parent)) {
@@ -127,21 +131,21 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
                       }
                    })
                    .filter( r => r );
-      log.info('Subtrees that are a parent of a root match',roots.map( r => r.identifier ));
+      log.info('Number of subtrees that are a parent of a root match',roots.length);
       let result_trees = roots.map( root_pair => {
         let subtree_results = sugar.trace(subtree, root_pair.root, comparator );
         let traced_parent = root_trees_by_leaf_original.get(root_pair.parent_leaf);
         let wildcard_res = root_sugar.composition_for_tag(wildcard_symbol)[0];
         let grafted_results = [];
+        log.info('Matched after tracing',subtree_results);
         for (let traced_subtree of subtree_results) {
           let result_tree = traced_parent.clone();
           let graft_residue = result_tree.composition_for_tag(wildcard_symbol)[0];
-          let mono_class = result_tree.constructor.Monosaccharide;
-          let new_wildcard = new mono_class(wildcard_res);
-          traced_subtree.root.original = new_wildcard;
+          traced_subtree.root.original = wildcard_res;
           if (graft_residue === result_tree.root) {
             result_tree.root = traced_subtree.root;
           } else {
+            traced_subtree.root.copyTagsFrom(graft_residue);
             graft_residue.parent.replaceChild(graft_residue,traced_subtree.root,0);
           }
           grafted_results.push(result_tree);
@@ -151,6 +155,7 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       return flatten(result_trees);
     });
   });
+  log.info('Found',flatten(flatten(result)).length,'matching trees');
   return flatten(flatten(result));
 };
 

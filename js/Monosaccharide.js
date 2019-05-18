@@ -338,13 +338,13 @@ export default class Monosaccharide {
 
   setTag(tagname,value) {
     if (! tag_map.has(this) ) {
-      tag_map.set(this, {});
+      tag_map.set(this, new Map());
     }
     let tag_set = tag_map.get(this);
     let tag_symbol = (typeof tagname === 'symbol') ? tagname : Symbol(tagname);
-    tag_set[tag_symbol] = (typeof value !== 'undefined') ? value : true;
+    tag_set.set(tag_symbol,(typeof value !== 'undefined') ? value : true );
     if (value === null) {
-      delete tag_set[tag_symbol];
+      tag_set.delete(tag_symbol);
     }
     return tag_symbol;
   }
@@ -354,17 +354,17 @@ export default class Monosaccharide {
       return;
     }
     let tag_set = tag_map.get(this);
-    return tag_set[tag];
+    return tag_set.get(tag);
   }
 
   copyTagsFrom(residue) {
     if (! tag_map.has(this) ) {
-      tag_map.set(this, {});
+      tag_map.set(this, new Map());
     }
     let tag_set = tag_map.get(this);
 
-    for (const tag of Object.getOwnPropertySymbols(tag_map.get(residue) || {})) {
-      tag_set[tag] = tag_map.get(residue)[tag];
+    for (const tag of (tag_map.get(residue) || new Map()).keys() ) {
+      tag_set.set(tag, tag_map.get(residue).get(tag));
     }
   }
 
