@@ -251,6 +251,9 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     let els_to_render = [];
     for (let residue of sugar.composition_for_tag(this.groupTag) ) {
       let rendered_els = this.rendered.get(residue);
+      if ( ! rendered_els ) {
+        continue;
+      }
       if (rendered_els.linkage) {
         container.tagGroup.appendChild(rendered_els.linkage);
       }
