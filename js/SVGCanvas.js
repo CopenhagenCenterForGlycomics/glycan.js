@@ -72,6 +72,11 @@ class SVGCanvas {
     for (let key of Object.keys(options)) {
       a_line.setAttribute(key,options[key]);
     }
+    let [fill_style,stroke_style,stroke_width] = [ options.fill ? `fill: var(--fill-color,${options.fill});` : '',
+                                                   options.stroke ? `stroke: var(--stroke-color,${options.stroke});` : '',
+                                                   options['stroke-width'] ? `stroke-width: var(--stroke-width,${options['stroke-width']})` : ''
+                                                 ];
+    a_line.setAttribute('style',`${fill_style}${stroke_style}${stroke_width}`);
     this.appendChild(a_line);
     return a_line;
   }
