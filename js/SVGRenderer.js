@@ -143,6 +143,18 @@ class SVGRenderer extends Renderer {
       for (let el of container.tagGroup.element.childNodes) {
         container.appendChild(el);
       }
+      let tag_element_style = container.tagGroup.element.ownerDocument.defaultView.getComputedStyle(container.tagGroup.element);
+      if (tag_element_style) {
+        let zindex = tag_element_style.getPropertyValue('--zindex').trim() || 0;
+        zindex = parseInt(zindex);
+        let parent = container.tagGroup.element.parentElement;
+        if (zindex < 0) {
+          parent.insertBefore(container.tagGroup.element, parent.firstChild);
+        }
+        if (zindex > 0) {
+          parent.insertBefore(container.tagGroup.element, null);
+        }
+      }
     }
     return container;
   }
