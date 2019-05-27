@@ -62,6 +62,33 @@ QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
   assert.ok(supported.map( res => res.identifier ).join(',') === 'New,New,New');
 });
 
+QUnit.test( 'Test negative reaction for bisecting GlcNAc' , function( assert ) {
+  let base_sequence = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
+  let delta_sequence = 'GlcNAc(b1-4)';
+  let position = 'y3a';
+  let sequence = `${base_sequence}+"!{${delta_sequence}}@${position}"`;
+  let reaction = new IupacReaction();
+  reaction.sequence = sequence;
+  assert.ok(reaction.negative, 'Reaction is a negative reaction');
+  let reaction_positive = new IupacReaction();
+  reaction_positive.sequence = `${base_sequence}+"{Fuc(a1-6)}@${position}"`;
+  let reactionset = new ReactionSet();
+  reactionset.addReactionRule(reaction_positive);
+  reactionset.addReactionRule(reaction);
+
+  let reactiongroup = new ReactionGroup();
+
+  reactiongroup.addReactionSet(reactionset);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc';
+
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  console.log(supported);
+});
+
+
 
 QUnit.test( 'We can check if a group supports an operation' , function( assert ) {
   let base_sequence = 'Gal(b1-2)*';
