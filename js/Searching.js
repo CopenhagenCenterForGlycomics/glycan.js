@@ -180,6 +180,7 @@ const cache_symbol = Symbol('cache_symbol');
 const WILDCARD = { type: 'wildcard'};
 const FIXED = { type: 'fixed'};
 const COMPOSITION = { type: 'composition'};
+const TRACE = { type: 'trace'};
 
 class CachingSearcher extends Searcher {
 
@@ -234,4 +235,19 @@ class CachingSearcher extends Searcher {
   }
 }
 
-export { CachingSearcher, Searcher };
+const CacheTrace = (sugar,pattern,root,comparator) => {
+  if (! Object.isFrozen(sugar) || ! Object.isFrozen(pattern) ) {
+    return sugar.trace(pattern,root,comparator);
+  }
+  const tuple = [ sugar, pattern, root, comparator, TRACE ];
+
+  const cache = CachingSearcher.Cache;
+
+  if ( ! cache.has(tuple) ) {
+    cache.set(tuple, sugar.trace(pattern,root,comparator) );
+  }
+
+  return cache.get(tuple).map( traced => traced.clone() );
+};
+
+export { CachingSearcher, Searcher, CacheTrace };

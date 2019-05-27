@@ -3,7 +3,7 @@ import Monosaccharide from './Monosaccharide';
 
 import { Tracer } from './Tracing';
 
-import { CachingSearcher } from './Searching';
+import { CachingSearcher, CacheTrace } from './Searching';
 
 import get_residue_chords from './residue_chords';
 
@@ -26,6 +26,7 @@ let onlyUnique = function(value, index, self) {
 let has_tag = (tag,res) => res.getTag(tag);
 
 const frozen_sequence_symbol = Symbol('frozen_sequence');
+const frozen_composition_symbol = Symbol('frozen_composition');
 
 export default class Sugar {
   constructor() {
@@ -47,6 +48,19 @@ export default class Sugar {
       Object.freeze(res);
     }
     this[frozen_sequence_symbol] = this.sequence;
+    this[frozen_composition_symbol] = this.composition();
+
+    Object.defineProperty(this,'composition', {
+      value: (root=this.root) => {
+        if (root === this.root) {
+          return this[frozen_composition_symbol];
+        } else {
+          return this.constructor.prototype.composition.call(this,root);
+        }
+      }
+    });
+
+
     Object.defineProperty(this,'sequence', {
       get: () => this[frozen_sequence_symbol]
     });
@@ -122,7 +136,7 @@ export default class Sugar {
     if (pattern.composition().map( res => res.identifier).filter( id => id === '*').length > 0) {
       return return_roots;
     }
-    let return_sugars = flatten(return_roots.map( root => this.trace(pattern,root,comparator)));
+    let return_sugars = flatten(return_roots.map( root => CacheTrace(this,pattern,root,comparator)));
     return return_sugars;
   }
 

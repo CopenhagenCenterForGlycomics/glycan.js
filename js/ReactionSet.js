@@ -1,6 +1,9 @@
 
 import Reaction from './Reaction';
 
+import { CacheTrace } from './Searching';
+
+
 import debug from './Debug';
 
 const reactions = Symbol('reactions');
@@ -46,7 +49,7 @@ let comparator = (a,b) => {
 let filter_with_delta = function(attachments,sugar) {
   let delta = this.delta;
   let matched_attachments = attachments.map( res => {
-    let trees = sugar.trace(delta,res,comparator);
+    let trees = CacheTrace(sugar,delta,res,comparator);
     trees = trees.filter( match_root_original(res) );
     return trees;
   }).filter( trace_result => trace_result.length > 0 );
@@ -147,6 +150,8 @@ const create_reaction = (reaction_class,cache,reac) => {
   return set;
 };
 
+const reaction_cache = new Map();
+
 class ReactionGroup {
   constructor() {
     this[reactionset] = [];
@@ -155,7 +160,6 @@ class ReactionGroup {
   static groupFromJSON(json,sugarclass) {
     let reaction_group = new this();
     const reaction_class = Reaction.CopyIO(new sugarclass());
-    const reaction_cache = new Map();
 
     for (let gene of Object.keys(json) ) {
       if (json[gene].reactions.length > 0) {
