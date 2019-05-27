@@ -63,15 +63,12 @@ QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
 });
 
 QUnit.test( 'Test negative reaction for bisecting GlcNAc' , function( assert ) {
-  let base_sequence = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
-  let delta_sequence = 'GlcNAc(b1-4)';
-  let position = 'y3a';
-  let sequence = `${base_sequence}+"!{${delta_sequence}}@${position}"`;
+  let sequence = `GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc+"!{Fuc(a1-6)}@y1a"`;
   let reaction = new IupacReaction();
   reaction.sequence = sequence;
   assert.ok(reaction.negative, 'Reaction is a negative reaction');
   let reaction_positive = new IupacReaction();
-  reaction_positive.sequence = `${base_sequence}+"{Fuc(a1-6)}@${position}"`;
+  reaction_positive.sequence = `GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc+"{Fuc(a1-6)}@y1a"`;
   let reactionset = new ReactionSet();
   reactionset.addReactionRule(reaction_positive);
   reactionset.addReactionRule(reaction);
@@ -83,9 +80,17 @@ QUnit.test( 'Test negative reaction for bisecting GlcNAc' , function( assert ) {
   let test_sugar = new IupacSugar();
   test_sugar.sequence = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc';
 
-  let supported_tag = reactiongroup.supportLinkages(test_sugar);
-  let supported = test_sugar.composition_for_tag(supported_tag);
-  console.log(supported);
+
+  let test_sugar_positive = new IupacSugar();
+  test_sugar_positive.sequence = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc';
+
+  let supported = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+  assert.ok(supported.length == 0,'No supported residues for negative sequence');
+
+  supported = test_sugar_positive.composition_for_tag(reactiongroup.supportLinkages(test_sugar_positive));
+
+  assert.ok(supported.length == 1,'Supported residues for positive sequence');
+
 });
 
 
