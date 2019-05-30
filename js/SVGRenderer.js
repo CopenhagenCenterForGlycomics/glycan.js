@@ -27,6 +27,44 @@ const SYMBOLS_DEF = ( ! isNodejs() ) ? require('../sugars.svg').default : '';
 
 const str = (num) => num.toFixed(PRECISION);
 
+const upgrade_symbol_elements = (canvas,symbols) => {
+  for (let symbol of canvas.querySelectorAll('symbol')) {
+    symbol.parentNode.removeChild(symbol);
+  }
+  let icons = canvas.ownerDocument.createElement('div');
+  icons.innerHTML = symbols.replace(/<\?.*\?>/,'');
+  for (let defs of icons.querySelectorAll('defs')) {
+    canvas.appendChild(defs);
+  }
+};
+
+const use_css_variables = (canvas) => {
+  for (let shape of canvas.querySelectorAll('symbol *[fill]')) {
+    let fill = shape.getAttribute('fill');
+    let strokeWidth = shape.getAttribute('stroke-width');
+    let stroke = shape.getAttribute('stroke');
+    if (fill) {
+      shape.style.fill = `var(--fill-color,${fill})`;
+    }
+    if (strokeWidth) {
+      shape.style.strokeWidth = `var(--stroke-width,${strokeWidth})`;
+    }
+    if (stroke) {
+      shape.style.stroke = `var(--stroke-color,${stroke})`;
+    }
+  }
+  for (let line of canvas.querySelectorAll('g[*|location] line')) {
+    let strokeWidth = line.getAttribute('stroke-width');
+    let stroke = line.getAttribute('stroke');
+    if (strokeWidth) {
+      line.style.strokeWidth = `var(--stroke-width,${strokeWidth})`;
+    }
+    if (stroke) {
+      line.style.stroke = `var(--stroke-color,${stroke})`;
+    }
+  }
+};
+
 const wire_canvas_events = function(canvas,callback) {
   for (let target of supported_events.split(' ')) {
     canvas.addEventListener( target, callback, { passive: true, capture: true } );
@@ -75,6 +113,9 @@ class SVGRenderer extends Renderer {
 
     renderer[container_symbol] = element.parentNode;
     renderer.element = new SVGCanvas(element);
+
+    upgrade_symbol_elements(element,SVGRenderer.SYMBOLS);
+    use_css_variables(element);
 
     wire_canvas_events(element, handle_events.bind(renderer,element), { passive:true, capture:false } );
     let sugar_elements = element.querySelectorAll('g');
