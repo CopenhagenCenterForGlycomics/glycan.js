@@ -131,6 +131,31 @@ QUnit.test( 'We can check if a group supports an operation' , function( assert )
   assert.deepEqual(result.substrate,[]);
 });
 
+QUnit.test( 'Test if we can support short reactions' , function( assert ) {
+  let base_sequence = 'Gal(u?-?)*';
+  let search_sequence = 'Gal(b1-3)GlcNAc(b1-3)Gal(b1-3)GalNAc(a1-O)Ser';
+  let delta_sequence = 'GlcNAc(b1-3)';
+  let position = 'y2a';
+  let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
+  let reactionset = new ReactionSet();
+
+  let reaction = new IupacReaction();
+  reaction.sequence = sequence;
+  reactionset.addReactionRule(reaction);
+
+  let reactiongroup = new ReactionGroup();
+
+  reactiongroup.addReactionSet(reactionset);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+
+  let result = test_sugar.composition_for_tag(reactiongroup.supportLinkages(test_sugar));
+  assert.ok(result.length === 1,'Only one substrate');
+  assert.ok(result[0].identifier === 'GlcNAc','Correct identifier');
+  assert.ok(result[0].parent.identifier === 'Gal','Correct identifier for parent');
+  assert.ok(result[0].parent.parent.identifier === 'GalNAc','Correct identifier for grandparent');
+});
 
 QUnit.test( 'Test if we can add in N links' , function( assert ) {
   let base_sequence = 'Asn';
