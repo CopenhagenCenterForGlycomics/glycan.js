@@ -12,7 +12,9 @@ const active_mode = Symbol('active_mode');
 const MODE_EXPAND = Symbol('MODE_EXPAND');
 const MODE_MINIMAL = Symbol('MODE_MINIMAL');
 
-import TracedMonosaccharide from './Tracing';
+const parent_symbol = Symbol('parent');
+
+import { TracedMonosaccharide } from './Tracing';
 
 import MixedTupleMap from '../lib/MixedTupleMap';
 
@@ -42,7 +44,7 @@ class Counter {
   constructor() {
   }
 
-  static get get(counter) {
+  static get(counter) {
     if (! counter_map[counter]) {
       counter_map[counter] = new Counter();
     }
@@ -50,17 +52,18 @@ class Counter {
   }
 }
 
-const get_wrapped_residue = (clazz,repeat,monosaccharide,repeat_count) => {
+const get_wrapped_residue = (clazz,repeat,monosaccharide,parent,repeat_count) => {
   let id_tuple = [repeat,Counter.get(repeat_count),monosaccharide];
   if ( ! repeat_wraps.has(id_tuple) ) {
-    repeat_wraps.set(id_tuple, new clazz(monosaccharide,repeat,repeat_count));
+    repeat_wraps.set(id_tuple, new clazz(monosaccharide,parent,repeat,repeat_count));
   }
   return repeat_wraps.get(id_tuple);
 };
 
 class RepeatMonosaccharide extends TracedMonosaccharide {
-    constructor(original,repeat,count) {
-      super(original.identifier);
+    constructor(original,parent,repeat,count) {
+      super(original);
+      this[parent_symbol] = parent;
       this.repeat = repeat;
       this.repeat_count = count;
       return this;
@@ -83,27 +86,47 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       // No-op this
     }
 
-    linkageOf() {
-
-    }
-
     graft() {
       // No-op
     }
 
-    childAt() {
-      
+    get parent() {
+      if (this[parent_symbol]) {
+        return this[parent_symbol];
+      }
+      return super.parent;
     }
 
     get child_linkages() {
+      let original_kids = this.original.child_linkages;
 
+      let results = new Map();
+
+      if (this.original === this.repeat[last_residue] && this.repeat_count < this.repeat.max ) {
+
+        const root_link = this.repeat.root.parent.linkageOf(this.repeat.root);
+        const new_wrapped_root = get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.repeat_count + 1);
+        results.set( root_link, Object.freeze([ new_wrapped_root ]) );
+        return results;
+      }
+
+      let kid_links = [...original_kids.keys()];
+
+      for( const link of kid_links ) {
+        const kids = original_kids.get(link);
+        const mapped = Object.freeze(kids.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.repeat_count )));
+        results.set(link,mapped);
+      }
+      return results;
     }
 
     get children() {
       if (this.original === this.repeat[last_residue] && this.repeat_count < this.repeat.max ) {
-        return Object.freeze([ get_wrapped_residue(this.constructor,this.repeat.root.original,this.repeat_count + 1) ]);
+        const new_wrapped_root = get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.repeat_count + 1);
+        return Object.freeze([ new_wrapped_root ]);
       }
-      return Object.freeze(super().map( child => get_wrapped_residue(this.constructor,child, this.repeat_count )));
+      const mapped_children = Object.freeze(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.repeat_count )));
+      return mapped_children;
     }
 
 }
@@ -131,8 +154,8 @@ export default class Repeat {
     return MODE_MINIMAL;
   }
 
-  static get root() {
-    return get_wrapped_residue(RepeatMonosaccharide,this,this[template_sugar].root,this.min); 
+  get root() {
+    return get_wrapped_residue(RepeatMonosaccharide,this,this[template_sugar].root,null,this.min); 
   }
 
   get mode() {
