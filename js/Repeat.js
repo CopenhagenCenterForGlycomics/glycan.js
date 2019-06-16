@@ -97,6 +97,17 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       return super.parent;
     }
 
+    linkageOf(child) {
+      if (child instanceof RepeatMonosaccharide) {
+        if (this.original === this.repeat[last_residue]) {
+          return this.repeat.root.parent.linkageOf(this.repeat.root);
+        }
+        return this.original.linkageOf(child.original);        
+      } else {
+        return super.linkageOf(child);
+      }
+    }
+
     get child_linkages() {
       let original_kids = this.original.child_linkages;
 
