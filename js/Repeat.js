@@ -30,7 +30,7 @@ import MixedTupleMap from '../lib/MixedTupleMap';
 
 // When we match a repeat, there should be
 // two modes: Expand and minimal. Expand
-// expands the repeat out to the max 
+// expands the repeat out to the max
 // number of repeat units, and minimal
 // only matches the minimal repeat unit
 
@@ -102,7 +102,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
         if (this.original === this.repeat[last_residue]) {
           return this.repeat.root.parent.linkageOf(this.repeat.root);
         }
-        return this.original.linkageOf(child.original);        
+        return this.original.linkageOf(child.original);
       } else {
         return super.linkageOf(child);
       }
@@ -166,7 +166,7 @@ export default class Repeat {
   }
 
   get root() {
-    return get_wrapped_residue(RepeatMonosaccharide,this,this[template_sugar].root,null,this.min); 
+    return get_wrapped_residue(RepeatMonosaccharide,this,this[template_sugar].root,null,this.min);
   }
 
   get mode() {
