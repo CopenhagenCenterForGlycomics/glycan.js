@@ -14,6 +14,10 @@ const MODE_MINIMAL = Symbol('MODE_MINIMAL');
 
 const parent_symbol = Symbol('parent');
 
+const sort_order_symbol = Symbol('sort_order');
+
+import { default as Monosaccharide, calculateSiblingOrder } from './Monosaccharide';
+
 import { TracedMonosaccharide } from './Tracing';
 
 import MixedTupleMap from '../lib/MixedTupleMap';
@@ -69,17 +73,14 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       return this;
     }
 
-    get depth() {
-
-    }
-
     balance() {
-      // No-op
-    }
-
-    addChild() {
-      // We should add a child to this, but leave it out of the repeat
-      // Logic could be tricky for this one
+      const parent_linkages = this.children.map( res => {return { link: this.linkageOf(res), res: res }; });
+      parent_linkages.sort( (a,b) => a.link - b.link );
+      let all_children = parent_linkages.map( obj => obj.res );
+      all_children = Object.freeze( calculateSiblingOrder(all_children) );
+      all_children.forEach( (child,idx) => {
+        child[sort_order_symbol] = idx+1;
+      });
     }
 
     removeChild() {
@@ -104,40 +105,67 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
         }
         return this.original.linkageOf(child.original);
       } else {
-        return super.linkageOf(child);
+        // return super.linkageOf(child);
+        return (new Monosaccharide(' ')).linkageOf.call(this,child);
       }
     }
 
     get child_linkages() {
       let original_kids = this.original.child_linkages;
 
-      let results = new Map();
+      let self_children = super.child_linkages;
+      let results = new Map([...self_children].filter( ([key,]) => (key === 0 || key) ));
 
       if (this.original === this.repeat[last_residue] && this.repeat_count < this.repeat.max ) {
 
         const root_link = this.repeat.root.parent.linkageOf(this.repeat.root);
         const new_wrapped_root = get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.repeat_count + 1);
-        results.set( root_link, Object.freeze([ new_wrapped_root ]) );
+        let self_kids = results.get( root_link ) || [];
+
+        let mapped = Object.freeze(self_kids.concat( [ new_wrapped_root ] ) );
+        if (mapped.length > 0 && mapped.every( child => child[sort_order_symbol])) {
+            let sorted_mapped = Object.freeze(mapped.slice().sort( (a,b) => a[sort_order_symbol] - b[sort_order_symbol] ));
+            results.set(root_link,sorted_mapped);
+        } else {
+          results.set( root_link, mapped);
+        }
         return results;
       }
 
       let kid_links = [...original_kids.keys()];
 
       for( const link of kid_links ) {
-        const kids = original_kids.get(link);
-        const mapped = Object.freeze(kids.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.repeat_count )));
-        results.set(link,mapped);
+        const kids = original_kids.get(link) || [];
+        const current_kids = results.get(link) || [];
+        const mapped = Object.freeze( current_kids.concat(kids.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.repeat_count ))) );
+        if (mapped.length > 0) {
+          if (mapped.every( child => child[sort_order_symbol] )) {
+            let sorted_mapped = Object.freeze(mapped.slice().sort( (a,b) => a[sort_order_symbol] - b[sort_order_symbol] ));
+            results.set(link,sorted_mapped);
+          } else {
+            results.set(link,mapped);
+          }
+        }
       }
       return results;
     }
 
     get children() {
+      let self_kids = super.children;
+
+      let all_children;
       if (this.original === this.repeat[last_residue] && this.repeat_count < this.repeat.max ) {
         const new_wrapped_root = get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.repeat_count + 1);
-        return Object.freeze([ new_wrapped_root ]);
+        all_children = Object.freeze(self_kids.concat([ new_wrapped_root ]));
+      } else {
+        all_children = Object.freeze( self_kids.concat(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.repeat_count ))) );
       }
-      const mapped_children = Object.freeze(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.repeat_count )));
-      return mapped_children;
+
+      if (all_children.every( child => child[sort_order_symbol] ) && all_children.length > 0) {
+        all_children = Object.freeze(all_children.slice().sort( (a,b) => a[sort_order_symbol] - b[sort_order_symbol] ));
+      }
+
+      return all_children;
     }
 
 }
