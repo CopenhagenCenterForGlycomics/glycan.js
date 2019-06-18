@@ -84,9 +84,15 @@ let check_overlaps = (positions) => {
   let quad = new QuadTree({x: min_x, y: min_y, width: width, height: height });
 
   for(let position of positions.map( (pos,idx) => Object.assign({idx: idx },pos.position) )) {
+    if (position.ignore_overlap) {
+      continue;
+    }
     quad.insert(position);
   }
   for (let i = 0; i < positions.length; i++) {
+    if (positions[i].position.ignore_overlap) {
+      continue;
+    }
     let check_position = positions[i].position;
     let items = quad.retrieve(check_position);
     for (let item of items) {
