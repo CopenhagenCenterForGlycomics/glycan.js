@@ -173,6 +173,9 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
 export default class Repeat {
   constructor(sugar,attachment,min=1,max=1) {
     this[template_sugar] = sugar;
+    if (sugar.root.identifier === 'Root') {
+      sugar.root = sugar.root.children[0];
+    }
     this[last_residue] = sugar.leaves[0];
     if ( ! attachment ) {
       if (sugar.leaves.length !== 1) {
@@ -194,7 +197,14 @@ export default class Repeat {
   }
 
   get root() {
-    return get_wrapped_residue(RepeatMonosaccharide,this,this[template_sugar].root,null,this.min);
+    let root = get_wrapped_residue(RepeatMonosaccharide,this,this[template_sugar].root,null,this.min);
+    if (this[template_sugar].root.parent && this[template_sugar].root.parent.children.indexOf(root) < 0) {
+      let target_linkage = this[template_sugar].root.parent.linkageOf(this[template_sugar].root);
+      let placeholder = this[template_sugar].root.parent;
+      placeholder.removeChild(target_linkage,this[template_sugar].root);
+      placeholder.addChild(target_linkage,root);
+    }
+    return root;
   }
 
   get mode() {

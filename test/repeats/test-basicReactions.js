@@ -20,15 +20,13 @@ QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = sequence;
 
-  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man';
+  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)';
   let repeat_sug = new IupacSugar();
   repeat_sug.sequence = sequence;
-  repeat_sug.root.anomer = 'b';
-  repeat_sug.root.parent_linkage = 1;
 
-  let repeat = new Repeat(repeat_sug,'y2a',1,4);
+  let repeat = new Repeat(repeat_sug,'y3a',1,4);
   repeat.mode = Repeat.EXPAND;
-  sugar.root.addChild(5,repeat.root);
+  sugar.root.graft(repeat.root);
 
   let base_sequence = 'Glc(b1-4)Man(b1-5)*';
   let delta_sequence = 'Man(b1-5)';
@@ -58,17 +56,15 @@ QUnit.test( 'Test reaction matching on main branch of repeat' , function( assert
   let sugar = new IupacSugar();
   sugar.sequence = sequence;
 
-  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man';
+  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)';
   let repeat_sug = new IupacSugar();
   repeat_sug.sequence = sequence;
-  repeat_sug.root.anomer = 'b';
-  repeat_sug.root.parent_linkage = 1;
 
   const repeat_count = 4;
 
-  let repeat = new Repeat(repeat_sug,'y2a',1,repeat_count);
+  let repeat = new Repeat(repeat_sug,'y3a',1,repeat_count);
   repeat.mode = Repeat.EXPAND;
-  sugar.root.addChild(5,repeat.root);
+  sugar.root.graft(repeat.root);
 
   let base_sequence = 'Man(b1-5)*';
   let delta_sequence = 'Glc(b1-4)';
@@ -97,17 +93,15 @@ QUnit.test( 'Test reaction matching on branch of repeat' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = sequence;
 
-  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man';
+  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)';
   let repeat_sug = new IupacSugar();
   repeat_sug.sequence = sequence;
-  repeat_sug.root.anomer = 'b';
-  repeat_sug.root.parent_linkage = 1;
 
   const repeat_count = 4;
 
-  let repeat = new Repeat(repeat_sug,'y2a',1,repeat_count);
+  let repeat = new Repeat(repeat_sug,'y3a',1,repeat_count);
   repeat.mode = Repeat.EXPAND;
-  sugar.root.addChild(5,repeat.root);
+  sugar.root.graft(repeat.root);
 
   let base_sequence = 'Man(b1-5)*';
   let delta_sequence = 'Fuc(a1-8)';
