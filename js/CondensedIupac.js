@@ -1,6 +1,6 @@
 
 import Monosaccharide from './Monosaccharide';
-
+import { default as Repeat, RepeatMonosaccharide } from './Repeat';
 
 let follow_bold_branch, create_bold_tree;
 
@@ -87,10 +87,55 @@ let reverse = function(string) {
   return string.split('').reverse().join('');
 };
 
+let matches_repeat = (key) => {
+  return ( res => { return res.identifier === `Repeat${key}`; } );
+};
+
+const create_repeat_objects = (sugar,definitions) => {
+  let residues = sugar.composition();
+  for (let key of Object.keys(definitions)) {
+    let repeat_placeholder = residues.filter( matches_repeat(key) ).shift();
+    if ( ! repeat_placeholder ) {
+      continue;
+    }
+    let repeat_seq = definitions[key].seq;
+    let max_repeats = 1;
+    if (definitions[key].variable.match(/^\d+$/)) {
+      max_repeats = parseInt(definitions[key].variable);
+    }
+    const clazz = sugar.constructor;
+    let repeat_sug = new clazz();
+    repeat_sug.sequence = repeat_seq;
+    let repeat_end = repeat_sug.root;
+    while (repeat_end.children && repeat_end.children.length > 0) {
+      repeat_end = repeat_end.children[0];
+    }
+    let location = repeat_sug.location_for_monosaccharide(repeat_end);
+    let repeat = new Repeat(repeat_sug,location,1,max_repeats);
+    repeat.mode = Repeat.EXPAND;
+    let target = repeat_placeholder.parent;
+    target.removeChild(target.linkageOf(repeat_placeholder),repeat_placeholder);
+    target.graft(repeat.root);
+    if (repeat_placeholder.children.length > 0) {
+      repeat.child = repeat_placeholder.children[0];      
+    }
+  }
+};
+
 let parse_sequence = function(sequence) {
   let comment = '';
   [sequence,comment]=sequence.split('+');
   comment = (comment || '').replace(/^"/,'').replace(/"$/,'');
+
+  const repeat_re = /{([^}]+)}([a-z]|\d+)/g;
+  let repeat_match;
+  let repeat_count = 0;
+  let repeat_definitions = {};
+
+  while ( (repeat_match = repeat_re.exec(sequence)) !== null ) {
+    sequence = sequence.replace(repeat_match[0],`Repeat${++repeat_count}(u?-?)`);
+    repeat_definitions[repeat_count] = { seq: repeat_match[1], variable: repeat_match[2] };
+  }
 
   if (sequence.match(/[\]\)]$/)) {
     sequence = `${sequence}Root`;
@@ -110,6 +155,8 @@ let parse_sequence = function(sequence) {
 
   this.root = root;
 
+  create_repeat_objects(this,repeat_definitions);
+
   if (comment) {
     this.comment = comment;
   }
@@ -119,7 +166,21 @@ let parse_sequence = function(sequence) {
 
 
 let write_monosaccharide = (mono) => {
-  return mono.toString();
+  let name = mono.toString();
+
+  let is_repeat_unit = mono instanceof RepeatMonosaccharide;
+  let has_all_repeat_kids = (mono.children.length > 0) && mono.children.every( res => res instanceof RepeatMonosaccharide);
+  let has_no_repeat_kids = (mono.children.length === 0) || mono.children.every( res => ! (res instanceof RepeatMonosaccharide) );
+  if ((! is_repeat_unit) && has_all_repeat_kids) {
+    return `}${name}`;
+  }
+  if ( is_repeat_unit &&
+       mono.endsRepeat &&
+       has_no_repeat_kids
+      ) {
+    return `{${name}`;
+  }
+  return name;
 };
 
 let write_linkage = (mono) => {
