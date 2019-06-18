@@ -101,6 +101,10 @@ Red  #ed1c24
       <polyline fill="#fff" stroke="#000" stroke-width="1" points="50,5 95,50 5,50 50,5"/>
       <polyline fill="#a17a4d" stroke="#000" stroke-width="1" points="50,95 95,50 5,50 50,95"/>
     </symbol>
+    <symbol id="cer" viewBox="0 0 100 100">
+      <path fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" d="M35.8,15 64.2,15 75.5,27.2 64.2,38.3 75.5,50 64.2,61.1 75.5,72 64.2,83 75.5,94 L75.5,110 L35.8,110"/>
+      <path fill="#fff" stroke="#999" stroke-width="4" stroke-linecap="round"  d="M35.8,15 24.5,27.2 35.8,38.3 24.5,50 35.8,61.1 24.5,72 35.8,83 24.5,94"/>
+    </symbol>
     <!--
     <symbol id="man(a1-2)man" viewBox="0 0 100 100">
       <svg viewBox="0 0 100 100" x="0" y="0" width="100" height="50">
@@ -248,8 +252,10 @@ Red  #ed1c24
   <text x="450" text-anchor="middle" y="810">HyL</text>
 
   <use xlink:href="#s" x="100" y="850" width="100" height="100"/>
+  <use xlink:href="#cer" x="200" y="850" width="100" height="100"/>
 
   <text x="150" text-anchor="middle" y="960">S</text>
+  <text x="250" text-anchor="middle" y="960">Cer</text>
 
 
 <!--
