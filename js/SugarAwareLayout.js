@@ -2,6 +2,8 @@ import CondensedLayout from './CondensedLayout';
 
 import Monosaccharide from './Monosaccharide';
 
+const not_sulf = res => res.identifier !== 'S';
+
 class SugarAwareLayout extends CondensedLayout {
   static LayoutMonosaccharide(sugar,res,position,parent_position,layout) {
 
@@ -11,8 +13,10 @@ class SugarAwareLayout extends CondensedLayout {
 
     position = super.LayoutMonosaccharide(sugar,res,position,parent_position);
 
-    if (res.siblings.length == 1 && (res.identifier == 'Fuc' || res.identifier == 'NeuAc')) {
-      if (res.identifier == 'NeuAc' && res.siblings[0].identifier == 'Fuc') {
+    let sibs = res.siblings;
+
+    if (sibs.filter(not_sulf).length == 1 && (res.identifier == 'Fuc' || res.identifier == 'NeuAc')) {
+      if (res.identifier == 'NeuAc' && sibs.filter(not_sulf)[0].identifier == 'Fuc') {
         position.dx = 0;
         position.dy = -1 * DELTA_Y;
         position.dy -= position.r; // Make room for linkage
@@ -56,7 +60,7 @@ class SugarAwareLayout extends CondensedLayout {
       return position;
     }
 
-    if (res.siblings.length == 1 && res.identifier === 'P') {
+    if (sibs.length == 1 && res.identifier === 'P') {
       position.dy = 0;
       position.dx = res.parent.linkageOf(res) >= 0 ? DELTA_X : -1 * DELTA_X;
       if (this.LINKS) {
@@ -65,7 +69,7 @@ class SugarAwareLayout extends CondensedLayout {
       return position;
     }
 
-    if (res.siblings.length == 1 && (res.identifier === 'GlcNAc' && res.siblings[0].identifier == 'GlcNAc')) {
+    if (sibs.length == 1 && (res.identifier === 'GlcNAc' && sibs[0].identifier == 'GlcNAc')) {
       if (res.parent.linkageOf(res) === 3) {
         position.dx = 0;
       }
@@ -73,19 +77,19 @@ class SugarAwareLayout extends CondensedLayout {
     }
 
     // If only a single sibling is Fuc or NeuAc make it a stub
-    if (res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0 &&
-        res.siblings.filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) >= 0 ).length <= 1
+    if (sibs.filter(not_sulf).filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0 &&
+        sibs.filter(not_sulf).filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) >= 0 ).length <= 1
         ) {
       position.dx = 0;
     }
 
-    if (res.siblings.length == 1 && ( res.siblings[0].identifier === 'P' || res.siblings[0].identifier === 'S') ) {
+    if (sibs.length === 1 && ( sibs[0].identifier === 'P' || sibs[0].identifier === 'S') ) {
       position.dx = 0;
     }
 
-    if ( res.siblings.length === 2 &&
-          [ res ].concat(res.siblings).map( res => res.identifier ).indexOf( 'Fuc' ) >= 0 &&
-          [ res ].concat(res.siblings).map( res => res.identifier ).indexOf( 'S' ) >= 0 &&
+    if ( sibs.length === 2 &&
+          [ res ].concat(sibs).map( res => res.identifier ).indexOf( 'Fuc' ) >= 0 &&
+          [ res ].concat(sibs).map( res => res.identifier ).indexOf( 'S' ) >= 0 &&
           ['Fuc'].indexOf(res.identifier) >= 0) {
       position.dy = 0;
       position.dx = res.parent.linkageOf(res) >= 4 ? DELTA_X : -1 * DELTA_X;
