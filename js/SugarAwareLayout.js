@@ -2,9 +2,23 @@ import CondensedLayout from './CondensedLayout';
 
 import Monosaccharide from './Monosaccharide';
 
-const not_sulf = res => res.identifier !== 'S';
+const not_sulf = res => res.identifier !== 'HSO3';
 
 class SugarAwareLayout extends CondensedLayout {
+
+  static CalculateIdentifier(residue) {
+    let residue_id = residue.identifier.toLowerCase();
+    let parent_linkage = residue.parent ? residue.parent.linkageOf(residue) : null;
+    if (parent_linkage === Monosaccharide.LINKAGES.N) {
+      parent_linkage = 'N';
+    }
+    if (parent_linkage === Monosaccharide.LINKAGES.O) {
+      parent_linkage = 'O';
+    }
+    let residue_suffix = (residue.parent && residue_id === 'hso3' && parent_linkage) ? '.'+parent_linkage : '';
+    return `${residue_id}${residue_suffix}`;
+  }
+
   static LayoutMonosaccharide(sugar,res,position,parent_position,layout) {
 
     const DELTA_Y = this.DELTA_Y;
@@ -36,7 +50,7 @@ class SugarAwareLayout extends CondensedLayout {
       return position;
     }
 
-    if (res.identifier === 'S') {
+    if (res.identifier === 'HSO3') {
       position.r = 1/4*DELTA_X;
       let linkage_pos = res.parent.linkageOf(res);
       if (linkage_pos === 2 || linkage_pos === 6 || linkage_pos === Monosaccharide.LINKAGES.N) {
@@ -89,7 +103,7 @@ class SugarAwareLayout extends CondensedLayout {
 
     if ( sibs.length === 2 &&
           [ res ].concat(sibs).map( res => res.identifier ).indexOf( 'Fuc' ) >= 0 &&
-          [ res ].concat(sibs).map( res => res.identifier ).indexOf( 'S' ) >= 0 &&
+          [ res ].concat(sibs).map( res => res.identifier ).indexOf( 'HSO3' ) >= 0 &&
           ['Fuc'].indexOf(res.identifier) >= 0) {
       position.dy = 0;
       position.dx = res.parent.linkageOf(res) >= 4 ? DELTA_X : -1 * DELTA_X;

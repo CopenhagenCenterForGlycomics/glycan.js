@@ -155,6 +155,10 @@ let CondensedLayout = class {
     return calculate_position.call(this,renderable,monosaccharide,position,parent_position);
   }
 
+  static CalculateIdentifier(residue) {
+    return residue.identifier.toLowerCase();
+  }
+
   static PerformLayout(renderable) {
     let layout = new WeakMap();
     // Items in the tree based upon

@@ -361,10 +361,10 @@ class CanvasRenderer extends Renderer {
     .start();
   }
 
-  renderIcon(container,residue) {
-    let icon = container.use(residue.identifier,0,0,1,1);
-    icon.src = this.symbols[residue.identifier.toLowerCase()].svg;
-    icon.paths = this.symbols[residue.identifier.toLowerCase()].paths;
+  renderIcon(container,identifier) {
+    let icon = container.use(identifier,0,0,1,1);
+    icon.src = this.symbols[identifier].svg;
+    icon.paths = this.symbols[identifier].paths;
     let canvas = this.element.canvas;
     Object.defineProperty(icon, 'element', {
       get: function() {

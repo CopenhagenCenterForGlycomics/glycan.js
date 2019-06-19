@@ -172,6 +172,7 @@ const layout_sugar = function(sugar,layout_engine) {
   }
   log.info('Laying out',sugar.sequence);
   let layout = layout_engine.PerformLayout(sugar);
+  layout.calculateIdentifier = layout_engine.CalculateIdentifier;
   return layout;
 };
 
@@ -212,7 +213,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
     if ( ! current ) {
       // Render icon
-      icon = this.renderIcon( container, residue, sugar );
+      icon = this.renderIcon( container, layout.calculateIdentifier(residue) , residue, sugar );
       current = { residue: icon, linkage: null };
       this.rendered.set(residue, current);
     } else {
