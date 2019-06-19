@@ -31,6 +31,8 @@ const draw_path = (path,ctx,rc) => {
   if (path.fontSize) {
     ctx.font = `${path.fontSize}px sans-serif`;
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = path.fill;
     ctx.fillText(path.text,path.x, path.y);
   }
 
@@ -53,14 +55,23 @@ const render_icon = function(canvas) {
       offscreen.height = 100;
       let offscreen_ctx = offscreen.getContext('2d');
       let rc = rough.canvas(offscreen);
-      for(let path of this.paths) {
+      for(let path of this.paths.filter( path => ! path.text )) {
         draw_path(path,offscreen_ctx,rc);
       }
       CACHED_ICONS.set(this,offscreen);
     }
+
+    ctx.save();
+
     ctx.translate(50,50);
     ctx.rotate(Math.PI / 180 * this.rotate );
     ctx.drawImage(CACHED_ICONS.get(this),-50,-50);
+
+    ctx.restore();
+
+    for (let path of this.paths.filter( path => path.text )) {
+      draw_path(path,ctx,canvas);
+    }
 
     ctx.restore();
   }
