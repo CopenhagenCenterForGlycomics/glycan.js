@@ -20,10 +20,10 @@ QUnit.test( 'Create a simple repeat' , function( assert ) {
   repeat_sug.sequence = sequence;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,2);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
   let repeat_seq = sugar.sequence;
-  assert.ok(repeat_seq === '{Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
+  assert.equal(repeat_seq,'{Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
 });
 
 QUnit.test( 'Create a repeat with an extension at the end' , function( assert ) {
@@ -36,7 +36,7 @@ QUnit.test( 'Create a repeat with an extension at the end' , function( assert ) 
   repeat_sug.sequence = sequence;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,2);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
 
   sequence = 'NeuAc';
@@ -49,7 +49,7 @@ QUnit.test( 'Create a repeat with an extension at the end' , function( assert ) 
   sugar.leaves()[0].addChild(8,end_sugar.root);
 
   let repeat_seq = sugar.sequence;
-  assert.ok(repeat_seq === 'NeuAc(a2-8){Glc(b1-4)Man(b1-5)Glc(b1-4)Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
+  assert.equal(repeat_seq,'NeuAc(a2-8){Glc(b1-4)Man(b1-5)Glc(b1-4)Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
 });
 
 QUnit.test( 'Create a repeat with an extension in the middle' , function( assert ) {
@@ -62,7 +62,7 @@ QUnit.test( 'Create a repeat with an extension in the middle' , function( assert
   repeat_sug.sequence = sequence;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,2);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
 
   sequence = 'NeuAc';
@@ -77,7 +77,7 @@ QUnit.test( 'Create a repeat with an extension in the middle' , function( assert
   target.addChild(8,end_sugar.root);
 
   let repeat_seq = sugar.sequence;
-  assert.ok(repeat_seq === '{Glc(b1-4)Man(b1-5)[NeuAc(a2-8)]Glc(b1-4)Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
+  assert.equal(repeat_seq,'{Glc(b1-4)Man(b1-5)[NeuAc(a2-8)]Glc(b1-4)Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
 });
 
 QUnit.test( 'Create a repeat with an extension in the middle that has correct branch order' , function( assert ) {
@@ -90,7 +90,7 @@ QUnit.test( 'Create a repeat with an extension in the middle that has correct br
   repeat_sug.sequence = sequence;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,2);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
 
   sequence = 'NeuAc';
@@ -103,7 +103,7 @@ QUnit.test( 'Create a repeat with an extension in the middle that has correct br
   sugar.leaves()[0].parent.parent.addChild(3,end_sugar.root);
 
   let repeat_seq = sugar.sequence;
-  assert.ok(repeat_seq === 'NeuAc(a2-3)[{Glc(b1-4)Man(b1-5)]Glc(b1-4)Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
+  assert.equal(repeat_seq,'NeuAc(a2-3)[{Glc(b1-4)Man(b1-5)]Glc(b1-4)Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
 });
 
 QUnit.test( 'Create a repeat with an extension in the middle that balances correctly' , function( assert ) {
@@ -116,7 +116,7 @@ QUnit.test( 'Create a repeat with an extension in the middle that balances corre
   repeat_sug.sequence = sequence;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,2);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
 
   sequence = 'NeuAc';
@@ -140,5 +140,5 @@ QUnit.test( 'Create a repeat with an extension in the middle that balances corre
 
 
   let repeat_seq = sugar.sequence;
-  assert.ok(repeat_seq.replace(/[{}]/g,'') === target_sugar.sequence, 'Has repeat generated sequence');
+  assert.equal(repeat_seq.replace(/[{}]/g,''),target_sugar.sequence, 'Has repeat generated sequence');
 });

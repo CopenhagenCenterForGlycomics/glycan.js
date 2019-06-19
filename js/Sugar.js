@@ -1,5 +1,6 @@
 'use strict';
 import Monosaccharide from './Monosaccharide';
+import { RepeatMonosaccharide } from './Repeat';
 
 import { Tracer } from './Tracing';
 
@@ -67,13 +68,11 @@ export default class Sugar {
     Object.freeze(this);
   }
 
-  // FIXME - Matching residues (given a prototype, which residues match)
+  get repeats() {
+    let repeat_residues = this.composition(this.root).filter( res => res instanceof RepeatMonosaccharide );
+    return repeat_residues.map( res => res.repeat ).filter( (o,i,a) => a.indexOf(o) === i );
+  }
 
-  // Positional description
-  // FIXME - linkage + residue path from given residue to root - optional return residues also
-  // FIXME - get path to root
-
-  // FIXME - paths (all paths from leaves to root)
   paths(root=this.root,start=this.leaves(root)) {
     let self = this;
     return [].concat(start).map((leaf) => Array.from(self.residues_to_root(leaf)));

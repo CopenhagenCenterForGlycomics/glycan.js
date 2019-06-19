@@ -100,8 +100,12 @@ const create_repeat_objects = (sugar,definitions) => {
     }
     let repeat_seq = definitions[key].seq;
     let max_repeats = 1;
+    let variable_identifier = '';
     if (definitions[key].variable.match(/^\d+$/)) {
       max_repeats = parseInt(definitions[key].variable);
+    }
+    if (definitions[key].variable.match(/[a-z]/)) {
+      variable_identifier = definitions[key].variable;
     }
     const clazz = sugar.constructor;
     let repeat_sug = new clazz();
@@ -112,7 +116,11 @@ const create_repeat_objects = (sugar,definitions) => {
     }
     let location = repeat_sug.location_for_monosaccharide(repeat_end);
     let repeat = new Repeat(repeat_sug,location,1,max_repeats);
-    repeat.mode = Repeat.EXPAND;
+
+    if (variable_identifier) {
+      repeat.identifier = variable_identifier;
+    }
+
     let target = repeat_placeholder.parent;
     target.removeChild(target.linkageOf(repeat_placeholder),repeat_placeholder);
     target.graft(repeat.root);
@@ -124,7 +132,7 @@ const create_repeat_objects = (sugar,definitions) => {
 
 let parse_sequence = function(sequence) {
   let comment = '';
-  [sequence,comment]=sequence.split('+');
+  [,sequence,comment]=sequence.match(/([^\+]+)(?:\+(\".+\"))*/);
   comment = (comment || '').replace(/^"/,'').replace(/"$/,'');
 
   const repeat_re = /{([^}]+)}([a-z]|\d+)/g;
@@ -172,7 +180,7 @@ let write_monosaccharide = (mono) => {
   let has_all_repeat_kids = (mono.children.length > 0) && mono.children.every( res => res instanceof RepeatMonosaccharide);
   let has_no_repeat_kids = (mono.children.length === 0) || mono.children.every( res => ! (res instanceof RepeatMonosaccharide) );
   if ((! is_repeat_unit) && has_all_repeat_kids) {
-    return `}${name}`;
+    return `}${mono.children[0].repeat.identifier}${name}`;
   }
   if ( is_repeat_unit &&
        mono.endsRepeat &&
@@ -202,7 +210,12 @@ let write_sequence = function(start=this.root) {
     return;
   }
   let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(self,kid[1])+write_link(kid[0])+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
-  return child_sequence+write_monosaccharide(start)+write_linkage(start);
+  let seq = child_sequence+write_monosaccharide(start)+write_linkage(start);
+  if (start === this.root && this.comment) {
+    return `${seq}+"${this.comment}"`;
+  } else {
+    return seq;
+  }
 };
 
 let getPropertyDescriptor = function(object,descriptor) {

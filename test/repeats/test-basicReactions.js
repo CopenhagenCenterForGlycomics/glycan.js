@@ -25,7 +25,7 @@ QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
   repeat_sug.sequence = sequence;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,4);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
 
   let base_sequence = 'Glc(b1-4)Man(b1-5)*';
@@ -63,7 +63,7 @@ QUnit.test( 'Test reaction matching on main branch of repeat' , function( assert
   const repeat_count = 4;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,repeat_count);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
 
   let base_sequence = 'Man(b1-5)*';
@@ -100,7 +100,7 @@ QUnit.test( 'Test reaction matching on branch of repeat' , function( assert ) {
   const repeat_count = 4;
 
   let repeat = new Repeat(repeat_sug,'y3a',1,repeat_count);
-  repeat.mode = Repeat.EXPAND;
+  repeat.mode = Repeat.MODE_EXPAND;
   sugar.root.graft(repeat.root);
 
   let base_sequence = 'Man(b1-5)*';

@@ -39,5 +39,5 @@ QUnit.test( 'Read a simple repeat' , function( assert ) {
   let sequence = glycosuite_repeats[0];
   let sugar = new IupacSugar();
   sugar.sequence = sequence;
-  assert.ok(sugar.sequence === 'Gal(b1-4){GlcNAc(b1-3)Gal(b1-4)}GlcNAc(b1-2)Man(a1-3)[Gal(b1-4){GlcNAc(b1-3)Gal(b1-4)}GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc', 'Has repeat generated sequence');
+  assert.equal(sugar.sequence,sequence, 'Has repeat generated sequence');
 });
