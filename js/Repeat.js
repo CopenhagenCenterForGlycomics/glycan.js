@@ -26,6 +26,8 @@ const counter_symbol = Symbol('counter');
 
 import { default as Monosaccharide, calculateSiblingOrder } from './Monosaccharide';
 
+import Sugar from './Sugar';
+
 import { TracedMonosaccharide } from './Tracing';
 
 import MixedTupleMap from '../lib/MixedTupleMap';
@@ -217,13 +219,42 @@ export default class Repeat {
         throw new Error('Too many leaves on repeat without defined attachment site');
       }
     } else {
-      this[last_residue] = sugar.locate_monosaccharide(attachment);
+      this[last_residue] = ((typeof attachment === 'string') && ! (attachment instanceof Monosaccharide)) ? sugar.locate_monosaccharide(attachment) : attachment;
     }
     this[min_repeats] = min;
     this[max_repeats] = max;
     this[child_residue_symbol] = new Monosaccharide('Root');
 
   }
+
+  static addToSugar(sugar,start,end,mode,min=1,max=1) {
+    if (! (start instanceof Monosaccharide) && (typeof start === 'string')) {
+      start = sugar.locate_monosaccharide(start);
+    }
+    if (! (end instanceof Monosaccharide) && (typeof end === 'string')) {
+      end = sugar.locate_monosaccharide(end);
+    }
+
+    let temp_end = new Monosaccharide('Root');
+    for (let kid of end.children) {
+      temp_end.graft(kid);
+    }
+
+    let parent = start.parent;
+    let parent_link = parent.linkageOf(start);
+    parent.removeChild(parent_link,start);
+
+    let temp_sugar = new Sugar();
+    temp_sugar.root = start;
+    let repeat = new Repeat(temp_sugar,end,min,max);
+    repeat.mode = mode;
+    for (let kid of temp_end.children) {
+      repeat[child_residue_symbol].graft(kid);
+    }
+    parent.addChild(parent_link,repeat.root);
+    return repeat;
+  }
+
 
   static get MODE_EXPAND() {
     return MODE_EXPAND;
@@ -271,20 +302,21 @@ export default class Repeat {
     return this[max_repeats];
   }
 
-  get child() {
-    return this[child_residue_symbol].children[0];
+  get children() {
+    return this[child_residue_symbol].children;
   }
 
-  set child(residue) {
+  set children(children) {
     let root = this[child_residue_symbol];
     for (let kid of root.children) {
       root.removeChild(root.linkageOf(kid),kid);
     }
-
-    if (residue.parent) {
-      root.graft(residue);
-    } else {
-      root.addChild(0,residue);
+    for (let residue of children) {
+      if (residue.parent) {
+        root.graft(residue);
+      } else {
+        root.addChild(0,residue);
+      }
     }
   }
 

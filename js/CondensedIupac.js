@@ -125,7 +125,7 @@ const create_repeat_objects = (sugar,definitions) => {
     target.removeChild(target.linkageOf(repeat_placeholder),repeat_placeholder);
     target.graft(repeat.root);
     if (repeat_placeholder.children.length > 0) {
-      repeat.child = repeat_placeholder.children[0];      
+      repeat.children = repeat_placeholder.children;
     }
   }
 };
@@ -205,11 +205,11 @@ let link_expander = function(links) {
 };
 
 let write_sequence = function(start=this.root) {
-  let self = this;
   if ( ! start ) {
     return;
   }
-  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(self,kid[1])+write_link(kid[0])+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
+
+  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   let seq = child_sequence+write_monosaccharide(start)+write_linkage(start);
   if (start === this.root && this.comment) {
     return `${seq}+"${this.comment}"`;
