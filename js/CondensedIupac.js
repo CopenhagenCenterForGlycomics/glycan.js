@@ -177,11 +177,8 @@ let write_monosaccharide = (mono) => {
   let name = mono.toString();
 
   let is_repeat_unit = mono instanceof RepeatMonosaccharide;
-  let has_all_repeat_kids = (mono.children.length > 0) && mono.children.every( res => res instanceof RepeatMonosaccharide);
   let has_no_repeat_kids = (mono.children.length === 0) || mono.children.every( res => ! (res instanceof RepeatMonosaccharide) );
-  if ((! is_repeat_unit) && has_all_repeat_kids) {
-    return `}${mono.children[0].repeat.identifier}${name}`;
-  }
+
   if ( is_repeat_unit &&
        mono.endsRepeat &&
        has_no_repeat_kids
@@ -204,12 +201,18 @@ let link_expander = function(links) {
   return links[1].map( (mono) => [ position , mono ]);
 };
 
+let cap_repeat = (res) => {
+  if (res instanceof RepeatMonosaccharide && res.parent && ( ! (res.parent instanceof RepeatMonosaccharide) )) {
+    return '}'+res.repeat.identifier;
+  }
+  return '';
+};
+
 let write_sequence = function(start=this.root) {
   if ( ! start ) {
     return;
   }
-
-  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')' ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
+  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')'+cap_repeat(kid[1]) ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   let seq = child_sequence+write_monosaccharide(start)+write_linkage(start);
   if (start === this.root && this.comment) {
     return `${seq}+"${this.comment}"`;

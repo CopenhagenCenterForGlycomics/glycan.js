@@ -191,7 +191,14 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
         const new_wrapped_root = get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.counter + 1);
         all_children = Object.freeze(self_kids.concat([ new_wrapped_root ]));
       } else if (this.endsRepeat && this.counter >= max_count ) {
-        all_children = Object.freeze( self_kids.concat( this.repeat[child_residue_symbol].children ) );
+        let repeat_kids = this.repeat[child_residue_symbol].children;
+        for (let kid of repeat_kids) {
+          Object.defineProperty(kid, 'parent', {
+            value: this,
+            writable: false
+          });
+        }
+        all_children = Object.freeze( self_kids.concat( repeat_kids ) );
       } else {
         all_children = Object.freeze( self_kids.concat(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ))) );
       }
