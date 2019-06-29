@@ -41,3 +41,12 @@ QUnit.test( 'Read a simple repeat' , function( assert ) {
   sugar.sequence = sequence;
   assert.equal(sugar.sequence,sequence, 'Has repeat generated sequence');
 });
+
+QUnit.test( 'Read a repeat after branch' , function( assert ) {
+  let sequence = 'GlcNAc(b1-2){Man(a1-3)}j[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+  assert.equal(sugar.sequence,sequence, 'Has repeat generated sequence');
+});
+
+
