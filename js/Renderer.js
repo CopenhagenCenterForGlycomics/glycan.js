@@ -193,14 +193,14 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
       bracket_scale = 1/4;
     }
 
-    const bracket_position = point_along_line(...extents, -0.4 );
+    const bracket_position = point_along_line(...extents, -0.5 );
     const perpendicular = perpendicular_line( bracket_position[0],bracket_position[1], extents[2],extents[3] , SCALE * child_pos.width * bracket_scale );
     const cap = half_perpendicular_line( ...perpendicular , reverse_cap*SCALE * child_pos.width / 8 );
     const cap_end = half_perpendicular_line( perpendicular[2],perpendicular[3],perpendicular[0],perpendicular[1] , reverse_cap*-1*SCALE * child_pos.width / 8 );
 
-    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#f33' });
-    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#f33' });
-    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#f33' });
+    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
 
   }
 
@@ -222,14 +222,14 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
     if (child_pos.x - parent_pos.x !== 0 && child_pos.y - parent_pos.y !== 0 ) {
       bracket_scale = 1/4;
     }
-    const bracket_position = point_along_line(...extents, 0.6 );
+    const bracket_position = point_along_line(...extents, reverse_cap > 0 ? 0.55 : 0.5 );
     const perpendicular = perpendicular_line( bracket_position[0],bracket_position[1], extents[2],extents[3] , SCALE * child_pos.width * bracket_scale );
     const cap = half_perpendicular_line( ...perpendicular , reverse_cap*SCALE * child_pos.width / 8 );
     const cap_end = half_perpendicular_line( perpendicular[2],perpendicular[3],perpendicular[0],perpendicular[1] , reverse_cap*-1*SCALE * child_pos.width / 8 );
 
-    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#f33' });
-    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#f33' });
-    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#f33' });
+    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
   }
 
   return group;

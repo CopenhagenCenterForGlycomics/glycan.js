@@ -1,6 +1,15 @@
 import CondensedLayout from './CondensedLayout';
 
 class SugarAwareLayout extends CondensedLayout {
+
+  static get DELTA_X() {
+    return super.DELTA_X*1.25;
+  }
+
+  static get DELTA_Y() {
+    return super.DELTA_Y*1.25;
+  }
+
   static LayoutMonosaccharide(sugar,res,position,parent_position,layout) {
 
     const DELTA_Y = this.DELTA_Y;
