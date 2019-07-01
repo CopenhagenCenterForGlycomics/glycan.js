@@ -110,11 +110,14 @@ const create_repeat_objects = (sugar,definitions) => {
     const clazz = sugar.constructor;
     let repeat_sug = new clazz();
     repeat_sug.sequence = repeat_seq;
-    let repeat_end = repeat_sug.root;
-    while (repeat_end.children && repeat_end.children.length > 0) {
-      repeat_end = repeat_end.children[0];
+    let location = definitions[key].attachment;
+    if ( ! location ) {
+      let repeat_end = repeat_sug.root;
+      while (repeat_end.children && repeat_end.children.length > 0) {
+        repeat_end = repeat_end.children[0];
+      }
+      location = repeat_sug.location_for_monosaccharide(repeat_end);
     }
-    let location = repeat_sug.location_for_monosaccharide(repeat_end);
     let repeat = new Repeat(repeat_sug,location,1,max_repeats);
 
     if (variable_identifier) {
@@ -134,15 +137,13 @@ let parse_sequence = function(sequence) {
   let comment = '';
   [,sequence,comment]=sequence.match(/([^\+]+)(?:\+(\".+\"))*/);
   comment = (comment || '').replace(/^"/,'').replace(/"$/,'');
-
-  const repeat_re = /{([^}]+)}([a-z]|\d+)/g;
+  const repeat_re = /{([^}@]+)(?:@([a-z]\d+[a-z]))?}([a-z]|\d+)/g;
   let repeat_match;
   let repeat_count = 0;
   let repeat_definitions = {};
-
   while ( (repeat_match = repeat_re.exec(sequence)) !== null ) {
     sequence = sequence.replace(repeat_match[0],`Repeat${++repeat_count}(u?-?)`);
-    repeat_definitions[repeat_count] = { seq: repeat_match[1], variable: repeat_match[2] };
+    repeat_definitions[repeat_count] = { seq: repeat_match[1], attachment: repeat_match[2], variable: repeat_match[3] };
   }
 
   if (sequence.match(/[\]\)]$/)) {
@@ -173,16 +174,12 @@ let parse_sequence = function(sequence) {
 };
 
 
-let write_monosaccharide = (mono) => {
+let repeat_leaf_tags = new WeakMap();
+
+let write_monosaccharide = (mono,sugar) => {
   let name = mono.toString();
 
-  let is_repeat_unit = mono instanceof RepeatMonosaccharide;
-  let has_no_repeat_kids = (mono.children.length === 0) || mono.children.every( res => ! (res instanceof RepeatMonosaccharide) );
-
-  if ( is_repeat_unit &&
-       mono.endsRepeat &&
-       has_no_repeat_kids
-      ) {
+  if ( repeat_leaf_tags.get(sugar) && mono.getTag(repeat_leaf_tags.get(sugar)) ) {
     return `{${name}`;
   }
   return name;
@@ -203,7 +200,7 @@ let link_expander = function(links) {
 
 let cap_repeat = (res) => {
   if (res instanceof RepeatMonosaccharide && res.parent && ( ! (res.parent instanceof RepeatMonosaccharide) )) {
-    return '}'+res.repeat.identifier;
+    return ((res.repeat.off_main ? `@${res.repeat.attachment}` : '' )+`}${res.repeat.identifier}`);
   }
   return '';
 };
@@ -212,8 +209,23 @@ let write_sequence = function(start=this.root) {
   if ( ! start ) {
     return;
   }
+  if (start === this.root) {
+    let all_repeat_residues = this.composition().filter( res => (res instanceof RepeatMonosaccharide) );
+    let repeat_leaf_residues = all_repeat_residues.filter( res => ((res.children.length === 0) || res.children.every( r => ! (r instanceof RepeatMonosaccharide) )));
+    let leaf_tag = Symbol('repeat_leaf');
+    let seen_repeats = new Map();
+    repeat_leaf_residues.forEach( res => {
+      if ( ! seen_repeats.has(res.repeat) ) {
+        seen_repeats.set(res.repeat,res);
+        res.setTag(leaf_tag);
+      }
+    });
+    if (repeat_leaf_residues.length > 0) {
+      repeat_leaf_tags.set(this,leaf_tag);
+    }
+  }
   let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')'+cap_repeat(kid[1]) ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
-  let seq = child_sequence+write_monosaccharide(start)+write_linkage(start);
+  let seq = child_sequence+write_monosaccharide(start,this)+write_linkage(start);
   if (start === this.root && this.comment) {
     return `${seq}+"${this.comment}"`;
   } else {

@@ -24,6 +24,8 @@ const repeat_symbol = Symbol('repeat');
 
 const counter_symbol = Symbol('counter');
 
+const attachment_symbol = Symbol('attachment');
+
 import { default as Monosaccharide, calculateSiblingOrder } from './Monosaccharide';
 
 import Sugar from './Sugar';
@@ -217,10 +219,15 @@ export { RepeatMonosaccharide };
 export default class Repeat {
   constructor(sugar,attachment,min=1,max=1) {
     this[template_sugar] = sugar;
+
+    let main_branch_residue = sugar.leaves()[0];
+
     if (sugar.root.identifier === 'Root') {
       sugar.root = sugar.root.children[0];
     }
-    this[last_residue] = sugar.leaves[0];
+
+    this[last_residue] = main_branch_residue;
+
     if ( ! attachment ) {
       if (sugar.leaves.length !== 1) {
         throw new Error('Too many leaves on repeat without defined attachment site');
@@ -228,6 +235,17 @@ export default class Repeat {
     } else {
       this[last_residue] = ((typeof attachment === 'string') && ! (attachment instanceof Monosaccharide)) ? sugar.locate_monosaccharide(attachment) : attachment;
     }
+
+    if (typeof attachment !== 'string') {
+      attachment = sugar.location_for_monosaccharide(this[last_residue]);
+    }
+
+    if (this[last_residue] && this[last_residue] !== main_branch_residue) {
+      this.off_main = true;
+    }
+
+    this[attachment_symbol] = attachment;
+
     this[min_repeats] = min;
     this[max_repeats] = max;
     this[child_residue_symbol] = new Monosaccharide('Root');
@@ -280,6 +298,10 @@ export default class Repeat {
       placeholder.addChild(target_linkage,root);
     }
     return root;
+  }
+
+  get attachment() {
+    return this[attachment_symbol];
   }
 
   get identifier() {
