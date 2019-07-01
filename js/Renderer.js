@@ -232,11 +232,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
     group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
 
     if (child_repeat) {
-      let repeat_label = group.text( cap[2] , cap[3], child.repeat.identifier );
-      repeat_label.setAttribute('font-size',str(Math.floor(SCALE/3)));
-      repeat_label.setAttribute('text-anchor','end');
-      repeat_label.firstChild.setAttribute('dy','0.25em');
-      repeat_label.firstChild.setAttribute('dx','-0.25em');
+      group.text( cap[2] , cap[3], child.repeat.identifier, { 'font-size' : str(Math.floor(SCALE/3)), 'text-anchor' : 'end', 'dy' : '0.25em', 'dx' : '-0.25em' } );
     }
   }
 

@@ -77,11 +77,12 @@ class SVGCanvas {
                                                    options['stroke-width'] ? `stroke-width: var(--stroke-width,${options['stroke-width']})` : ''
                                                  ];
     a_line.setAttribute('style',`${fill_style}${stroke_style}${stroke_width}`);
+    a_line.setAttribute('stroke-linecap','round');
     this.appendChild(a_line);
     return a_line;
   }
 
-  text(x,y,text) {
+  text(x,y,text,options={}) {
     let a_text = this.canvas.ownerDocument.createElementNS(SVGNS,'text');
     let a_tspan = this.canvas.ownerDocument.createElementNS(SVGNS, 'tspan');
     if (typeof text != 'string') {
@@ -94,6 +95,17 @@ class SVGCanvas {
     a_text.style.fontFamily = 'Helvetica, Verdana, Arial, Sans-serif';
     a_text.setAttribute('x',str(x));
     a_text.setAttribute('y',str(y));
+    for (let optkey of ['font-size','text-anchor']) {
+      if (options[optkey]) {
+        a_text.setAttribute(optkey,options[optkey]);
+      }
+    }
+    for (let optkey of ['dy','dx']) {
+      if (options[optkey]) {
+        a_tspan.setAttribute(optkey,options[optkey]);
+      }
+    }
+
     this.appendChild(a_text);
     return a_text;
   }
