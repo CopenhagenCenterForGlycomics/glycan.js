@@ -44,6 +44,9 @@ const render_text = function(canvas){
     ctx.textAlign = this.options['text-anchor'];
   }
   ctx.textBaseline = 'top';
+  if (this.options.dy) {
+    ctx.textBaseline = 'middle';
+  }
   ctx.fillStyle = 'black';
   ctx.fillText(this.text, this.x, this.y);
 };
