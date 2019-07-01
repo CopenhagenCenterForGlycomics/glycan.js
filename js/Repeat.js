@@ -104,10 +104,6 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       });
     }
 
-    removeChild() {
-      // No-op this
-    }
-
     graft() {
       // No-op
     }
@@ -217,6 +213,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
 export { RepeatMonosaccharide };
 
 export default class Repeat {
+
   constructor(sugar,attachment,min=1,max=1) {
     this[template_sugar] = sugar;
 
@@ -250,6 +247,10 @@ export default class Repeat {
     this[max_repeats] = max;
     this[child_residue_symbol] = new Monosaccharide('Root');
 
+  }
+
+  static get Monosaccharide() {
+    return RepeatMonosaccharide;
   }
 
   static addToSugar(sugar,start,end,mode,min=1,max=1) {
