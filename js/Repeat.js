@@ -85,6 +85,12 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       return this;
     }
 
+    clone() {
+      let result = new this.constructor(this.original,this[parent_symbol],this[repeat_symbol].clone(),this[counter_symbol]);
+      result.copyTagsFrom(this);
+      return result;
+    }
+
     get repeat() {
       return this[repeat_symbol];
     }
@@ -237,6 +243,10 @@ export default class Repeat {
     this[max_repeats] = max;
     this[child_residue_symbol] = new Monosaccharide('Root');
 
+  }
+
+  clone() {
+    return new this.constructor(this[template_sugar],this[attachment_symbol],this[min_repeats],this[max_repeats]);
   }
 
   get off_main() {
