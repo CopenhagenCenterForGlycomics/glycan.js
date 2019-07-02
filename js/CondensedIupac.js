@@ -1,6 +1,6 @@
 
 import Monosaccharide from './Monosaccharide';
-import { default as Repeat, RepeatMonosaccharide } from './Repeat';
+import Repeat from './Repeat';
 
 let follow_bold_branch, create_bold_tree;
 
@@ -199,7 +199,7 @@ let link_expander = function(links) {
 };
 
 let cap_repeat = (res) => {
-  if (res instanceof RepeatMonosaccharide && res.parent && ( ! (res.parent instanceof RepeatMonosaccharide) )) {
+  if (res instanceof Repeat.Monosaccharide && res.parent && ( ! (res.parent instanceof Repeat.Monosaccharide) )) {
     return ((res.repeat.off_main ? `@${res.repeat.attachment}` : '' )+`}${res.repeat.identifier}`);
   }
   return '';
@@ -210,8 +210,8 @@ let write_sequence = function(start=this.root) {
     return;
   }
   if (start === this.root) {
-    let all_repeat_residues = this.composition().filter( res => (res instanceof RepeatMonosaccharide) );
-    let repeat_leaf_residues = all_repeat_residues.filter( res => ((res.children.length === 0) || res.children.every( r => ! (r instanceof RepeatMonosaccharide) )));
+    let all_repeat_residues = this.composition().filter( res => (res instanceof Repeat.Monosaccharide) );
+    let repeat_leaf_residues = all_repeat_residues.filter( res => ((res.children.length === 0) || res.children.every( r => ! (r instanceof Repeat.Monosaccharide) )));
     let leaf_tag = Symbol('repeat_leaf');
     let seen_repeats = new Map();
     repeat_leaf_residues.forEach( res => {

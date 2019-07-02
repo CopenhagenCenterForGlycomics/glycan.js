@@ -1,6 +1,6 @@
 'use strict';
 import Monosaccharide from './Monosaccharide';
-import { RepeatMonosaccharide } from './Repeat';
+import Repeat from './Repeat';
 
 import { Tracer } from './Tracing';
 
@@ -69,7 +69,7 @@ export default class Sugar {
   }
 
   get repeats() {
-    let repeat_residues = this.composition(this.root).filter( res => res instanceof RepeatMonosaccharide );
+    let repeat_residues = this.composition(this.root).filter( res => res instanceof Repeat.Monosaccharide );
     return repeat_residues.map( res => res.repeat ).filter( (o,i,a) => a.indexOf(o) === i );
   }
 

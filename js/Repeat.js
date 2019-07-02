@@ -155,10 +155,6 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
         return results;
       }
 
-      if (this.endsRepeat && this.counter >= max_count ) {
-        return results;
-      }
-
       let kid_links = [...original_kids.keys()];
 
 
@@ -196,7 +192,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
             writable: false
           });
         }
-        all_children = Object.freeze( self_kids.concat( repeat_kids ) );
+        all_children = Object.freeze( self_kids.concat( repeat_kids ).concat(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ))) );
       } else {
         all_children = Object.freeze( self_kids.concat(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ))) );
       }
@@ -209,8 +205,6 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     }
 
 }
-
-export { RepeatMonosaccharide };
 
 export default class Repeat {
 
@@ -237,16 +231,16 @@ export default class Repeat {
       attachment = sugar.location_for_monosaccharide(this[last_residue]);
     }
 
-    if (this[last_residue] && this[last_residue] !== main_branch_residue) {
-      this.off_main = true;
-    }
-
     this[attachment_symbol] = attachment;
 
     this[min_repeats] = min;
     this[max_repeats] = max;
     this[child_residue_symbol] = new Monosaccharide('Root');
 
+  }
+
+  get off_main() {
+    return this[last_residue] !== this[template_sugar].leaves()[0];
   }
 
   static get Monosaccharide() {
@@ -330,6 +324,10 @@ export default class Repeat {
 
   get max() {
     return this[max_repeats];
+  }
+
+  set max(max) {
+    this[max_repeats] = max;
   }
 
   get children() {

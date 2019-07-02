@@ -4,7 +4,7 @@ import debug from './Debug';
 
 import Monosaccharide from './Monosaccharide';
 
-import { RepeatMonosaccharide } from './Repeat';
+import Repeat from './Repeat';
 
 const module_string='glycanjs:renderer';
 
@@ -174,8 +174,8 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
     render_link_label.call(this,child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
   }
 
-  const child_repeat = child instanceof RepeatMonosaccharide;
-  const parent_repeat = parent instanceof RepeatMonosaccharide;
+  const child_repeat = child instanceof Repeat.Monosaccharide;
+  const parent_repeat = parent instanceof Repeat.Monosaccharide;
 
 
   if (child_repeat && child.endsRepeat && child.children.length === 0) {
