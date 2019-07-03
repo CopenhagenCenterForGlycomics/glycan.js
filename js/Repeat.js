@@ -225,7 +225,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       } else if (this.endsRepeat && this.counter >= max_count ) {
         let repeat_kids = this.repeat[child_residue_symbol].children;
         for (let kid of repeat_kids) {
-          if (kid.parent === this.repeat[child_residue_symbol]) {
+          if (kid.parent === this.repeat[child_residue_symbol] || kid.parent.counter < max_count ) {
             kid.parent = this;
           }
         }
