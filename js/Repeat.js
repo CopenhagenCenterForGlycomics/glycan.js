@@ -141,7 +141,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       if (this.repeat.mode === MODE_EXPAND) {
         return super.removeChild(linkage,child);
       }
-      delete child.parent;
+
       return this.repeat[child_residue_symbol].removeChild(linkage,child);
     }
 
@@ -391,7 +391,6 @@ export default class Repeat {
     let root = this[child_residue_symbol];
     for (let kid of root.children) {
       root.removeChild(root.linkageOf(kid),kid);
-      delete kid.parent;
     }
     for (let residue of children) {
       if (residue.parent) {
