@@ -28,8 +28,6 @@ const attachment_symbol = Symbol('attachment');
 
 import { default as Monosaccharide, calculateSiblingOrder } from './Monosaccharide';
 
-import Sugar from './Sugar';
-
 import { TracedMonosaccharide } from './Tracing';
 
 import MixedTupleMap from '../lib/MixedTupleMap';
@@ -246,7 +244,13 @@ export default class Repeat {
   }
 
   clone() {
-    return new this.constructor(this[template_sugar],this[attachment_symbol],this[min_repeats],this[max_repeats]);
+    let cloned = new this.constructor(this[template_sugar],this[last_residue],this.min,this.max);
+    cloned[attachment_symbol] = this[attachment_symbol];
+    cloned.identifier = this.identifier;
+    if (this.mode) {
+      cloned.mode = this.mode;
+    }
+    return cloned;
   }
 
   get off_main() {
@@ -274,8 +278,9 @@ export default class Repeat {
     let parent_link = parent.linkageOf(start);
     parent.removeChild(parent_link,start);
 
-    let temp_sugar = new Sugar();
-    temp_sugar.root = start;
+    let temp_sugar = new sugar.constructor();
+    temp_sugar.root = new Monosaccharide('Root');
+    temp_sugar.root.addChild(parent_link,start);
     let repeat = new Repeat(temp_sugar,end,min,max);
     repeat.mode = mode;
     for (let kid of temp_end.children) {
@@ -296,9 +301,9 @@ export default class Repeat {
 
   get root() {
     let root = get_wrapped_residue(RepeatMonosaccharide,this,this[template_sugar].root,null,this.min);
-    if (this[template_sugar].root.parent && this[template_sugar].root.parent.children.indexOf(root) < 0) {
+    if (this[template_sugar].root.parent && ! root.parent ) {
       let target_linkage = this[template_sugar].root.parent.linkageOf(this[template_sugar].root);
-      let placeholder = this[template_sugar].root.parent;
+      let placeholder = this[template_sugar].root.parent.clone();
       placeholder.removeChild(target_linkage,this[template_sugar].root);
       placeholder.addChild(target_linkage,root);
     }

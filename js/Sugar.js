@@ -115,12 +115,29 @@ export default class Sugar {
 
   clone(visitor) {
     let cloned = new WeakMap();
+    let cloned_repeats = new WeakMap();
     let nodes = this.breadth_first_traversal(this.root,visitor);
     for (let node of nodes) {
+      if ((node instanceof Repeat.Monosaccharide) && node.repeat.root !== node ) {
+        continue;
+      }
       if ( ! cloned.has(node) ) {
         cloned.set(node,node.clone());
       }
       let node_clone = cloned.get(node);
+      if (node_clone instanceof Repeat.Monosaccharide) {
+        cloned_repeats.set( node.repeat, node_clone.repeat );
+        cloned.set(node, node_clone.repeat.root );
+        node_clone = cloned.get(node);
+      }
+      if ((node.parent instanceof Repeat.Monosaccharide) && node.parent.repeat.children.indexOf(node) >= 0) {
+        let repeat = cloned_repeats.get(node.parent.repeat);
+        repeat.children = repeat.children.concat( node_clone );
+        node_clone.parent.replaceChild(node_clone,node_clone,node.parent.linkageOf(node));
+        continue;
+      }
+
+
       if (node.parent && cloned.get(node.parent)) {
         cloned.get(node.parent).addChild(node.parent.linkageOf(node),node_clone);
       }

@@ -224,6 +224,9 @@ let write_sequence = function(start=this.root) {
       repeat_leaf_tags.set(this,leaf_tag);
     }
   }
+  // Write the sequences for each of the children of this residue
+  // making sure that we place the children in square brackets
+  // if they are off the main branch
   let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')'+cap_repeat(kid[1]) ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   let seq = child_sequence+write_monosaccharide(start,this)+write_linkage(start);
   if (start === this.root && this.comment) {

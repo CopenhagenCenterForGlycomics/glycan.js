@@ -32,6 +32,42 @@ QUnit.test( 'Test creating a repeat on a sugar with an extra child' , function( 
 });
 
 
+QUnit.test( 'Test creating a repeat on a sugar off the major branch' , function( assert ) {
+  let sequence = 'GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]GlcNAc(b1-4)GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  let repeat = Repeat.addToSugar(sugar,'y5a','y6a',Repeat.MODE_MINIMAL,1,4);
+  repeat.identifier = 'j';
+  let new_res = new IupacSugar.Monosaccharide('Fuc');
+  new_res.parent_linkage = 1;
+  new_res.anomer = 'a';
+  sugar.leaves()[0].original.addChild(4,new_res);
+  assert.equal(sugar.sequence, '{Fuc(a1-4)GlcNAc(b1-3)Gal(b1-3)@y3a}jGlcNAc(b1-2)Man(a1-3)[Man(a1-6)]GlcNAc(b1-4)GlcNAc');
+});
+
+QUnit.test( 'Test creating a repeat on a sugar off the major branch with a child' , function( assert ) {
+  let sequence = 'GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]GlcNAc(b1-4)GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  let repeat = Repeat.addToSugar(sugar,'y5a','y6a',Repeat.MODE_MINIMAL,1,4);
+  repeat.identifier = 'j';
+  let new_res = new IupacSugar.Monosaccharide('Fuc');
+  new_res.parent_linkage = 1;
+  new_res.anomer = 'a';
+  sugar.leaves()[0].original.addChild(4,new_res);
+  assert.equal(sugar.sequence, '{Fuc(a1-4)GlcNAc(b1-3)Gal(b1-3)@y3a}jGlcNAc(b1-2)Man(a1-3)[Man(a1-6)]GlcNAc(b1-4)GlcNAc');
+
+  new_res = new IupacSugar.Monosaccharide('Gal');
+  new_res.parent_linkage = 1;
+  new_res.anomer = 'b';
+  let target = sugar.leaves()[0].parent;
+  assert.equal(target.identifier,'GlcNAc');
+  target.addChild(3,new_res);
+  assert.equal(sugar.sequence, 'Gal(b1-3){Fuc(a1-4)GlcNAc(b1-3)Gal(b1-3)@y3a}jGlcNAc(b1-2)Man(a1-3)[Man(a1-6)]GlcNAc(b1-4)GlcNAc');
+});
+
 QUnit.test( 'Test creating a repeat on a sugar with many children' , function( assert ) {
   let sequence = 'NeuAc(a2-3)[Fuc(a1-6)]Gal(b1-4)[Fuc(a1-8)]Man(b1-5)GlcNAc';
   let sugar = new IupacSugar();
