@@ -123,7 +123,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       if (! this.endsRepeat) {
         throw new Error('Adding a child that isnt at the end of a repeat');
       }
-      if (this.repeat.mode === MODE_EXPAND) {
+      if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
         return super.addChild(linkage,child);
       }
       
@@ -138,7 +138,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       if (! this.endsRepeat) {
         throw new Error('Removing a child that isnt at the end of a repeat');
       }
-      if (this.repeat.mode === MODE_EXPAND) {
+      if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
         return super.removeChild(linkage,child);
       }
 
