@@ -217,16 +217,18 @@ let write_sequence = function(start=this.root) {
   // making sure that we place the children in square brackets
   // if they are off the main branch
 
-  let child_links = [].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander));
-  if ((start instanceof Repeat.Monosaccharide) && start.repeat.mode === Repeat.MODE_MINIMAL) {
+  let child_links = [];
+  if ((start instanceof Repeat.Monosaccharide) && start.repeat.mode === Repeat.MODE_MINIMAL && start.repeat.root === start) {
     let repeat_kids = start.repeat.children;
     if (repeat_kids.length > 0) {
-      child_links = [].concat.apply([], [...repeat_kids[0].parent.child_linkages].filter( ([linkage,child]) => {
-        return ! (child instanceof Repeat.Monosaccharide );
+      child_links = [].concat.apply([], [...repeat_kids[0].parent.child_linkages].map( ([linkage,kids]) => {
+        return [ linkage, kids.filter( child => ! (child instanceof Repeat.Monosaccharide ) ) ];
       }).sort( (a,b) => a[0] - b[0] ).map( link_expander ));
     } else {
       child_links = [];
     }
+  } else {
+    child_links = [].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander));
   }
 
   let child_sequence = ''+child_links.map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')'+cap_repeat(kid[1]) ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );

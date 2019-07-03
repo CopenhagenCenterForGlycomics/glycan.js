@@ -122,6 +122,16 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       return this.repeat[child_residue_symbol].addChild(linkage,child);
     }
 
+    removeChild(linkage,child) {
+      if (! this.endsRepeat) {
+        throw new Error('Removing a child that isnt at the end of a repeat');
+      }
+      if (this.repeat.mode === MODE_EXPAND) {
+        return super.removeChild(linkage,child);
+      }
+      return this.repeat[child_residue_symbol].removeChild(linkage,child);
+    }
+
     get endsRepeat() {
       return this.original === this.repeat[last_residue];
     }
@@ -135,7 +145,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
 
     linkageOf(child) {
       if (child instanceof RepeatMonosaccharide) {
-        if (this.endsRepeat) {
+        if (this.endsRepeat && child.repeat === this.repeat && child.counter !== this.counter && child.original === this.repeat.root.original ) {
           return this.repeat.root.parent.linkageOf(this.repeat.root);
         }
         return this.original.linkageOf(child.original);
