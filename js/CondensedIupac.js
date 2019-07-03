@@ -173,14 +173,17 @@ let parse_sequence = function(sequence) {
   return root;
 };
 
-
-let repeat_leaf_tags = new WeakMap();
-
-let write_monosaccharide = (mono,sugar) => {
+let write_monosaccharide = (mono) => {
   let name = mono.toString();
 
-  if ( repeat_leaf_tags.get(sugar) && mono.getTag(repeat_leaf_tags.get(sugar)) ) {
-    return `{${name}`;
+  if ( mono instanceof Repeat.Monosaccharide ) {
+    if (mono.repeat.mode === Repeat.MODE_MINIMAL) {
+      return `{${mono.repeat.template.sequence.replace(/\([a-z]\d+-$/,'')}`;
+    }
+    if (mono.repeat.mode === Repeat.MODE_EXPAND) {
+      return `${name}`;
+    }
+
   }
   return name;
 };
@@ -199,7 +202,7 @@ let link_expander = function(links) {
 };
 
 let cap_repeat = (res) => {
-  if (res instanceof Repeat.Monosaccharide && res.parent && ( ! (res.parent instanceof Repeat.Monosaccharide) )) {
+  if (res instanceof Repeat.Monosaccharide && res.repeat.root === res && res.repeat.mode === Repeat.MODE_MINIMAL) {
     return ((res.repeat.off_main ? `@${res.repeat.attachment}` : '' )+`}${res.repeat.identifier}`);
   }
   return '';
@@ -209,25 +212,24 @@ let write_sequence = function(start=this.root) {
   if ( ! start ) {
     return;
   }
-  if (start === this.root) {
-    let all_repeat_residues = this.composition().filter( res => (res instanceof Repeat.Monosaccharide) );
-    let repeat_leaf_residues = all_repeat_residues.filter( res => ((res.children.length === 0) || res.children.every( r => ! (r instanceof Repeat.Monosaccharide) )));
-    let leaf_tag = Symbol('repeat_leaf');
-    let seen_repeats = new Map();
-    repeat_leaf_residues.forEach( res => {
-      if ( ! seen_repeats.has(res.repeat) ) {
-        seen_repeats.set(res.repeat,res);
-        res.setTag(leaf_tag);
-      }
-    });
-    if (repeat_leaf_residues.length > 0) {
-      repeat_leaf_tags.set(this,leaf_tag);
-    }
-  }
+
   // Write the sequences for each of the children of this residue
   // making sure that we place the children in square brackets
   // if they are off the main branch
-  let child_sequence = ''+[].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander)).map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')'+cap_repeat(kid[1]) ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
+
+  let child_links = [].concat.apply([],[...start.child_linkages].sort( (a,b) => a[0] - b[0] ).map(link_expander));
+  if ((start instanceof Repeat.Monosaccharide) && start.repeat.mode === Repeat.MODE_MINIMAL) {
+    let repeat_kids = start.repeat.children;
+    if (repeat_kids.length > 0) {
+      child_links = [].concat.apply([], [...repeat_kids[0].parent.child_linkages].filter( ([linkage,child]) => {
+        return ! (child instanceof Repeat.Monosaccharide );
+      }).sort( (a,b) => a[0] - b[0] ).map( link_expander ));
+    } else {
+      child_links = [];
+    }
+  }
+
+  let child_sequence = ''+child_links.map( kid => write_sequence.call(this,kid[1])+write_link(kid[0])+')'+cap_repeat(kid[1]) ).reduce( (curr,next) => curr ? curr+'['+next+']' : next , '' );
   let seq = child_sequence+write_monosaccharide(start,this)+write_linkage(start);
   if (start === this.root && this.comment) {
     return `${seq}+"${this.comment}"`;

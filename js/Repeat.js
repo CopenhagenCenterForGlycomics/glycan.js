@@ -112,6 +112,16 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       // No-op
     }
 
+    addChild(linkage,child) {
+      if (! this.endsRepeat) {
+        throw new Error('Adding a child that isnt at the end of a repeat');
+      }
+      if (this.repeat.mode === MODE_EXPAND) {
+        return super.addChild(linkage,child);
+      }
+      return this.repeat[child_residue_symbol].addChild(linkage,child);
+    }
+
     get endsRepeat() {
       return this.original === this.repeat[last_residue];
     }
@@ -297,6 +307,10 @@ export default class Repeat {
 
   static get MODE_MINIMAL() {
     return MODE_MINIMAL;
+  }
+
+  get template() {
+    return this[template_sugar];
   }
 
   get root() {

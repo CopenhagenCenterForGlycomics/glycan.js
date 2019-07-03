@@ -1,6 +1,7 @@
 /*global QUnit*/
 
 import Sugar from '../../js/Sugar';
+import Repeat from '../../js/Repeat';
 
 import {IO as Iupac} from '../../js/CondensedIupac';
 
@@ -39,6 +40,9 @@ QUnit.test( 'Read a simple repeat' , function( assert ) {
   for (let sequence of glycosuite_repeats.slice(0,1) ) {
     let sugar = new IupacSugar();
     sugar.sequence = sequence;
+    for (let rep of sugar.repeats) {
+      rep.mode = Repeat.MODE_MINIMAL;
+    }
     assert.equal(sugar.sequence,sequence, 'Has repeat generated sequence');
   }
 });
@@ -47,6 +51,9 @@ QUnit.test( 'Read a repeat after branch' , function( assert ) {
   let sequence = 'GlcNAc(b1-2){Glc(a1-3)}j[Man(a1-6)]Asn';
   let sugar = new IupacSugar();
   sugar.sequence = sequence;
+  for (let rep of sugar.repeats) {
+    rep.mode = Repeat.MODE_MINIMAL;
+  }
   assert.equal(sugar.sequence,sequence, 'Has repeat generated sequence');
 });
 

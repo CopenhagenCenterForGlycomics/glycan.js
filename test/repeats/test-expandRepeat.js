@@ -27,10 +27,10 @@ QUnit.test( 'Expand a simple repeat' , function( assert ) {
 
   repeat.mode = Repeat.MODE_EXPAND;
 
-  assert.equal(sugar.sequence,'{Glc(b1-4)[Fuc(a1-8)]Man(b1-5)}GlcNAc', 'Can switch to expanded mode');
+  assert.equal(sugar.sequence,'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)GlcNAc', 'Can switch to expanded mode');
 
   repeat.max = 10;
 
-  assert.equal(sugar.sequence,'{Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)}GlcNAc', 'Can lengthen expansion');
+  assert.equal(sugar.sequence,'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)GlcNAc', 'Can lengthen expansion');
 
 });
