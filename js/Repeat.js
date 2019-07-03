@@ -162,8 +162,9 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
           return this.repeat.root.parent.linkageOf(this.repeat.root);
         }
         return this.original.linkageOf(child.original);
+      } else if (this.endsRepeat && this.repeat.children.indexOf(child) >= 0) {
+        return this.repeat[child_residue_symbol].linkageOf(child);
       } else {
-        // return super.linkageOf(child);
         return (new Monosaccharide(' ')).linkageOf.call(this,child);
       }
     }
