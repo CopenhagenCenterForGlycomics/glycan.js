@@ -51,3 +51,28 @@ QUnit.test( 'Reading and writing sequence' , function( assert ) {
   let repeat_seq = sugar.sequence;
   assert.equal(repeat_seq,sequence, 'Has repeat generated sequence');
 });
+
+QUnit.test( 'Reading and writing sequence off major branch with child' , function( assert ) {
+  let sequence = 'Gal(b1-3){Fuc(a1-2)[Fuc(a1-4)GlcNAc(b1-3)]Gal(b1-3)@y3b}2GlcNAc(b1-2)Man(a1-3)[Gal(b1-3){Fuc(a1-2)[Fuc(a1-4)GlcNAc(b1-3)]Gal(b1-3)@y3b}2GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+  for (let repeat of sugar.repeats) {
+    repeat.mode = Repeat.MODE_MINIMAL;    
+  }
+  let repeat_seq = sugar.sequence;
+  assert.equal(repeat_seq,sequence, 'Has repeat generated sequence');
+});
+
+QUnit.test( 'Reading and writing sequence off major branch with child' , function( assert ) {
+  let sequence = 'Gal(b1-3){Fuc(a1-2)[Fuc(a1-4)GlcNAc(b1-3)]Gal(b1-3)@y3b}3GlcNAc(b1-2)Man(a1-3)[Gal(b1-3){Fuc(a1-2)[Fuc(a1-4)GlcNAc(b1-3)]Gal(b1-3)@y3b}3GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+  for (let repeat of sugar.repeats) {
+    repeat.mode = Repeat.MODE_EXPAND;    
+  }
+  let repeat_seq = sugar.sequence;
+  let target_sequence = 'Fuc(a1-2)[Fuc(a1-2)[Fuc(a1-2)[Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)]Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)]Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)]Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[Fuc(a1-2)[Fuc(a1-2)[Fuc(a1-2)[Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)]Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)]Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)]Gal(b1-3)GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+  assert.equal(repeat_seq,target_sequence, 'Has repeat generated sequence');
+});
+
+

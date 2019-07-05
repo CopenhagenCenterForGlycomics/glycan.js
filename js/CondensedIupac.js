@@ -103,6 +103,7 @@ const create_repeat_objects = (sugar,definitions) => {
     let variable_identifier = '';
     if (definitions[key].variable.match(/^\d+$/)) {
       max_repeats = parseInt(definitions[key].variable);
+      variable_identifier = ''+max_repeats;
     }
     if (definitions[key].variable.match(/[a-z]/)) {
       variable_identifier = definitions[key].variable;
@@ -141,10 +142,12 @@ let parse_sequence = function(sequence) {
   let repeat_match;
   let repeat_count = 0;
   let repeat_definitions = {};
+  let repeat_free_seq = sequence;
   while ( (repeat_match = repeat_re.exec(sequence)) !== null ) {
-    sequence = sequence.replace(repeat_match[0],`Repeat${++repeat_count}(u?-?)`);
+    repeat_free_seq = repeat_free_seq.replace(repeat_match[0],`Repeat${++repeat_count}(u?-?)`);
     repeat_definitions[repeat_count] = { seq: repeat_match[1], attachment: repeat_match[2], variable: repeat_match[3] };
   }
+  sequence = repeat_free_seq;
 
   if (sequence.match(/[\]\)]$/)) {
     sequence = `${sequence}Root`;
