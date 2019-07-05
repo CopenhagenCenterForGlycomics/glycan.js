@@ -132,8 +132,9 @@ export default class Sugar {
       }
       if ((node.parent instanceof Repeat.Monosaccharide) && node.parent.repeat.children.indexOf(node) >= 0) {
         let repeat = cloned_repeats.get(node.parent.repeat);
+        let res = new Monosaccharide('Root');
+        res.addChild(node.parent.linkageOf(node),node_clone);
         repeat.children = repeat.children.concat( node_clone );
-        node_clone.parent.replaceChild(node_clone,node_clone,node.parent.linkageOf(node));
         continue;
       }
 

@@ -74,10 +74,13 @@ const get_wrapped_residue = (clazz,repeat,monosaccharide,parent,counter) => {
   return repeat_wraps.get(id_tuple);
 };
 
-const patch_parent = (residue,root) => {
+const patch_parent = (residue,repeat) => {
   Object.defineProperty(residue,'parent', {
-    get : function() { return this._parent ? this._parent : root;  },
-    set : function(parent) { this._parent = parent; }
+    get : () => {
+      const max_count = repeat.mode === MODE_EXPAND ? repeat.max : repeat.mode === MODE_MINIMAL ? repeat.min : 1;
+      let parent = get_wrapped_residue(repeat.constructor.Monosaccharide, repeat, repeat[last_residue],null,max_count);
+      return parent;
+    }
   });
 };
 
@@ -126,12 +129,10 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
         return super.addChild(linkage,child);
       }
-
-      let root = this.repeat[child_residue_symbol];
-
-      root.addChild(linkage,child);
-
-      patch_parent(child,root);
+      if (this.repeat[child_residue_symbol].children.indexOf(child) < 0) {
+        this.repeat[child_residue_symbol].addChild(linkage,child);
+        patch_parent(child,this.repeat);
+      }
     }
 
     removeChild(linkage,child) {
@@ -228,11 +229,6 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
         all_children = Object.freeze(self_kids.concat([ new_wrapped_root ]).concat( wrapped_original_kids ));
       } else if (this.endsRepeat && this.counter >= max_count ) {
         let repeat_kids = this.repeat[child_residue_symbol].children;
-        for (let kid of repeat_kids) {
-          if (kid.parent === this.repeat[child_residue_symbol] || kid.parent.counter < max_count ) {
-            kid.parent = this;
-          }
-        }
         all_children = Object.freeze( self_kids.concat( repeat_kids ).concat( wrapped_original_kids ) );
       } else {
         all_children = Object.freeze( self_kids.concat( wrapped_original_kids ) );
@@ -322,7 +318,7 @@ export default class Repeat {
     repeat.mode = mode;
     for (let kid of temp_end.children) {
       repeat[child_residue_symbol].graft(kid);
-      patch_parent(kid,repeat[child_residue_symbol]);
+      patch_parent(kid,repeat);
     }
     parent.addChild(parent_link,repeat.root);
     return repeat;
@@ -402,7 +398,7 @@ export default class Repeat {
       } else {
         root.addChild(0,residue);
       }
-      patch_parent(residue,root);
+      patch_parent(residue,this);
     }
   }
 
