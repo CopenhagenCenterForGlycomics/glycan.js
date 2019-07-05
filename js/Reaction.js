@@ -134,6 +134,9 @@ class Reaction extends Sugar {
     this.delta.freeze();
   }
   get comment() {
+    if (this.delta) {
+      return;
+    }
     return this[comment_symbol];
   }
   get delta() {

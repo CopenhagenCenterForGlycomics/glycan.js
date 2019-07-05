@@ -4,6 +4,8 @@ import debug from './Debug';
 
 import Monosaccharide from './Monosaccharide';
 
+import Repeat from './Repeat';
+
 const module_string='glycanjs:renderer';
 
 const log = debug(module_string);
@@ -131,6 +133,29 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   return label;
 };
 
+const point_along_line = (x0,y0,x1,y1,t) => {
+  return [(1-t)*x0 + t*x1, (1-t)*y0 + t*y1 ];
+};
+
+const perpendicular_line = (x0,y0,x1,y1,length) => {
+  let x = y0 - y1; // as vector at 90 deg to the line
+  let y = x1 - x0;
+  const len = length / Math.hypot(x, y);
+  x *= len;
+  y *= len; 
+  return [x0 + x, y0 + y, x0 - x, y0 - y];
+};
+
+const half_perpendicular_line = (x0,y0,x1,y1,length) => {
+  let x = y0 - y1; // as vector at 90 deg to the line
+  let y = x1 - x0;
+  const len = length / Math.hypot(x, y);
+  x *= len;
+  y *= len; 
+  return [x0 - x, y0 - y, x0, y0];
+};
+
+
 const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,show_labels = true) {
   if ( ! parent_pos ) {
     return;
@@ -148,6 +173,69 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
   if ( show_labels ) {
     render_link_label.call(this,child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
   }
+
+  const child_repeat = child instanceof Repeat.Monosaccharide;
+  const parent_repeat = parent instanceof Repeat.Monosaccharide;
+
+
+  if (child_repeat && child.endsRepeat && child.children.length === 0) {
+    const extents = [
+      SCALE*(child_pos.x + child_pos.width / 2),
+      SCALE*(child_pos.y + child_pos.height / 2),
+      SCALE*(parent_pos.x + parent_pos.width / 2),
+      SCALE*(parent_pos.y + parent_pos.height / 2)
+    ];
+    const reverse_cap = -1;
+
+    let bracket_scale = 0.25;
+    
+    if (child_pos.x - parent_pos.x !== 0 && child_pos.y - parent_pos.y !== 0 ) {
+      bracket_scale = 1/4;
+    }
+
+    const bracket_position = point_along_line(...extents, -0.5 );
+    const perpendicular = perpendicular_line( bracket_position[0],bracket_position[1], extents[2],extents[3] , SCALE * child_pos.width * bracket_scale );
+    const cap = half_perpendicular_line( ...perpendicular , reverse_cap*SCALE * child_pos.width / 8 );
+    const cap_end = half_perpendicular_line( perpendicular[2],perpendicular[3],perpendicular[0],perpendicular[1] , reverse_cap*-1*SCALE * child_pos.width / 8 );
+
+    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+
+  }
+
+
+  if ( child_repeat ? ! parent_repeat : parent_repeat  ) {
+
+
+    // This line should go to the edges of the icons along the long (y-axis)
+    const extents = [
+      SCALE*(child_pos.x + child_pos.width / 2),
+      SCALE*(child_pos.y + child_pos.height / 2),
+      SCALE*(parent_pos.x + parent_pos.width / 2),
+      SCALE*(parent_pos.y + parent_pos.height / 2)
+    ];
+
+    const reverse_cap = child_repeat ? 1 : -1;
+
+    let bracket_scale = 0.25;
+    if (child_pos.x - parent_pos.x !== 0 && child_pos.y - parent_pos.y !== 0 ) {
+      bracket_scale = 1/4;
+    }
+    const bracket_position = point_along_line(...extents, reverse_cap > 0 ? 0.55 : 0.5 );
+    const perpendicular = perpendicular_line( bracket_position[0],bracket_position[1], extents[2],extents[3] , SCALE * child_pos.width * bracket_scale );
+    const cap = half_perpendicular_line( ...perpendicular , reverse_cap*SCALE * child_pos.width / 8 );
+    const cap_end = half_perpendicular_line( perpendicular[2],perpendicular[3],perpendicular[0],perpendicular[1] , reverse_cap*-1*SCALE * child_pos.width / 8 );
+
+    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+
+    if (child_repeat) {
+      group.text( cap[2] , cap[3], child.repeat.identifier, { 'font-size' : str(Math.floor(SCALE/3)), 'text-anchor' : 'end', 'dy' : '0.25em', 'dx' : '-0.25em' } );
+    }
+  }
+
   return group;
 };
 

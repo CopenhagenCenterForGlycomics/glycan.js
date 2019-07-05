@@ -1,5 +1,6 @@
 'use strict';
 import Monosaccharide from './Monosaccharide';
+import Repeat from './Repeat';
 
 import { Tracer } from './Tracing';
 
@@ -67,13 +68,11 @@ export default class Sugar {
     Object.freeze(this);
   }
 
-  // FIXME - Matching residues (given a prototype, which residues match)
+  get repeats() {
+    let repeat_residues = this.composition(this.root).filter( res => res instanceof Repeat.Monosaccharide );
+    return repeat_residues.map( res => res.repeat ).filter( (o,i,a) => a.indexOf(o) === i );
+  }
 
-  // Positional description
-  // FIXME - linkage + residue path from given residue to root - optional return residues also
-  // FIXME - get path to root
-
-  // FIXME - paths (all paths from leaves to root)
   paths(root=this.root,start=this.leaves(root)) {
     let self = this;
     return [].concat(start).map((leaf) => Array.from(self.residues_to_root(leaf)));
@@ -116,12 +115,30 @@ export default class Sugar {
 
   clone(visitor) {
     let cloned = new WeakMap();
+    let cloned_repeats = new WeakMap();
     let nodes = this.breadth_first_traversal(this.root,visitor);
     for (let node of nodes) {
+      if ((node instanceof Repeat.Monosaccharide) && node.repeat.root !== node ) {
+        continue;
+      }
       if ( ! cloned.has(node) ) {
         cloned.set(node,node.clone());
       }
       let node_clone = cloned.get(node);
+      if (node_clone instanceof Repeat.Monosaccharide) {
+        cloned_repeats.set( node.repeat, node_clone.repeat );
+        cloned.set(node, node_clone.repeat.root );
+        node_clone = cloned.get(node);
+      }
+      if ((node.parent instanceof Repeat.Monosaccharide) && node.parent.repeat.children.indexOf(node) >= 0) {
+        let repeat = cloned_repeats.get(node.parent.repeat);
+        let res = new Monosaccharide('Root');
+        res.addChild(node.parent.linkageOf(node),node_clone);
+        repeat.children = repeat.children.concat( node_clone );
+        continue;
+      }
+
+
       if (node.parent && cloned.get(node.parent)) {
         cloned.get(node.parent).addChild(node.parent.linkageOf(node),node_clone);
       }

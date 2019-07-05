@@ -16,8 +16,8 @@ QUnit.test( 'Read in a simple reaction' , function( assert ) {
   let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
   let reaction = new IupacReaction();
   reaction.sequence = sequence;
-  assert.ok(reaction.sequence === base_sequence, 'Has the same sequence');
-  assert.ok(reaction.delta.sequence === delta_sequence, 'Has the same delta sequence');
+  assert.equal(reaction.sequence, base_sequence, 'Has the same sequence');
+  assert.equal(reaction.delta.sequence, delta_sequence, 'Has the same delta sequence');
 });
 
 QUnit.test( 'Reactions are immutable' , function( assert ) {
@@ -27,11 +27,11 @@ QUnit.test( 'Reactions are immutable' , function( assert ) {
   let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
   let reaction = new IupacReaction();
   reaction.sequence = sequence;
-  assert.ok(reaction.sequence === base_sequence, 'Has the same sequence');
-  assert.ok(reaction.delta.sequence === delta_sequence, 'Has the same delta sequence');
+  assert.equal(reaction.sequence,base_sequence, 'Has the same sequence');
+  assert.equal(reaction.delta.sequence, delta_sequence, 'Has the same delta sequence');
   assert.throws( () => reaction.sequence = `${base_sequence}+"{Glc(b1-4)}@${position}"`, TypeError , 'Reactions should be immutable');
-  assert.ok(reaction.sequence === base_sequence, 'Has the same sequence');
-  assert.ok(reaction.delta.sequence === delta_sequence, 'Has the same delta sequence');
+  assert.equal(reaction.sequence,base_sequence, 'Has the same sequence');
+  assert.equal(reaction.delta.sequence, delta_sequence, 'Has the same delta sequence');
 });
 
 QUnit.test( 'Throws error when reaction has incorrect location' , function( assert ) {

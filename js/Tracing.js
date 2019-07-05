@@ -58,8 +58,6 @@ let clone_and_add_monosaccharide = function(wrapped_sugar,parent,child) {
   let new_sugar = wrapped_sugar.clone();
   parent = new_sugar.composition().filter( res => res.original === parent.original )[0];
   let wrapped_child = new wrapped_sugar.constructor.Monosaccharide(child);
-  wrapped_child = Object.assign(wrapped_child,child);
-
   parent.addChild(parent.original.linkageOf(child),wrapped_child);
 
   return { sugar: new_sugar, child: wrapped_child};

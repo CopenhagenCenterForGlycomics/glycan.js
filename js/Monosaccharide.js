@@ -64,6 +64,8 @@ const reorder_kids = function(children) {
   return sorted_kids.map( path => path[0] ).filter( only_unique );
 };
 
+export { reorder_kids as calculateSiblingOrder };
+
 /*   We basically want a barebones Monosacharide class that uses
   some common set of identifiers for each of the monosaccharide
   units. We can then mixin things like mass and sequence
@@ -303,6 +305,7 @@ export default class Monosaccharide {
   }
 
   linkageOf(child) {
+    let kid_linkages = this.child_linkages;
     let linkages = this.child_linkages.entries();
     let curr;
     for (curr of linkages) {

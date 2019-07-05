@@ -8,6 +8,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@babel/preset-env": "^7.4.5",
     "debug-any-level": "^0.3.0",
     "es6-tween": "^5.4.1",
     "esm": "3.2.20",
@@ -15,8 +16,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7",
+    "@babel/preset-env": "",
     "babel-loader": "^8.0.5",
-    "babel-preset-env": "^1.6.0",
+    "core-js": "2",
     "jshint": "^2.10.2",
     "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.2.0",

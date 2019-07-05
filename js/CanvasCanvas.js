@@ -38,12 +38,15 @@ class RenderTree {
 
 const render_text = function(canvas){
   let ctx = canvas.getContext('2d');
-  ctx.font = '25px Helvetica';
+  ctx.font = `${this.options['font-size'] || 25}px Helvetica`;
   ctx.textAlign = 'left';
-  if (this['text-anchor']) {
-    ctx.textAlign = this['text-anchor'];
+  if (this.options['text-anchor']) {
+    ctx.textAlign = this.options['text-anchor'];
   }
   ctx.textBaseline = 'top';
+  if (this.options.dy) {
+    ctx.textBaseline = 'middle';
+  }
   ctx.fillStyle = 'black';
   ctx.fillText(this.text, this.x, this.y);
 };
@@ -111,8 +114,8 @@ class Canvas extends RenderTree {
     return a_line;
   }
 
-  text(x,y,text) {
-    let a_text = { x,y,text, render: render_text };
+  text(x,y,text,options={}) {
+    let a_text = { x,y,text,options, render: render_text };
     this.appendChild(a_text);
     return a_text;
   }
