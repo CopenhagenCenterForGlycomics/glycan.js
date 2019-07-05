@@ -126,7 +126,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
         return super.addChild(linkage,child);
       }
-      
+
       let root = this.repeat[child_residue_symbol];
 
       root.addChild(linkage,child);
@@ -172,28 +172,30 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     get child_linkages() {
       let original_kids = this.original.child_linkages;
 
+      let kid_links = [...original_kids.keys()];
+
       let self_children = super.child_linkages;
       let results = new Map([...self_children].filter( ([key,]) => (key === 0 || key) ));
 
       const max_count = this.repeat.mode === MODE_EXPAND ? this.repeat.max : this.repeat.mode === MODE_MINIMAL ? this.repeat.min : 1;
 
       if (this.endsRepeat && this.counter < max_count ) {
-
         const root_link = this.repeat.root.parent.linkageOf(this.repeat.root);
         const new_wrapped_root = get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.counter + 1);
-        let self_kids = results.get( root_link ) || [];
 
-        let mapped = Object.freeze(self_kids.concat( [ new_wrapped_root ] ) );
-        if (mapped.length > 0 && mapped.every( child => child[sort_order_symbol])) {
-          let sorted_mapped = Object.freeze(mapped.slice().sort( (a,b) => a[sort_order_symbol] - b[sort_order_symbol] ));
-          results.set(root_link,sorted_mapped);
-        } else {
-          results.set( root_link, mapped);
+        for (let link of kid_links.concat( [ root_link ]).filter( (o,i,a) => a.indexOf(o) === i ) ) {
+          let self_kids = (results.get( link ) || []).concat( original_kids.get( link ) || []);
+          let mapped = Object.freeze( link === root_link ? self_kids.concat( [ new_wrapped_root ] ) : self_kids );
+          if (mapped.length > 0 && mapped.every( child => child[sort_order_symbol])) {
+            let sorted_mapped = Object.freeze(mapped.slice().sort( (a,b) => a[sort_order_symbol] - b[sort_order_symbol] ));
+            results.set(link,sorted_mapped);
+          } else {
+            results.set(link, mapped);
+          }
         }
         return results;
       }
 
-      let kid_links = [...original_kids.keys()];
 
 
       for( const link of kid_links ) {
@@ -219,9 +221,11 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
 
       const max_count = this.repeat.mode === MODE_EXPAND ? this.repeat.max : this.repeat.mode === MODE_MINIMAL ? this.repeat.min : 1;
 
+      const wrapped_original_kids = this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ));
+
       if (this.endsRepeat && this.counter < max_count ) {
         const new_wrapped_root = get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.counter + 1);
-        all_children = Object.freeze(self_kids.concat([ new_wrapped_root ]));
+        all_children = Object.freeze(self_kids.concat([ new_wrapped_root ]).concat( wrapped_original_kids ));
       } else if (this.endsRepeat && this.counter >= max_count ) {
         let repeat_kids = this.repeat[child_residue_symbol].children;
         for (let kid of repeat_kids) {
@@ -229,9 +233,9 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
             kid.parent = this;
           }
         }
-        all_children = Object.freeze( self_kids.concat( repeat_kids ).concat(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ))) );
+        all_children = Object.freeze( self_kids.concat( repeat_kids ).concat( wrapped_original_kids ) );
       } else {
-        all_children = Object.freeze( self_kids.concat(this.original.children.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ))) );
+        all_children = Object.freeze( self_kids.concat( wrapped_original_kids ) );
       }
 
       if (all_children.every( child => child[sort_order_symbol] ) && all_children.length > 0) {
