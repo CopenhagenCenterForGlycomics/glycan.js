@@ -110,9 +110,10 @@ class SVGRenderer extends Renderer {
 
   static fromSVGElement(element,sugar_class) {
     let renderer = new SVGRenderer();
-
     renderer[container_symbol] = element.parentNode;
     renderer.element = new SVGCanvas(element);
+
+    renderer.element.canvas = element;
 
     upgrade_symbol_elements(element,SVGRenderer.SYMBOLS);
     use_css_variables(element);
