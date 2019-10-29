@@ -253,6 +253,24 @@ class SVGRenderer extends Renderer {
     icon.element.setAttribute('transform',transform);
   }
 
+  screenCoordinatesFromLayout(layout) {
+    let svg = this.element.canvas;
+    var pt=svg.createSVGPoint();
+    let xend = layout.x + layout.width;
+    let yend = layout.y + layout.height;
+    pt.x=layout.x*SCALE;
+    pt.y=layout.y*SCALE;
+    let transformed = pt.matrixTransform(svg.getScreenCTM());
+    layout.x = transformed.x;
+    layout.y = transformed.y;
+    pt.x=xend*SCALE;
+    pt.y=yend*SCALE;
+    transformed = pt.matrixTransform(svg.getScreenCTM());
+    layout.width = transformed.x - layout.x;
+    layout.height = transformed.y - layout.y;
+    return layout;
+  }
+
   scaleToFit(padding=DEFAULT_PADDING) {
     let svg = this.element.canvas;
     let bb=svg.getBBox();

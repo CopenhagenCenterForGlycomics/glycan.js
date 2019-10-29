@@ -361,6 +361,26 @@ class CanvasRenderer extends Renderer {
     .start();
   }
 
+  screenCoordinatesFromLayout(layout) {
+    let canvas = this.element.canvas;
+    var pt={x:0,y:0};
+    let xend = layout.x + layout.width;
+    let yend = layout.y + layout.height;
+    pt.x=layout.x*SCALE;
+    pt.y=layout.y*SCALE;
+    let transformed = canvas.cm.matrix.applyToPoint(pt.x,pt.y);
+    layout.x = transformed.x;
+    layout.y = transformed.y;
+    pt.x=xend*SCALE;
+    pt.y=yend*SCALE;
+    transformed = canvas.cm.matrix.applyToPoint(pt.x,pt.y);
+    layout.width = transformed.x - layout.x;
+    layout.height = transformed.y - layout.y;
+    layout.x += canvas.getBoundingClientRect().x;
+    layout.y += canvas.getBoundingClientRect().y;
+    return layout;
+  }
+
   renderIcon(container,identifier) {
     let icon = container.use(identifier,0,0,1,1);
     icon.src = this.symbols[identifier].svg;
