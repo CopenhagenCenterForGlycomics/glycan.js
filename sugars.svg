@@ -271,11 +271,26 @@ Red  #ed1c24
   <text x="350" text-anchor="middle" y="810">Asn</text>
   <text x="450" text-anchor="middle" y="810">HyL</text>
 
-  <use xlink:href="#s" x="100" y="850" width="100" height="100"/>
+  <use xlink:href="#hso3" x="100" y="850" width="100" height="100"/>
   <use xlink:href="#cer" x="200" y="850" width="100" height="100"/>
+  <use xlink:href="#hso3.2" x="300" y="850" width="100" height="100"/>
+  <use xlink:href="#hso3.3" x="400" y="850" width="100" height="100"/>
 
-  <text x="150" text-anchor="middle" y="960">S</text>
+  <text x="150" text-anchor="middle" y="960">HSO3</text>
   <text x="250" text-anchor="middle" y="960">Cer</text>
+  <text x="350" text-anchor="middle" y="960">2S</text>
+  <text x="450" text-anchor="middle" y="960">3S</text>
+
+
+  <use xlink:href="#hso3.4" x="100" y="1000" width="100" height="100"/>
+  <use xlink:href="#hso3.6" x="200" y="1000" width="100" height="100"/>
+  <use xlink:href="#hso3.N" x="300" y="1000" width="100" height="100"/>
+
+  <text x="150" text-anchor="middle" y="1110">4S</text>
+  <text x="250" text-anchor="middle" y="1110">6S</text>
+  <text x="350" text-anchor="middle" y="1110">NS</text>
+  <text x="450" text-anchor="middle" y="1110">3S</text>
+
 
 
 <!--
