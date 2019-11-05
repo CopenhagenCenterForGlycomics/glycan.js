@@ -427,8 +427,10 @@ class Renderer {
     this.global_layout = new WeakMap();
     for (let sugar of this[rendered_sugars_symbol]) {
       let layout = layout_sugar(sugar,this[layout_engine]);
-      for (let sugarEl of [sugar,...sugar.composition()]) {
-        this.global_layout.set(sugarEl,layout.get(sugarEl));
+      if ( layout ) {
+        for (let sugarEl of [sugar,...sugar.composition()]) {
+          this.global_layout.set(sugarEl,layout.get(sugarEl));
+        }
       }
       let modified_residues = FULL_REFRESH ? sugar.composition() : sugar.composition().filter(calculate_moved_residues.bind(this,layout));
       render_sugar.bind(this)(sugar, layout,modified_residues);
