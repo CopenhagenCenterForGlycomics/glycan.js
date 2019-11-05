@@ -248,6 +248,9 @@ const proxy_bounds = (x,y) => {
 };
 
 const retarget_event = function(ev) {
+  if ( ! ev.sugarX && ! ev.sugarY ) {
+    return;
+  }
   let inside_icons = [...this.iconset].filter(inside_icon.bind(null,ev.sugarX,ev.sugarY));
   let target_type = ev.type;
   for (let icon of inside_icons) {
@@ -259,10 +262,23 @@ const retarget_event = function(ev) {
       icon.element.dispatchEvent(new_ev);
 
       if (target_type === 'dragover' && this.last_dragenter !== icon ) {
+        if (this.last_dragenter) {
+          delete this.last_dragenter;
+          new_ev = new Event('dragleave',{bubbles: true});
+          icon.element.dispatchEvent(new_ev);          
+        }
         new_ev = new Event('dragenter',{bubbles: true});
         icon.element.dispatchEvent(new_ev);
+        this.last_dragenter = icon;
       }
       return;
+    }
+  }
+  if (inside_icons.length < 1 && target_type === 'dragover') {
+    if (this.last_dragenter) {
+      let new_ev = new Event('dragleave',{bubbles: true});
+      this.last_dragenter.element.dispatchEvent(new_ev);
+      delete this.last_dragenter;
     }
   }
 };
