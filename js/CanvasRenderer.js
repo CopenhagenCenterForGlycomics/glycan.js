@@ -100,7 +100,7 @@ const render = function(canvas,renderobj) {
   let min_y = Math.min(...coords.y)-100;
   let max_y = Math.max(...coords.y)+100;
 
-  let scale = 10;
+  let scale = 1;
 
   canvas.width = scale*(max_x - min_x);
   canvas.height = scale*(max_y - min_y);
