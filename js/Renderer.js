@@ -331,9 +331,15 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
     this.setIconPosition(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
   }
-
-  for (let zindex of zindices.sort( (a,b) => a.z - b.z ) ) {
-    container.sendToFront(zindex.icon);
+  let correct_order = zindices.map( z => z.icon.element )
+                              .map( el => [...el.parentNode.children].indexOf(el) )
+                              .map( (v,i,a) => v - (a[i-1] || 0) )
+                              .map( v => v >= 0 )
+                              .reduce( (curr,next) => curr && next, true);
+  if ( ! correct_order ) {
+    for (let zindex of zindices.sort( (a,b) => a.z - b.z ) ) {
+      container.sendToFront(zindex.icon);
+    }
   }
 
   if (this.groupTag && container.tagGroup) {
