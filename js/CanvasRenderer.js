@@ -108,50 +108,20 @@ const render = function(canvas,renderobj) {
   let ctx = canvas.getContext('2d');
 
   let { width: actual_width, height: actual_height } = canvas.getBoundingClientRect();
-  let padding_left = 0;
-  let x_scale = 1;
-  let padding_top = 0;
-  let y_scale = 1;
-  if (canvas.height > canvas.width) {
-    let used_space_width = canvas.width * (actual_height / canvas.height);
-    x_scale = canvas.width * used_space_width/actual_width;
-    let remaining_space_width = actual_width - used_space_width;
-    padding_left = remaining_space_width / 2;
-    console.log('Used space is ',used_space_width,'padding width',padding_left,'Actual width',actual_width,'Canvas width',canvas.width);
-  } else {
-    let used_space_height = canvas.height * (actual_width / canvas.width);
-    y_scale = used_space_height/actual_height;
-    let remaining_space_height = actual_height - used_space_height;
-    padding_top = remaining_space_height / 2;
-  }
-  console.log('Scale X value is ',x_scale);
-  console.log('Scale Y value is ',y_scale);
-
-  console.log('Mouse co-ordinates need to subtract',padding_left,padding_top);
 
   let svg_h = canvas.height;
   let h = actual_height;
   let svg_w = canvas.width;
   let w = actual_width;
+  let canvas_transforms;
 
-  // svg_h = 100;
-  // svg_w = 50;
-  // w = 50;
-  // h = 10;
-
-  let centering_matrix = (new CanvasMatrix([svg_h/h,0,0,svg_h/h,0,0])).multiply(new CanvasMatrix([1,
-                                            0,
-                                            0,
-                                            1,
-                                            -0.5*w,0]));
-
-  // console.log(centering_matrix.applyToPoint(25,5)); // x: 0, y: 50
-  // console.log(centering_matrix.applyToPoint(27.5,5)); // x: 25, y: 50
-
-  let centering_matrix_2 = (new CanvasMatrix([1,0,0,1,0.5*svg_w,0])).multiply(centering_matrix);
-
-  // console.log(centering_matrix_2.applyToPoint(25,5)); // x: 25, y: 50
-  // console.log(centering_matrix_2.applyToPoint(27.5,5)); // x: 50, y: 50
+  if (svg_h > svg_w) {
+    let centering_matrix = (new CanvasMatrix([svg_h/h,0,0,svg_h/h,0,0])).multiply(new CanvasMatrix([1,0,0,1,-0.5*w,0]));
+    canvas_transforms = (new CanvasMatrix([1,0,0,1,0.5*svg_w,0])).multiply(centering_matrix);
+  } else {
+    let centering_matrix = (new CanvasMatrix([svg_w/w,0,0,svg_w/w,0,0])).multiply(new CanvasMatrix([1,0,0,1,0,-0.5*h]));
+    canvas_transforms = (new CanvasMatrix([1,0,0,1,0,0.5*svg_h])).multiply(centering_matrix);    
+  }
 
   ctx.setTransform(scale,0,0,scale,-1*scale*min_x,-1*scale*min_y);
 
@@ -161,7 +131,9 @@ const render = function(canvas,renderobj) {
     matrix: (new CanvasMatrix([scale,0,0,scale,-1*scale*min_x,-1*scale*min_y]))
   });
 
-  canvas.cm.centering_matrix = centering_matrix_2;
+  canvas.cm.centering_matrix = canvas_transforms;
+
+  canvas.screenToCanvasMatrix = (new CanvasMatrix([scale,0,0,scale,-1*scale*min_x,-1*scale*min_y])).inverse().multiply(canvas_transforms);
 
   perform_rendering(canvas,renderobj);
 };
@@ -256,8 +228,7 @@ const wire_canvas_events = function(canvas,callback) {
 const handle_events = function(canvas,event) {
   if (event.clientX) {
     let rect = canvas.getBoundingClientRect();
-    let fixed_points = canvas.cm.centering_matrix.applyToPoint(event.clientX-rect.x,event.clientY-rect.y);
-    let transformed = canvas.cm.matrix.inverse().applyToPoint(fixed_points.x,fixed_points.y);
+    let transformed = canvas.screenToCanvasMatrix.applyToPoint(event.clientX-rect.x,event.clientY-rect.y);
     let xpos = transformed.x / SCALE;
     let ypos = transformed.y / SCALE;
     event.sugarX = xpos;
@@ -424,12 +395,12 @@ class CanvasRenderer extends Renderer {
     let yend = layout.y + layout.height;
     pt.x=layout.x*SCALE;
     pt.y=layout.y*SCALE;
-    let transformed = canvas.cm.matrix.applyToPoint(pt.x,pt.y);
+    let transformed = canvas.screenToCanvasMatrix.inverse().applyToPoint(pt.x,pt.y);
     layout.x = transformed.x;
     layout.y = transformed.y;
     pt.x=xend*SCALE;
     pt.y=yend*SCALE;
-    transformed = canvas.cm.matrix.applyToPoint(pt.x,pt.y);
+    transformed = canvas.screenToCanvasMatrix.inverse().applyToPoint(pt.x,pt.y);
     layout.width = transformed.x - layout.x;
     layout.height = transformed.y - layout.y;
     layout.x += canvas.getBoundingClientRect().x;
