@@ -325,6 +325,9 @@ class CanvasRenderer extends Renderer {
       if (elements.residue.element) {
         elements.residue.element.parentNode.removeChild(elements.residue.element);
       }
+      if (this.iconset.has(elements.residue)) {
+        this.iconset.delete(elements.residue);
+      }
     }
     if (elements.linkage) {
       elements.linkage.parent.remove(elements.linkage);
