@@ -59,6 +59,33 @@ class SugarAwareLayout extends CondensedLayout {
       return position;
     }
 
+    if (res.identifier === 'PI') {
+      position.r = 0.75;
+    }
+
+    if (res.identifier === 'GlcN' && res.parent.identifier === 'PI') {
+      position.dx = 0.5*DELTA_X;
+      return position;
+    }
+
+
+    if (res.identifier === 'EtNP') {
+      let linkage_pos = res.parent.linkageOf(res);
+      if (linkage_pos === 2) {
+        position.dy = 0;
+        position.dx = -0.66*DELTA_X;
+      }
+      if (linkage_pos === 6 && res.parent.children.length === 1) {
+        position.dy = -1.1*DELTA_Y;
+        position.dx = 0;
+      }
+      if (linkage_pos === 6 && res.parent.children.length > 1) {
+        position.dx = 0.66*DELTA_X;
+        position.dy = 0;
+      }
+      position.ignore_overlap = true;
+    }
+
     if (res.identifier === 'HSO3') {
       position.r = 1/4*DELTA_X;
       let linkage_pos = res.parent.linkageOf(res);
@@ -106,7 +133,7 @@ class SugarAwareLayout extends CondensedLayout {
       position.dx = 0;
     }
 
-    if (sibs.length === 1 && ( sibs[0].identifier === 'P' || sibs[0].identifier === 'S') ) {
+    if (sibs.length === 1 && ( ['P','HSO3','EtNP'].indexOf(sibs[0].identifier) >= 0 ) ) {
       position.dx = 0;
     }
 
