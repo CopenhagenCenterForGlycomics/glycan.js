@@ -85,6 +85,8 @@ const handle_events = function(svg,event) {
   }
 };
 
+let StaticSVGRenderer;
+
 class SVGRenderer extends Renderer {
   constructor(container,layout) {
     log('SVGRenderer');
@@ -109,7 +111,7 @@ class SVGRenderer extends Renderer {
   }
 
   static fromSVGElement(element,sugar_class) {
-    let renderer = new SVGRenderer();
+    let renderer = new StaticSVGRenderer();
     renderer[container_symbol] = element.parentNode;
     renderer.element = new SVGCanvas(element);
 
@@ -284,6 +286,18 @@ class SVGRenderer extends Renderer {
   }
 
 }
+
+StaticSVGRenderer = class extends SVGRenderer {
+
+  layoutFor(residue) {
+    let {x,y,width,height} = this.rendered.get(residue).residue.element.getBoundingClientRect();
+    return {x,y,width,height};
+  }
+
+  screenCoordinatesFromLayout(layout) {
+    return layout;
+  }
+};
 
 
 export default SVGRenderer;
