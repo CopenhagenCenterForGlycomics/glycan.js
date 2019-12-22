@@ -47,12 +47,18 @@ const render_text = function(canvas){
   if (this.options.dy) {
     ctx.textBaseline = 'middle';
   }
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = '#111';
   ctx.fillText(this.text, this.x, this.y);
 };
 
 const render_line = function(canvas){
   let ctx = canvas.getContext('2d');
+  if (this.options['stroke-width']) {
+    ctx.lineWidth = this.options['stroke-width'];
+  }
+  if (this.options.stroke) {
+    ctx.strokeStyle = this.options.stroke;
+  }
   ctx.beginPath();
   ctx.moveTo(this.x,this.y);
   ctx.lineTo(this.x2, this.y2);

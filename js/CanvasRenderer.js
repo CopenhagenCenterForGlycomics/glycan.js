@@ -1,4 +1,4 @@
-/*global document,Event*/
+/*global document,Event,HTMLCanvasElement*/
 'use strict';
 
 import { Tween, autoPlay, onTick } from 'es6-tween';
@@ -300,13 +300,19 @@ class CanvasRenderer extends Renderer {
 
     this.ready = import_icons.call(this);
 
-    if (container) {
-      this[container_symbol] = container;
-      log.info('Creating canvas element');
-      let canvas = container.ownerDocument.createElement('canvas');
-      canvas.setAttribute('width','1px');
-      canvas.setAttribute('height','1px');
-      container.appendChild(canvas);
+    let canvas;
+
+    if (container) { 
+      if (! (container instanceof HTMLCanvasElement) ) {
+        this[container_symbol] = container;
+        log.info('Creating canvas element');
+        canvas = container.ownerDocument.createElement('canvas');
+        canvas.setAttribute('width','1px');
+        canvas.setAttribute('height','1px');
+        container.appendChild(canvas);
+      } else {
+        canvas = container;
+      }
       this.element = new Canvas(canvas);
       wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
       for (let ev of ['click','dragover']) {

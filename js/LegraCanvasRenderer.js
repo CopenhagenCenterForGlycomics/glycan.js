@@ -1,4 +1,3 @@
-/*global document*/
 'use strict';
 
 import CanvasCanvas from './CanvasCanvas';
@@ -10,47 +9,69 @@ const GRID_SIZE = 12.5;
 
 class LegraCanvasRenderer extends CanvasRenderer {
   constructor(container,layout) {
-    super(container,layout);
-    this.offscreen = document.createElement('canvas');
-    container.appendChild(this.offscreen);
+    let offscreen = container.ownerDocument.createElement('canvas');
+    let onscreen = container.ownerDocument.createElement('canvas');
 
-    this.onscreen = this.element.canvas;
+    offscreen.offscreen = 'offscreen';
+    onscreen.offscreen = 'onscreen';
 
-    this.offscreen.offscreen = true;
 
-    this.offscreen.width = this.element.canvas.width;
-    this.offscreen.height = this.element.canvas.height;
-    this.offscreen.style.pointerEvents = 'none';
-    this.offscreen.style.position = 'absolute';
-    this.offscreen.style.top = '0';
-    this.offscreen.style.left = '0';
-    this.onscreen.style.opacity = 0;
-    this.element = new CanvasCanvas(this.onscreen);
-    const legra = new Legra(this.offscreen.getContext('2d'),GRID_SIZE);
+    super(onscreen,layout);
+
+    this.offscreen = offscreen;
+    this.onscreen = onscreen;
+    Object.defineProperty(onscreen, 'screenToCanvasMatrix', {
+      get: function() { return offscreen.screenToCanvasMatrix; }
+    });
+    Object.defineProperty(offscreen, 'getBoundingClientRect', {
+      get: function() { return () => onscreen.getBoundingClientRect(); }
+    });
+
+
+    container.appendChild(this.onscreen);
+
+    this.offscreen.width = '1px';
+    this.offscreen.height = '1px';
+
+    this.element = new CanvasCanvas(this.offscreen);
+
+    const legra = new Legra(this.onscreen.getContext('2d'),GRID_SIZE);
     this.legra = legra;
   }
 
-  renderLinkage(child_pos,parent_pos,child,parent,sugar,canvas) {
-    return this.renderLinkageGroup(canvas);
+  renderLinkage(...args) {
+    let retval = CanvasRenderer.prototype.renderLinkage.call(this,...args);
+    if ( ! retval ) {
+        return;
+    }
+    for (let obj of (retval.torender)) {
+        if (obj.options && obj.options['stroke-width']) {
+            console.log(obj);
+            obj.options['stroke-width'] = GRID_SIZE;
+            obj.options.stroke = '#777';
+        }
+    }
+    return retval;
   }
 
   paint() {
     CanvasRenderer.prototype.paint.call(this);
     setTimeout( () => {
-        let actual_width = this.onscreen.width;
-        let actual_height = this.onscreen.height;
+        this.onscreen.getContext('2d').clearRect(0,0,this.onscreen.width,this.onscreen.height);
+        let actual_width = this.offscreen.width;
+        let actual_height = this.offscreen.height;
         let target_width = Math.ceil(actual_width / GRID_SIZE) * GRID_SIZE;
         let target_height = Math.ceil(actual_height / GRID_SIZE) * GRID_SIZE;
-        this.offscreen.width = target_width;
-        this.offscreen.height = target_height;
-        this.legra.drawImage(this.onscreen,[-0.5*(target_width - actual_width),-0.5*(target_height - actual_height)]);
-        let imgdata = this.offscreen.getContext('2d').getImageData(0, 0, this.onscreen.width, this.onscreen.height);
+        this.onscreen.width = target_width;
+        this.onscreen.height = target_height;
+        this.legra.drawImage(this.offscreen,[-0.5*(target_width - actual_width),-0.5*(target_height - actual_height)]);
+        let imgdata = this.onscreen.getContext('2d').getImageData(0, 0, this.onscreen.width, this.onscreen.height);
         for (let i = 0; i < imgdata.data.length; i += 4) {
-            if (imgdata.data[i + 1] === 0 && imgdata.data[i + 2] === 0 && imgdata.data[i + 2] === 0) {
+            if ((imgdata.data[i] === 0) && (imgdata.data[i + 1] === 0) && (imgdata.data[i + 2] === 0) ) {
                 imgdata.data[i+3] = 0;
             }
         }
-        this.offscreen.getContext('2d').putImageData(imgdata,0,0);
+        this.onscreen.getContext('2d').putImageData(imgdata,0,0);
     },0);
   }
 
