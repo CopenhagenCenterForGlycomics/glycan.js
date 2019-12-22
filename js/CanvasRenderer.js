@@ -293,11 +293,8 @@ class CanvasRenderer extends Renderer {
     this.iconset = new Set();
 
     onTick( () => {
-      for (let icon of this.iconset) {
-        if (! icon.rendered ) {
-          render(this.element.canvas,this.element);
-          return;
-        }
+      if (this.animating) {
+        this.paint();
       }
     });
 
@@ -454,10 +451,14 @@ class CanvasRenderer extends Renderer {
   scaleToFit() {
   }
 
+  paint() {
+    render(this.element.canvas,this.element);
+  }
+
   async refresh() {
     return this.ready.then( async () => {
       await Renderer.prototype.refresh.call(this);
-      render(this.element.canvas,this.element);
+      this.paint();
     });
   }
 
