@@ -1,3 +1,4 @@
+/*global HTMLCanvasElement*/
 'use strict';
 
 import CanvasCanvas from './CanvasCanvas';
@@ -9,8 +10,15 @@ const GRID_SIZE = 12.5;
 
 class LegraCanvasRenderer extends CanvasRenderer {
   constructor(container,layout) {
+    let onscreen;
+    if (! (container instanceof HTMLCanvasElement)) {
+        onscreen = container.ownerDocument.createElement('canvas');
+        container.appendChild(onscreen);
+    } else {
+        onscreen = container;
+    }
+
     let offscreen = container.ownerDocument.createElement('canvas');
-    let onscreen = container.ownerDocument.createElement('canvas');
 
     offscreen.offscreen = 'offscreen';
     onscreen.offscreen = 'onscreen';
@@ -26,9 +34,6 @@ class LegraCanvasRenderer extends CanvasRenderer {
     Object.defineProperty(offscreen, 'getBoundingClientRect', {
       get: function() { return () => onscreen.getBoundingClientRect(); }
     });
-
-
-    container.appendChild(this.onscreen);
 
     this.offscreen.width = '1px';
     this.offscreen.height = '1px';
@@ -46,7 +51,6 @@ class LegraCanvasRenderer extends CanvasRenderer {
     }
     for (let obj of (retval.torender)) {
         if (obj.options && obj.options['stroke-width']) {
-            console.log(obj);
             obj.options['stroke-width'] = GRID_SIZE;
             obj.options.stroke = '#777';
         }
