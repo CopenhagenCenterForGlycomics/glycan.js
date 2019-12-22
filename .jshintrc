@@ -6,7 +6,7 @@
   "quotmark": true,
   "undef": true,
   "unused": true,
-  "esversion": 6,
+  "esversion": 8,
   "quotmark" : "single",
   "trailing": true
 }

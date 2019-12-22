@@ -326,6 +326,15 @@ class CanvasRenderer extends Renderer {
     return SCALE;
   }
 
+  get animating() {
+    for (let res of this.iconset) {
+      if (! res.rendered) {
+         return true;
+      }
+    }
+    return false;
+  }
+
   setupContainer(container,sugar) {
     const canvas = this.element;
 
@@ -445,9 +454,9 @@ class CanvasRenderer extends Renderer {
   scaleToFit() {
   }
 
-  refresh() {
-    return this.ready.then( () => {
-      super.refresh();
+  async refresh() {
+    return this.ready.then( async () => {
+      await Renderer.prototype.refresh.call(this);
       render(this.element.canvas,this.element);
     });
   }
