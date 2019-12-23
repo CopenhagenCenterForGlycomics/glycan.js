@@ -199,21 +199,11 @@ const extract_paths = (symbol) => {
   return paths;
 };
 
+const all_symbols = Symbol('global_symbols');
+const performing_import = Symbol('performing_import');
 
-const import_icons = function() {
-  let icons = document.createElement('svg');
-  this.symbols = {};
-  return Promise.resolve()
-  .then( () => icons.innerHTML = SYMBOLS_DEF )
-  .then( () => {
-    for (let symbol of icons.querySelectorAll('defs symbol')) {
-      let symboltext = symbol.innerHTML.replace(/#/g,'%23');
-      let paths = extract_paths(symbol);
-      let svg_text = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="100px" height="100px">${symboltext}</svg>`;
-      this.symbols[symbol.getAttribute('id')] = { svg: svg_text, paths };
-    }
-  });
-};
+
+let import_icons;
 
 const TweenMap = new WeakMap();
 
@@ -470,5 +460,37 @@ class CanvasRenderer extends Renderer {
 
 }
 
+CanvasRenderer[all_symbols] = null;
+CanvasRenderer[performing_import] = false;
+
+import_icons = function() {
+
+  let icons = document.createElement('svg');
+  if (CanvasRenderer[performing_import]) {
+    return new Promise( (resolve) => {
+      setTimeout( () => {
+        import_icons.call(this).then( resolve );
+      },0);
+    });
+  }
+  if (CanvasRenderer[all_symbols] !== null) {
+    this.symbols = CanvasRenderer[all_symbols];
+    return Promise.resolve();
+  }
+  CanvasRenderer[performing_import] = true;
+  this.symbols = {};
+  return Promise.resolve()
+  .then( () => icons.innerHTML = SYMBOLS_DEF )
+  .then( () => {
+    for (let symbol of icons.querySelectorAll('defs symbol')) {
+      let symboltext = symbol.innerHTML.replace(/#/g,'%23');
+      let paths = extract_paths(symbol);
+      let svg_text = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="100px" height="100px">${symboltext}</svg>`;
+      this.symbols[symbol.getAttribute('id')] = { svg: svg_text, paths };
+    }
+    CanvasRenderer[all_symbols] = this.symbols;
+    CanvasRenderer[performing_import] = false;
+  });
+};
 
 export default CanvasRenderer;
