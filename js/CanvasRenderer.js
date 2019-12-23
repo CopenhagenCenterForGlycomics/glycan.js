@@ -110,9 +110,9 @@ const render = function(canvas,renderobj) {
   let { width: actual_width, height: actual_height } = canvas.getBoundingClientRect();
 
   let svg_h = canvas.height;
-  let h = actual_height;
+  let h = actual_height || 1;
   let svg_w = canvas.width;
-  let w = actual_width;
+  let w = actual_width || 1;
   let canvas_transforms;
 
   if (svg_h > svg_w) {
