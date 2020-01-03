@@ -4,7 +4,9 @@
 
 const CACHED_ICONS = new WeakMap();
 
-import Canvas from './CanvasCanvas';
+import CanvasRenderer from './CanvasRenderer';
+
+const Canvas = CanvasRenderer.Canvas;
 
 import rough from 'roughjs/dist/rough.umd.js';
 

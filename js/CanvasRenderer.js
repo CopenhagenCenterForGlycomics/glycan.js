@@ -22,6 +22,8 @@ const SCALE = 100;
 
 const log = debug(module_string);
 
+const done_tweening = Symbol('done_tween');
+
 const extend_boundaries = (current,newcoords) => {
   current.x.push(newcoords[0]);
   current.y.push(newcoords[1]);
@@ -311,6 +313,10 @@ class CanvasRenderer extends Renderer {
     }
   }
 
+  static get Canvas() {
+    return Canvas;
+  }
+
   static get SYMBOLS() {
     return SYMBOLS_DEF;
   }
@@ -383,6 +389,7 @@ class CanvasRenderer extends Renderer {
     let tween = TweenMap.get(icon);
     let timing = 200;
     icon.rendered = false;
+    clearTimeout(icon[done_tweening]);
 
     if (icon.x === x && icon.y === y && icon.width === width && icon.height === height) {
       icon.rendered = true;
@@ -401,7 +408,9 @@ class CanvasRenderer extends Renderer {
     }
     tween.to({x: x, y: y, width: width, height: height, rotate: rotate },timing)
     .on('complete', (icon) => {
-      icon.rendered = true;
+      icon[done_tweening] = setTimeout(() => {
+        icon.rendered = true;
+      },0);
     })
     .start();
   }

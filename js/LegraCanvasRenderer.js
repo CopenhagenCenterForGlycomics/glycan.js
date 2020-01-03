@@ -1,12 +1,35 @@
 /*global HTMLCanvasElement*/
 'use strict';
 
-import CanvasCanvas from './CanvasCanvas';
 import CanvasRenderer from './CanvasRenderer';
+
+const CanvasCanvas = CanvasRenderer.Canvas;
 
 import Legra from 'legra/lib/legra.umd.js';
 
 const GRID_SIZE = 12.5;
+
+const roundFloat = (value, toNearest, fixed) => {
+  return parseFloat((Math.round(value / toNearest) * toNearest).toFixed(fixed));
+};
+
+const wrap_gridsize = (baselayout) => {
+    return class extends baselayout {
+
+        static PerformLayout(renderable) {
+            let layout = baselayout.PerformLayout.call(this,renderable);
+            for (let res of renderable.composition()) {
+                let pos = layout.get(res);
+                if ( ! pos ) {
+                    continue;
+                }
+                pos.x = roundFloat(pos.x,GRID_SIZE/100,3);
+                pos.y = roundFloat(pos.y,GRID_SIZE/100,3);
+            }
+            return layout;
+        }
+    };
+};
 
 class LegraCanvasRenderer extends CanvasRenderer {
   constructor(container,layout) {
@@ -24,7 +47,7 @@ class LegraCanvasRenderer extends CanvasRenderer {
     onscreen.offscreen = 'onscreen';
 
 
-    super(onscreen,layout);
+    super(onscreen,wrap_gridsize(layout));
 
     this.offscreen = offscreen;
     this.onscreen = onscreen;

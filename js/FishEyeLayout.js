@@ -61,7 +61,7 @@ const MakeFishEye = (baseclass) => {
 
     static PerformLayout(renderable) {
       log('Performing FishEyeLayout');
-      let layout = super.PerformLayout(renderable);
+      let layout = baseclass.PerformLayout.call(this,renderable);
       for (let res of renderable.composition()) {
         let position = layout.get(res);
         let [x,y,width,height] = [position.x,position.y,position.width,position.height];

@@ -26,7 +26,7 @@ class LinkageLayout extends SugarAwareLayout {
     const DELTA_X = this.DELTA_X;
 
 
-    position = super.LayoutMonosaccharide(sugar,res,position,parent_position,layout);
+    position = SugarAwareLayout.LayoutMonosaccharide.call(this,sugar,res,position,parent_position,layout);
 
     if ( ! res.parent ) {
       return position;

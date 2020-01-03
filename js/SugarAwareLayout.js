@@ -34,7 +34,7 @@ class SugarAwareLayout extends CondensedLayout {
     const DELTA_X = this.DELTA_X;
 
 
-    position = super.LayoutMonosaccharide(sugar,res,position,parent_position);
+    position = CondensedLayout.LayoutMonosaccharide.call(this,sugar,res,position,parent_position);
 
     let sibs = res.siblings;
 
