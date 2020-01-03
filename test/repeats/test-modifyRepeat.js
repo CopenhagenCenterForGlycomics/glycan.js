@@ -116,3 +116,19 @@ QUnit.test( 'Turn repeat back into regular residues keeping multipe repeats' , f
   repeat.identifier = repeat.max+'';
   assert.equal(sugar.sequence,'Fuc(a1-8)Man(b1-5){Glc(b1-4)[Fuc(a1-8)]Man(b1-5)}3GlcNAc', 'Has repeat generated sequence removing a residue');
 });
+
+QUnit.test( 'Remove end residue from repeat' , function( assert ) {
+  let sequence = '{GlcNAc(b1-3)Gal(b1-3)}3GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  let repeat = sugar.repeats[0];
+  repeat.mode = Repeat.MODE_EXPAND;
+  assert.equal(sugar.sequence,'GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn', 'Has repeat generated sequence');
+  let removing_res = sugar.leaves().filter( res => res.identifier == 'GlcNAc')[0];
+  removing_res.parent.removeChild(3,removing_res);
+  repeat.identifier = repeat.max+'';
+  assert.equal(sugar.sequence,'Gal(b1-3)GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn', 'Has repeat generated sequence removing a residue');
+  repeat.mode = Repeat.MODE_MINIMAL;
+  assert.equal(sugar.sequence,'Gal(b1-3){GlcNAc(b1-3)Gal(b1-3)}2GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn', 'Has repeat generated sequence removing a residue');
+});
