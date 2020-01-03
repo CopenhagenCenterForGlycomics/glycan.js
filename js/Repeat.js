@@ -84,6 +84,8 @@ const patch_parent = (residue,repeat) => {
   });
 };
 
+let copy_children_skipping_residue;
+
 class RepeatMonosaccharide extends TracedMonosaccharide {
 
     constructor(original,parent,repeat,counter) {
@@ -144,8 +146,32 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
 
     removeChild(linkage,child) {
 
-      if (this.repeat.mode === MODE_EXPAND) {
-        return super.removeChild(linkage,child);
+      if (this.repeat.mode === MODE_EXPAND && ! this.endsRepeat) {
+        if ( ! (child instanceof RepeatMonosaccharide) ) {
+          return super.removeChild(linkage,child);
+        } else {
+          // Copy repeat from parent of child up to start of repeat
+          // and then add to the repeat, grafting across children
+          // when needed
+          let parent = this;
+          while ( parent && (parent instanceof RepeatMonosaccharide) && ! parent.endsRepeat ) {
+            parent = this.parent;
+          }
+          let res_class = this.original.constructor;
+          let new_root = new res_class('root');
+          copy_children_skipping_residue(parent,new_root,child);
+          if ( parent instanceof RepeatMonosaccharide ) {
+            child.repeat.max -= 1;
+          } else {
+            for (let repeat_kid of parent.children.filter( res => (res instanceof RepeatMonosaccharide))) {
+              parent.removeChild(parent.linkageOf(repeat_kid),repeat_kid);
+            }
+            for (let child of new_root.children) {
+              parent.graft(child);
+            }
+          }
+          return;
+        }
       }
 
       if (! this.endsRepeat) {
@@ -227,6 +253,22 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     }
 
 }
+
+copy_children_skipping_residue = (parent,newroot,toskip) => {
+  let parent_repeat_kids = parent.children.filter( res => res !== toskip );
+  const cloned_map = new Map();
+  const graft_cloner = (newparent,res) => {
+    let old_parent = res.parent;
+    let linkage = old_parent.linkageOf(res);
+    let toadd = (res instanceof RepeatMonosaccharide) ? res.original.clone() : res;
+    cloned_map.set(res,toadd);
+    newparent.addChild(linkage, toadd);
+  };
+  parent_repeat_kids.forEach( graft_cloner.bind(null,newroot) );
+  for (let kid of parent_repeat_kids) {
+    copy_children_skipping_residue(kid, cloned_map.get(kid), toskip );
+  }
+};
 
 export default class Repeat {
 

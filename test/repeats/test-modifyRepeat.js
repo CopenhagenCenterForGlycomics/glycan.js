@@ -52,3 +52,44 @@ QUnit.test( 'Modify a simple repeat at the end' , function( assert ) {
   sugar.locate_monosaccharide('y3a').original.addChild(6,new_child);
   assert.equal(sugar.sequence,'{Gal(a1-6)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)@y3a}GlcNAc', 'Has repeat generated sequence');
 });
+
+QUnit.test( 'Turn repeat back into regular residues' , function( assert ) {
+  let sequence = 'GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)';
+  let repeat_sug = new IupacSugar();
+  repeat_sug.sequence = sequence;
+
+  let repeat = new Repeat(repeat_sug,'y3a',1,2);
+  repeat.mode = Repeat.MODE_EXPAND;
+  repeat.identifier = '1';
+  repeat.max = 1;
+  sugar.root.graft(repeat.root);
+  assert.equal(sugar.sequence,'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)GlcNAc', 'Has repeat generated sequence');
+  let removing_res = sugar.leaves().filter( res => res.identifier == 'Glc')[0];
+  removing_res.parent.removeChild(4,removing_res);
+  assert.equal(sugar.sequence,'Fuc(a1-8)Man(b1-5)GlcNAc', 'Has repeat generated sequence removing a residue');
+});
+
+
+QUnit.test( 'Turn repeat back into regular residues keeping a repeat' , function( assert ) {
+  let sequence = 'GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  sequence = 'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)';
+  let repeat_sug = new IupacSugar();
+  repeat_sug.sequence = sequence;
+
+  let repeat = new Repeat(repeat_sug,'y3a',1,2);
+  repeat.mode = Repeat.MODE_EXPAND;
+  repeat.identifier = '1';
+  repeat.max = 2;
+  sugar.root.graft(repeat.root);
+  assert.equal(sugar.sequence,'Glc(b1-4)[Fuc(a1-8)]Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)GlcNAc', 'Has repeat generated sequence');
+  let removing_res = sugar.leaves().filter( res => res.identifier == 'Glc')[0];
+  removing_res.parent.removeChild(4,removing_res);
+  assert.equal(sugar.sequence,'Fuc(a1-8)Man(b1-5)Glc(b1-4)[Fuc(a1-8)]Man(b1-5)GlcNAc', 'Has repeat generated sequence removing a residue');
+});
