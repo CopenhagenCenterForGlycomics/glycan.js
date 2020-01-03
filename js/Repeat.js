@@ -143,11 +143,13 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     }
 
     removeChild(linkage,child) {
+
+      if (this.repeat.mode === MODE_EXPAND) {
+        return super.removeChild(linkage,child);
+      }
+
       if (! this.endsRepeat) {
         throw new Error('Removing a child that isnt at the end of a repeat');
-      }
-      if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
-        return super.removeChild(linkage,child);
       }
 
       return this.repeat[child_residue_symbol].removeChild(linkage,child);
