@@ -161,8 +161,8 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
           let new_root = new res_class('root');
           copy_children_skipping_residue(parent,new_root,child);
           if ( parent instanceof RepeatMonosaccharide ) {
-            child.repeat.max -= 1;
-            child.repeat.children = [...new_root.children];
+            this.repeat.max -= 1;
+            this.repeat.children = [...new_root.children];
           } else {
             for (let repeat_kid of parent.children.filter( res => (res instanceof RepeatMonosaccharide))) {
               parent.removeChild(parent.linkageOf(repeat_kid),repeat_kid);
