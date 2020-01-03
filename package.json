@@ -11,9 +11,7 @@
     "@babel/preset-env": "^7.4.5",
     "debug-any-level": "^0.3.0",
     "es6-tween": "^5.4.1",
-    "esm": "3.2.20",
-    "legra": "^0.2.0",
-    "roughjs": "^3.1.0"
+    "esm": "3.2.20"
   },
   "devDependencies": {
     "@babel/core": "^7",
