@@ -159,7 +159,14 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
           }
           let res_class = this.original.constructor;
           let new_root = new res_class('root');
-          copy_children_skipping_residue(parent,new_root,child);
+          let clone_map = copy_children_skipping_residue(parent,new_root,child);
+          let replaced_parent = clone_map.get(this);
+          if (replaced_parent !== this) {
+            this.balance = () => {
+              return replaced_parent.balance();
+            };
+            replaced_parent.renderer = this.renderer;
+          }
           if ( parent instanceof RepeatMonosaccharide ) {
             this.repeat.max -= 1;
             this.repeat.children = [...new_root.children];
@@ -257,7 +264,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
 
 copy_children_skipping_residue = (parent,newroot,toskip) => {
   let parent_repeat_kids = parent.children.filter( res => res !== toskip );
-  const cloned_map = new Map();
+  let cloned_map = new Map();
   const graft_cloner = (newparent,res) => {
     let old_parent = res.parent;
     let linkage = old_parent.linkageOf(res);
@@ -267,8 +274,9 @@ copy_children_skipping_residue = (parent,newroot,toskip) => {
   };
   parent_repeat_kids.forEach( graft_cloner.bind(null,newroot) );
   for (let kid of parent_repeat_kids) {
-    copy_children_skipping_residue(kid, cloned_map.get(kid), toskip );
+    cloned_map = new Map( [...cloned_map, ...copy_children_skipping_residue(kid, cloned_map.get(kid), toskip )]);
   }
+  return cloned_map;
 };
 
 export default class Repeat {
