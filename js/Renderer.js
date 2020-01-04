@@ -176,9 +176,9 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
 
   const child_repeat = (child instanceof Repeat.Monosaccharide) && child.repeat.mode !== Repeat.MODE_EXPAND;
   const parent_repeat = (parent instanceof Repeat.Monosaccharide) && parent.repeat.mode !== Repeat.MODE_EXPAND;
+  const different_repeats = child_repeat && parent_repeat && child.repeat !== parent.repeat;
 
-
-  if (child_repeat && child.endsRepeat && child.children.length === 0 ) {
+  if (child_repeat && child.endsRepeat ) {
     const extents = [
       SCALE*(child_pos.x + child_pos.width / 2),
       SCALE*(child_pos.y + child_pos.height / 2),
@@ -205,7 +205,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
   }
 
 
-  if ( child_repeat ? ! parent_repeat : parent_repeat ) {
+  if ( child_repeat ? (! parent_repeat || different_repeats) : parent_repeat ) {
 
 
     // This line should go to the edges of the icons along the long (y-axis)

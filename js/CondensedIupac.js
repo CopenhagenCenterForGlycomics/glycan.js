@@ -225,7 +225,7 @@ let write_sequence = function(start=this.root) {
     let repeat_kids = start.repeat.children;
     if (repeat_kids.length > 0) {
       child_links = [].concat.apply([], [...repeat_kids[0].parent.child_linkages].map( ([linkage,kids]) => {
-        return [ linkage, kids.filter( child => ! (child instanceof Repeat.Monosaccharide ) ) ];
+        return [ linkage, kids.filter( child => ! (child instanceof Repeat.Monosaccharide && child.repeat === start.repeat ) ) ];
       }).sort( (a,b) => a[0] - b[0] ).map( link_expander ));
     } else {
       child_links = [];
