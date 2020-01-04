@@ -209,7 +209,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     }
 
     linkageOf(child) {
-      if (child instanceof RepeatMonosaccharide) {
+      if (child instanceof RepeatMonosaccharide && child.repeat === this.repeat) {
         if (this.endsRepeat && child.repeat === this.repeat && child.counter !== this.counter && child.original === this.repeat.root.original ) {
           return this.repeat.root.parent.linkageOf(this.repeat.root);
         }
@@ -351,6 +351,14 @@ export default class Repeat {
     let parent = start.parent;
     let parent_link = parent.linkageOf(start);
     parent.removeChild(parent_link,start);
+
+    if (parent instanceof RepeatMonosaccharide) {
+      let new_start = start.clone();
+      for (let kid of start.children) {
+        new_start.graft(kid);
+      }
+      start = new_start;
+    }
 
     let temp_sugar = new sugar.constructor();
     temp_sugar.root = new Monosaccharide('Root');
