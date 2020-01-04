@@ -24,8 +24,6 @@ const repeat_symbol = Symbol('repeat');
 
 const counter_symbol = Symbol('counter');
 
-const attachment_symbol = Symbol('attachment');
-
 import { default as Monosaccharide, calculateSiblingOrder } from './Monosaccharide';
 
 import { TracedMonosaccharide } from './Tracing';
@@ -304,8 +302,6 @@ export default class Repeat {
       attachment = sugar.location_for_monosaccharide(this[last_residue]);
     }
 
-    this[attachment_symbol] = attachment;
-
     this[min_repeats] = min;
     this[max_repeats] = max;
     this[child_residue_symbol] = new Monosaccharide('Root');
@@ -314,7 +310,6 @@ export default class Repeat {
 
   clone() {
     let cloned = new this.constructor(this[template_sugar],this[last_residue],this.min,this.max);
-    cloned[attachment_symbol] = this[attachment_symbol];
     cloned.identifier = this.identifier;
     if (this.mode) {
       cloned.mode = this.mode;
@@ -385,7 +380,7 @@ export default class Repeat {
   }
 
   get attachment() {
-    return this[attachment_symbol];
+    return this[template_sugar].location_for_monosaccharide(this[last_residue]);
   }
 
   get identifier() {

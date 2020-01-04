@@ -32,6 +32,22 @@ QUnit.test( 'Modify a simple repeat' , function( assert ) {
   assert.equal(sugar.sequence,'{Glc(b1-4)[Gal(a1-6)][Fuc(a1-8)]Man(b1-5)}GlcNAc', 'Has repeat generated sequence');
 
 });
+QUnit.test( 'Make sure repeat unit is balanced' , function( assert ) {
+  let sequence = 'Gal(b1-3){GlcNAc(b1-3)Gal(b1-3)}3GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  let repeat = sugar.repeats[0];
+  repeat.mode = Repeat.MODE_MINIMAL;
+  let new_child = new Monosaccharide('Fuc');
+  new_child.anomer = 'a';
+  new_child.parent_linkage = 1;
+  assert.equal(repeat.attachment,'y3a');
+  sugar.locate_monosaccharide('y7a').original.addChild(2,new_child);
+  assert.equal(repeat.attachment,'y3b');
+  assert.equal(sugar.sequence,'Gal(b1-3){Fuc(a1-2)[GlcNAc(b1-3)]Gal(b1-3)@y3b}3GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn', 'Has repeat generated sequence');
+});
+
 
 QUnit.test( 'Modify a simple repeat at the end' , function( assert ) {
   let sequence = 'GlcNAc';
