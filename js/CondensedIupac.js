@@ -120,6 +120,7 @@ const create_repeat_objects = (sugar,definitions) => {
       location = repeat_sug.location_for_monosaccharide(repeat_end);
     }
     let repeat = new Repeat(repeat_sug,location,1,max_repeats);
+    repeat.mode = Repeat.MODE_MINIMAL;
 
     if (variable_identifier) {
       repeat.identifier = variable_identifier;
