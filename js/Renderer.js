@@ -319,7 +319,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     }
 
     // Render linkage
-    current.linkage = this.renderLinkage(position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, sugar, container, show_labels );
+    current.linkage = this.renderLinkage(position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, sugar, container, show_labels && residue.identifier !== 'HSO3' );
 
     let rotate_angle = 0;
     if (position.rotate) {
