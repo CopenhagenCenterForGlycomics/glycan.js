@@ -32,6 +32,9 @@ class LinkageLayout extends SugarAwareLayout {
       return position;
     }
 
+    if ( res.identifier === 'HSO3') {
+      return position;
+    }
 
     let matches = sugar.match_sugar_pattern(NLINKED_CORE, identifier_comparator );
     if (matches.length > 0) {
