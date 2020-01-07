@@ -438,10 +438,10 @@ export default class Repeat {
 
   set children(children) {
     let root = this[child_residue_symbol];
-    for (let kid of root.children) {
+    for (let kid of root.children.filter( kid => children.indexOf(kid) < 0 )) {
       root.removeChild(root.linkageOf(kid),kid);
     }
-    for (let residue of children) {
+    for (let residue of children.filter( kid => root.children.indexOf(kid) < 0)) {
       if (residue.parent) {
         root.graft(residue);
       } else {
