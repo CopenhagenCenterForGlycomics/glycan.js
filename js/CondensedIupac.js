@@ -133,6 +133,8 @@ const create_repeat_objects = (sugar,definitions) => {
       repeat.children = repeat_placeholder.children;
     }
   }
+  // Traverse the tree to make sure parents are set
+  residues = sugar.composition();
 };
 
 let parse_sequence = function(sequence) {
