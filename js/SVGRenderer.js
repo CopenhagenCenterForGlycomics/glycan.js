@@ -1,3 +1,4 @@
+/*global SVGDefsElement,DOMParser*/
 'use strict';
 import debug from './Debug';
 
@@ -108,6 +109,37 @@ class SVGRenderer extends Renderer {
 
   static get GLOBAL_SCALE() {
     return SCALE;
+  }
+
+  appendSymbols() {
+    this.constructor.AppendSymbols(this);
+  }
+
+  static AppendSymbols(element) {
+
+    if (element instanceof SVGRenderer) {
+      element = element.element.canvas;
+    }
+
+    const icons_elements = Promise.resolve(this.SYMBOLS).then( SYMBOLS_DEF => {
+      return (new DOMParser()).parseFromString(SYMBOLS_DEF, 'image/svg+xml');
+    }).then( el => {
+      return el.querySelectorAll('svg defs');
+    });
+
+    if (! (element instanceof SVGDefsElement)) {
+      let el = element.ownerDocument.createElementNS('http://www.w3.org/2000/svg','defs');
+      element.appendChild(el);
+      element = el;
+    }
+
+    return icons_elements.then( symbols => {
+      console.log(symbols);
+      for (let symbol of symbols ) {
+        element.appendChild(symbol.cloneNode(true));
+      }
+    });
+
   }
 
   static fromSVGElement(element,sugar_class) {

@@ -7,12 +7,12 @@
 	<script type="text/javascript" src="/glycan-bundle.js"></script>
 </head>
 <body>
-	<div id="container">
+	<div id="container" style="width: 30%; height: 30%;">
 	</div>
 	<script type="text/javascript">
 	window.onload = function() {
-		let renderer = new Glycan.CanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
-		renderer.symbolpath = 'sugars.svg';
+		let renderer = new Glycan.SVGRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
+		renderer.appendSymbols();
 		Glycan.SugarAwareLayoutFishEye.lock_residues = true;
 		Glycan.SugarAwareLayoutFishEye.LINKS = false;
 
@@ -30,6 +30,7 @@
 			new_res.parent_linkage = 1;
 			sug.root.addChild(6,new_res);
 			sug.root.balance();
+			renderer.scaleToFit();
 			renderer.refresh();
 		},3000);
 		renderer.addSugar(sug);
