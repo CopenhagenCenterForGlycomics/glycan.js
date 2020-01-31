@@ -11,7 +11,7 @@
 	</div>
 	<script type="text/javascript">
 	window.onload = function() {
-		let renderer = new Glycan.RoughCanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
+		let renderer = new Glycan.CanvasRenderer(document.getElementById('container'),Glycan.SugarAwareLayoutFishEye);
 		renderer.symbolpath = 'sugars.svg';
 		Glycan.SugarAwareLayoutFishEye.lock_residues = true;
 		Glycan.SugarAwareLayoutFishEye.LINKS = false;

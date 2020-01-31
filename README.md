@@ -14,6 +14,14 @@ There's no big focus on backwards compatibility, and since we want this library
 to remain relatively modern for a pretty long time, we won't hobble it with bad
 design to accomodate the older browsers.
 
+## Demo rendering of Sugars
+
+```
+npm start
+```
+
+Go to `http://localhost:8080/demo/`
+
 ## TODOs
 
 * Methods to mark up residues on sugars that are supported by a reaction - what to do
@@ -21,9 +29,6 @@ design to accomodate the older browsers.
   GlcGal, but another reaction can do Glc -> GalGal = Gal[Glc]Gal ? (non-terminal)...
   Do we do the trimming thing again? Test without negative - tag residues, and then
   test the negative containing ones, ignoring the first round?
-
-* When given a residue and donor, reduce reaction sets down to ones that are possible
-  so that we can get lists of linkages that can be made.
 
 ## Things that seem like niche use-cases, but aren't
 
