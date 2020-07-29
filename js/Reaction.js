@@ -50,7 +50,7 @@ let rewrite_sequence = base => {
     }
     set sequence(seq) {
       super.sequence = seq;
-      return super.sequence;
+      return;
     }
   };
 };
@@ -135,7 +135,7 @@ class Reaction extends Sugar {
   }
   get comment() {
     if (this.delta) {
-      return;
+      return undefined;
     }
     return this[comment_symbol];
   }

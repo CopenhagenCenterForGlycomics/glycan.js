@@ -1,3 +1,2 @@
-/*global require:true */
-require = require('esm')(module);
-module.exports = require('./main.js');
+/*global */
+module.exports = require('esm')(module)('./main.js');

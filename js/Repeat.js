@@ -86,187 +86,187 @@ let copy_children_skipping_residue;
 
 class RepeatMonosaccharide extends TracedMonosaccharide {
 
-    constructor(original,parent,repeat,counter) {
-      super(original);
-      this[parent_symbol] = parent;
-      this[repeat_symbol] = repeat;
-      this[counter_symbol] = counter;
-      return this;
+  constructor(original,parent,repeat,counter) {
+    super(original);
+    this[parent_symbol] = parent;
+    this[repeat_symbol] = repeat;
+    this[counter_symbol] = counter;
+    return this;
+  }
+
+  static is_wrapped(r) {
+    return r instanceof RepeatMonosaccharide;
+  }
+
+  static is_not_wrapped(r) {
+    return ! RepeatMonosaccharide.is_wrapped(r);
+  }
+
+
+  clone() {
+    let result = new this.constructor(this.original,this[parent_symbol],this[repeat_symbol].clone(),this[counter_symbol]);
+    result.copyTagsFrom(this);
+    return result;
+  }
+
+  get repeat() {
+    return this[repeat_symbol];
+  }
+
+  get counter() {
+    return this[counter_symbol];
+  }
+
+
+  balance() {
+    const parent_linkages = this.children.map( res => {return { link: this.linkageOf(res), res: res }; });
+    parent_linkages.sort( (a,b) => a.link - b.link );
+    let all_children = parent_linkages.map( obj => obj.res );
+    all_children = Object.freeze( calculateSiblingOrder(all_children) );
+    all_children.forEach( (child,idx) => {
+      child[sort_order_symbol] = idx+1;
+    });
+  }
+
+  graft() {
+    // No-op
+  }
+
+  addChild(linkage,child) {
+    if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
+      return super.addChild(linkage,child);
     }
-
-    static is_wrapped(r) {
-      return r instanceof RepeatMonosaccharide;
+    if (this.repeat[child_residue_symbol].children.indexOf(child) < 0) {
+      this.repeat[child_residue_symbol].addChild(linkage,child);
+      patch_parent(child,this.repeat);
     }
+  }
 
-    static is_not_wrapped(r) {
-      return ! RepeatMonosaccharide.is_wrapped(r);
-    }
+  removeChild(linkage,child) {
 
-
-    clone() {
-      let result = new this.constructor(this.original,this[parent_symbol],this[repeat_symbol].clone(),this[counter_symbol]);
-      result.copyTagsFrom(this);
-      return result;
-    }
-
-    get repeat() {
-      return this[repeat_symbol];
-    }
-
-    get counter() {
-      return this[counter_symbol];
-    }
-
-
-    balance() {
-      const parent_linkages = this.children.map( res => {return { link: this.linkageOf(res), res: res }; });
-      parent_linkages.sort( (a,b) => a.link - b.link );
-      let all_children = parent_linkages.map( obj => obj.res );
-      all_children = Object.freeze( calculateSiblingOrder(all_children) );
-      all_children.forEach( (child,idx) => {
-        child[sort_order_symbol] = idx+1;
-      });
-    }
-
-    graft() {
-      // No-op
-    }
-
-    addChild(linkage,child) {
-      if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
-        return super.addChild(linkage,child);
-      }
-      if (this.repeat[child_residue_symbol].children.indexOf(child) < 0) {
-        this.repeat[child_residue_symbol].addChild(linkage,child);
-        patch_parent(child,this.repeat);
-      }
-    }
-
-    removeChild(linkage,child) {
-
-      if (this.repeat.mode === MODE_EXPAND && ! this.endsRepeat) {
-        if ( ! (child instanceof RepeatMonosaccharide) ) {
-          return super.removeChild(linkage,child);
+    if (this.repeat.mode === MODE_EXPAND && ! this.endsRepeat) {
+      if ( ! (child instanceof RepeatMonosaccharide) ) {
+        return super.removeChild(linkage,child);
+      } else {
+        // Copy repeat from parent of child up to start of repeat
+        // and then add to the repeat, grafting across children
+        // when needed
+        let parent = this;
+        while ( parent && (parent instanceof RepeatMonosaccharide) && ! parent.endsRepeat ) {
+          parent = this.parent;
+        }
+        let res_class = this.original.constructor;
+        let new_root = new res_class('root');
+        let clone_map = copy_children_skipping_residue(parent,new_root,child);
+        let replaced_parent = clone_map.get(this);
+        if (replaced_parent !== this) {
+          this.balance = () => {
+            return replaced_parent.balance();
+          };
+          replaced_parent.renderer = this.renderer;
+        }
+        if ( parent instanceof RepeatMonosaccharide ) {
+          this.repeat.max -= 1;
+          this.repeat.children = [...new_root.children];
         } else {
-          // Copy repeat from parent of child up to start of repeat
-          // and then add to the repeat, grafting across children
-          // when needed
-          let parent = this;
-          while ( parent && (parent instanceof RepeatMonosaccharide) && ! parent.endsRepeat ) {
-            parent = this.parent;
+          for (let repeat_kid of parent.children.filter( res => (res instanceof RepeatMonosaccharide))) {
+            parent.removeChild(parent.linkageOf(repeat_kid),repeat_kid);
           }
-          let res_class = this.original.constructor;
-          let new_root = new res_class('root');
-          let clone_map = copy_children_skipping_residue(parent,new_root,child);
-          let replaced_parent = clone_map.get(this);
-          if (replaced_parent !== this) {
-            this.balance = () => {
-              return replaced_parent.balance();
-            };
-            replaced_parent.renderer = this.renderer;
+          for (let child of new_root.children) {
+            parent.graft(child);
           }
-          if ( parent instanceof RepeatMonosaccharide ) {
-            this.repeat.max -= 1;
-            this.repeat.children = [...new_root.children];
-          } else {
-            for (let repeat_kid of parent.children.filter( res => (res instanceof RepeatMonosaccharide))) {
-              parent.removeChild(parent.linkageOf(repeat_kid),repeat_kid);
-            }
-            for (let child of new_root.children) {
-              parent.graft(child);
-            }
-          }
-          return;
         }
-      }
-
-      if (this.repeat.mode === MODE_MINIMAL && child instanceof RepeatMonosaccharide) {
-        if (child.endsRepeat) {
-          child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
-          child.repeat.root.parent.replaceChild(child.repeat.root, child.repeat.root.original);
-          return;
-        }
-        child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
         return;
       }
-
-      if ( ! this.endsRepeat ) {
-        throw new Error('Removing a child that isnt at the end of a repeat');
-      }
-
-      return this.repeat[child_residue_symbol].removeChild(linkage,child);
     }
 
-    get endsRepeat() {
-      return this.original === this.repeat[last_residue];
+    if (this.repeat.mode === MODE_MINIMAL && child instanceof RepeatMonosaccharide) {
+      if (child.endsRepeat) {
+        child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
+        child.repeat.root.parent.replaceChild(child.repeat.root, child.repeat.root.original);
+        return;
+      }
+      child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
+      return;
     }
 
-    get parent() {
-      if (this[parent_symbol]) {
-        return this[parent_symbol];
-      }
-      return super.parent;
+    if ( ! this.endsRepeat ) {
+      throw new Error('Removing a child that isnt at the end of a repeat');
     }
 
-    linkageOf(child) {
-      if (child instanceof RepeatMonosaccharide && child.repeat === this.repeat) {
-        if (this.endsRepeat && child.repeat === this.repeat && child.counter !== this.counter && child.original === this.repeat.root.original ) {
-          return this.repeat.root.parent.linkageOf(this.repeat.root);
-        }
-        return this.original.linkageOf(child.original);
-      } else if (this.endsRepeat && this.repeat.children.indexOf(child) >= 0) {
-        return this.repeat[child_residue_symbol].linkageOf(child);
-      } else {
-        return (new Monosaccharide(' ')).linkageOf.call(this,child);
+    return this.repeat[child_residue_symbol].removeChild(linkage,child);
+  }
+
+  get endsRepeat() {
+    return this.original === this.repeat[last_residue];
+  }
+
+  get parent() {
+    if (this[parent_symbol]) {
+      return this[parent_symbol];
+    }
+    return super.parent;
+  }
+
+  linkageOf(child) {
+    if (child instanceof RepeatMonosaccharide && child.repeat === this.repeat) {
+      if (this.endsRepeat && child.repeat === this.repeat && child.counter !== this.counter && child.original === this.repeat.root.original ) {
+        return this.repeat.root.parent.linkageOf(this.repeat.root);
+      }
+      return this.original.linkageOf(child.original);
+    } else if (this.endsRepeat && this.repeat.children.indexOf(child) >= 0) {
+      return this.repeat[child_residue_symbol].linkageOf(child);
+    } else {
+      return (new Monosaccharide(' ')).linkageOf.call(this,child);
+    }
+  }
+
+  get child_linkages() {
+    let linkage_map = super.child_linkages;
+    let results = new Map();
+    for (let link of linkage_map.keys()) {
+      for (let res of linkage_map.get(link).filter( RepeatMonosaccharide.is_wrapped )) {
+        let wrapped_link = res.original.parent.linkageOf(res.original);
+        results.set( wrapped_link , (results.get(wrapped_link) || []).concat(res) );
+      }
+      for (let res of linkage_map.get(link).filter( RepeatMonosaccharide.is_not_wrapped )) {
+        results.set( link, (results.get(link) || []).concat(res) );
       }
     }
+    return results;
+  }
 
-    get child_linkages() {
-      let linkage_map = super.child_linkages;
-      let results = new Map();
-      for (let link of linkage_map.keys()) {
-        for (let res of linkage_map.get(link).filter( RepeatMonosaccharide.is_wrapped )) {
-          let wrapped_link = res.original.parent.linkageOf(res.original);
-          results.set( wrapped_link , (results.get(wrapped_link) || []).concat(res) );
-        }
-        for (let res of linkage_map.get(link).filter( RepeatMonosaccharide.is_not_wrapped )) {
-          results.set( link, (results.get(link) || []).concat(res) );
-        }
-      }
-      return results;
+  get children() {
+
+    const max_count = this.repeat.mode === MODE_EXPAND ? this.repeat.max : this.repeat.mode === MODE_MINIMAL ? this.repeat.min : 1;
+
+    let original_kids = this.original.children;
+    let self_kids = super.children;
+
+    let repeat_end_kids = [];
+
+    if (this.repeat.mode === MODE_MINIMAL) {
+      self_kids = [];
     }
 
-    get children() {
-
-      const max_count = this.repeat.mode === MODE_EXPAND ? this.repeat.max : this.repeat.mode === MODE_MINIMAL ? this.repeat.min : 1;
-
-      let original_kids = this.original.children;
-      let self_kids = super.children;
-
-      let repeat_end_kids = [];
-
-      if (this.repeat.mode === MODE_MINIMAL) {
-        self_kids = [];
-      }
-
-      if (this.endsRepeat && this.counter >= max_count) {
-        repeat_end_kids = this.repeat.children;
-      }
-
-      let results = [];
-
-      if (this.endsRepeat && this.counter < max_count ) {
-        results.push(get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.counter + 1));
-      }
-      const wrapped_original = original_kids.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ));
-      const mapped = Object.freeze([self_kids,repeat_end_kids,results].reduce( (curr,newarr) => curr.concat(newarr), wrapped_original ));
-      if (mapped.length > 0 && mapped.every( child => child[sort_order_symbol])) {
-        let sorted_mapped = Object.freeze(mapped.slice().sort( (a,b) => a[sort_order_symbol] - b[sort_order_symbol] ));
-        return sorted_mapped;
-      } else {
-        return mapped;
-      }
+    if (this.endsRepeat && this.counter >= max_count) {
+      repeat_end_kids = this.repeat.children;
     }
+
+    let results = [];
+
+    if (this.endsRepeat && this.counter < max_count ) {
+      results.push(get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.counter + 1));
+    }
+    const wrapped_original = original_kids.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ));
+    const mapped = Object.freeze([self_kids,repeat_end_kids,results].reduce( (curr,newarr) => curr.concat(newarr), wrapped_original ));
+    if (mapped.length > 0 && mapped.every( child => child[sort_order_symbol])) {
+      let sorted_mapped = Object.freeze(mapped.slice().sort( (a,b) => a[sort_order_symbol] - b[sort_order_symbol] ));
+      return sorted_mapped;
+    } else {
+      return mapped;
+    }
+  }
 
 }
 

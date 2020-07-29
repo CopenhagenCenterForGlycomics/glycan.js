@@ -7,10 +7,10 @@ const module_string='glycanjs:fisheyelayout';
 const log = debug(module_string);
 
 var radius = 2,
-    distortion = 3,
-    k0,
-    k1,
-    focus = [-100, -3];
+  distortion = 3,
+  k0,
+  k1,
+  focus = [-100, -3];
 
 let residue_only = true;
 
@@ -24,8 +24,8 @@ rescale();
 
 function fisheye(d) {
   var dx = d.x - focus[0],
-      dy = d.y - focus[1],
-      dd = Math.sqrt(dx * dx + dy * dy);
+    dy = d.y - focus[1],
+    dd = Math.sqrt(dx * dx + dy * dy);
   if (!dd || dd >= radius) {
     return {x: d.x, y: d.y, z: dd >= radius ? 1 : 10};
   }

@@ -1,4 +1,4 @@
-/*global document,Event,HTMLCanvasElement*/
+/*global */
 'use strict';
 
 import { Tween, autoPlay, onTick } from 'es6-tween';
@@ -328,7 +328,7 @@ class CanvasRenderer extends Renderer {
   get animating() {
     for (let res of this.iconset) {
       if (! res.rendered) {
-         return true;
+        return true;
       }
     }
     return false;
@@ -407,12 +407,12 @@ class CanvasRenderer extends Renderer {
       icon.rendered = true;
     }
     tween.to({x: x, y: y, width: width, height: height, rotate: rotate },timing)
-    .on('complete', (icon) => {
-      icon[done_tweening] = setTimeout(() => {
-        icon.rendered = true;
-      },0);
-    })
-    .start();
+      .on('complete', (icon) => {
+        icon[done_tweening] = setTimeout(() => {
+          icon.rendered = true;
+        },0);
+      })
+      .start();
   }
 
   screenCoordinatesFromLayout(layout) {
@@ -489,17 +489,17 @@ import_icons = function() {
   CanvasRenderer[performing_import] = true;
   this.symbols = {};
   return Promise.resolve()
-  .then( () => icons.innerHTML = SYMBOLS_DEF )
-  .then( () => {
-    for (let symbol of icons.querySelectorAll('defs symbol')) {
-      let symboltext = symbol.innerHTML.replace(/#/g,'%23');
-      let paths = extract_paths(symbol);
-      let svg_text = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="100px" height="100px">${symboltext}</svg>`;
-      this.symbols[symbol.getAttribute('id')] = { svg: svg_text, paths };
-    }
-    CanvasRenderer[all_symbols] = this.symbols;
-    CanvasRenderer[performing_import] = false;
-  });
+    .then( () => icons.innerHTML = SYMBOLS_DEF )
+    .then( () => {
+      for (let symbol of icons.querySelectorAll('defs symbol')) {
+        let symboltext = symbol.innerHTML.replace(/#/g,'%23');
+        let paths = extract_paths(symbol);
+        let svg_text = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="100px" height="100px">${symboltext}</svg>`;
+        this.symbols[symbol.getAttribute('id')] = { svg: svg_text, paths };
+      }
+      CanvasRenderer[all_symbols] = this.symbols;
+      CanvasRenderer[performing_import] = false;
+    });
 };
 
 export default CanvasRenderer;

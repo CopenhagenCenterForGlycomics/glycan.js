@@ -8,30 +8,31 @@ let Renderable = class {
   get rendered() {
     // Get the actual rendered element / reference to element
     // so that we can add other stuff to the rendered thing
+    return undefined;
   }
   get cx() {
-
+    return this[position_symbol].cx;
   }
   set cx(cx) {
     this[position_symbol].cx = cx;
   }
   get cy() {
-
+    return this[position_symbol].cy;
   }
   set cy(cy) {
     this[position_symbol].cy = cy;
   }
   get radius() {
-
+    return this.radius;
   }
   set radius(radius) {
     this.radius=radius;
   }
   get box() {
-
+    return undefined;
   }
   get locked() {
-
+    return undefined;
   }
   lock(others) {
     // Return new box that wraps around this

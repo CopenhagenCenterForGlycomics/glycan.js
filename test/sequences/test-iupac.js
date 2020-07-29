@@ -88,14 +88,14 @@ let make_tracking_sugar = (base) => {
 
   let tracking_mono = class extends base.Monosaccharide {
     constructor(identifier) {
+      super(identifier);
       tracker.push(identifier);
-      return super(identifier);
     }
   };
   let tracking_sugar = class extends base {
     constructor() {
+      super();
       tracker.length = 0;
-      return super();
     }
     get tracker() {
       return tracker;

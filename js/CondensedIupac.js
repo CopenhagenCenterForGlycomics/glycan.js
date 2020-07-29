@@ -139,7 +139,7 @@ const create_repeat_objects = (sugar,definitions) => {
 
 let parse_sequence = function(sequence) {
   let comment = '';
-  [,sequence,comment]=sequence.match(/([^\+]+)(?:\+(\".+\"))*/);
+  [,sequence,comment]=sequence.match(/([^+]+)(?:\+(".+"))*/);
   comment = (comment || '').replace(/^"/,'').replace(/"$/,'');
   const repeat_re = /{([^}@]+)(?:@([a-z]\d+[a-z]))?}([a-z]|\d+)/g;
   let repeat_match;
@@ -152,15 +152,15 @@ let parse_sequence = function(sequence) {
   }
   sequence = repeat_free_seq;
 
-  if (sequence.match(/[\]\)]$/)) {
+  if (sequence.match(/[\])]$/)) {
     sequence = `${sequence}Root`;
   }
   sequence = sequence+')';
-  let units = sequence.split(/([\[\]])/);
+  let units = sequence.split(/([[\]])/);
 
   // Reverse ordering of branches so we see closer residues first
-  units = units.map( unit => unit.split(/\)(?=[A-Za-z\*])/).reverse().join(')') )
-               .map( unit => unit.match(/\d$/) ? unit+')' : unit );
+  units = units.map( unit => unit.split(/\)(?=[A-Za-z*])/).reverse().join(')') )
+    .map( unit => unit.match(/\d$/) ? unit+')' : unit );
 
   // We wish to split the units by the linkages
   units = [].concat.apply([],units.map(unit => reverse(unit).split(')').filter( (unit) => unit.length ).map(reverse))).reverse();

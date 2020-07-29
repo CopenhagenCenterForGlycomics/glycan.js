@@ -115,41 +115,41 @@ const rewrite_linear = (type) => {
   let start = type.substring(0,5);
   let newstart = start;
   switch (start) {
-    case '1,1-e':
-      newstart = '1,5-a';
-      break;
-    case '2,2-e':
-      newstart = '0,2-a';
-      break;
-    case '3,3-e':
-      newstart = '3,5-a';
-      break;
-    case '4,4-e':
-    case '5,5-e':
-      newstart = '0,4-a';
-      break;
-    case '1,3-e':
-      newstart = '1,3-a';
-      break;
-    case '2,4-e':
-      newstart = '2,4-a';
-      break;
-    case '3,5-e':
-      newstart = '3,4-a';
-      break;
-    case '1,1-w':
-      newstart = '1,5-x';
-      break;
-    case '2,2-w':
-      newstart = '0,2-x';
-      break;
-    case '3,3-w':
-      newstart = '3,5-x';
-      break;
-    case '4,4-w':
-    case '5,5-w':
-      newstart = '0,4-x';
-      break;
+  case '1,1-e':
+    newstart = '1,5-a';
+    break;
+  case '2,2-e':
+    newstart = '0,2-a';
+    break;
+  case '3,3-e':
+    newstart = '3,5-a';
+    break;
+  case '4,4-e':
+  case '5,5-e':
+    newstart = '0,4-a';
+    break;
+  case '1,3-e':
+    newstart = '1,3-a';
+    break;
+  case '2,4-e':
+    newstart = '2,4-a';
+    break;
+  case '3,5-e':
+    newstart = '3,4-a';
+    break;
+  case '1,1-w':
+    newstart = '1,5-x';
+    break;
+  case '2,2-w':
+    newstart = '0,2-x';
+    break;
+  case '3,3-w':
+    newstart = '3,5-x';
+    break;
+  case '4,4-w':
+  case '5,5-w':
+    newstart = '0,4-x';
+    break;
   }
   return `${newstart}${base}`;
 };
@@ -158,7 +158,7 @@ const children_with_fragment = (parent_type,children) => {
   let surviving_kids = children;
   if ( parent_type ) {
     if ( parent_type.match(/^[bc]/) ) {
-      surviving_kids = surviving_kids; // Reducing end modificaitions keep all the kids
+      // surviving_kids = surviving_kids; // Reducing end modificaitions keep all the kids
     }
     let positions = parent_type.match(/(\d),(\d)-([ax])/);
     if ( positions ) {
@@ -184,7 +184,7 @@ class FragmentResidue extends TracedMonosaccharide {
   }
   get parent() {
     if ((this.type || '').match(/(^[bc]|-a)/)) {
-      return;
+      return undefined;
     }
     return super.parent;
   }
@@ -285,15 +285,15 @@ let Fragmentable = (base) => class extends base {
     linear_base = linear_base ? linear_base[1] : null;
 
     switch (linear_base) {
-      case '1,1-e': result_mass += 0 + O; break;
-      case '3,3-e': result_mass += 0 + O; break;
-      case '5,5-e': result_mass += 0 - O - 2 * H - C; break;
-      case '3,5-e': result_mass += 0 + 2 * H + C; break;
-      case '1,1-w': result_mass += 0 - 2 * H - O; break;
-      case '2,2-w': result_mass += 0 - 2 * H; break;
-      case '3,3-w': result_mass += 0 - 2 * H - O; break;
-      case '4,4-w': result_mass += 0 - 2 * H; break;
-      case '5,5-w': result_mass += 0 + O + C + H; break;
+    case '1,1-e': result_mass += 0 + O; break;
+    case '3,3-e': result_mass += 0 + O; break;
+    case '5,5-e': result_mass += 0 - O - 2 * H - C; break;
+    case '3,5-e': result_mass += 0 + 2 * H + C; break;
+    case '1,1-w': result_mass += 0 - 2 * H - O; break;
+    case '2,2-w': result_mass += 0 - 2 * H; break;
+    case '3,3-w': result_mass += 0 - 2 * H - O; break;
+    case '4,4-w': result_mass += 0 - 2 * H; break;
+    case '5,5-w': result_mass += 0 + O + C + H; break;
     }
 
     if (this.type.match(/^[yz]/) || this.type.match(/^\d,\d-[xw]/)) {

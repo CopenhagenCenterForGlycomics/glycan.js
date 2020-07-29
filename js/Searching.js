@@ -27,7 +27,7 @@ let global_match_subpath = function(path_pattern,comparator,path) {
   }
   // We get back the elements of the paths where we match the pattern
   return loop_path.map(start => path.indexOf(start) )
-                       .map(start_idx => path.slice( start_idx - path_pattern.length + 1, start_idx + 1 ));
+    .map(start_idx => path.slice( start_idx - path_pattern.length + 1, start_idx + 1 ));
 };
 
 let match_fixed_paths = function(sugar,pattern,comparator) {
@@ -42,8 +42,8 @@ let match_fixed_paths = function(sugar,pattern,comparator) {
     let matcher = global_match_subpath.bind(null,search_path,comparator);
     let subpaths = paths.map( matcher );
     potential_roots = potential_roots.concat(
-                        flatten( subpaths.map( match_roots ) )
-                      ).filter(onlyUnique);
+      flatten( subpaths.map( match_roots ) )
+    ).filter(onlyUnique);
     let matched_residues = flatten(flatten(subpaths)).filter(onlyUnique);
     matched_residues.forEach( res => {
       search_path_match_count.set(res, (search_path_match_count.get(res) || 0)+ 1 );
@@ -121,16 +121,16 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
       log.info('For subtree',subtree.sequence,'we matched roots',roots.map( r => r.identifier ));
       log.info('We should be able to match each of these roots with a Root sugar match');
       roots = roots.filter(root => ((! root.parent) || subtree.parent_link == 0 || (root.parent.linkageOf(root) == subtree.parent_link)) )
-                   .map( root => {
-                      log.info('The parents of ',root.identifier,root.parent,' are being checked for being leaves of any root tree');
-                      let parents = [...sugar.residues_to_root(root)];
-                      for (let parent of parents) {
-                        if (root_trees_by_leaf_original.get(parent)) {
-                          return { root: root, parent_leaf: parent };
-                        }
-                      }
-                   })
-                   .filter( r => r );
+        .map( root => {
+          log.info('The parents of ',root.identifier,root.parent,' are being checked for being leaves of any root tree');
+          let parents = [...sugar.residues_to_root(root)];
+          for (let parent of parents) {
+            if (root_trees_by_leaf_original.get(parent)) {
+              return { root: root, parent_leaf: parent };
+            }
+          }
+        })
+        .filter( r => r );
       log.info('Number of subtrees that are a parent of a root match',roots.length);
       let result_trees = roots.map( root_pair => {
         let subtree_results = sugar.trace(subtree, root_pair.root, comparator );

@@ -1,4 +1,4 @@
-/*global window*/
+/*global */
 'use strict';
 
 import * as Glycan from './main';

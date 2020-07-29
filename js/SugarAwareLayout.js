@@ -128,7 +128,7 @@ class SugarAwareLayout extends CondensedLayout {
     // If only a single sibling is Fuc or NeuAc make it a stub
     if (sibs.filter(not_sulf).filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0 &&
         sibs.filter(not_sulf).filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) >= 0 ).length <= 1
-        ) {
+    ) {
       position.dx = 0;
     }
 

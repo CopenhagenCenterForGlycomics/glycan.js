@@ -72,9 +72,9 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     linkage='';
   }
   let [child_cx,child_cy,parent_cx,parent_cy] = [child_pos.x+child_pos.width/2,
-                                             child_pos.y+child_pos.height/2,
-                                             parent_pos.x+parent_pos.width/2,
-                                             parent_pos.y+parent_pos.height/2];
+    child_pos.y+child_pos.height/2,
+    parent_pos.x+parent_pos.width/2,
+    parent_pos.y+parent_pos.height/2];
 
   let long_axis = ROTATE ? child_cx - parent_cx : child_cy - parent_cy;
   let short_axis = ROTATE ? child_cy - parent_cy : child_cx - parent_cx;
@@ -123,11 +123,11 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   }
 
   let label = this.renderLinkageLabel( canvas,
-                                       ROTATE ? long_axis_coord : short_axis_coord,
-                                       ROTATE ? short_axis_coord : long_axis_coord,
-                                       fancy_anomer+linkage,
-                                       ROTATE,
-                                       short_axis_pos );
+    ROTATE ? long_axis_coord : short_axis_coord,
+    ROTATE ? short_axis_coord : long_axis_coord,
+    fancy_anomer+linkage,
+    ROTATE,
+    short_axis_pos );
 
   canvas.sendToBack(label);
   return label;
@@ -161,10 +161,10 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
     return;
   }
   let positions = [
-      SCALE*(child_pos.x + child_pos.width / 2),
-      SCALE*(child_pos.y + child_pos.height / 2),
-      SCALE*(parent_pos.x + parent_pos.width / 2),
-      SCALE*(parent_pos.y + parent_pos.height / 2)
+    SCALE*(child_pos.x + child_pos.width / 2),
+    SCALE*(child_pos.y + child_pos.height / 2),
+    SCALE*(parent_pos.x + parent_pos.width / 2),
+    SCALE*(parent_pos.y + parent_pos.height / 2)
   ];
   let group = this.renderLinkageGroup(canvas,sugar,child);
   canvas.sendToBack(group);
@@ -332,10 +332,10 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     this.setIconPosition(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
   }
   let correct_order = zindices.map( z => z.icon.element )
-                              .map( el => [...el.parentNode.children].indexOf(el) )
-                              .map( (v,i,a) => v - (a[i-1] || 0) )
-                              .map( v => v >= 0 )
-                              .reduce( (curr,next) => curr && next, true);
+    .map( el => [...el.parentNode.children].indexOf(el) )
+    .map( (v,i,a) => v - (a[i-1] || 0) )
+    .map( v => v >= 0 )
+    .reduce( (curr,next) => curr && next, true);
   if ( ! correct_order ) {
     for (let zindex of zindices.sort( (a,b) => a.z - b.z ) ) {
       container.sendToFront(zindex.icon);
@@ -379,7 +379,6 @@ class Renderer {
 
   set LayoutEngine(engine) {
     this[layout_engine] = engine;
-    return this[layout_engine];
   }
 
 
@@ -393,7 +392,6 @@ class Renderer {
 
   set element(el) {
     this[canvas_symbol] = el;
-    return this[canvas_symbol];
   }
 
 

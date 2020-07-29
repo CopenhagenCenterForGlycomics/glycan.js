@@ -152,24 +152,24 @@ const parse_composition = (composition) => {
     let [atom,number] = part.split(':');
     number = parseInt(number);
     switch (atom) {
-      case 'C':
-        atom = C;
-        break;
-      case 'H':
-        atom = H;
-        break;
-      case 'O':
-        atom = O;
-        break;
-      case 'N':
-        atom = N;
-        break;
-      case 'P':
-        atom = P;
-        break;
-      case 'S':
-        atom = S;
-        break;
+    case 'C':
+      atom = C;
+      break;
+    case 'H':
+      atom = H;
+      break;
+    case 'O':
+      atom = O;
+      break;
+    case 'N':
+      atom = N;
+      break;
+    case 'P':
+      atom = P;
+      break;
+    case 'S':
+      atom = S;
+      break;
     }
     atoms = atoms.concat( Array(number).fill(atom) );
   }
@@ -181,19 +181,19 @@ let read_definitions = () => {
   for (let block of DEFINITIONS.replace(/^\n/,'').split('\n\n')) {
     let definition = {};
     for (let line of block.split('\n')) {
-      let [field, value] = line.split(/^([^\:]+)\:/).slice(1);
+      let [field, value] = line.split(/^([^:]+):/).slice(1);
       switch (field) {
-        case 'name' :
-          definition.name = value;
-          break;
-        case 'terminii' :
-          // definition.ring = parse_terminii(value);
-          break;
-        case 'type' :
-          definition.type = value;
-          break;
-        case 'composition':
-          definition.composition = parse_composition(value);
+      case 'name' :
+        definition.name = value;
+        break;
+      case 'terminii' :
+        // definition.ring = parse_terminii(value);
+        break;
+      case 'type' :
+        definition.type = value;
+        break;
+      case 'composition':
+        definition.composition = parse_composition(value);
       }
     }
     parsed[ definition.name ] = definition;

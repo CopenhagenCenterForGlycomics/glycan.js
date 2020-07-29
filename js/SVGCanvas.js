@@ -73,9 +73,9 @@ class SVGCanvas {
       a_line.setAttribute(key,options[key]);
     }
     let [fill_style,stroke_style,stroke_width] = [ options.fill ? `fill: var(--fill-color,${options.fill});` : '',
-                                                   options.stroke ? `stroke: var(--stroke-color,${options.stroke});` : '',
-                                                   options['stroke-width'] ? `stroke-width: var(--stroke-width,${options['stroke-width']})` : ''
-                                                 ];
+      options.stroke ? `stroke: var(--stroke-color,${options.stroke});` : '',
+      options['stroke-width'] ? `stroke-width: var(--stroke-width,${options['stroke-width']})` : ''
+    ];
     a_line.setAttribute('style',`${fill_style}${stroke_style}${stroke_width}`);
     a_line.setAttribute('stroke-linecap','round');
     this.appendChild(a_line);
@@ -86,11 +86,11 @@ class SVGCanvas {
     let a_text = this.canvas.ownerDocument.createElementNS(SVGNS,'text');
     let a_tspan = this.canvas.ownerDocument.createElementNS(SVGNS, 'tspan');
     if (typeof text != 'string') {
-        a_text.appendChild(text);
+      a_text.appendChild(text);
     } else {
-        a_text.appendChild(a_tspan);
-        a_tspan.textContent = text;
-        a_tspan.setAttribute('dy','0');
+      a_text.appendChild(a_tspan);
+      a_tspan.textContent = text;
+      a_tspan.setAttribute('dy','0');
     }
     a_text.style.fontFamily = 'Helvetica, Verdana, Arial, Sans-serif';
     a_text.setAttribute('x',str(x));

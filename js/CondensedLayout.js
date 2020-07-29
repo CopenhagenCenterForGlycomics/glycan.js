@@ -197,17 +197,17 @@ let CondensedLayout = class {
 
       for (let item of overlapping) {
         let colliding_parents = [].concat.apply([], layout.get(item)
-                                      .collision
-                                      .map( map_get_item.bind(null,positions_overlap_map) )
-                                      .map( path_to_root.bind(null,renderable) ));
+          .collision
+          .map( map_get_item.bind(null,positions_overlap_map) )
+          .map( path_to_root.bind(null,renderable) ));
         log.info(item.identifier,
-                    'collides with',
-                    colliding_parents[0].identifier,
-                    'at',
-                    layout.get(item).x,layout.get(item).y,
-                    layout.get(item).collision.map( coll => [coll.x,coll.y]),
-                    'which is a child of',
-                    colliding_parents.map(res => res.identifier));
+          'collides with',
+          colliding_parents[0].identifier,
+          'at',
+          layout.get(item).x,layout.get(item).y,
+          layout.get(item).collision.map( coll => [coll.x,coll.y]),
+          'which is a child of',
+          colliding_parents.map(res => res.identifier));
         for (let parent of renderable.residues_to_root(item)) {
           if ( parent === item ) {
             continue;

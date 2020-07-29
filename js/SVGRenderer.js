@@ -1,4 +1,4 @@
-/*global SVGDefsElement,DOMParser*/
+/*global */
 'use strict';
 import debug from './Debug';
 

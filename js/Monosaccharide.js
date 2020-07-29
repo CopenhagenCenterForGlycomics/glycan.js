@@ -305,7 +305,6 @@ export default class Monosaccharide {
   }
 
   linkageOf(child) {
-    let kid_linkages = this.child_linkages;
     let linkages = this.child_linkages.entries();
     let curr;
     for (curr of linkages) {

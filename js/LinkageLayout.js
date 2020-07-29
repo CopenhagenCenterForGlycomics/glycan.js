@@ -61,39 +61,39 @@ class LinkageLayout extends SugarAwareLayout {
     let is_fucose = res.identifier === 'Fuc';
 
     switch (linkage) {
-      case 0:
-        position.dx = 0;
-        position.dy = -1 * DELTA_Y;
-        break;
-      case 2:
-        position.dx = -1 * DELTA_X;
-        position.dy = 0;
-        break;
-      case 3:
-        position.dx = -1 * DELTA_X;
-        position.dy = -1 * DELTA_Y;
-        if (is_fucose) {
-          position.rotate = 90;
-        }
-        break;
-      case 4:
-        position.dx = 0;
-        position.dy = -1 * DELTA_Y;
-        if (is_fucose) {
-          position.rotate = 180;
-        }
-        break;
-      case 6:
-        position.dx = 1 * DELTA_X;
-        position.dy = -1 * DELTA_Y;
-        if (is_fucose) {
-          position.rotate = 225;
-        }
-        break;
-      case 8:
-        position.dx = 1 * DELTA_X;
-        position.dy = 0;
-        break;
+    case 0:
+      position.dx = 0;
+      position.dy = -1 * DELTA_Y;
+      break;
+    case 2:
+      position.dx = -1 * DELTA_X;
+      position.dy = 0;
+      break;
+    case 3:
+      position.dx = -1 * DELTA_X;
+      position.dy = -1 * DELTA_Y;
+      if (is_fucose) {
+        position.rotate = 90;
+      }
+      break;
+    case 4:
+      position.dx = 0;
+      position.dy = -1 * DELTA_Y;
+      if (is_fucose) {
+        position.rotate = 180;
+      }
+      break;
+    case 6:
+      position.dx = 1 * DELTA_X;
+      position.dy = -1 * DELTA_Y;
+      if (is_fucose) {
+        position.rotate = 225;
+      }
+      break;
+    case 8:
+      position.dx = 1 * DELTA_X;
+      position.dy = 0;
+      break;
     }
 
     return position;

@@ -1,4 +1,4 @@
-/*global QUnit, document*/
+/*global QUnit*/
 
 import Sugar from '../../js/Sugar';
 import {IO as Iupac} from '../../js/CondensedIupac';

@@ -17,7 +17,7 @@
     "@babel/preset-env": "^7.4.5",
     "babel-loader": "^8.0.5",
     "core-js": "2",
-    "jshint": "^2.10.2",
+    "eslint": "^7.5.0",
     "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.2.0",
     "karma-qunit": "^3.0.0",

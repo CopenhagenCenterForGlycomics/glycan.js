@@ -1,4 +1,4 @@
-/*global Image*/
+/*global */
 'use strict';
 
 const torender = Symbol('torender');

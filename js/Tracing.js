@@ -11,41 +11,38 @@ const log = debug(module_string);
 let noop = () => {};
 
 class TracedMonosaccharide extends Monosaccharide {
-    constructor(original) {
-      super(original.identifier);
-      this.original = original;
-      return this;
-    }
-    get anomer() {
-      return this.original.anomer;
-    }
-    get parent_linkage() {
-      return this.original.parent_linkage;
-    }
-    get identifier() {
-      return this.original.identifier;
-    }
-    set anomer(ignore) {
-      noop(ignore);
-      return this.original.anomer;
-    }
-    set parent_linkage(ignore) {
-      noop(ignore);
-      return this.original.parent_linkage;
-    }
-    set identifier(ignore) {
-      noop(ignore);
-      return this.original.identifier;
-    }
-    linkageOf(node) {
-      return this.original.linkageOf(node.original);
-    }
-    clone() {
-      let cloned = new this.constructor(this.original);
-      cloned.original = this.original;
-      cloned.copyTagsFrom(this);
-      return cloned;
-    }
+  constructor(original) {
+    super(original.identifier);
+    this.original = original;
+    return this;
+  }
+  get anomer() {
+    return this.original.anomer;
+  }
+  get parent_linkage() {
+    return this.original.parent_linkage;
+  }
+  get identifier() {
+    return this.original.identifier;
+  }
+  set anomer(ignore) {
+    noop(ignore);
+  }
+  set parent_linkage(ignore) {
+    noop(ignore);
+  }
+  set identifier(ignore) {
+    noop(ignore);
+  }
+  linkageOf(node) {
+    return this.original.linkageOf(node.original);
+  }
+  clone() {
+    let cloned = new this.constructor(this.original);
+    cloned.original = this.original;
+    cloned.copyTagsFrom(this);
+    return cloned;
+  }
 }
 
 let initialise_sugar = function(target,wanted) {

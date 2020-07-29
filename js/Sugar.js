@@ -227,7 +227,7 @@ export default class Sugar {
         return writer_function.call(this);
       }
       set sequence(sequence) {
-        return parser_function.call(this,sequence);
+        parser_function.call(this,sequence);
       }
     };
   }

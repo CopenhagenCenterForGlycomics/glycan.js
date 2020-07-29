@@ -11,44 +11,44 @@ class IupacReaction extends Iupac(Reaction) {}
 class IupacSugar extends Iupac(Sugar) {}
 
 
-const MGAT2 = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-2)}@y5b\"'];
-const MGAT4A = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-4)}@y5a\"'];
-const MGAT5 = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+\"{GlcNAc(b1-6)}@y5b\"'];
-const CHSY1 = ['GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GlcA(b1-3)}@y7a\"',
-               'GlcA(b1-3)GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GalNAc(b1-4)}@y8a\"'
-              ];
+const MGAT2 = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+"{GlcNAc(b1-2)}@y5b"'];
+const MGAT4A = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+"{GlcNAc(b1-4)}@y5a"'];
+const MGAT5 = ['GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc(b1-N)Asn+"{GlcNAc(b1-6)}@y5b"'];
+const CHSY1 = ['GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GlcA(b1-3)}@y7a"',
+  'GlcA(b1-3)GalNAc(b1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GalNAc(b1-4)}@y8a"'
+];
 
-const EXT1 = [  'GlcNAc(a1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GlcA(b1-4)}@y7a\"',
-                'GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GlcNAc(a1-4)}@y5a\"',
-                'GlcA(b1-4)GlcNAc(a1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GlcNAc(a1-4)}@y8a\"'
-             ];
+const EXT1 = [  'GlcNAc(a1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GlcA(b1-4)}@y7a"',
+  'GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GlcNAc(a1-4)}@y5a"',
+  'GlcA(b1-4)GlcNAc(a1-4)*(u?-?)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GlcNAc(a1-4)}@y8a"'
+];
 
-const CSGALNACT1 = ['GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GalNAc(b1-4)}@y5a\"'];
+const CSGALNACT1 = ['GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GalNAc(b1-4)}@y5a"'];
 
-const POMGNT2 = ['Man(a1-O)Ser+\"{GlcNAc(b1-4)}@y2a\"'];
-const B3GALNT2 = ['GlcNAc(b1-4)Man(a1-O)Ser+\"{GalNAc(b1-3)}@y3a\"'];
-const B4GAT1 = ['Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{GlcA(b1-3)}@y9a\"'];
+const POMGNT2 = ['Man(a1-O)Ser+"{GlcNAc(b1-4)}@y2a"'];
+const B3GALNT2 = ['GlcNAc(b1-4)Man(a1-O)Ser+"{GalNAc(b1-3)}@y3a"'];
+const B4GAT1 = ['Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{GlcA(b1-3)}@y9a"'];
 
 const LARGE1GLCA = [
-'Xyl(a1-3)GlcA(b1-3)*(u?-?)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{GlcA(b1-3)}@y13a\"',
-'Xyl(a1-3)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{GlcA(b1-3)}@y11a\"'
+  'Xyl(a1-3)GlcA(b1-3)*(u?-?)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{GlcA(b1-3)}@y13a"',
+  'Xyl(a1-3)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{GlcA(b1-3)}@y11a"'
 ];
 
 const LARGE1XYL = [
-'GlcA(b1-3)*(u?-?)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Xyl(a1-3)}@y12a\"',
-'GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Xyl(a1-3)}@y10a\"'
+  'GlcA(b1-3)*(u?-?)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{Xyl(a1-3)}@y12a"',
+  'GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{Xyl(a1-3)}@y10a"'
 ];
 
 
 const FKTN1 = [
-'Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Rbo(u5-1)P(u1-1)}@y6a\"'
+  'Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{Rbo(u5-1)P(u1-1)}@y6a"'
 ];
 
 const FKTN3 = [
-'GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Rbo(u5-1)P(u1-3)}@y4a\"'
+  'GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{Rbo(u5-1)P(u1-3)}@y4a"'
 ];
 
-const TMEM5 = ['Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+\"{Xyl(b1-4)}@y8a\"'];
+const TMEM5 = ['Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser+"{Xyl(b1-4)}@y8a"'];
 
 
 const DERMATAN_SEQUENCE = 'GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
@@ -63,17 +63,17 @@ const NLINKED_CORE = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNA
 const MATRIGLYCAN_SEQUENCE = 'GlcA(b1-3)Xyl(a1-3)GlcA(b1-3)Xyl(a1-3)GlcA(b1-3)Xyl(a1-3)GlcA(b1-3)Xyl(b1-4)Rbo(u5-1)P(u1-1)Rbo(u5-1)P(u1-3)GalNAc(b1-3)GlcNAc(b1-4)[P(u1-6)]Man(a1-O)Ser';
 
 const ALL_REACTIONS = { MGAT2: MGAT2,
-                        MGAT4A: MGAT4A,
-                        MGAT5: MGAT5,
-                        CHSY1: CHSY1,
-                        EXT1: EXT1,
-                        CSGALNACT1: CSGALNACT1,
-                        POMGNT2: POMGNT2,
-                        B3GALNT2: B3GALNT2,
-                        B4GAT1: B4GAT1,
-                        LARGE1: [].concat(LARGE1XYL,LARGE1GLCA),
-                        FKTN: [].concat(FKTN1,FKTN3),
-                        TMEM5: TMEM5 };
+  MGAT4A: MGAT4A,
+  MGAT5: MGAT5,
+  CHSY1: CHSY1,
+  EXT1: EXT1,
+  CSGALNACT1: CSGALNACT1,
+  POMGNT2: POMGNT2,
+  B3GALNT2: B3GALNT2,
+  B4GAT1: B4GAT1,
+  LARGE1: [].concat(LARGE1XYL,LARGE1GLCA),
+  FKTN: [].concat(FKTN1,FKTN3),
+  TMEM5: TMEM5 };
 
 const ALL_REACTION_GROUPS = Object.keys(ALL_REACTIONS).map( gene => {
   let reactionseqs = ALL_REACTIONS[gene];

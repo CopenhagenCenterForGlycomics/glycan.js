@@ -63,12 +63,12 @@ QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
 });
 
 QUnit.test( 'Test negative reaction for bisecting GlcNAc' , function( assert ) {
-  let sequence = `GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc+"!{Fuc(a1-6)}@y1a"`;
+  let sequence = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc+"!{Fuc(a1-6)}@y1a"';
   let reaction = new IupacReaction();
   reaction.sequence = sequence;
   assert.ok(reaction.negative, 'Reaction is a negative reaction');
   let reaction_positive = new IupacReaction();
-  reaction_positive.sequence = `GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc+"{Fuc(a1-6)}@y1a"`;
+  reaction_positive.sequence = 'GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc+"{Fuc(a1-6)}@y1a"';
   let reactionset = new ReactionSet();
   reactionset.addReactionRule(reaction_positive);
   reactionset.addReactionRule(reaction);
