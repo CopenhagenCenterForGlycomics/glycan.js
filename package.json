@@ -22,7 +22,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-qunit": "^3.0.0",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^3.0.5",
+    "karma-webpack": "^4.0.2",
     "precommit-hook": "^3.0.0",
     "qunit": "^2.9.2",
     "raw-loader": "^2.0.0",
@@ -31,15 +31,13 @@
     "webpack-dev-server": "^3.2.1"
   },
   "scripts": {
-    "jshint-pre-commit": "./scripts/jshint-pre-commit.sh",
     "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
     "tracetest": "./scripts/trace_tests.sh",
     "build-web": "./node_modules/.bin/webpack -d",
     "build-watch-web": "./node_modules/.bin/webpack --watch",
     "server": "python ./scripts/simplehttpserver",
     "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "lint": "jshint .",
-    "validate": "npm ls"
+    "lint": "./node_modules/.bin/eslint test/**/*.js js/*.js --fix"
   },
   "browserify": {
     "transform": [
