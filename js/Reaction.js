@@ -97,6 +97,10 @@ let execute = function(sugar) {
     for (let kid of addition.root.children) {
       attachment.graft(kid);
     }
+    if (addition.root.identifier !== 'Root') {
+      // Turn the addition root into an EpimerisedMonosaccharide
+      attachment.parent.replaceChildKeepingChildren(attachment,addition.root.clone());
+    }
   }
 };
 
