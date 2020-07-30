@@ -3,6 +3,7 @@ import Reaction from './Reaction';
 
 import { CacheTrace } from './Searching';
 
+import { EpimerisableMonosaccharide } from './Epimerisation';
 
 import debug from './Debug';
 
@@ -195,6 +196,11 @@ class ReactionGroup {
     }
     return tag;
   }
+
+  /* What possible linkages can be made on this sugar at the 
+     given sugar, donor, linkage and substrate
+   */
+
   supportsLinkageAt(sugar,donor,linkage,substrate,reactions=this.reactions) {
     let possible_linkages = [];
     let possible_anomers = [];
@@ -293,7 +299,23 @@ class ReactionGroup {
       if ( ! symbol_map.has( reaction )) {
         symbol_map.set( reaction, { substrate: Symbol('substrate'), residue: Symbol('residue') });
       }
+
+      if (reaction instanceof ReactionSet) {
+        for (let single_reaction of reaction.positive) {
+          let epimerisable = single_reaction.composition().filter( res => res instanceof EpimerisableMonosaccharide );
+          epimerisable.forEach( res => res.enable() );          
+        }
+      }
+
       reaction.tagSubstrateResidues(sugar,symbol_map.get(reaction).substrate);
+
+      if (reaction instanceof ReactionSet) {
+        for (let single_reaction of reaction.positive) {
+          let epimerisable = single_reaction.composition().filter( res => res instanceof EpimerisableMonosaccharide );
+          epimerisable.forEach( res => res.disable() );          
+        }
+      }
+
       let attachments = sugar.composition_for_tag(symbol_map.get(reaction).substrate);
       let trees = filter_with_delta.call(reaction,attachments,sugar);
       let supported = trees.map( tree => {

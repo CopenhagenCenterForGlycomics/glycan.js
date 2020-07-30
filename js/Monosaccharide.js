@@ -285,16 +285,15 @@ export default class Monosaccharide {
     }
   }
 
-  replaceChildKeepingChildren(child,new_child) {
-    if (Object.isFrozen(this) || Object.isFrozen(new_child) || Object.isFrozen(child)) {
-      throw new TypeError('Cannot replace child on frozen monosaccharide');
+  adoptChildrenFrom(parent) {
+    if (Object.isFrozen(this) || Object.isFrozen(parent)) {
+      throw new TypeError('Cannot adopt children on frozen monosaccharide');
     }
-    for (let [linkage,children] of child.child_linkages) {
+    for (let [,children] of parent.child_linkages) {
       for (let kid of children) {
-        new_child.graft(kid);
+        this.graft(kid);
       }
     }
-    this.replaceChild(child,new_child);
   }
 
   replaceChild(child,new_child,override_position) {

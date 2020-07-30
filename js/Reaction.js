@@ -1,6 +1,8 @@
 
 import Sugar from './Sugar';
 
+import { EpimerisableMonosaccharide } from './Epimerisation';
+
 let comment_symbol = Symbol('comment_string');
 let negative_symbol = Symbol('is_negative');
 let reaction_sugar = Symbol('reaction_sugar');
@@ -77,6 +79,21 @@ let parseReaction = (sugar) => {
   if (!  sugar[ reaction_position ]) {
     throw new Error('Cannot locate attachment point');
   }
+
+  if (subsugar.root.identifier !== 'Root') {
+    let attachment = sugar[reaction_position];
+
+    let epimierisable = new EpimerisableMonosaccharide(attachment,subsugar.root.identifier,false);
+    epimierisable.adoptChildrenFrom(attachment);
+    epimierisable.copyTagsFrom(attachment);
+    if (attachment.parent) {
+      attachment.parent.replaceChild(attachment,epimierisable);
+    } else {
+      sugar.root = epimierisable;
+    }
+    sugar[reaction_position] = epimierisable;
+  }
+
   sugar[ reaction_position_string ] = location;
   sugar.attachment_tag = Symbol('attachment');
   sugar[ reaction_position ].setTag(sugar.attachment_tag);
@@ -86,7 +103,10 @@ let find_sugar_substrates = function(sugar) {
   // The attachment tag is part of the reaction
   let substrates = sugar.match_sugar_pattern(this,comparator) || [];
   return substrates.map( match => {
-    let first_tagged = match.composition_for_tag(this.attachment_tag)[0] || {};
+    let first_tagged = match.composition_for_tag(this.attachment_tag)[0];
+    if ( ! first_tagged ) {
+      return;
+    }
     return first_tagged.original;
   }).filter( r => r );
 };
@@ -98,8 +118,14 @@ let execute = function(sugar) {
       attachment.graft(kid);
     }
     if (addition.root.identifier !== 'Root') {
-      // Turn the addition root into an EpimerisedMonosaccharide
-      attachment.parent.replaceChildKeepingChildren(attachment,addition.root.clone());
+      let epimierisable = new EpimerisableMonosaccharide(attachment,addition.root.identifier,true);
+      epimierisable.adoptChildrenFrom(attachment);
+      epimierisable.copyTagsFrom(attachment);
+      if (attachment.parent) {
+        attachment.parent.replaceChild(attachment,epimierisable);
+      } else {
+        sugar.root = epimierisable;
+      }
     }
   }
 };
