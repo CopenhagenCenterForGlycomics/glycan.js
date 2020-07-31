@@ -14,12 +14,12 @@ if (!Function.prototype.bind) {
     }
 
     var aArgs   = Array.prototype.slice.call(arguments, 1),
-        fToBind = this,
-        fNOP    = function() {},
-        fBound  = function() {
-          return fToBind.apply(this instanceof fNOP ? this : oThis,
-                 aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
+      fToBind = this,
+      fNOP    = function() {},
+      fBound  = function() {
+        return fToBind.apply(this instanceof fNOP ? this : oThis,
+          aArgs.concat(Array.prototype.slice.call(arguments)));
+      };
 
     fNOP.prototype = this.prototype;
     fBound.prototype = new fNOP();
@@ -33,7 +33,6 @@ debug.disable();
 if ( QUnit.config && QUnit.config.debug ) {
   console.log(`Enabling Debugging for ${QUnit.config.debug}`);
   debug.enable(QUnit.config.debug);
-  debug.useColors = () => false;
 }
 
 // We probably want to have promises to handle
