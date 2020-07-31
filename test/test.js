@@ -28,7 +28,10 @@ if (!Function.prototype.bind) {
   };
 }
 
+debug.disable();
+
 if ( QUnit.config && QUnit.config.debug ) {
+  console.log(`Enabling Debugging for ${QUnit.config.debug}`);
   debug.enable(QUnit.config.debug);
   debug.useColors = () => false;
 }
