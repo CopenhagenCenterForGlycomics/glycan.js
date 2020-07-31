@@ -36,7 +36,7 @@ let identifier_comparator = (a,b) => {
   }
 
   return (a.identifier === b.identifier);
-}
+};
 
 let comparator = (a,b) => {
   if ( ! a || ! b ) {

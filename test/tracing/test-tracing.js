@@ -1,3 +1,4 @@
+/*global QUnit*/
 
 import Sugar from '../../js/Sugar';
 
