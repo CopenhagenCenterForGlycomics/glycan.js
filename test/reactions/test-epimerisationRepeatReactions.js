@@ -52,6 +52,31 @@ QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
 
 });
 
+QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
+  let sequence = 'GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  sequence = 'Glc(b1-4)Gal(b1-5)';
+  let repeat_sug = new IupacSugar();
+  repeat_sug.sequence = sequence;
+
+  let repeat = new Repeat(repeat_sug,'y3a',1,4);
+  repeat.mode = Repeat.MODE_EXPAND;
+  sugar.root.graft(repeat.root);
+
+  let epimerisation_reaction = 'Gal(b1-5)*+"{New}@y2a"';
+
+  let chain_synthesis_reaction = 'Glc(b1-4)*+"{Gal(b1-5)}@y2a"';
+
+  let reaction = new IupacReaction();
+  reaction.sequence = epimerisation_reaction;
+
+  reaction.execute(sugar);
+  assert.equal(sugar.sequence,'Glc(b1-4)New(b1-5)Glc(b1-4)New(b1-5)Glc(b1-4)New(b1-5)Glc(b1-4)New(b1-5)GlcNAc');
+
+});
+
 QUnit.test( 'Test reaction matching on last residue of simple repeat' , function( assert ) {
   let sequence = 'GlcNAc';
   let sugar = new IupacSugar();
