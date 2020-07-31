@@ -344,13 +344,18 @@ class ReactionGroup {
         let part_supported = tree_root.composition(tree_root.root.children[0]);
         return part_supported.map( res => res.original );
       });
-      for (let residue of [].concat.apply([], supported)) {
-        if (is_epimerisation_reaction) {
-          for (let tree of trees.flat()) {
-            for (let epimerised of tree.composition_for_tag(EPIMERISED_TAG)) {
-              epimerised.original.setTag(EPIMERISED_TAG, epimerised.getTag(EPIMERISED_TAG));
-            }
+
+      if (is_epimerisation_reaction) {
+        for (let tree of trees.flat()) {
+          for (let epimerised of tree.composition_for_tag(EPIMERISED_TAG)) {
+            epimerised.original.setTag(EPIMERISED_TAG, epimerised.getTag(EPIMERISED_TAG));
           }
+        }
+      }
+
+      for (let residue of [].concat.apply([], supported)) {
+        if (residue.getTag(EPIMERISED_TAG) && is_epimerisation_reaction) {
+          continue;
         }
         residue.setTag(symbol_map.get(reaction).residue);
         residue.setTag(with_support);

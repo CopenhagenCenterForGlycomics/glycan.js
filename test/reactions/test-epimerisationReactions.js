@@ -59,8 +59,15 @@ QUnit.test( 'Can use epimerising reaction with children to support a linkage' , 
   test_sugar.sequence = search_sequence;
   let supported_tag = reactiongroup.supportLinkages(test_sugar);
   let supported = test_sugar.composition_for_tag(supported_tag);
-  assert.equal(supported.length, 1);
-  assert.equal(supported.map( res => res.identifier ).join(','),'New');
+  assert.equal(supported.length, 0);
+  assert.equal(supported.map( res => res.identifier ).join(','),'');
+  let tags = test_sugar
+    .composition()
+    .filter( res => res.identifier == 'New')
+    .map( res => res.getTags())
+    .flat()
+    .map( symb => symb.description );
+  assert.deepEqual(tags,['substrate','has_been_epimerised']);
 });
 
 QUnit.test( 'Can perform multiple epimerisation with wildcards' , function( assert ) {
@@ -122,8 +129,16 @@ QUnit.test( 'Can use epimerising reaction with wildcards to support a linkage' ,
   test_sugar.sequence = search_sequence;
   let supported_tag = reactiongroup.supportLinkages(test_sugar);
   let supported = test_sugar.composition_for_tag(supported_tag);
-  assert.equal(supported.length, 2);
-  assert.equal(supported.map( res => res.identifier ).join(','),'New,New');
+
+  assert.deepEqual(supported,[]);
+
+  let tags = test_sugar
+    .composition()
+    .filter( res => res.identifier == 'New')
+    .map( res => res.getTags())
+    .flat()
+    .map( symb => symb.description );
+  assert.deepEqual(tags,['substrate','has_been_epimerised','substrate','has_been_epimerised']);
 });
 
 QUnit.test( 'Can use epimerising reaction with wildcards to support a linkage' , function( assert ) {
@@ -146,9 +161,24 @@ QUnit.test( 'Can use epimerising reaction with wildcards to support a linkage' ,
   test_sugar.sequence = search_sequence;
   let supported_tag = reactiongroup.supportLinkages(test_sugar);
   let supported = test_sugar.composition_for_tag(supported_tag);
-  assert.equal(supported.length, 1);
-  assert.equal(supported.map( res => res.identifier ).join(','),'New');
-  assert.equal(supported.map( res => res.parent.identifier ).join(','),'GlcNAc');
+  assert.equal(supported.length, 0);
+  var tags = test_sugar
+    .composition()
+    .filter( res => res.identifier == 'New' && res.parent.identifier == 'GlcNAc')
+    .map( res => res.getTags())
+    .flat()
+    .map( symb => symb.description );
+  assert.deepEqual(tags,['substrate','has_been_epimerised']);
+
+
+  tags = test_sugar
+    .composition()
+    .filter( res => res.identifier == 'New' && res.parent.identifier != 'GlcNAc')
+    .map( res => res.getTags())
+    .flat()
+    .map( symb => symb.description );
+  assert.deepEqual(tags,[]);
+
 });
 
 QUnit.test( 'Can use epimerising reaction with children to support a linkage' , function( assert ) {
@@ -203,7 +233,82 @@ QUnit.test( 'Can use chain epimerisation and regular transferase to support link
   assert.equal(supported.map( res => res.identifier ).join(','),'Gal,New');
 });
 
-// Possibly do a two-step with epimerases FIRST and then noting it can have mutiple identifiers?
-// Can't match the base_sequence in the search_sequence - possibly need to subclass reaction to have new behaviour
-// Apply epimerase to base first, and test for support of epimerised base_sequence
-// Then mark attachment point as maybe epimerised so we can play with the comparator 
+QUnit.test( 'Epimerisation does not erroneously support extra residues' , function( assert ) {
+  let search_sequence = 'New(b1-4)Gal(b1-3)GlcNAc';
+
+  let epimerisation_reaction = 'Man(b1-3)GlcNAc+"{New(b1-4)Gal}@y2a"';
+
+  let reactions = [ epimerisation_reaction ];
+
+  let reactiongroup = new ReactionGroup();
+
+  for (let sequence of reactions ) {
+    let reactionset = new ReactionSet();
+    let reaction = new IupacReaction();
+    reaction.sequence = sequence;
+    reactionset.addReactionRule(reaction);
+    reactiongroup.addReactionSet(reactionset);
+  }
+
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.equal(supported.length, 1);
+  assert.equal(supported.map( res => res.identifier ).join(','),'New');
+});
+
+QUnit.test( 'Epimerisation without extension works with chains' , function( assert ) {
+  let search_sequence = 'Gal(b1-3)GlcNAc';
+
+  let epimerisation_reaction = 'Man(b1-3)GlcNAc+"{Gal}@y2a"';
+
+  let chain_synthesis_reaction = 'GlcNAc+"{Man(b1-3)}@y1a"';
+
+  let reactions = [ epimerisation_reaction, chain_synthesis_reaction ];
+
+  let reactiongroup = new ReactionGroup();
+
+  for (let sequence of reactions ) {
+    let reactionset = new ReactionSet();
+    let reaction = new IupacReaction();
+    reaction.sequence = sequence;
+    reactionset.addReactionRule(reaction);
+    reactiongroup.addReactionSet(reactionset);
+  }
+
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.equal(supported.length, 1);
+  assert.equal(supported.map( res => res.identifier ).join(','),'Gal');
+});
+
+QUnit.test( 'Epimerisation without extension does not work without previous chain' , function( assert ) {
+  let search_sequence = 'Gal(b1-3)GlcNAc';
+
+  let epimerisation_reaction = 'Man(b1-3)GlcNAc+"{Gal}@y2a"';
+
+  let reactions = [ epimerisation_reaction ];
+
+  let reactiongroup = new ReactionGroup();
+
+  for (let sequence of reactions ) {
+    let reactionset = new ReactionSet();
+    let reaction = new IupacReaction();
+    reaction.sequence = sequence;
+    reactionset.addReactionRule(reaction);
+    reactiongroup.addReactionSet(reactionset);
+  }
+
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.equal(supported.length, 0);
+  assert.equal(supported.map( res => res.identifier ).join(','),'');
+});
