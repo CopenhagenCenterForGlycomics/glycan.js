@@ -15,6 +15,9 @@ const module_string='glycanjs:reactionset';
 
 const log = debug(module_string);
 
+const EPIMERISED_TAG = Symbol('has_been_epimerised');
+
+
 let clean_tags = (tag) => { return res => res.setTag(tag,null); };
 
 let not_in_array = (array) => { return el => array.indexOf(el) < 0; };
@@ -23,7 +26,17 @@ let only_unique = (v, i, s) => s.indexOf(v) === i;
 
 let match_root_original = (res) => { return tree => tree.root.original === res; };
 
-let identifier_comparator = (a,b) => a.identifier === b.identifier;
+let identifier_comparator = (a,b) => {
+
+  if (a.getTag(EPIMERISED_TAG) === b.identifier) {
+    return true;
+  }
+  if (b.getTag(EPIMERISED_TAG) === a.identifier) {
+    return true;
+  }
+
+  return (a.identifier === b.identifier);
+}
 
 let comparator = (a,b) => {
   if ( ! a || ! b ) {
@@ -300,10 +313,18 @@ class ReactionGroup {
         symbol_map.set( reaction, { substrate: Symbol('substrate'), residue: Symbol('residue') });
       }
 
+      var is_epimerisation_reaction = false;
+
       if (reaction instanceof ReactionSet) {
         for (let single_reaction of reaction.positive) {
           let epimerisable = single_reaction.composition().filter( res => res instanceof EpimerisableMonosaccharide );
-          epimerisable.forEach( res => res.enable() );          
+          if (epimerisable.length > 0) {
+            is_epimerisation_reaction = true;
+            single_reaction.delta.root.setTag(EPIMERISED_TAG,epimerisable[0].identifier);
+          }
+          epimerisable.forEach( res => {
+            res.enable();
+          });
         }
       }
 
@@ -324,6 +345,13 @@ class ReactionGroup {
         return part_supported.map( res => res.original );
       });
       for (let residue of [].concat.apply([], supported)) {
+        if (is_epimerisation_reaction) {
+          for (let tree of trees.flat()) {
+            for (let epimerised of tree.composition_for_tag(EPIMERISED_TAG)) {
+              epimerised.original.setTag(EPIMERISED_TAG, epimerised.getTag(EPIMERISED_TAG));
+            }
+          }
+        }
         residue.setTag(symbol_map.get(reaction).residue);
         residue.setTag(with_support);
       }

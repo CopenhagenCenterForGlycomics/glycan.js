@@ -362,6 +362,13 @@ export default class Monosaccharide {
     return tag_symbol;
   }
 
+  getTags() {
+    if (! tag_map.has(this) ) {
+      return [];
+    }
+    return [...tag_map.get(this).keys()];
+  }
+
   getTag(tag) {
     if (! tag_map.has(this) ) {
       return;

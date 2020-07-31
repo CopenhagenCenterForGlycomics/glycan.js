@@ -175,6 +175,34 @@ QUnit.test( 'Can use epimerising reaction with children to support a linkage' , 
   assert.equal(supported.map( res => res.identifier ).join(','),'New');
 });
 
+QUnit.test( 'Can use chain epimerisation and regular transferase to support linkages' , function( assert ) {
+  let search_sequence = 'New(b1-4)Gal(b1-3)GlcNAc';
+
+  let epimerisation_reaction = 'Man(b1-3)GlcNAc+"{New(b1-4)Gal}@y2a"';
+
+  let chain_synthesis_reaction = 'GlcNAc+"{Man(b1-3)}@y1a"';
+
+  let reactions = [ epimerisation_reaction, chain_synthesis_reaction ];
+
+  let reactiongroup = new ReactionGroup();
+
+  for (let sequence of reactions ) {
+    let reactionset = new ReactionSet();
+    let reaction = new IupacReaction();
+    reaction.sequence = sequence;
+    reactionset.addReactionRule(reaction);
+    reactiongroup.addReactionSet(reactionset);
+  }
+
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.equal(supported.length, 2);
+  assert.equal(supported.map( res => res.identifier ).join(','),'Gal,New');
+});
+
 // Possibly do a two-step with epimerases FIRST and then noting it can have mutiple identifiers?
 // Can't match the base_sequence in the search_sequence - possibly need to subclass reaction to have new behaviour
 // Apply epimerase to base first, and test for support of epimerised base_sequence
