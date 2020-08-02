@@ -28,7 +28,9 @@ function perform_remove_child(sugar,location,assert) {
     return;
   }
   let parent = child.parent;
+  let parent_location = sugar.location_for_monosaccharide(parent);
   parent.removeChild(parent.linkageOf(child),child);
+  parent = sugar.locate_monosaccharide(parent_location);
   assert.ok(parent.children.indexOf(child) < 0,`Did not remove child of type ${child.constructor.name} at ${location}`);
 }
 
@@ -38,8 +40,11 @@ function perform_replace_child(sugar,location,assert) {
     return;
   }
   let parent = child.parent;
+  let parent_location = sugar.location_for_monosaccharide(parent);
+
   let replacement = new Monosaccharide('Z');
   parent.replaceChild(child,replacement,parent.linkageOf(child));
+  parent = sugar.locate_monosaccharide(parent_location);
   assert.ok(parent.children.indexOf(child) < 0,`Did not remove child of type ${child.constructor.name} at ${location}`);
   assert.ok(parent.children.indexOf(replacement) >= 0,`Did not add child to replace ${child.constructor.name} at ${location}`);
 }
@@ -55,7 +60,7 @@ QUnit.test( 'Expanded sugars have the same sequence' , function( assert ) {
 QUnit.test( 'Test removing children', function( assert )  {
   let { expanded, plain } = get_sugars();
   let locations = plain.composition().map( res => plain.location_for_monosaccharide(res) );
-  for (let location of ["y5a","y4b","y4a"]) { // Also y5b
+  for (let location of locations) {
     let { expanded : test_expanded ,  plain : test_plain } = get_sugars();
     perform_remove_child(test_plain,location,assert);
     perform_remove_child(test_expanded,location,assert);
@@ -66,7 +71,7 @@ QUnit.test( 'Test removing children', function( assert )  {
 QUnit.test( 'Test replacing children', function( assert )  {
   let { expanded, plain } = get_sugars();
   let locations = plain.composition().map( res => plain.location_for_monosaccharide(res) );
-  for (let location of ["y5a","y4b","y4a"]) { // Also y5b
+  for (let location of locations) {
     let { expanded : test_expanded ,  plain : test_plain } = get_sugars();
     perform_replace_child(test_plain,location,assert);
     perform_replace_child(test_expanded,location,assert);

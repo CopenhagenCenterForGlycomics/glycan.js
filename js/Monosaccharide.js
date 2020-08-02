@@ -137,7 +137,7 @@ export default class Monosaccharide {
 
   get child_linkages() {
     var results = new Map();
-    this.children.forEach(function(mono) {
+    this.children.forEach(mono => {
       let position = linkage_map.get(mono);
       let real_position = position;
 
@@ -305,13 +305,14 @@ export default class Monosaccharide {
     let parent_pos = child.parent_linkage;
     let anomer = child.anomer;
 
-    this.removeChild(position,child);
+    let new_self = this.removeChild(position,child);
+    let parent = new_self ? new_self : this;
     new_child.parent_linkage = parent_pos;
     new_child.anomer = anomer;
     if (typeof override_position !== 'undefined') {
-      this.addChild(override_position,new_child);
+      parent.addChild(override_position,new_child);
     } else {
-      this.addChild(position,new_child);
+      parent.addChild(position,new_child);
     }
   }
 

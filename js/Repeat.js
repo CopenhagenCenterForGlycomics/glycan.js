@@ -74,6 +74,8 @@ const get_wrapped_residue = (clazz,repeat,monosaccharide,parent,counter) => {
 
 const patch_parent = (residue,repeat) => {
   Object.defineProperty(residue,'parent', {
+    configurable: true,
+    enumerable: true,
     get : () => {
       const max_count = repeat.mode === MODE_EXPAND ? repeat.max : repeat.mode === MODE_MINIMAL ? repeat.min : 1;
       let parent = get_wrapped_residue(repeat.constructor.Monosaccharide, repeat, repeat[last_residue],null,max_count);
@@ -133,7 +135,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
   }
 
   addChild(linkage,child) {
-    if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeat || this.counter < this.repeat.max )) {
+    if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeatUnit || this.counter < this.repeat.max )) {
       return super.addChild(linkage,child);
     }
     if (this.repeat[child_residue_symbol].children.indexOf(child) < 0) {
@@ -143,45 +145,65 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
   }
 
   removeChild(linkage,child) {
+    if (this.repeat.mode === MODE_EXPAND) {
 
-    if (this.repeat.mode === MODE_EXPAND && ! this.endsRepeat) {
-      if ( ! (child instanceof RepeatMonosaccharide) ) {
-        return super.removeChild(linkage,child);
+      // If this is the end of a repeat, we simply remove the child from the 
+      // child of the repeat unit
+      if (this.endsRepeatUnit && this.counter === this.repeat.max) {
+        return this.repeat[child_residue_symbol].removeChild(linkage,child);
       } else {
-        // Copy repeat from parent of child up to start of repeat
-        // and then add to the repeat, grafting across children
-        // when needed
-        let parent = this;
-        while ( parent && (parent instanceof RepeatMonosaccharide) && ! parent.endsRepeat ) {
-          parent = this.parent;
-        }
-        let res_class = this.original.constructor;
-        let new_root = new res_class('root');
-        let clone_map = copy_children_skipping_residue(parent,new_root,child);
-        let replaced_parent = clone_map.get(this);
-        if (replaced_parent !== this) {
-          this.balance = () => {
-            return replaced_parent.balance();
-          };
-          replaced_parent.renderer = this.renderer;
-        }
-        if ( parent instanceof RepeatMonosaccharide ) {
-          this.repeat.max -= 1;
-          this.repeat.children = [...new_root.children];
+
+        // Children added on to expanded repeat units aren't
+        // controlled by the RepeatMonosaccharide children code
+
+        if ( ! (child instanceof RepeatMonosaccharide) ) {
+          return super.removeChild(linkage,child);
         } else {
-          for (let repeat_kid of parent.children.filter( res => (res instanceof RepeatMonosaccharide))) {
-            parent.removeChild(parent.linkageOf(repeat_kid),repeat_kid);
+          // We are going to break the repeat by
+          // cloning residues up to the end of the
+          // last repeatUnit and grafting them 
+          // onto the parent
+
+          // Copy repeat from parent of child up to start of repeat
+          // and then add to the repeat, grafting across children
+          // when needed
+          let parent = this;
+          while ( parent && (parent instanceof RepeatMonosaccharide) && ! parent.endsRepeatUnit ) {
+            parent = parent.parent;
           }
-          for (let child of new_root.children) {
-            parent.graft(child);
+
+          let res_class = this.original.constructor;
+          let new_root = new res_class('temp_root');
+          let clone_map = copy_children_skipping_residue(parent,new_root,child);
+          if ( ! clone_map.get(this) ) {
+            clone_map.set(this,this);
           }
+          let replaced_parent = clone_map.get(this);
+          if (replaced_parent !== this) {
+            this.balance = () => {
+              return replaced_parent.balance();
+            };
+            replaced_parent.renderer = this.renderer;
+          }
+
+          if ( parent instanceof RepeatMonosaccharide ) {
+            parent.repeat.max = parent.counter;
+            parent.repeat.children = [...new_root.children];
+          } else {
+            for (let repeat_kid of parent.children.filter( res => (res instanceof RepeatMonosaccharide))) {
+              parent.removeChild(parent.linkageOf(repeat_kid),repeat_kid);
+            }
+            for (let child of new_root.children) {
+              parent.graft(child);
+            }
+          }
+          return replaced_parent;
         }
-        return;
       }
     }
 
     if (this.repeat.mode === MODE_MINIMAL && child instanceof RepeatMonosaccharide) {
-      if (child.endsRepeat) {
+      if (child.endsRepeatUnit) {
         child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
         child.repeat.root.parent.replaceChild(child.repeat.root, child.repeat.root.original);
         return;
@@ -190,14 +212,13 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       return;
     }
 
-    if ( ! this.endsRepeat ) {
+    if ( ! this.endsRepeatUnit ) {
       throw new Error('Removing a child that isnt at the end of a repeat');
     }
 
-    return this.repeat[child_residue_symbol].removeChild(linkage,child);
   }
 
-  get endsRepeat() {
+  get endsRepeatUnit() {
     return this.original === this.repeat[last_residue];
   }
 
@@ -210,11 +231,11 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
 
   linkageOf(child) {
     if (child instanceof RepeatMonosaccharide && child.repeat === this.repeat) {
-      if (this.endsRepeat && child.repeat === this.repeat && child.counter !== this.counter && child.original === this.repeat.root.original ) {
+      if (this.endsRepeatUnit && child.repeat === this.repeat && child.counter !== this.counter && child.original === this.repeat.root.original ) {
         return this.repeat.root.parent.linkageOf(this.repeat.root);
       }
       return this.original.linkageOf(child.original);
-    } else if (this.endsRepeat && this.repeat.children.indexOf(child) >= 0) {
+    } else if (this.endsRepeatUnit && this.repeat.children.indexOf(child) >= 0) {
       return this.repeat[child_residue_symbol].linkageOf(child);
     } else {
       return (new Monosaccharide(' ')).linkageOf.call(this,child);
@@ -249,13 +270,13 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       self_kids = [];
     }
 
-    if (this.endsRepeat && this.counter >= max_count) {
+    if (this.endsRepeatUnit && this.counter >= max_count) {
       repeat_end_kids = this.repeat.children;
     }
 
     let results = [];
 
-    if (this.endsRepeat && this.counter < max_count ) {
+    if (this.endsRepeatUnit && this.counter < max_count ) {
       results.push(get_wrapped_residue(this.constructor, this.repeat, this.repeat.root.original, this, this.counter + 1));
     }
     const wrapped_original = original_kids.map( child => get_wrapped_residue(this.constructor,this.repeat, child, this, this.counter ));
@@ -277,6 +298,10 @@ copy_children_skipping_residue = (parent,newroot,toskip) => {
     let old_parent = res.parent;
     let linkage = old_parent.linkageOf(res);
     let toadd = (res instanceof RepeatMonosaccharide) ? res.original.clone() : res;
+    if (old_parent instanceof RepeatMonosaccharide && old_parent.repeat[child_residue_symbol].children.indexOf(res) >= 0) {
+      old_parent.repeat[child_residue_symbol].removeChild(linkage,res);
+      delete res.parent;
+    }
     cloned_map.set(res,toadd);
     newparent.addChild(linkage, toadd);
   };
