@@ -67,8 +67,6 @@ QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
 
   let epimerisation_reaction = 'Gal(b1-5)*+"{New}@y2a"';
 
-  let chain_synthesis_reaction = 'Glc(b1-4)*+"{Gal(b1-5)}@y2a"';
-
   let reaction = new IupacReaction();
   reaction.sequence = epimerisation_reaction;
 

@@ -10,7 +10,7 @@ import {IO as Iupac} from '../../js/CondensedIupac';
 class IupacSugar extends Iupac(Sugar) {}
 
 function get_sugars() {
-  let sequence = "A(a1-2){B(a1-2)[E(a1-4)D(a1-4)]C(a1-2)@y3a}3F(a1-2)G";
+  let sequence = 'A(a1-2){B(a1-2)[E(a1-4)D(a1-4)]C(a1-2)@y3a}3F(a1-2)G';
   let collapsed = new IupacSugar();
   collapsed.sequence = sequence;
   collapsed.repeats[0].mode = Repeat.MODE_MINIMAL;
@@ -58,7 +58,7 @@ QUnit.test( 'Expanded sugars have the same sequence' , function( assert ) {
 });
 
 QUnit.test( 'Test removing children', function( assert )  {
-  let { expanded, plain } = get_sugars();
+  let { plain } = get_sugars();
   let locations = plain.composition().map( res => plain.location_for_monosaccharide(res) );
   for (let location of locations) {
     let { expanded : test_expanded ,  plain : test_plain } = get_sugars();
@@ -69,7 +69,7 @@ QUnit.test( 'Test removing children', function( assert )  {
 });
 
 QUnit.test( 'Test replacing children', function( assert )  {
-  let { expanded, plain } = get_sugars();
+  let { plain } = get_sugars();
   let locations = plain.composition().map( res => plain.location_for_monosaccharide(res) );
   for (let location of locations) {
     let { expanded : test_expanded ,  plain : test_plain } = get_sugars();
