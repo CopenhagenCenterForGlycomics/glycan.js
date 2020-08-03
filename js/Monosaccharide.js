@@ -285,13 +285,13 @@ export default class Monosaccharide {
     }
   }
 
-  adoptChildrenFrom(parent) {
+  donateChildrenTo(parent) {
     if (Object.isFrozen(this) || Object.isFrozen(parent)) {
       throw new TypeError('Cannot adopt children on frozen monosaccharide');
     }
-    for (let [,children] of parent.child_linkages) {
+    for (let [,children] of this.child_linkages) {
       for (let kid of children) {
-        this.graft(kid);
+        parent.graft(kid);
       }
     }
   }

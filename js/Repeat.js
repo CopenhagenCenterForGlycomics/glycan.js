@@ -144,6 +144,17 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     }
   }
 
+  donateChildrenTo(parent) {
+    if (this.counter === this.repeat.max && this.endsRepeatUnit) {
+      for (let kid of this.repeat.children) {
+        delete kid.parent;
+        parent.graft(kid);
+      }
+    } else {
+      copy_children_skipping_residue(this,parent);
+    }
+  }
+
   removeChild(linkage,child) {
     if (this.repeat.mode === MODE_EXPAND) {
 
@@ -159,6 +170,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
         if ( ! (child instanceof RepeatMonosaccharide) ) {
           return super.removeChild(linkage,child);
         } else {
+
           // We are going to break the repeat by
           // cloning residues up to the end of the
           // last repeatUnit and grafting them 
@@ -303,7 +315,9 @@ copy_children_skipping_residue = (parent,newroot,toskip) => {
       delete res.parent;
     }
     cloned_map.set(res,toadd);
-    newparent.addChild(linkage, toadd);
+    if (newparent.children.indexOf(toadd) < 0) {
+      newparent.addChild(linkage, toadd);
+    }
   };
   parent_repeat_kids.forEach( graft_cloner.bind(null,newroot) );
   for (let kid of parent_repeat_kids) {

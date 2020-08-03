@@ -84,7 +84,7 @@ let parseReaction = (sugar) => {
     let attachment = sugar[reaction_position];
 
     let epimierisable = new EpimerisableMonosaccharide(attachment,subsugar.root.identifier,false);
-    epimierisable.adoptChildrenFrom(attachment);
+    attachment.donateChildrenTo(epimierisable);
     epimierisable.copyTagsFrom(attachment);
     if (attachment.parent) {
       attachment.parent.replaceChild(attachment,epimierisable);
@@ -112,16 +112,19 @@ let find_sugar_substrates = function(sugar) {
 };
 
 let execute = function(sugar) {
-  for (let attachment of find_sugar_substrates.call(this,sugar)) {
+  for (let attachment_location of [...find_sugar_substrates.call(this,sugar)].map( res => sugar.location_for_monosaccharide(res) )) {
+    let attachment = sugar.locate_monosaccharide(attachment_location);
     let addition = this[ reaction_sugar ].clone();
     for (let kid of addition.root.children) {
       attachment.graft(kid);
     }
     if (addition.root.identifier !== 'Root') {
       let epimierisable = new EpimerisableMonosaccharide(attachment,addition.root.identifier,true);
-      epimierisable.adoptChildrenFrom(attachment);
+      attachment.donateChildrenTo(epimierisable);
       epimierisable.copyTagsFrom(attachment);
-      if (attachment.parent) {
+
+      attachment = sugar.locate_monosaccharide(attachment_location);
+      if (attachment !== sugar.root) {
         attachment.parent.replaceChild(attachment,epimierisable);
       } else {
         sugar.root = epimierisable;

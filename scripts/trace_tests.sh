@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export DEBUG=${DEBUG:-glycanjs:searching:*}
+export DEBUG=${DEBUG:-""}
 export KARMA_SPECS=$1
 export PORT=9876 
 
