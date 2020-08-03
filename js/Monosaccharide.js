@@ -137,7 +137,7 @@ export default class Monosaccharide {
 
   get child_linkages() {
     var results = new Map();
-    this.children.forEach(function(mono) {
+    this.children.forEach(mono => {
       let position = linkage_map.get(mono);
       let real_position = position;
 
@@ -285,6 +285,17 @@ export default class Monosaccharide {
     }
   }
 
+  donateChildrenTo(parent) {
+    if (Object.isFrozen(this) || Object.isFrozen(parent)) {
+      throw new TypeError('Cannot adopt children on frozen monosaccharide');
+    }
+    for (let [,children] of this.child_linkages) {
+      for (let kid of children) {
+        parent.graft(kid);
+      }
+    }
+  }
+
   replaceChild(child,new_child,override_position) {
     if (Object.isFrozen(this) || Object.isFrozen(new_child) || Object.isFrozen(child)) {
       throw new TypeError('Cannot replace child on frozen monosaccharide');
@@ -294,13 +305,14 @@ export default class Monosaccharide {
     let parent_pos = child.parent_linkage;
     let anomer = child.anomer;
 
-    this.removeChild(position,child);
+    let new_self = this.removeChild(position,child);
+    let parent = new_self ? new_self : this;
     new_child.parent_linkage = parent_pos;
     new_child.anomer = anomer;
     if (typeof override_position !== 'undefined') {
-      this.addChild(override_position,new_child);
+      parent.addChild(override_position,new_child);
     } else {
-      this.addChild(position,new_child);
+      parent.addChild(position,new_child);
     }
   }
 
@@ -349,6 +361,13 @@ export default class Monosaccharide {
       tag_set.delete(tag_symbol);
     }
     return tag_symbol;
+  }
+
+  getTags() {
+    if (! tag_map.has(this) ) {
+      return [];
+    }
+    return [...tag_map.get(this).keys()];
   }
 
   getTag(tag) {

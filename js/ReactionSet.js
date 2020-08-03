@@ -3,6 +3,7 @@ import Reaction from './Reaction';
 
 import { CacheTrace } from './Searching';
 
+import { EpimerisableMonosaccharide } from './Epimerisation';
 
 import debug from './Debug';
 
@@ -14,6 +15,9 @@ const module_string='glycanjs:reactionset';
 
 const log = debug(module_string);
 
+const EPIMERISED_TAG = Symbol('has_been_epimerised');
+
+
 let clean_tags = (tag) => { return res => res.setTag(tag,null); };
 
 let not_in_array = (array) => { return el => array.indexOf(el) < 0; };
@@ -22,7 +26,17 @@ let only_unique = (v, i, s) => s.indexOf(v) === i;
 
 let match_root_original = (res) => { return tree => tree.root.original === res; };
 
-let identifier_comparator = (a,b) => a.identifier === b.identifier;
+let identifier_comparator = (a,b) => {
+
+  if (a.getTag(EPIMERISED_TAG) === b.identifier) {
+    return true;
+  }
+  if (b.getTag(EPIMERISED_TAG) === a.identifier) {
+    return true;
+  }
+
+  return (a.identifier === b.identifier);
+};
 
 let comparator = (a,b) => {
   if ( ! a || ! b ) {
@@ -195,6 +209,11 @@ class ReactionGroup {
     }
     return tag;
   }
+
+  /* What possible linkages can be made on this sugar at the 
+     given sugar, donor, linkage and substrate
+   */
+
   supportsLinkageAt(sugar,donor,linkage,substrate,reactions=this.reactions) {
     let possible_linkages = [];
     let possible_anomers = [];
@@ -293,7 +312,31 @@ class ReactionGroup {
       if ( ! symbol_map.has( reaction )) {
         symbol_map.set( reaction, { substrate: Symbol('substrate'), residue: Symbol('residue') });
       }
+
+      var is_epimerisation_reaction = false;
+
+      if (reaction instanceof ReactionSet) {
+        for (let single_reaction of reaction.positive) {
+          let epimerisable = single_reaction.composition().filter( res => res instanceof EpimerisableMonosaccharide );
+          if (epimerisable.length > 0) {
+            is_epimerisation_reaction = true;
+            single_reaction.delta.root.setTag(EPIMERISED_TAG,epimerisable[0].identifier);
+          }
+          epimerisable.forEach( res => {
+            res.enable();
+          });
+        }
+      }
+
       reaction.tagSubstrateResidues(sugar,symbol_map.get(reaction).substrate);
+
+      if (reaction instanceof ReactionSet) {
+        for (let single_reaction of reaction.positive) {
+          let epimerisable = single_reaction.composition().filter( res => res instanceof EpimerisableMonosaccharide );
+          epimerisable.forEach( res => res.disable() );          
+        }
+      }
+
       let attachments = sugar.composition_for_tag(symbol_map.get(reaction).substrate);
       let trees = filter_with_delta.call(reaction,attachments,sugar);
       let supported = trees.map( tree => {
@@ -301,7 +344,19 @@ class ReactionGroup {
         let part_supported = tree_root.composition(tree_root.root.children[0]);
         return part_supported.map( res => res.original );
       });
+
+      if (is_epimerisation_reaction) {
+        for (let tree of trees.flat()) {
+          for (let epimerised of tree.composition_for_tag(EPIMERISED_TAG)) {
+            epimerised.original.setTag(EPIMERISED_TAG, epimerised.getTag(EPIMERISED_TAG));
+          }
+        }
+      }
+
       for (let residue of [].concat.apply([], supported)) {
+        if (residue.getTag(EPIMERISED_TAG) && is_epimerisation_reaction) {
+          continue;
+        }
         residue.setTag(symbol_map.get(reaction).residue);
         residue.setTag(with_support);
       }
