@@ -155,6 +155,20 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     }
   }
 
+  replaceChild(child,new_child,override_position) {
+    if (this.repeat.mode === MODE_EXPAND) {
+      return super.replaceChild(child,new_child,override_position);
+    }
+    if (! (child instanceof RepeatMonosaccharide)) {
+      return super.replaceChild(child,new_child,override_position);
+    }
+    if (this.repeat[last_residue] === child.original) {
+      this.repeat[last_residue] = new_child;
+    }
+    let replacement = this.original.replaceChild(child.original,new_child,override_position);
+    return replacement;
+  }
+
   removeChild(linkage,child) {
     if (this.repeat.mode === MODE_EXPAND) {
 
@@ -214,14 +228,23 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
       }
     }
 
-    if (this.repeat.mode === MODE_MINIMAL && child instanceof RepeatMonosaccharide) {
-      if (child.endsRepeatUnit) {
+    if (this.repeat.mode === MODE_MINIMAL) {
+      if (child instanceof RepeatMonosaccharide) {
+        if (child.endsRepeatUnit) {
+          child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
+          child.repeat.root.parent.replaceChild(child.repeat.root, child.repeat.root.original);
+          return;
+        }
         child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
-        child.repeat.root.parent.replaceChild(child.repeat.root, child.repeat.root.original);
         return;
+      } else {
+        if (this.repeat.children.indexOf(child) >= 0 ) {
+          this.repeat[child_residue_symbol].removeChild(linkage,child);
+          delete child.parent;
+          return;
+        }
+        throw new Error('REPEAT_UNREACHABLE');
       }
-      child.original.parent.removeChild(child.original.parent.linkageOf(child.original),child.original);
-      return;
     }
 
     if ( ! this.endsRepeatUnit ) {
@@ -242,7 +265,7 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
   }
 
   linkageOf(child) {
-    if (child instanceof RepeatMonosaccharide && child.repeat === this.repeat) {
+    if ((child instanceof RepeatMonosaccharide) && child.repeat === this.repeat) {
       if (this.endsRepeatUnit && child.repeat === this.repeat && child.counter !== this.counter && child.original === this.repeat.root.original ) {
         return this.repeat.root.parent.linkageOf(this.repeat.root);
       }
@@ -310,7 +333,7 @@ copy_children_skipping_residue = (parent,newroot,toskip) => {
     let old_parent = res.parent;
     let linkage = old_parent.linkageOf(res);
     let toadd = (res instanceof RepeatMonosaccharide) ? res.original.clone() : res;
-    if (old_parent instanceof RepeatMonosaccharide && old_parent.repeat[child_residue_symbol].children.indexOf(res) >= 0) {
+    if ((old_parent instanceof RepeatMonosaccharide) && old_parent.repeat[child_residue_symbol].children.indexOf(res) >= 0) {
       old_parent.repeat[child_residue_symbol].removeChild(linkage,res);
       delete res.parent;
     }
@@ -437,7 +460,7 @@ export default class Repeat {
   }
 
   get attachment() {
-    return this[template_sugar].location_for_monosaccharide(this[last_residue]);
+    return this.template.location_for_monosaccharide(this[last_residue]);
   }
 
   get identifier() {
