@@ -52,7 +52,7 @@ QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
 
 });
 
-QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
+QUnit.test( 'Test reaction execution on simple repeat' , function( assert ) {
   let sequence = 'GlcNAc';
   let sugar = new IupacSugar();
   sugar.sequence = sequence;
@@ -72,6 +72,75 @@ QUnit.test( 'Test reaction matching on simple repeat' , function( assert ) {
 
   reaction.execute(sugar);
   assert.equal(sugar.sequence,'Glc(b1-4)New(b1-5)Glc(b1-4)New(b1-5)Glc(b1-4)New(b1-5)Glc(b1-4)New(b1-5)GlcNAc');
+
+});
+
+QUnit.test( 'Test reaction execution on simple collapsed repeat' , function( assert ) {
+  let sequence = 'GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  sequence = 'Glc(b1-4)Gal(b1-5)';
+  let repeat_sug = new IupacSugar();
+  repeat_sug.sequence = sequence;
+
+  let repeat = new Repeat(repeat_sug,'y3a',1,4);
+  repeat.mode = Repeat.MODE_MINIMAL;
+  repeat.identifier = ''+repeat.max;
+  sugar.root.graft(repeat.root);
+
+  let epimerisation_reaction = 'Glc(b1-4)*+"{New}@y2a"';
+
+  let reaction = new IupacReaction();
+  reaction.sequence = epimerisation_reaction;
+  reaction.execute(sugar);
+  assert.equal(sugar.sequence,'{New(b1-4)Gal(b1-5)}4GlcNAc');
+
+});
+
+QUnit.test( 'Test reaction execution on simple collapsed repeat first residue' , function( assert ) {
+  let sequence = 'GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  sequence = 'Glc(b1-4)Gal(b1-5)';
+  let repeat_sug = new IupacSugar();
+  repeat_sug.sequence = sequence;
+
+  let repeat = new Repeat(repeat_sug,'y3a',1,4);
+  repeat.mode = Repeat.MODE_MINIMAL;
+  repeat.identifier = ''+repeat.max;
+  sugar.root.graft(repeat.root);
+
+  let epimerisation_reaction = 'Gal(b1-5)*+"{New}@y2a"';
+
+  let reaction = new IupacReaction();
+  reaction.sequence = epimerisation_reaction;
+  reaction.execute(sugar);
+  assert.equal(sugar.sequence,'{Glc(b1-4)New(b1-5)}4GlcNAc');
+
+});
+
+QUnit.test( 'Test reaction execution on simple collapsed repeat first residue adding branch' , function( assert ) {
+  let sequence = 'GlcNAc';
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+
+  sequence = 'Glc(b1-4)Gal(b1-5)';
+  let repeat_sug = new IupacSugar();
+  repeat_sug.sequence = sequence;
+
+  let repeat = new Repeat(repeat_sug,'y3a',1,4);
+  repeat.mode = Repeat.MODE_MINIMAL;
+  repeat.identifier = ''+repeat.max;
+  sugar.root.graft(repeat.root);
+
+  let epimerisation_reaction = 'Gal(b1-5)*+"{Gal(b1-3)New}@y2a"';
+
+  let reaction = new IupacReaction();
+  reaction.sequence = epimerisation_reaction;
+  reaction.execute(sugar);
+  assert.equal(sugar.sequence,'{Gal(b1-3)[Glc(b1-4)]New(b1-5)@y2b}4GlcNAc');
 
 });
 

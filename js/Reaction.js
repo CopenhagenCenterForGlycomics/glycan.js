@@ -2,6 +2,7 @@
 import Sugar from './Sugar';
 
 import { EpimerisableMonosaccharide } from './Epimerisation';
+import Repeat from './Repeat';
 
 let comment_symbol = Symbol('comment_string');
 let negative_symbol = Symbol('is_negative');
@@ -115,20 +116,45 @@ let execute = function(sugar) {
   for (let attachment_location of [...find_sugar_substrates.call(this,sugar)].map( res => sugar.location_for_monosaccharide(res) )) {
     let attachment = sugar.locate_monosaccharide(attachment_location);
     let addition = this[ reaction_sugar ].clone();
-    for (let kid of addition.root.children) {
-      attachment.graft(kid);
-    }
     if (addition.root.identifier !== 'Root') {
       let epimierisable = new EpimerisableMonosaccharide(attachment,addition.root.identifier,true);
-      attachment.donateChildrenTo(epimierisable);
-      epimierisable.copyTagsFrom(attachment);
+      if ( (attachment instanceof Repeat.Monosaccharide) && ! (attachment.parent instanceof Repeat.Monosaccharide) ) {
 
-      attachment = sugar.locate_monosaccharide(attachment_location);
-      if (attachment !== sugar.root) {
-        attachment.parent.replaceChild(attachment,epimierisable);
+        // Special case starting repeat
+
+        attachment.original.donateChildrenTo(epimierisable);
+        attachment.repeat.template.root = epimierisable;
+        attachment.parent.replaceChild(attachment,attachment.repeat.root);
+        attachment = epimierisable;
+        for (let kid of addition.root.children) {
+          attachment.graft(kid);
+        }
+
       } else {
-        sugar.root = epimierisable;
+
+        for (let kid of addition.root.children) {
+          attachment.graft(kid);
+        }
+        attachment.donateChildrenTo(epimierisable);
+        epimierisable.copyTagsFrom(attachment);
+
+        attachment = sugar.locate_monosaccharide(attachment_location);
+        if (attachment !== sugar.root) {
+          attachment.parent.replaceChild(attachment,epimierisable);
+        } else {
+          sugar.root = epimierisable;
+          attachment = epimierisable;
+        }
+
       }
+    } else {
+
+      // Simple addition of residues
+
+      for (let kid of addition.root.children) {
+        attachment.graft(kid);
+      }
+
     }
   }
 };
