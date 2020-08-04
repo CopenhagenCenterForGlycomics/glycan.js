@@ -130,10 +130,6 @@ class RepeatMonosaccharide extends TracedMonosaccharide {
     });
   }
 
-  graft() {
-    // No-op
-  }
-
   addChild(linkage,child) {
     if (this.repeat.mode === MODE_EXPAND && (! this.endsRepeatUnit || this.counter < this.repeat.max )) {
       return super.addChild(linkage,child);

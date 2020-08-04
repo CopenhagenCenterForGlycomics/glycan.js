@@ -112,8 +112,16 @@ let find_sugar_substrates = function(sugar) {
   }).filter( r => r );
 };
 
-let execute = function(sugar) {
-  for (let attachment_location of [...find_sugar_substrates.call(this,sugar)].map( res => sugar.location_for_monosaccharide(res) )) {
+let execute = function(sugar,residue) {
+  let all_locations;
+
+  if ( ! residue ) {
+    all_locations = [...find_sugar_substrates.call(this,sugar)].map( res => sugar.location_for_monosaccharide(res) );
+  } else {
+    all_locations = [ sugar.location_for_monosaccharide(residue) ];
+  }
+
+  for (let attachment_location of all_locations ) {
     let attachment = sugar.locate_monosaccharide(attachment_location);
     let addition = this[ reaction_sugar ].clone();
     if (addition.root.identifier !== 'Root') {
@@ -239,8 +247,8 @@ class Reaction extends Sugar {
   }
 
   // Move to a container class with positive and negative assertions
-  execute(sugar) {
-    return execute.call(this,sugar);
+  execute(sugar,residue) {
+    return execute.call(this,sugar,residue);
   }
 
   generate(sugar) {
