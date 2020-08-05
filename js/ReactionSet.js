@@ -224,9 +224,10 @@ class ReactionGroup {
         let substrates = sugar.composition_for_tag(reaction.tagAvailableSubstrateResidues(sugar));
         if (substrates.length > 0) {
           let donor_res = reaction.delta.root.children[0];
+          let donor_seq = reaction.delta.root.identifier !== 'Root' ? reaction.delta.sequence : donor_res.toSugar(reaction.delta.constructor).sequence;
           let reac_linkage = reaction.delta.root.linkageOf(donor_res);
           possible_linkages.push(reac_linkage);
-          possible_donors.push(donor_res.identifier);
+          possible_donors.push(donor_seq);
           possible_anomers.push(donor_res.anomer);
         }
       }
@@ -240,8 +241,9 @@ class ReactionGroup {
 
     let donor_filtered = this.reactions.filter( reaction => {
       let donor_res = reaction.delta.root.children[0];
+      let donor_seq = reaction.delta.root.identifier !== 'Root' ? reaction.delta.sequence : donor_res.toSugar(reaction.delta.constructor).sequence;
       let reac_linkage = reaction.delta.root.linkageOf(donor_res);
-      let matching_donor = (! donor || (donor_res.identifier === donor));
+      let matching_donor = (! donor || (donor_seq === donor));
       if (matching_donor) {
         possible_linkages.push(reac_linkage);
         possible_anomers.push(donor_res.anomer);
