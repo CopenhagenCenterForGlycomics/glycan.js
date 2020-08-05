@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "debug-any-level": "^0.3.0",
-    "es6-tween": "^5.4.1",
+    "es6-tween": "^5.5.11",
     "esm": "3.2.20"
   },
   "devDependencies": {

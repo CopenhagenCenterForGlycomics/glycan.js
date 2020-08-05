@@ -383,9 +383,12 @@ class CanvasRenderer extends Renderer {
   }
 
   setIconPosition(icon,x,y,width,height,rotate) {
-    if ( ! TweenMap.get(icon) ) {
-      TweenMap.set(icon,new Tween(icon));
+    if ( TweenMap.get(icon) ) {
+      TweenMap.get(icon).stop();
     }
+
+    TweenMap.set(icon,new Tween(icon));
+
     let tween = TweenMap.get(icon);
     let timing = 200;
     icon.rendered = false;
@@ -410,7 +413,7 @@ class CanvasRenderer extends Renderer {
       .on('complete', (icon) => {
         icon[done_tweening] = setTimeout(() => {
           icon.rendered = true;
-        },0);
+        },100);
       })
       .start();
   }
