@@ -178,7 +178,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
   const parent_repeat = (parent instanceof Repeat.Monosaccharide) && parent.repeat.mode !== Repeat.MODE_EXPAND;
   const different_repeats = child_repeat && parent_repeat && child.repeat !== parent.repeat;
 
-  if (child_repeat && child.endsRepeat && child.children.filter( res => ['Fuc','HSO3'].indexOf(res.identifier) < 0 ).length === 0 ) {
+  if (child_repeat && child.endsRepeatUnit && child.children.filter( res => ['Fuc','HSO3'].indexOf(res.identifier) < 0 ).length === 0 ) {
     const extents = [
       SCALE*(child_pos.x + child_pos.width / 2),
       SCALE*(child_pos.y + child_pos.height / 2),

@@ -2,6 +2,8 @@ import CondensedLayout from './CondensedLayout';
 
 import Monosaccharide from './Monosaccharide';
 
+import Repeat from './Repeat';
+
 const not_sulf = res => res.identifier !== 'HSO3';
 
 const horizontal_identifiers = [ 'GlcA','IdoA','Xyl','HSO3','Rbo','P','GlcN'];
@@ -44,7 +46,11 @@ class SugarAwareLayout extends CondensedLayout {
 
     let sibs = res.siblings;
 
-    if (sibs.filter(not_sulf).length == 1 && (res.identifier == 'Fuc' || res.identifier == 'NeuAc')) {
+    if ( (sibs.filter(not_sulf).length == 1 && (res.identifier == 'Fuc' || res.identifier == 'NeuAc')) ||
+          ( res.parent && res.parent.endsRepeatUnit && res.parent.repeat.mode == Repeat.MODE_MINIMAL && res.identifier == 'Fuc')
+      ) {
+      // Stubby NeuAc and Fuc along a chain
+      // Stubby Fuc at the end of a repeat unit
       if (res.identifier == 'NeuAc' && sibs.filter(not_sulf)[0].identifier == 'Fuc') {
         position.dx = 0;
         position.dy = -1 * DELTA_Y;
@@ -124,6 +130,7 @@ class SugarAwareLayout extends CondensedLayout {
       return position;
     }
 
+    // Make Type I chains linear
     if (sibs.length == 1 && (res.identifier === 'GlcNAc' && sibs[0].identifier == 'GlcNAc')) {
       if (res.parent.linkageOf(res) === 3) {
         position.dx = 0;
