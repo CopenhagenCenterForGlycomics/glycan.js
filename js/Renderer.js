@@ -325,7 +325,8 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     if (position.rotate) {
       rotate_angle = position.rotate;
     }
-    if (ROTATE) {
+
+    if (ROTATE && ! position.keep_horizontal) {
       rotate_angle -= 90;
     }
 

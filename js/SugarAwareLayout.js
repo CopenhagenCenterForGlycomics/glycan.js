@@ -4,6 +4,8 @@ import Monosaccharide from './Monosaccharide';
 
 const not_sulf = res => res.identifier !== 'HSO3';
 
+const horizontal_identifiers = [ 'GlcA','IdoA','Xyl','HSO3','Rbo','P','GlcN'];
+
 class SugarAwareLayout extends CondensedLayout {
 
   static CalculateIdentifier(residue) {
@@ -35,6 +37,10 @@ class SugarAwareLayout extends CondensedLayout {
 
 
     position = CondensedLayout.LayoutMonosaccharide.call(this,sugar,res,position,parent_position);
+
+    if (horizontal_identifiers.indexOf(res.identifier) >= 0) {
+      position.keep_horizontal = true;
+    }
 
     let sibs = res.siblings;
 
