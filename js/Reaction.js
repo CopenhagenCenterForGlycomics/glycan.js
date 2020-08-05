@@ -121,6 +121,8 @@ let execute = function(sugar,residue) {
     all_locations = [ sugar.location_for_monosaccharide(residue) ];
   }
 
+  let added = new Set();
+
   for (let attachment_location of all_locations ) {
     let attachment = sugar.locate_monosaccharide(attachment_location);
     let addition = this[ reaction_sugar ].clone();
@@ -134,14 +136,18 @@ let execute = function(sugar,residue) {
         attachment.repeat.template.root = epimierisable;
         attachment.parent.replaceChild(attachment,attachment.repeat.root);
         attachment = epimierisable;
+        added.add(epimierisable);
+
         for (let kid of addition.root.children) {
           attachment.graft(kid);
+          [...addition.composition(kid)].forEach(added.add, added);
         }
 
       } else {
 
         for (let kid of addition.root.children) {
           attachment.graft(kid);
+          [...addition.composition(kid)].forEach(added.add, added);
         }
         attachment.donateChildrenTo(epimierisable);
         epimierisable.copyTagsFrom(attachment);
@@ -153,7 +159,7 @@ let execute = function(sugar,residue) {
           sugar.root = epimierisable;
           attachment = epimierisable;
         }
-
+        added.add(epimierisable);
       }
     } else {
 
@@ -161,10 +167,13 @@ let execute = function(sugar,residue) {
 
       for (let kid of addition.root.children) {
         attachment.graft(kid);
+        [...addition.composition(kid)].forEach(added.add, added);
       }
 
     }
   }
+
+  return [...added];
 };
 
 let execute_all = function(sugar) {
