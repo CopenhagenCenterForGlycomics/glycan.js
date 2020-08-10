@@ -164,6 +164,35 @@ const create_reaction = (reaction_class,cache,reac) => {
   return set;
 };
 
+
+function getAllSupportedActions(sugar,reactions) {
+
+  let possible_linkages = [];
+  let possible_anomers = [];
+  let possible_donors = [];
+
+  for (let reaction of reactions) {
+    let substrates = sugar.composition_for_tag(reaction.tagAvailableSubstrateResidues(sugar));
+    if (substrates.length > 0) {
+      let donor_res = reaction.delta.root.children[0];
+      let reac_linkage = reaction.delta.root.linkageOf(donor_res);
+      if ( ! substrates.some( res => res.childAt(reac_linkage) === undefined ) ) {
+        continue;
+      }
+      let donor_seq = reaction.delta.root.identifier !== 'Root' ? reaction.delta.sequence : donor_res.toSugar(reaction.delta.constructor).sequence;
+      possible_linkages.push(reac_linkage);
+      possible_donors.push(donor_seq);
+      possible_anomers.push(donor_res.anomer);
+    }
+  }
+  possible_anomers = possible_anomers.filter(only_unique);
+  possible_linkages = possible_linkages.filter(only_unique);
+  possible_donors = possible_donors.filter(only_unique);
+
+  return { anomer: possible_anomers, linkage: possible_linkages, donor: possible_donors, substrate: [] };
+
+}
+
 const reaction_cache = new Map();
 
 class ReactionGroup {
@@ -215,73 +244,55 @@ class ReactionGroup {
    */
 
   supportsLinkageAt(sugar,donor,linkage,substrate,reactions=this.reactions) {
+
+    if ( ! donor ) {
+      return getAllSupportedActions(sugar,reactions);
+    }
+
     let possible_linkages = [];
     let possible_anomers = [];
     let possible_donors = [];
-
-    if ( ! donor ) {
-      for (let reaction of reactions) {
-        let substrates = sugar.composition_for_tag(reaction.tagAvailableSubstrateResidues(sugar));
-        if (substrates.length > 0) {
-          let donor_res = reaction.delta.root.children[0];
-          let reac_linkage = reaction.delta.root.linkageOf(donor_res);
-          if ( ! substrates.some( res => res.childAt(reac_linkage) === undefined ) ) {
-            continue;
-          }
-          let donor_seq = reaction.delta.root.identifier !== 'Root' ? reaction.delta.sequence : donor_res.toSugar(reaction.delta.constructor).sequence;
-          possible_linkages.push(reac_linkage);
-          possible_donors.push(donor_seq);
-          possible_anomers.push(donor_res.anomer);
-        }
-      }
-      possible_anomers = possible_anomers.filter(only_unique);
-      possible_linkages = possible_linkages.filter(only_unique);
-      possible_donors = possible_donors.filter(only_unique);
-
-      return { anomer: possible_anomers, linkage: possible_linkages, donor: possible_donors, substrate: [] };
-    }
 
     let donor_filtered = this.reactions.filter( reaction => {
       let donor_res = reaction.delta.root.children[0];
       let donor_seq = reaction.delta.root.identifier !== 'Root' ? reaction.delta.sequence : donor_res.toSugar(reaction.delta.constructor).sequence;
       let reac_linkage = reaction.delta.root.linkageOf(donor_res);
       let matching_donor = (! donor || (donor_seq === donor));
-      if (matching_donor) {
-        possible_linkages.push(reac_linkage);
-        possible_anomers.push(donor_res.anomer);
-      }
       return matching_donor;
     });
 
-    let used_linkage_filtered = donor_filtered.filter( reaction => {
+    let possible_substrates_for_reaction = new WeakMap();
+
+    donor_filtered.forEach( reaction => {
       let substrates = sugar.composition_for_tag(reaction.tagAvailableSubstrateResidues(sugar));
       if (substrates.length > 0) {
         let donor_res = reaction.delta.root.children[0];
         let reac_linkage = reaction.delta.root.linkageOf(donor_res);
         let free_substrate_children = substrates.filter( res => res.childAt(reac_linkage) === undefined );
-        return free_substrate_children.length > 0;
+        possible_substrates_for_reaction.set(reaction,free_substrate_children);
+        if (free_substrate_children.length > 0) {
+          possible_linkages.push(reac_linkage);
+          possible_anomers.push(donor_res.anomer);
+        }
       }
-      return false;
     });
+
+    let used_linkage_filtered = donor_filtered.filter( reac => (possible_substrates_for_reaction.get(reac) || []).length > 0 );
 
     let filtered_reactions = used_linkage_filtered;
 
     possible_anomers = possible_anomers.filter(only_unique);
     possible_linkages = possible_linkages.filter(only_unique);
 
-    log.info('Remaining reactions after filtering by donor',donor_filtered.length);
+    log.info(`Remaining reactions after filtering by donor ${donor_filtered.length}`);
+    log.info(`Remaining reactions after filtering by used_linakge ${used_linkage_filtered.length}`);
 
     // If there isn't a linkage specified - what are the possible
     // linkages that this reaction set supports
 
-    if ( donor_filtered.length < 1 || (typeof linkage === 'undefined' && typeof substrate === 'undefined') ) {
-      let substrates = used_linkage_filtered.map( reac => {
-        let subs = sugar.composition_for_tag(reac.tagAvailableSubstrateResidues(sugar));
-        let donor_res = reac.delta.root.children[0];
-        let reac_linkage = reac.delta.root.linkageOf(donor_res);
-        return subs.filter( res => res.childAt(reac_linkage) === undefined );
-      }).flat().filter(only_unique);
-      return donor_filtered.length > 0 ? { anomer: possible_anomers, linkage: possible_linkages, substrate: substrates } : { anomer:[], linkage: [] };
+    if ( used_linkage_filtered.length < 1 || (typeof linkage === 'undefined' && typeof substrate === 'undefined') ) {
+      let substrates = used_linkage_filtered.map( reac => possible_substrates_for_reaction.get(reac) ).flat().filter(only_unique);
+      return used_linkage_filtered.length > 0 ? { anomer: possible_anomers, linkage: possible_linkages, substrate: substrates } : { anomer:[], linkage: [], substrate: [] };
     }
 
     // If there is a linkage - filter the reactions down to the
@@ -296,18 +307,19 @@ class ReactionGroup {
 
       filtered_reactions = linkage_filtered;
 
-      log.info('Remaining reactions after filtering by linkage',linkage_filtered.length);
+      log.info(`Remaining reactions after filtering by linkage ${linkage_filtered.length}`);
       if ( linkage_filtered.length < 1 ) {
         return linkage_filtered.length > 0 ? { anomer: possible_anomers, linkage: [ linkage ], substrate: [] } : { anomer: [], linkage: [], substrate: [] };
       }
     }
-
-    possible_linkages = [];
-    possible_anomers = [];
+    if ( substrate ) {
+      possible_linkages = [];
+      possible_anomers = [];
+    }
     let possible_anomer_linkages = [];
 
     for (let reaction of filtered_reactions) {
-      let substrates = sugar.composition_for_tag(reaction.tagAvailableSubstrateResidues(sugar));
+      let substrates = possible_substrates_for_reaction.get(reaction);
       if (substrates.indexOf(substrate) >= 0) {
         let donor_res = reaction.delta.root.children[0];
         let reac_linkage = reaction.delta.root.linkageOf(donor_res);

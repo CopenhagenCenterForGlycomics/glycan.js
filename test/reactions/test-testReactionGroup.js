@@ -14,6 +14,7 @@ class IupacSugar extends Iupac(Sugar) {}
 QUnit.module('Test that we can execute ReactionGroups', {
 });
 
+
 QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
   let base_sequence = 'Gal(b1-2)*';
   let search_sequence = 'New(b1-4)Gal(b1-2)Man(b1-3)[Test(b1-3)Gal(b1-2)Gal(b1-4)]GlcNAc';
@@ -100,35 +101,50 @@ QUnit.test( 'We can check if a group supports an operation' , function( assert )
   let search_sequence = 'New(b1-4)Gal(b1-2)Man(b1-3)[New(b1-4)Gal(b1-2)New(b1-4)Gal(b1-2)]GlcNAc';
   let delta_sequence = 'New(b1-4)';
   let position = 'y2a';
-  let sequence = `${base_sequence}+"{${delta_sequence}}@${position}"`;
+  let sequence = `${base_sequence}+"{New(b1-4)}@${position}"`;
   let reactionset = new ReactionSet();
 
   let reaction = new IupacReaction();
   reaction.sequence = sequence;
+
   reactionset.addReactionRule(reaction);
+
 
   let reaction_b = new IupacReaction();
   reaction_b.sequence = `${base_sequence}+"{New(b1-5)}@${position}"`;
 
+  let reactionset_b = new ReactionSet();
+
+  reactionset_b.addReactionRule(reaction_b);
 
   let reactiongroup = new ReactionGroup();
 
   reactiongroup.addReactionSet(reactionset);
-  reactiongroup.addReactionSet(reaction_b);
+  reactiongroup.addReactionSet(reactionset_b);
 
   let test_sugar = new IupacSugar();
   test_sugar.sequence = search_sequence;
 
   let result = reactiongroup.supportsLinkageAt(test_sugar,'New');
-  assert.deepEqual(result.anomer,['b']);
-  assert.deepEqual(result.linkage,[4,5]);
+  assert.deepEqual(result.anomer,['b'],'Single supported anomer for just donor');
+  assert.deepEqual(result.linkage,[5],'Single supported linkage for just donor');
   result = reactiongroup.supportsLinkageAt(test_sugar,'New',4);
-  assert.deepEqual(result.anomer,[]);
-  assert.deepEqual(result.linkage,[]);
+  assert.deepEqual(result.anomer,[],'No supported anomers for donor and linkage');
+  assert.deepEqual(result.linkage,[],'No supported linkages for donor and linkage');
   result = reactiongroup.supportsLinkageAt(test_sugar,'New',4,test_sugar.leaves()[0].parent);
-  assert.deepEqual(result.anomer,[]);
-  assert.deepEqual(result.linkage,[]);
-  assert.deepEqual(result.substrate,[]);
+  assert.deepEqual(result.anomer,[],'No supported anomers for donor, linkage and substrate');
+  assert.deepEqual(result.linkage,[],'No supported linkages for donor, linkage and substrate');
+  assert.deepEqual(result.substrate,[],'No supported substrates for donor, linkage and substrate');
+
+  result = reactiongroup.supportsLinkageAt(test_sugar,'New',5);
+  assert.deepEqual(result.anomer,['b'],'Supported anomer for donor and linkage');
+  assert.deepEqual(result.linkage,[5],'Supported linkage for donor and linkage');
+
+  result = reactiongroup.supportsLinkageAt(test_sugar,'New',5,test_sugar.leaves()[0].parent);
+  assert.deepEqual(result.anomer,['b'],'Supported anomer for donor, linkage and substrate');
+  assert.deepEqual(result.linkage,[5],'Supported linkage for donor, linkage and substrate');
+  assert.deepEqual(result.substrate,[test_sugar.leaves()[0].parent],'Supported substrate for donor, linkage and substrate');
+
 });
 
 QUnit.test( 'Test if we can support short reactions' , function( assert ) {
