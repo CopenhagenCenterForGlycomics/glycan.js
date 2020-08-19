@@ -86,14 +86,16 @@ class SugarAwareLayout extends CondensedLayout {
       if (linkage_pos === 2) {
         position.dy = 0;
         position.dx = -0.66*DELTA_X;
+        position.rotate = -90;
       }
       if (linkage_pos === 6 && res.parent.children.length === 1) {
-        position.dy = -1.1*DELTA_Y;
+        position.dy = -1.25*DELTA_Y;
         position.dx = 0;
       }
       if (linkage_pos === 6 && res.parent.children.length > 1) {
         position.dx = 0.66*DELTA_X;
         position.dy = 0;
+        position.rotate = 90;
       }
       position.ignore_overlap = true;
     }
