@@ -29,6 +29,21 @@ let has_tag = (tag,res) => res.getTag(tag);
 const frozen_sequence_symbol = Symbol('frozen_sequence');
 const frozen_composition_symbol = Symbol('frozen_composition');
 
+const find_repeat_unit_for_original = function(start, counter, original) {
+  for (let child of start.children.filter( res => res instanceof Repeat.Monosaccharide)) {
+    if (child.counter == counter && child.original == original) {
+      return child;
+    }
+    if (child.counter > counter ) {
+      continue;
+    }
+    let child_result = find_repeat_unit_for_original(child,counter,original);
+    if (child_result) {
+      return child_result;
+    }
+  }
+};
+
 export default class Sugar {
   constructor() {
   }
@@ -118,29 +133,61 @@ export default class Sugar {
     let cloned_repeats = new WeakMap();
     let nodes = this.breadth_first_traversal(this.root,visitor);
     for (let node of nodes) {
+
+      // When we are cloning, we are going to delegate the generation
+      // of clones of repeat residues to the Repeat class, so we should
+      // only clone the root of the repeat unit
+
       if ((node instanceof Repeat.Monosaccharide) && node.repeat.root !== node ) {
         continue;
       }
+
       if ( ! cloned.has(node) ) {
         cloned.set(node,node.clone());
       }
+
       let node_clone = cloned.get(node);
+
+      // If this is the repeat root (the only time the code should reach this point)
+      // we should set the clone residue to be the root of the repeat that
+      // we generate when we do the cloning
+
       if (node_clone instanceof Repeat.Monosaccharide) {
         cloned_repeats.set( node.repeat, node_clone.repeat );
         cloned.set(node, node_clone.repeat.root );
         node_clone = cloned.get(node);
       }
+
+      // If this is a child of a repeat, and this is a child at the end of the repeat
+      // we should add them to the end of the new clone repeat
+
       if ((node.parent instanceof Repeat.Monosaccharide) && node.parent.repeat.children.indexOf(node) >= 0) {
         let repeat = cloned_repeats.get(node.parent.repeat);
+
+        // We add the residue to a placeholder residue
+        // so that there's a way to graft this residue and read
+        // the linkage
+
         let res = new Monosaccharide('Root');
         res.addChild(node.parent.linkageOf(node),node_clone);
         repeat.children = repeat.children.concat( node_clone );
         continue;
       }
 
-
+      // Add this child onto the parent
       if (node.parent && cloned.get(node.parent)) {
         cloned.get(node.parent).addChild(node.parent.linkageOf(node),node_clone);
+      } else {
+
+        // In the case where the parent is a repeat monosaccharide, and the
+        // parent hasn't been cloned yet, we should look for the corresponding
+        // repeat unit based on counter and the original monosaccharide
+
+        if (node.parent && (node.parent instanceof Repeat.Monosaccharide)) {
+          let new_repeat = cloned_repeats.get(node.parent.repeat);
+          let res = find_repeat_unit_for_original(new_repeat.root, node.parent.counter, node.parent.original );
+          res.addChild(node.parent.linkageOf(node),node_clone);
+        }
       }
     }
     let new_sugar = new this.constructor();
