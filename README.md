@@ -22,6 +22,14 @@ npm start
 
 Go to `http://localhost:8080/demo/`
 
+
+## Testing (in the wonky docker containers)
+
+```
+DEBUG='glycanjs:*:*' ./scripts/trace_tests.sh test/test-whatever.js
+PORT=9876 node ./node_modules/.bin/karma start --single-run
+```
+
 ## TODOs
 
 * Methods to mark up residues on sugars that are supported by a reaction - what to do
