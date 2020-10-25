@@ -264,6 +264,38 @@ QUnit.test( 'Can use chain epimerisation and regular transferase to support link
   assert.equal(supported.map( res => res.identifier ).join(','),'Gal,Glc,New');
 });
 
+QUnit.test( 'Support the HS epimerisation' , function( assert ) {
+  let search_sequence = 'HSO3(u1-3)[HSO3(u1-N)[HSO3(u1-3)[HSO3(u1-2)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)]GlcNAc(a1-4)GlcA(b1-4)]GlcN(a1-4)GlcA(b1-4)[HSO3(u1-6)]GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)]IdoA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
+
+  let epimerisation_reaction = 'GlcA(b1-4)GlcNAc(a1-4)*(u?-?)Xyl(b1-O)Ser+\"{HSO3(u1-N)GlcN}@y4a"';
+
+  let chain_synthesis_reaction = 'GlcNAc(a1-4)*(u?-?)IdoA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GlcA(b1-4)}@y7a"';
+
+  let chain_synthesis_reaction_post = 'GlcA(b1-4)GlcNAc(a1-4)*(u?-?)IdoA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+"{GlcNAc(a1-4)}@y8a"';
+
+
+  let reactions = [ epimerisation_reaction, chain_synthesis_reaction, chain_synthesis_reaction_post ];
+
+  let reactiongroup = new ReactionGroup();
+
+  for (let sequence of reactions ) {
+    let reactionset = new ReactionSet();
+    let reaction = new IupacReaction();
+    reaction.sequence = sequence;
+    reactionset.addReactionRule(reaction);
+    reactiongroup.addReactionSet(reactionset);
+  }
+
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.equal(supported.length, 10);
+  assert.equal(supported.map( res => res.identifier ).join(','),'GlcA,GlcNAc,GlcA,GlcN,HSO3,GlcA,GlcNAc,GlcA,GlcNAc,GlcA');
+});
+
+
 QUnit.test( 'Epimerisation does not erroneously support extra residues' , function( assert ) {
   let search_sequence = 'New(b1-4)Gal(b1-3)GlcNAc';
 
