@@ -204,11 +204,12 @@ class ReactionGroup {
     this[reactionset] = [];
   }
 
-  static groupFromJSON(json,sugarclass) {
+  static groupFromJSON(json,sugarclass,epimerases=[]) {
     let reaction_group = new this();
     const reaction_class = Reaction.CopyIO(new sugarclass());
-
-    for (let gene of Object.keys(json) ) {
+    let genes = Object.keys(json);
+    genes = epimerases.filter( gene => genes.indexOf(gene) >= 0).concat( genes.filter( gene => epimerases.indexOf(gene) < 0 ) );
+    for (let gene of genes) {
       if (json[gene].reactions.length > 0) {
         for (let set of json[gene].reactions.map( create_reaction.bind(null,reaction_class,reaction_cache) )) {
           if (set) {
