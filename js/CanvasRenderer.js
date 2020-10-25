@@ -505,4 +505,6 @@ import_icons = function() {
     });
 };
 
+CanvasRenderer.DEFAULT_PADDING = { top: 0, side: 0 };
+
 export default CanvasRenderer;

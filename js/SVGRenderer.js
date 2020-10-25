@@ -332,4 +332,6 @@ StaticSVGRenderer = class extends SVGRenderer {
 };
 
 
+SVGRenderer.DEFAULT_PADDING = DEFAULT_PADDING;
+
 export default SVGRenderer;
