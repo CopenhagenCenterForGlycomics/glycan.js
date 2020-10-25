@@ -63,6 +63,30 @@ QUnit.test( 'We can match and filter on wildcard matches' , function( assert ) {
   assert.ok(supported.map( res => res.identifier ).join(',') === 'New,New,New');
 });
 
+QUnit.test( 'Weird GAG sequence works' , function( assert ) {
+  let search_sequence = 'HSO3(u1-3)[HSO3(u1-2)GlcA(b1-3)GalNAc(b1-4)GlcA(b1-3)[HSO3(u1-4)]GalNAc(b1-4)GlcA(b1-3)[HSO3(u1-6)]GalNAc(b1-4)GlcA(b1-3)GalNAc(b1-4)]GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
+  let sequence = "Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser+\"{GlcA(b1-3)}@y4a\"";
+  let reactionset = new ReactionSet();
+
+  let reaction = new IupacReaction();
+  reaction.sequence = sequence;
+  reactionset.addReactionRule(reaction);
+
+  let reactiongroup = new ReactionGroup();
+
+  reactiongroup.addReactionSet(reactionset);
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.ok(supported.length === 1);
+  assert.ok(supported.map( res => res.identifier ).join(',') === 'GlcA');
+});
+
+
+
+
 QUnit.test( 'Test negative reaction for bisecting GlcNAc' , function( assert ) {
   let sequence = 'GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc+"!{Fuc(a1-6)}@y1a"';
   let reaction = new IupacReaction();

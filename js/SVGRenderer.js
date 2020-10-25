@@ -181,6 +181,10 @@ class SVGRenderer extends Renderer {
           renderer.element.sendToBack(link);
         }
         let rendered_data = renderer.rendered.get( sugar.locate_monosaccharide(link.getAttribute('glycanjs:location')) );
+        if ( ! rendered_data ) {
+          console.log('ERROR loading linkage for ',sugar.sequence,'missing residue at',link.getAttribute('glycanjs:location'));
+          continue;
+        }
         rendered_data.linkage = link;
       }
     }

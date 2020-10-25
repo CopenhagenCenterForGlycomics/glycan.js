@@ -233,6 +233,37 @@ QUnit.test( 'Can use chain epimerisation and regular transferase to support link
   assert.equal(supported.map( res => res.identifier ).join(','),'Gal,New');
 });
 
+QUnit.test( 'Can use chain epimerisation and regular transferase to support linkages' , function( assert ) {
+  let search_sequence = 'Glc(b1-2)[New(b1-4)]Gal(b1-3)GlcNAc';
+
+  let epimerisation_reaction = 'Man(b1-3)GlcNAc+"{New(b1-4)Gal}@y2a"';
+
+  let chain_synthesis_reaction = 'GlcNAc+"{Man(b1-3)}@y1a"';
+
+  let chain_synthesis_reaction_post = 'Man(b1-3)GlcNAc+"{Glc(b1-2)}@y2a"';
+
+
+  let reactions = [ epimerisation_reaction, chain_synthesis_reaction, chain_synthesis_reaction_post ];
+
+  let reactiongroup = new ReactionGroup();
+
+  for (let sequence of reactions ) {
+    let reactionset = new ReactionSet();
+    let reaction = new IupacReaction();
+    reaction.sequence = sequence;
+    reactionset.addReactionRule(reaction);
+    reactiongroup.addReactionSet(reactionset);
+  }
+
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported_tag = reactiongroup.supportLinkages(test_sugar);
+  let supported = test_sugar.composition_for_tag(supported_tag);
+  assert.equal(supported.length, 3);
+  assert.equal(supported.map( res => res.identifier ).join(','),'Gal,Glc,New');
+});
+
 QUnit.test( 'Epimerisation does not erroneously support extra residues' , function( assert ) {
   let search_sequence = 'New(b1-4)Gal(b1-3)GlcNAc';
 

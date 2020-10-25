@@ -3,6 +3,7 @@ import Sugar from './Sugar';
 
 import { EpimerisableMonosaccharide } from './Epimerisation';
 import Repeat from './Repeat';
+import { comparator } from './ReactionSet';
 
 let comment_symbol = Symbol('comment_string');
 let negative_symbol = Symbol('is_negative');
@@ -11,35 +12,6 @@ let reaction_position = Symbol('reaction_position');
 let reaction_position_string = Symbol('reaction_position_string');
 
 const validate_location = (sugar,location) => sugar.locate_monosaccharide(location);
-
-let identifier_comparator = (a,b) => a.identifier === b.identifier;
-
-let comparator = (a,b) => {
-  if ( ! a || ! b ) {
-    return false;
-  }
-  if (a.identifier === '*' || b.identifier === '*') {
-    return true;
-  }
-
-  let same_id = identifier_comparator(a,b);
-  let same_linkage = false;
-
-  if ( a.parent && b.parent ) {
-    if (a.parent.linkageOf(a) === 0 || b.parent.linkageOf(b) === 0) {
-      same_linkage = true;
-    } else {
-      same_linkage = a.parent.linkageOf(a) === b.parent.linkageOf(b);
-    }
-  }
-
-  if ( ! a.parent && ! b.parent ) {
-    same_linkage = true;
-  }
-
-  return same_id && same_linkage;
-};
-
 
 // We rewrite the sequence to
 // get rid of the placeholder Root
