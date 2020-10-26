@@ -314,6 +314,11 @@ Red  #ed1c24
 c1.05,0,1.8,0.05,2.2,0.15
 c0.6,0.15,1.1,0.5,1.5,1.05c0.4,0.55,0.55,1.15,0.55,1.9c0,1.05-0.3,1.85-0.95,2.4c-0.65,0.55-1.75,0.85-3.25,0.85h-4.65v-7z"/>
     </symbol>
+    <symbol id="dol-pp" viewBox="0 0 100 100">
+      <circle cx="50" cy="20" fill="#bbe5fa" r="7.5" stroke-width="2" stroke="#2f5fac"/>
+      <circle cx="50" cy="40" fill="#bbe5fa" r="7.5" stroke-width="2" stroke="#2f5fac"/>
+      <path fill="none" stroke="#999" stroke-width="4" stroke-linecap="round"  d="M50,50 55.8,61.1 44.5,72 55.8,83 44.5,94"/>
+    </symbol>
 
     <symbol id="pi" viewBox="0 0 100 100">
   <path d="M40.5,37.048h12.039c2.38,0,4.302,0.674,5.765,2.023c1.464,1.35,2.196,3.245,2.196,5.687c0,2.101-0.653,3.929-1.959,5.486
@@ -406,12 +411,12 @@ c0.6,0.15,1.1,0.5,1.5,1.05c0.4,0.55,0.55,1.15,0.55,1.9c0,1.05-0.3,1.85-0.95,2.4c
 
   <use xlink:href="#etnp" x="100" y="1150" width="100" height="100"/>
   <use xlink:href="#pi" x="200" y="1150" width="100" height="100"/>
-  <use xlink:href="#etnp" x="300" y="1150" width="100" height="100"/>
+  <use xlink:href="#dol-pp" x="300" y="1150" width="100" height="100"/>
   <use xlink:href="#etnp" x="400" y="1150" width="100" height="100"/>
 
   <text x="150" text-anchor="middle" y="1260">Etnp</text>
   <text x="250" text-anchor="middle" y="1260">PI</text>
-  <text x="350" text-anchor="middle" y="1260">Etnp</text>
+  <text x="350" text-anchor="middle" y="1260">Dol-PP</text>
   <text x="450" text-anchor="middle" y="1260">Etnp</text>
 
 
