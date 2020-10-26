@@ -296,6 +296,32 @@ QUnit.test( 'Support the HS epimerisation' , function( assert ) {
 });
 
 
+QUnit.test( 'Support possible epimerisation' , function( assert ) {
+  let search_sequence = 'GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
+
+  let epimerisation_reaction = 'GlcA(b1-4)GlcNAc(a1-4)*(u?-?)Xyl(b1-O)Ser+\"{HSO3(u1-N)GlcN}@y4a"';
+
+  let reactions = [ epimerisation_reaction ];
+
+  let reactiongroup = new ReactionGroup();
+
+  for (let sequence of reactions ) {
+    let reactionset = new ReactionSet();
+    let reaction = new IupacReaction();
+    reaction.sequence = sequence;
+    reactionset.addReactionRule(reaction);
+    reactiongroup.addReactionSet(reactionset);
+  }
+
+
+  let test_sugar = new IupacSugar();
+  test_sugar.sequence = search_sequence;
+  let supported = reactiongroup.supportsLinkageAt(test_sugar,'HSO3');
+  assert.equal(supported.substrate.length,2,'Can find a residue to epimerise');
+  console.log(supported);
+});
+
+
 QUnit.test( 'Epimerisation does not erroneously support extra residues' , function( assert ) {
   let search_sequence = 'New(b1-4)Gal(b1-3)GlcNAc';
 

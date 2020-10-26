@@ -260,7 +260,10 @@ class ReactionGroup {
 
     let donor_filtered = this.reactions.filter( reaction => {
       let donor_res = reaction.delta.root.children[0];
-      let donor_seq = reaction.delta.root.identifier !== 'Root' ? reaction.delta.sequence : donor_res.toSugar(reaction.delta.constructor).sequence;
+      if ( ! donor_res ) {
+        return false;
+      }
+      let donor_seq = donor_res.toSugar(reaction.delta.constructor).sequence;
       let reac_linkage = reaction.delta.root.linkageOf(donor_res);
       let matching_donor = (! donor || (donor_seq === donor));
       return matching_donor;
