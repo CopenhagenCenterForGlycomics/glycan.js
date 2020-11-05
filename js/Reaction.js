@@ -100,7 +100,7 @@ let execute = function(sugar,residue) {
     let addition = this[ reaction_sugar ].clone();
     if (addition.root.identifier !== 'Root') {
       let epimierisable = new EpimerisableMonosaccharide(attachment,addition.root.identifier,true);
-      if ( (attachment instanceof Repeat.Monosaccharide) && attachment.repeat.mode == Repeat.MODE_MINIMAL ) {
+      if ( (attachment instanceof Repeat.Monosaccharide) && attachment.repeat.mode == Repeat.MODE_MINIMAL && ! (attachment.parent instanceof Repeat.Monosaccharide)  ) {
         // Special case starting repeat
         let current_parent = attachment.parent;
         let current_repeat = attachment.repeat;
