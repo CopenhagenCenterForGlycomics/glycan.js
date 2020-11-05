@@ -181,6 +181,27 @@ QUnit.test( 'Test reaction matching on last residue of simple repeat' , function
 
 });
 
+QUnit.test('Test epimerisation reaction on sugar, replacing residues in repeat if needed', assert => {
+  let sequence = '{GlcA(b1-4)GlcNAc(a1-4)}3GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser';
+
+  let sugar = new IupacSugar();
+  sugar.sequence = sequence;
+  sugar.repeats[0].mode = Repeat.MODE_EXPAND;
+
+  let epimerisation_reaction = 'GlcA(b1-4)GlcNAc(a1-4)*(u?-?)Xyl(b1-O)Ser+"{HSO3(u?-N)GlcN}@y4a"';
+
+  let reaction = new IupacReaction();
+
+  let target_residue = sugar.locate_monosaccharide('y8a');
+
+  reaction.sequence = epimerisation_reaction;
+
+  reaction.execute(sugar,target_residue);
+
+  sugar.locate_monosaccharide('y8a').balance();
+
+  assert.equal(sugar.sequence,'HSO3(u?-N)[GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)]GlcN(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser');
+});
 
 QUnit.test( 'Test reaction matching on simple repeat with branch' , function( assert ) {
   let sequence = 'GlcNAc';

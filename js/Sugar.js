@@ -187,6 +187,7 @@ export default class Sugar {
           let new_repeat = cloned_repeats.get(node.parent.repeat);
           let res = find_repeat_unit_for_original(new_repeat.root, node.parent.counter, node.parent.original );
           res.addChild(node.parent.linkageOf(node),node_clone);
+          res.balance();
         }
       }
     }

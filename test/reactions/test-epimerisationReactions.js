@@ -318,7 +318,6 @@ QUnit.test( 'Support possible epimerisation' , function( assert ) {
   test_sugar.sequence = search_sequence;
   let supported = reactiongroup.supportsLinkageAt(test_sugar,'HSO3');
   assert.equal(supported.substrate.length,2,'Can find a residue to epimerise');
-  console.log(supported);
 });
 
 

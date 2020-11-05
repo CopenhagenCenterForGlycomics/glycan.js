@@ -84,6 +84,19 @@ const patch_parent = (residue,repeat) => {
   });
 };
 
+const repeat_iterator = function*(repeat,start=repeat.root) {
+  yield start;
+  if (! (start instanceof RepeatMonosaccharide)) {
+    return;
+  }
+  let kids = start.children;
+  for (let kid of kids) {
+    for (let child of repeat_iterator(repeat,kid)) {
+      yield child;
+    }
+  }
+}
+
 let copy_children_skipping_residue;
 
 class RepeatMonosaccharide extends TracedMonosaccharide {
