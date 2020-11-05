@@ -143,9 +143,9 @@ let execute = function(sugar,residue) {
       }
     } else {
 
-      // if ( (attachment instanceof Repeat.Monosaccharide) && attachment.repeat.mode == Repeat.MODE_MINIMAL ) {
-      //   attachment = attachment.original;
-      // }
+      if ( (attachment instanceof Repeat.Monosaccharide) && attachment.repeat.mode == Repeat.MODE_MINIMAL ) {
+        attachment = attachment.original;
+      }
 
       // Simple addition of residues
 
