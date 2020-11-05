@@ -103,10 +103,16 @@ let execute = function(sugar,residue) {
       if ( (attachment instanceof Repeat.Monosaccharide) && ! (attachment.parent instanceof Repeat.Monosaccharide) ) {
 
         // Special case starting repeat
+        let current_parent = attachment.parent;
+        let current_repeat = attachment.repeat;
 
         attachment.original.donateChildrenTo(epimierisable);
-        attachment.repeat.template.root = epimierisable;
-        attachment.parent.replaceChild(attachment,attachment.repeat.root);
+
+        current_repeat.template.root.parent.replaceChild(attachment.original,epimierisable);
+        current_repeat.template.root = epimierisable;
+
+        current_parent.replaceChild(attachment,current_repeat.root);
+
         attachment = epimierisable;
         added.add(epimierisable);
 

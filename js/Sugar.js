@@ -177,6 +177,7 @@ export default class Sugar {
       // Add this child onto the parent
       if (node.parent && cloned.get(node.parent)) {
         cloned.get(node.parent).addChild(node.parent.linkageOf(node),node_clone);
+        cloned.get(node.parent).balance();
       } else {
 
         // In the case where the parent is a repeat monosaccharide, and the
