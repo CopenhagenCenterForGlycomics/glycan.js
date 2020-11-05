@@ -222,7 +222,7 @@ QUnit.test('Test epimerisation reaction on repeat unit on sugar, replacing first
 
   sugar.locate_monosaccharide('y6a').balance();
 
-  assert.equal(sugar.sequence,'HSO3(u?-N)[HSO3(u?-N)[HSO3(u?-N)[GlcA(b1-4)]GlcN(a1-4)GlcA(b1-4)]GlcN(a1-4)GlcA(b1-4)]GlcN(a1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser');
+  assert.equal(sugar.sequence,'HSO3(u?-N)[GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)GlcNAc(a1-4)GlcA(b1-4)]GlcN(a1-4)GlcA(b1-3)Gal(b1-3)Gal(b1-4)Xyl(b1-O)Ser');
 });
 
 QUnit.test( 'Test reaction matching on simple repeat with branch' , function( assert ) {

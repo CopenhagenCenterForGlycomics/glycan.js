@@ -100,14 +100,12 @@ let execute = function(sugar,residue) {
     let addition = this[ reaction_sugar ].clone();
     if (addition.root.identifier !== 'Root') {
       let epimierisable = new EpimerisableMonosaccharide(attachment,addition.root.identifier,true);
-      if ( (attachment instanceof Repeat.Monosaccharide) && ! (attachment.parent instanceof Repeat.Monosaccharide) ) {
-
+      if ( (attachment instanceof Repeat.Monosaccharide) && attachment.repeat.mode == Repeat.MODE_MINIMAL ) {
         // Special case starting repeat
         let current_parent = attachment.parent;
         let current_repeat = attachment.repeat;
 
         attachment.original.donateChildrenTo(epimierisable);
-
         current_repeat.template.root.parent.replaceChild(attachment.original,epimierisable);
         current_repeat.template.root = epimierisable;
 
@@ -120,7 +118,11 @@ let execute = function(sugar,residue) {
           attachment.graft(kid);
           [...addition.composition(kid)].forEach(added.add, added);
         }
+        let cloned = current_repeat.clone();
 
+        cloned.children = current_repeat.children;
+
+        current_repeat.root.parent.replaceChild(current_repeat.root,cloned.root);
       } else {
 
         for (let kid of addition.root.children) {
@@ -140,6 +142,10 @@ let execute = function(sugar,residue) {
         added.add(epimierisable);
       }
     } else {
+
+      // if ( (attachment instanceof Repeat.Monosaccharide) && attachment.repeat.mode == Repeat.MODE_MINIMAL ) {
+      //   attachment = attachment.original;
+      // }
 
       // Simple addition of residues
 
