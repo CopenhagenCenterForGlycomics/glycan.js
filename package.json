@@ -10,7 +10,7 @@
   "dependencies": {
     "debug-any-level": "^0.3.0",
     "es6-tween": "^5.5.11",
-    "esm": "3.2.20"
+    "esm": "3.2.25"
   },
   "devDependencies": {
     "@babel/core": "^7",

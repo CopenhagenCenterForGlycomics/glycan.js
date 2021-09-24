@@ -245,7 +245,7 @@ class SVGRenderer extends Renderer {
     return group;
   }
 
-  renderLinkageLabel(canvas,x,y,text,ROTATE,short_axis_pos) {
+  renderLinkageLabel(canvas,x,y,text,ROTATE,short_axis_pos,LTR) {
     let label = canvas.text( x, y, text );
     label.setAttribute('font-size',str(Math.floor(SCALE/3)));
     label.firstChild.setAttribute('dy','0.75em');
@@ -253,6 +253,11 @@ class SVGRenderer extends Renderer {
     if (! ROTATE && short_axis_pos < 0) {
       label.setAttribute('text-anchor','end');
     }
+
+    if ( ROTATE && LTR ) {
+      label.setAttribute('text-anchor','end');
+    }
+
     if (ROTATE && short_axis_pos < 0) {
       label.firstChild.setAttribute('dy','0em');
     }

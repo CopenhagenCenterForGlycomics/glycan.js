@@ -58,6 +58,7 @@ const generic_short_axis_size = (res) => res.width;
 const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
 
   const ROTATE = this.rotate;
+  const LTR = this.leftToRight;
 
   let get_long_axis_size = ROTATE ? generic_short_axis_size : generic_long_axis_size;
   let get_short_axis_size = ROTATE ? generic_long_axis_size : generic_short_axis_size;
@@ -99,11 +100,13 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
 
   let residue_distance = long_axis;
 
-  let child_distance = residue_distance*0.75;
+  const ratio = 1;
+
+  let child_distance = residue_distance*ratio;
 
   if (Math.abs(residue_distance) >= (long_axis_size/2) ) {
     residue_distance -= long_axis_size/2;
-    child_distance = residue_distance*0.75 + get_long_axis_size(parent_pos)/2;
+    child_distance = residue_distance*ratio + get_long_axis_size(parent_pos)/2;
   } else if (residue_distance == 0) {
     child_distance = 0.425*Math.abs(short_axis);
   }
@@ -113,7 +116,7 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
   }
 
   let short_axis_coord = SCALE*(short_axis_base + short_axis_pos);
-  let long_axis_coord = SCALE*(long_axis_base + 1*get_long_axis_size(child_pos));
+  let long_axis_coord = SCALE*(long_axis_base + (LTR ? 0 : 1)*get_long_axis_size(child_pos));
 
   if (long_axis_direction === 0) {
     long_axis_coord = SCALE*(long_axis_base + get_long_axis_size(child_pos)/8);
@@ -127,7 +130,8 @@ const render_link_label = function(anomer,linkage,child_pos,parent_pos,canvas) {
     ROTATE ? short_axis_coord : long_axis_coord,
     fancy_anomer+linkage,
     ROTATE,
-    short_axis_pos );
+    short_axis_pos,
+    Math.abs(gradient) < 1 ? LTR : false );
 
   canvas.sendToBack(label);
   return label;
@@ -270,6 +274,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   let container = this.rendered.get(sugar);
 
   const ROTATE = this.rotate;
+  const LTR = this.leftToRight;
 
   // Setup container and set up tagging
 
@@ -286,8 +291,8 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     let xval = position.x;
     let yval = position.y;
     if (ROTATE) {
-      position.x = yval;
-      position.y = -1*xval - position.width;
+      position.x = (LTR ? -1 : 1 )*yval;
+      position.y = (LTR ? 1 : -1 )*(xval + position.width);
     }
 
     xvals.push(position.x);
@@ -327,7 +332,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     }
 
     if (ROTATE && ! position.keep_horizontal) {
-      rotate_angle -= 90;
+      rotate_angle -= (LTR ? -90 : 90);
     }
 
     this.setIconPosition(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
