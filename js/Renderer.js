@@ -291,8 +291,8 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     let xval = position.x;
     let yval = position.y;
     if (ROTATE) {
-      position.x = (LTR ? -1 : 1 )*yval;
-      position.y = (LTR ? 1 : -1 )*(xval + position.width);
+      position.x = LTR? -1*(yval + position.height) : yval;
+      position.y = LTR? xval : (xval + position.width);
     }
 
     xvals.push(position.x);
