@@ -2,6 +2,9 @@ import SugarAwareLayout from './SugarAwareLayout';
 import {IO as Iupac} from './CondensedIupac';
 import Sugar from './Sugar';
 
+import Monosaccharide from './Monosaccharide';
+
+
 class IupacSugar extends Iupac(Sugar) {}
 
 let identifier_comparator = (a,b) => {
@@ -33,6 +36,25 @@ class LinkageLayout extends SugarAwareLayout {
     }
 
     if ( res.identifier === 'HSO3') {
+      const SULF_DELTA_X = 5/4*DELTA_X;
+      const SULF_DELTA_Y = 1/2*(this.LINKS ? (DELTA_Y / 2) : DELTA_Y) ;
+      position.r = 1/4*DELTA_X;
+      let linkage_pos = res.parent.linkageOf(res);
+      if (linkage_pos === 2 || linkage_pos === 6 || linkage_pos === Monosaccharide.LINKAGES.N) {
+        position.dy = 0.5*SULF_DELTA_Y;
+        position.dx = 0.5*SULF_DELTA_X;
+        if (linkage_pos === 2 || linkage_pos === Monosaccharide.LINKAGES.N) {
+          position.dx *= -1;
+        }
+      }
+      if (linkage_pos === 3 || linkage_pos === 4 ) {
+        position.dy = -0.5*SULF_DELTA_Y;
+        position.dx = 0.5*SULF_DELTA_X;
+        if (linkage_pos === 3) {
+          position.dx *= -1;
+        }
+      }
+      position.ignore_overlap = true;
       return position;
     }
 

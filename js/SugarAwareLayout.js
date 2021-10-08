@@ -101,9 +101,9 @@ class SugarAwareLayout extends CondensedLayout {
     }
 
     if (res.identifier === 'HSO3') {
-      const SULF_DELTA_X = DELTA_X;
-      const SULF_DELTA_Y = this.links ? DELTA_Y / 2 : DELTA_Y ;
-      position.r = 1/4*SULF_DELTA_X;
+      const SULF_DELTA_X = 5/4*DELTA_X;
+      const SULF_DELTA_Y = this.LINKS ? DELTA_Y / 2 : DELTA_Y ;
+      position.r = 1/4*DELTA_X;
       let linkage_pos = res.parent.linkageOf(res);
       if (linkage_pos === 2 || linkage_pos === 6 || linkage_pos === Monosaccharide.LINKAGES.N) {
         position.dy = 0.5*SULF_DELTA_Y;
