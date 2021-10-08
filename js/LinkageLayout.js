@@ -95,7 +95,7 @@ class LinkageLayout extends SugarAwareLayout {
       position.dy = -1 * DELTA_Y;
       break;
     case 2:
-      position.dx = -1 * DELTA_X;
+      position.dx = -1 * DELTA_X * (parent_position.spread || 1);
       position.dy = 0;
       break;
     case 3:
@@ -116,7 +116,7 @@ class LinkageLayout extends SugarAwareLayout {
       position.dx = 1 * DELTA_X;
       position.dy = -1 * DELTA_Y;
       if (is_fucose) {
-        position.rotate = 225;
+        position.rotate = this.LINKS ? 206 : 225;
       }
       break;
     case 8:

@@ -233,7 +233,7 @@ let CondensedLayout = class {
             resolved[to_resolve] = true;
           }
           if (unresolved.length > 0) {
-            layout.get(item).spread = layout.get(item).spread + 1;
+            layout.get(item).spread = (layout.get(item).spread || 0) + 1;
             log.info('Increasing spread for',item.identifier,'to',layout.get(item).spread);
           }
         }

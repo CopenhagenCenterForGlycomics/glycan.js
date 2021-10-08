@@ -2,11 +2,29 @@ import CondensedLayout from './CondensedLayout';
 
 import Monosaccharide from './Monosaccharide';
 
+import {IO as Iupac} from './CondensedIupac';
+import Sugar from './Sugar';
+
 import Repeat from './Repeat';
 
 const not_sulf = res => res.identifier !== 'HSO3';
 
 const horizontal_identifiers = [ 'GlcA','IdoA','Xyl','HSO3','Rbo','P','GlcN'];
+
+class IupacSugar extends Iupac(Sugar) {}
+
+const NLINKED_CORE = new IupacSugar();
+NLINKED_CORE.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
+
+let identifier_comparator = (a,b) => {
+  if ( ! a || ! b) {
+    return false;
+  }
+  return a.identifier === b.identifier;
+};
+
+
+const CHECKED_NLINKED = new WeakMap();
 
 class SugarAwareLayout extends CondensedLayout {
 
@@ -44,6 +62,21 @@ class SugarAwareLayout extends CondensedLayout {
       position.keep_horizontal = true;
     }
 
+
+    if ( ! CHECKED_NLINKED.get(position) && ! this.LINKS && ! position.ignore_overlap ) {
+      let matches = sugar.match_sugar_pattern(NLINKED_CORE, identifier_comparator );
+      CHECKED_NLINKED.set(position,true);
+      if (matches.length > 0) {
+        if (matches[0].composition().map( traced => traced.original ).indexOf(res) >= 0) {
+          if ( ! this.LINKS ) {
+            position.ignore_overlap = true;
+          }
+        }
+      }
+    }
+
+
+
     let sibs = res.siblings;
 
     if ( (sibs.filter(not_sulf).length == 1 && (res.identifier == 'Fuc' || res.identifier == 'NeuAc')) ||
@@ -62,6 +95,7 @@ class SugarAwareLayout extends CondensedLayout {
 
       if (res.identifier == 'Fuc') {
         position.rotate = (position.dx < 0 ) ? 90 : -90;
+        position.ignore_overlap = true;
         return position;
       }
       if (this.LINKS) {
@@ -160,6 +194,7 @@ class SugarAwareLayout extends CondensedLayout {
 
       if (res.identifier == 'Fuc') {
         position.rotate = (position.dx < 0 ) ? 90 : -90;
+        position.ignore_overlap = true;
       }
 
       if (this.LINKS) {
