@@ -21,6 +21,7 @@ NLINKED_CORE.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
 const OLINKED_CORE = new IupacSugar();
 OLINKED_CORE.sequence = 'Gal(b1-3)GalNAc';
 
+const LINEARISE_CHAINS = false;
 
 class LinkageLayout extends SugarAwareLayout {
   static LayoutMonosaccharide(sugar,res,position,parent_position,layout) {
@@ -73,7 +74,7 @@ class LinkageLayout extends SugarAwareLayout {
     }
     matches = sugar.match_sugar_pattern(OLINKED_CORE, identifier_comparator );
     if (matches.length > 0) {
-      if (res.identifier === 'GlcNAc' && res.parent.linkageOf(res) === 3 && res.siblings.length === 0) {
+      if ( LINEARISE_CHAINS && res.identifier === 'GlcNAc' && res.parent.linkageOf(res) === 3 && res.siblings.length === 0) {
         return position;
       }
       let in_core = matches[0].composition().map( traced => traced.original );
@@ -101,6 +102,9 @@ class LinkageLayout extends SugarAwareLayout {
     case 2:
       position.dx = -1 * DELTA_X * (parent_position.spread || 1);
       position.dy = 0;
+      if (is_fucose) {
+        position.rotate = 90;
+      }
       break;
     case 3:
       position.dx = -1 * DELTA_X;
