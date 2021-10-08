@@ -61,6 +61,13 @@ class LinkageLayout extends SugarAwareLayout {
     let matches = sugar.match_sugar_pattern(NLINKED_CORE, identifier_comparator );
     if (matches.length > 0) {
       if (matches[0].composition().map( traced => traced.original ).indexOf(res) >= 0) {
+        if ( ! this.LINKS ) {
+          position.ignore_overlap = true;
+          if (res.identifier == 'Man' && res.parent.identifier == 'Man') {
+            position.dx = 0.25*position.dx;
+            position.dy = 0.225*position.dy;
+          }
+        }
         return position;
       }
     }
