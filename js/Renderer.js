@@ -292,7 +292,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
     let yval = position.y;
     if (ROTATE) {
       position.x = LTR? -1*(yval + position.height) : yval;
-      position.y = LTR? xval : (xval + position.width);
+      position.y = LTR? xval : -1*(xval + position.width);
     }
 
     xvals.push(position.x);

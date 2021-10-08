@@ -77,11 +77,15 @@ class LinkageLayout extends SugarAwareLayout {
         return position;
       }
       let in_core = matches[0].composition().map( traced => traced.original );
-      if (in_core.indexOf(res) >= 0) {
-        return position;
-      }
-      if (res.siblings.filter( sib => in_core.indexOf(sib) >= 0 ).length > 0) {
-        return position;
+      if ( in_core[0] && in_core[0].parent && ['Ser','Thr','Tyr'].indexOf(in_core[0].parent.identifier) < 0 ) {
+
+      } else {
+        if (in_core.indexOf(res) >= 0) {
+          return position;
+        }
+        if (res.siblings.filter( sib => in_core.indexOf(sib) >= 0 ).length > 0) {
+          return position;
+        }
       }
     }
 
@@ -102,7 +106,7 @@ class LinkageLayout extends SugarAwareLayout {
       position.dx = -1 * DELTA_X;
       position.dy = -1 * DELTA_Y;
       if (is_fucose) {
-        position.rotate = 90;
+        position.rotate = 0;
       }
       break;
     case 4:
