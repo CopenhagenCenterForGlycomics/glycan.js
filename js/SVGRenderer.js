@@ -29,11 +29,15 @@ const SYMBOLS_DEF = ( ! isNodejs() ) ? require('../sugars.svg').default : '';
 const str = (num) => num.toFixed(PRECISION);
 
 const upgrade_symbol_elements = (canvas,symbols) => {
-  for (let symbol of canvas.querySelectorAll('symbol')) {
-    symbol.parentNode.removeChild(symbol);
-  }
   let icons = canvas.ownerDocument.createElement('div');
   icons.innerHTML = symbols.replace(/<\?.*\?>/,'');
+
+  let ids = [...icons.querySelectorAll('defs symbol')].map( el => el.getAttribute('id'));
+  for (let symbol of canvas.querySelectorAll('symbol')) {
+    if (ids.indexOf(symbol.getAttribute('id')) >= 0) {
+      symbol.parentNode.removeChild(symbol);
+    }
+  }
   for (let defs of icons.querySelectorAll('defs')) {
     canvas.appendChild(defs);
   }
