@@ -72,16 +72,42 @@ let parseReaction = (sugar) => {
   sugar[ reaction_position ].setTag(sugar.attachment_tag);
 };
 
-let find_sugar_substrates = function(sugar) {
-  // The attachment tag is part of the reaction
-  let substrates = sugar.match_sugar_pattern(this,comparator) || [];
-  return substrates.map( match => {
-    let first_tagged = match.composition_for_tag(this.attachment_tag)[0];
-    if ( ! first_tagged ) {
-      return;
+const cache_symbol = Symbol('search_cache');
+const find_sugar_substrates_caches = new Map();
+
+let find_sugar_substrates = function(sugar,cacheKey) {
+  let sugar_caches;
+  let sugar_cache;
+  if (cacheKey) {
+    if ( ! find_sugar_substrates_caches.has(cacheKey) ) {
+      sugar_caches = new WeakMap();
+      find_sugar_substrates_caches.set(cacheKey,sugar_caches);
+    } else {
+      sugar_caches = find_sugar_substrates_caches.get(cacheKey);
     }
-    return first_tagged.original;
-  }).filter( r => r );
+    sugar_cache = sugar_caches.get(sugar);
+    if ( ! sugar_cache ) {
+      sugar_cache = new Map();
+      sugar_caches.set(sugar,sugar_cache);
+    }
+  }
+  let results = sugar_cache ? ( sugar_cache.has(this.sequence) ? sugar_cache.get(this.sequence) : null ) : null;
+
+  // The attachment tag is part of the reaction
+  if ( ! results ) {
+    let substrates = sugar.match_sugar_pattern(this,comparator) || [];
+    results = substrates.map( match => {
+      let first_tagged = match.composition_for_tag(this.attachment_tag)[0];
+      if ( ! first_tagged ) {
+        return;
+      }
+      return first_tagged.original;
+    }).filter( r => r );
+    if (sugar_cache) {
+      sugar_cache.set(this.sequence,results);
+    }
+  }
+  return results;
 };
 
 let execute = function(sugar,residue) {
@@ -208,8 +234,8 @@ class Reaction extends Sugar {
   }
 
   // Move to a container class with positive and negative assertions
-  tagSubstrateResidues(sugar,tag=Symbol('substrate')) {
-    let test_result = find_sugar_substrates.call(this,sugar);
+  tagSubstrateResidues(sugar,tag=Symbol('substrate'),cacheKey=null) {
+    let test_result = find_sugar_substrates.call(this,sugar,cacheKey);
     if (this.negative) {
       let without_delta = filter_delta_exists.call(this,test_result,sugar);
       test_result = test_result.filter( res => without_delta.indexOf(res) < 0 );

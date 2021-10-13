@@ -1,7 +1,8 @@
 'use strict';
 
 import debug from './Debug';
-import MixedTupleMap from '../lib/MixedTupleMap';
+// import MixedTupleMap from '../lib/MixedTupleMap';
+import TupleCache from './TupleCache';
 
 const module_string='glycanjs:searching';
 
@@ -71,18 +72,22 @@ let map_leaf_originals = function(trees,wildcard_symbol) {
   return result;
 };
 
+const wildcard_matcher = function(pattern,wildcard) {
+  return wildcard.children.map( kid => {
+    let new_sugar = kid.toSugar(pattern.constructor);
+    new_sugar.linkage = wildcard.linkageOf(kid);
+    new_sugar.parent_link = wildcard.parent ? wildcard.parent.linkageOf(wildcard) : 0;
+    return new_sugar;
+  });
+}
+
 let match_wildcard_paths = function(sugar,pattern,comparator) {
   const wildcard_symbol = Symbol('wildcard');
 
   log.info('Wildcard matching',sugar.sequence,pattern.sequence);
   let wildcard_residues = pattern.composition().filter( res => res.identifier === '*' );
 
-  let wildcard_subtrees = wildcard_residues.map( wildcard => wildcard.children.map( kid => {
-    let new_sugar = kid.toSugar(pattern.constructor);
-    new_sugar.linkage = wildcard.linkageOf(kid);
-    new_sugar.parent_link = wildcard.parent ? wildcard.parent.linkageOf(wildcard) : 0;
-    return new_sugar;
-  }));
+  let wildcard_subtrees = wildcard_residues.map( wildcard_matcher.bind(null,pattern) );
 
   let root_sugar = pattern.clone();
 
@@ -115,8 +120,8 @@ let match_wildcard_paths = function(sugar,pattern,comparator) {
   });
   // Grab the original leaves for the root match subtrees
   let root_trees_by_leaf_original = map_leaf_originals(root_trees,wildcard_symbol);
-  let result = wildcard_subtrees.map( subtree_set => {
-    return subtree_set.map( subtree => {
+  let result = wildcard_subtrees.map( function subtree_set_filterer(subtree_set) {
+    return subtree_set.map( function subtree_filter(subtree) {
       let roots = match_fixed_paths(sugar,subtree, comparator);
       log.info('For subtree',subtree.sequence,'we matched roots',roots.map( r => r.identifier ));
       log.info('We should be able to match each of these roots with a Root sugar match');
@@ -182,11 +187,15 @@ const FIXED = { type: 'fixed'};
 const COMPOSITION = { type: 'composition'};
 const TRACE = { type: 'trace'};
 
+function not_null(val) {
+  return (val !== null) && (typeof val !== 'undefined')
+}
+
 class CachingSearcher extends Searcher {
 
   static get Cache() {
     if ( ! this[cache_symbol] ) {
-      this[cache_symbol] = new MixedTupleMap();
+      this[cache_symbol] = new TupleCache();//MixedTupleMap();
     }
     return this[cache_symbol];
   }
@@ -195,15 +204,23 @@ class CachingSearcher extends Searcher {
     if (! Object.isFrozen(source) || ! Object.isFrozen(pattern) ) {
       return super.search(source,pattern,comparator);
     }
-    if (! this.Cache.has([source, COMPOSITION])) {
-      this.Cache.set([source, COMPOSITION], source.composition().map( res => res.identifier));
+
+    const source_tuple = [source,COMPOSITION];
+    const pattern_tuple = [pattern,COMPOSITION];
+
+
+    var pattern_composition = this.Cache.get(pattern_tuple);
+    var source_composition = this.Cache.get(source_tuple);
+
+    if (! source_composition) {
+      source_composition = source.composition().map( res => res.identifier);
+      this.Cache.set(source_tuple, source_composition);
     }
-    if (! this.Cache.has([pattern, COMPOSITION])) {
-      this.Cache.set([pattern,COMPOSITION], pattern.composition().map( res => res.identifier ));
+    if (! pattern_composition) {
+      pattern_composition = pattern.composition().map( res => res.identifier );
+      this.Cache.set(pattern_tuple, pattern_composition);
     }
-    let pattern_composition = this.Cache.get([pattern,COMPOSITION]);
-    let source_composition = this.Cache.get([source,COMPOSITION]);
-    let composition_match = pattern_composition.every( res => res === '*' || source_composition.find( source_res => source_res === res ) !== null );
+    let composition_match = pattern_composition.every( res => res === '*' || not_null(source_composition.find( source_res => source_res === res )) );
     if ( ! composition_match ) {
       return [];
     }

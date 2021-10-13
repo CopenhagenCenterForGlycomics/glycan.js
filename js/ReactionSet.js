@@ -74,10 +74,11 @@ let filter_with_delta = function(attachments,sugar) {
   return matched_attachments;
 };
 
-let find_sugar_substrates = function(sugar) {
+let find_sugar_substrates = function(sugar,cacheKey=null) {
   let result_attachments = [];
   for (let reaction of this.positive) {
-    let current_attachment = reaction.tagSubstrateResidues(sugar);
+    let current_attachment = Symbol('curr_attachment');
+    reaction.tagSubstrateResidues(sugar,current_attachment,cacheKey);
     let attachments = sugar.composition_for_tag(current_attachment);
     attachments.forEach( clean_tags(current_attachment) );
     result_attachments = result_attachments.concat( attachments );
@@ -86,7 +87,8 @@ let find_sugar_substrates = function(sugar) {
     return result_attachments;
   }
   for (let reaction of this.negative) {
-    let current_attachment = reaction.tagSubstrateResidues(sugar);
+    let current_attachment = Symbol('curr_attachment');
+    reaction.tagSubstrateResidues(sugar,current_attachment,cacheKey);
     let attachments = sugar.composition_for_tag(current_attachment);
     attachments.forEach( clean_tags(current_attachment) );
     result_attachments = result_attachments.filter( not_in_array(attachments) );
@@ -118,8 +120,8 @@ class ReactionSet {
     this[reactions].push(reaction);
   }
 
-  tagSubstrateResidues(sugar,tag=Symbol('substrate')) {
-    for (let residue of find_sugar_substrates.call(this,sugar)) {
+  tagSubstrateResidues(sugar,tag=Symbol('substrate'),cacheKey=null) {
+    for (let residue of find_sugar_substrates.call(this,sugar,cacheKey)) {
       residue.setTag(tag);
     }
     return tag;
@@ -231,9 +233,9 @@ class ReactionGroup {
     }
     return reaction;
   }
-  tagSubstrateResidues(sugar,reactions=this.reactions,tag=Symbol('substrate')) {
+  tagSubstrateResidues(sugar,reactions=this.reactions,tag=Symbol('substrate'),cacheKey=null) {
     for (let reaction of reactions) {
-      reaction.tagSubstrateResidues(sugar,tag);
+      reaction.tagSubstrateResidues(sugar,tag,cacheKey=null);
     }
     return tag;
   }
@@ -347,7 +349,7 @@ class ReactionGroup {
     }
   }
 
-  supportLinkages(sugar,reactions=this.reactions,with_support=Symbol('with_support')) {
+  supportLinkages(sugar,reactions=this.reactions,with_support=Symbol('with_support'),cacheKey=null) {
     let symbol_map = new WeakMap();
     for ( let reaction of reactions ) {
       if ( ! symbol_map.has( reaction )) {
@@ -369,7 +371,7 @@ class ReactionGroup {
         }
       }
 
-      reaction.tagSubstrateResidues(sugar,symbol_map.get(reaction).substrate);
+      reaction.tagSubstrateResidues(sugar,symbol_map.get(reaction).substrate,cacheKey);
 
       if (reaction instanceof ReactionSet) {
         for (let single_reaction of reaction.positive) {
