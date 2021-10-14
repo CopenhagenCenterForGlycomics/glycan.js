@@ -1,6 +1,7 @@
 export {default as Sugar} from './Sugar';
 export {default as Monosaccharide} from './Monosaccharide';
 export {default as Reaction} from './Reaction';
+export { SEQUENCE_CACHEKEY as SEQUENCE_CACHEKEY } from './Reaction';
 
 export * from './ReactionSet';
 

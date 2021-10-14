@@ -13,6 +13,8 @@ let reaction_position_string = Symbol('reaction_position_string');
 
 const validate_location = (sugar,location) => sugar.locate_monosaccharide(location);
 
+const SEQUENCE_CACHEKEY = Symbol('Sequence Cache');
+
 // We rewrite the sequence to
 // get rid of the placeholder Root
 // root monosaccharide.
@@ -78,17 +80,19 @@ const find_sugar_substrates_caches = new Map();
 let find_sugar_substrates = function(sugar,cacheKey) {
   let sugar_caches;
   let sugar_cache;
+
+  const use_seqs = cacheKey === SEQUENCE_CACHEKEY;
   if (cacheKey) {
     if ( ! find_sugar_substrates_caches.has(cacheKey) ) {
-      sugar_caches = new WeakMap();
+      sugar_caches = use_seqs ? new Map : new WeakMap();
       find_sugar_substrates_caches.set(cacheKey,sugar_caches);
     } else {
       sugar_caches = find_sugar_substrates_caches.get(cacheKey);
     }
-    sugar_cache = sugar_caches.get(sugar);
+    sugar_cache = sugar_caches.get(use_seqs ? sugar.sequence : sugar);
     if ( ! sugar_cache ) {
       sugar_cache = new Map();
-      sugar_caches.set(sugar,sugar_cache);
+      sugar_caches.set(use_seqs ? sugar.sequence : sugar,sugar_cache);
     }
   }
 
@@ -111,9 +115,18 @@ let find_sugar_substrates = function(sugar,cacheKey) {
       return first_tagged.original;
     }).filter( r => r );
     if (sugar_cache && (!is_epimerase || results.length == 0)) {
-      sugar_cache.set(cache_lookup_key,results);
+      if (use_seqs) {
+        sugar_cache.set(cache_lookup_key, results.map( res => sugar.location_for_monosaccharide(res) ));
+      } else {
+        sugar_cache.set(cache_lookup_key,results);
+      }
     }
   }
+
+  if (use_seqs && results[0] && typeof results[0] === 'string' ) {
+    results = results.map( pos => sugar.locate_monosaccharide(pos) );
+  }
+
   return results;
 };
 
@@ -287,3 +300,5 @@ class Reaction extends Sugar {
 Reaction.Comparator = comparator;
 
 export default Reaction;
+
+export { SEQUENCE_CACHEKEY };
