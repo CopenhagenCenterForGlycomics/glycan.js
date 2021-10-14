@@ -91,7 +91,14 @@ let find_sugar_substrates = function(sugar,cacheKey) {
       sugar_caches.set(sugar,sugar_cache);
     }
   }
-  let results = sugar_cache ? ( sugar_cache.has(this.sequence) ? sugar_cache.get(this.sequence) : null ) : null;
+
+  const is_epimerase = this.composition().some( res => res instanceof EpimerisableMonosaccharide);
+
+  const cache_lookup_key = this.sequence+this[reaction_position_string];
+
+  let cache_hit = sugar_cache ? sugar_cache.has(cache_lookup_key) : false;
+
+  let results = sugar_cache ? ( sugar_cache.has(cache_lookup_key) ? sugar_cache.get(cache_lookup_key) : null ) : null;
 
   // The attachment tag is part of the reaction
   if ( ! results ) {
@@ -103,8 +110,8 @@ let find_sugar_substrates = function(sugar,cacheKey) {
       }
       return first_tagged.original;
     }).filter( r => r );
-    if (sugar_cache) {
-      sugar_cache.set(this.sequence,results);
+    if (sugar_cache && (!is_epimerase || results.length == 0)) {
+      sugar_cache.set(cache_lookup_key,results);
     }
   }
   return results;
