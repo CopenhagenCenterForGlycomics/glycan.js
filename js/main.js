@@ -30,6 +30,8 @@ export { LinkageLayoutFishEye };
 export {default as SVGRenderer} from './SVGRenderer';
 export {default as CanvasRenderer} from './CanvasRenderer';
 
+export {default as SVGCanvas} from './SVGCanvas';
+
 export {default as Fragmentor } from './Fragmentor';
 
 export {Mass as Mass } from './Mass';
