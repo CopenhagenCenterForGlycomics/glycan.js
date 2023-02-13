@@ -8,6 +8,8 @@ const module_string='glycanjs:searching';
 
 const log = debug(module_string);
 
+const SKIP_CACHE_TAG = Symbol('skip_cache');
+
 let flatten = array => [].concat.apply([], array);
 
 let onlyUnique = function(value, index, self) {
@@ -204,6 +206,9 @@ class CachingSearcher extends Searcher {
     if (! Object.isFrozen(source) || ! Object.isFrozen(pattern) ) {
       return super.search(source,pattern,comparator);
     }
+    if ([...source.composition_for_tag(SKIP_CACHE_TAG)].length > 0) {
+      return super.search(source,pattern,comparator);      
+    }
 
     const source_tuple = [source,COMPOSITION];
     const pattern_tuple = [pattern,COMPOSITION];
@@ -231,6 +236,10 @@ class CachingSearcher extends Searcher {
     if (! Object.isFrozen(source) || ! Object.isFrozen(pattern) ) {
       return super.search_wildcard_paths(source,pattern,comparator);
     }
+    if ([...source.composition_for_tag(SKIP_CACHE_TAG)].length > 0) {
+      return super.search_wildcard_paths(source,pattern,comparator);      
+    }
+
     const tuple = [ source, pattern, comparator, WILDCARD ];
 
     if (this.Cache.has(tuple)) {
@@ -243,6 +252,10 @@ class CachingSearcher extends Searcher {
     if (! Object.isFrozen(source) || ! Object.isFrozen(pattern) ) {
       return super.search_fixed_paths(source,pattern,comparator);
     }
+    if ([...source.composition_for_tag(SKIP_CACHE_TAG)].length > 0) {
+      return super.search_fixed_paths(source,pattern,comparator);      
+    }
+
     const tuple = [ source, pattern, comparator, FIXED ];
     if (this.Cache.has(tuple)) {
       return this.Cache.get(tuple);
@@ -256,6 +269,11 @@ const CacheTrace = (sugar,pattern,root,comparator) => {
   if (! Object.isFrozen(sugar) || ! Object.isFrozen(pattern) ) {
     return sugar.trace(pattern,root,comparator);
   }
+  if ([...sugar.composition_for_tag(SKIP_CACHE_TAG)].length > 0) {
+    return sugar.trace(pattern,root,comparator);      
+  }
+
+
   const tuple = [ sugar, pattern, root, comparator, TRACE ];
 
   const cache = CachingSearcher.Cache;
@@ -267,4 +285,4 @@ const CacheTrace = (sugar,pattern,root,comparator) => {
   return cache.get(tuple).map( traced => traced.clone() );
 };
 
-export { CachingSearcher, Searcher, CacheTrace };
+export { CachingSearcher, Searcher, CacheTrace, SKIP_CACHE_TAG };

@@ -67,7 +67,7 @@ QUnit.test( 'Can use epimerising reaction with children to support a linkage' , 
     .map( res => res.getTags())
     .flat()
     .map( symb => symb.description );
-  assert.deepEqual(tags,['substrate','has_been_epimerised']);
+  assert.deepEqual(tags,['substrate','has_been_epimerised','skip_cache']);
 });
 
 QUnit.test( 'Can perform multiple epimerisation with wildcards' , function( assert ) {
@@ -138,7 +138,7 @@ QUnit.test( 'Can use epimerising reaction with wildcards to support a linkage' ,
     .map( res => res.getTags())
     .flat()
     .map( symb => symb.description );
-  assert.deepEqual(tags,['substrate','has_been_epimerised','substrate','has_been_epimerised']);
+  assert.deepEqual(tags,['substrate','has_been_epimerised','skip_cache','substrate','has_been_epimerised','skip_cache']);
 });
 
 QUnit.test( 'Can use epimerising reaction with wildcards to support a linkage' , function( assert ) {
@@ -168,7 +168,7 @@ QUnit.test( 'Can use epimerising reaction with wildcards to support a linkage' ,
     .map( res => res.getTags())
     .flat()
     .map( symb => symb.description );
-  assert.deepEqual(tags,['substrate','has_been_epimerised']);
+  assert.deepEqual(tags,['substrate','has_been_epimerised','skip_cache']);
 
 
   tags = test_sugar

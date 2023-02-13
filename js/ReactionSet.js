@@ -5,6 +5,8 @@ import { CacheTrace } from './Searching';
 
 import { EpimerisableMonosaccharide } from './Epimerisation';
 
+import { SKIP_CACHE_TAG } from './Searching';
+
 import debug from './Debug';
 
 const reactions = Symbol('reactions');
@@ -351,6 +353,12 @@ class ReactionGroup {
 
   supportLinkages(sugar,reactions=this.reactions,with_support=Symbol('with_support'),cacheKey=null) {
     let symbol_map = new WeakMap();
+
+    for ( let to_reset of sugar.composition_for_tag(EPIMERISED_TAG) ) {
+      to_reset.setTag(EPIMERISED_TAG,null);
+      to_reset.setTag(SKIP_CACHE_TAG,null);
+    }
+
     for ( let reaction of reactions ) {
       if ( ! symbol_map.has( reaction )) {
         symbol_map.set( reaction, { substrate: Symbol('substrate'), residue: Symbol('residue') });
@@ -392,12 +400,17 @@ class ReactionGroup {
         for (let tree of trees.flat()) {
           for (let epimerised of tree.composition_for_tag(EPIMERISED_TAG)) {
             epimerised.original.setTag(EPIMERISED_TAG, epimerised.getTag(EPIMERISED_TAG));
+            epimerised.original.setTag(SKIP_CACHE_TAG, true);
+
           }
         }
       }
 
       for (let residue of [].concat.apply([], supported)) {
         if (residue.getTag(EPIMERISED_TAG) && is_epimerisation_reaction) {
+          // We should skip supporting this specific residue because it's
+          // only an epimerisation reaction, and not telling us anything
+          // about the original residue
           continue;
         }
         residue.setTag(symbol_map.get(reaction).residue);
