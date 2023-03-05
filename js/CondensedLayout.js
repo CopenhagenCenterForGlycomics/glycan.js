@@ -84,13 +84,15 @@ let check_overlaps = (positions) => {
   let quad = new QuadTree({x: min_x, y: min_y, width: width, height: height });
 
   for(let position of positions.map( (pos,idx) => Object.assign({idx: idx },pos.position) )) {
-    if (position.ignore_overlap) {
+
+    // Skip this if ignore_overlap is true
+    if (position.ignore_overlap === true) {
       continue;
     }
     quad.insert(position);
   }
   for (let i = 0; i < positions.length; i++) {
-    if (positions[i].position.ignore_overlap) {
+    if (positions[i].position.ignore_overlap === true) {
       continue;
     }
     let check_position = positions[i].position;
@@ -99,6 +101,13 @@ let check_overlaps = (positions) => {
       if (item.idx === i) {
         continue;
       }
+      if (positions[i].item.parent == positions[item.idx].item ) {
+        continue;
+      }
+      if (positions[item.idx].item.parent == positions[i].item ) {
+        continue;
+      }
+
       let item_position = positions[item.idx].position;
       if (item_position.collision.indexOf(check_position) >= 0 &&
           check_position.collision.indexOf(item_position) >= 0 ) {
@@ -149,6 +158,10 @@ let CondensedLayout = class {
     } else {
       return 0.5*BASE_DELTA_Y;
     }
+  }
+
+  static get SPREAD_DELTA() {
+    return 1;
   }
 
   static LayoutMonosaccharide(renderable,monosaccharide,position,parent_position) {
@@ -233,7 +246,7 @@ let CondensedLayout = class {
             resolved[to_resolve] = true;
           }
           if (unresolved.length > 0) {
-            layout.get(item).spread = (layout.get(item).spread || 0) + 1;
+            layout.get(item).spread = (layout.get(item).spread || 0) + this.SPREAD_DELTA;
             log.info('Increasing spread for',item.identifier,'to',layout.get(item).spread);
           }
         }

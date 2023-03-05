@@ -50,6 +50,10 @@ class SugarAwareLayout extends CondensedLayout {
     return super.DELTA_Y*1.25;
   }
 
+  static get SPREAD_DELTA() {
+    return super.SPREAD_DELTA*0.25;
+  }
+
   static LayoutMonosaccharide(sugar,res,position,parent_position,layout) {
 
     const DELTA_Y = this.DELTA_Y;
@@ -95,7 +99,7 @@ class SugarAwareLayout extends CondensedLayout {
 
       if (res.identifier == 'Fuc') {
         position.rotate = (position.dx < 0 ) ? 90 : -90;
-        position.ignore_overlap = true;
+        position.dx = position.dx < 0 ? -0.75: 0.75;
         return position;
       }
       if (this.LINKS) {
