@@ -32,7 +32,7 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['qunit'],
 
-    plugins: ['karma-qunit','karma-webpack','karma-chrome-launcher','karma-sourcemap-loader','karma-jsdom-launcher'],
+    plugins: ['karma-qunit','karma-webpack','karma-sourcemap-loader','karma-jsdom-launcher'],
 
     browserify : {
       debug: true,
