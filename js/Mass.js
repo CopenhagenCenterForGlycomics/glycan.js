@@ -18,6 +18,9 @@ MASSES.set(H,1.007825035);
 MASSES.set(O,15.99491463);
 MASSES.set(N,14.003074);
 
+const UNDERIVATISED = Symbol('underivatised');
+const PERMETHYLATED = Symbol('permethylated');
+
 const DEFINITIONS =`
 terminii:r1:x;2:x;3:x;4:x
 name:P
@@ -218,11 +221,42 @@ const get_mass_for = (identifier) => {
   return composition_to_mass(def.composition);
 };
 
+// Permethylated masses:
+/*
+terminii:r1:HOH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:OH
+name:GlcNAc
+
+Skip r1, Then NAc,OH,OH,OH - 1 = 3*14
+
+terminii:r1:HOH;2eq:NH2;3eq:OH;4eq:OH;5eq:-;6eq:OH
+name:GalN
+Skip r1, Then NH2 (2), OH, OH, OH - 1 = 4*14
+
+terminii:r2:HOH;1ax:COOH;3ax:H;4:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:OH2
+name:NeuAc
+Skip r2, Then COOH,OH,NHAc,OH,OH,OH2 - 1 = 5*14
+
+*/
+
+const derivative_info = Symbol('derivative')
+
+
 const Mass = (base) => {
 
   class MonosaccharideMass extends base.Monosaccharide {
     get mass() {
-      return get_mass_for(this.identifier);
+      return get_mass_for(this.identifier,this.derivative);
+    }
+
+    get derivative() {
+      return this[derivative_info] || UNDERIVATISED;
+    }
+
+    set derivative(derivative) {
+      if ([ UNDERIVATISED, PERMETHYLATED ].indexOf(derivative) < 0) {
+        throw new Error('Bad derivative');
+      }
+      this[derivative_info] = derivative;
     }
 
     get proto() {
@@ -235,7 +269,12 @@ const Mass = (base) => {
     get mass() {
       return 2*MASSES.get(H) + MASSES.get(O) + this.composition().map( res => res.mass ).reduce( (a,b) => a + b,0);
     }
+    derivatise(derivative) {
+      for (let res of this.composition()) {
+        res.derivative = derivative;
+      }
+    }
   };
 };
 
-export { C, H, O, N, MASSES, Mass };
+export { C, H, O, N, MASSES, Mass, UNDERIVATISED, PERMETHYLATED };

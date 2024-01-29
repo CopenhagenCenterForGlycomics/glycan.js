@@ -32,7 +32,7 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['qunit'],
 
-    plugins: ['karma-qunit','karma-webpack','karma-chrome-launcher','karma-sourcemap-loader'],
+    plugins: ['karma-qunit','karma-webpack','karma-chrome-launcher','karma-sourcemap-loader','karma-jsdom-launcher'],
 
     browserify : {
       debug: true,
@@ -90,8 +90,8 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: [],
 
+    browsers: ['jsdom'],
     customLaunchers: {
     },
 

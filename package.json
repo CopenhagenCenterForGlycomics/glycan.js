@@ -18,8 +18,9 @@
     "babel-loader": "^8.0.5",
     "core-js": "2",
     "eslint": "^7.5.0",
-    "karma": "^4.0.1",
-    "karma-chrome-launcher": "^2.2.0",
+    "jsdom": "^24.0.0",
+    "karma": "^4.4.1",
+    "karma-jsdom-launcher": "^17.0.0",
     "karma-qunit": "^3.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^4.0.2",
@@ -31,13 +32,14 @@
     "webpack-dev-server": "^3.2.1"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start --single-run --browsers ChromeHeadless",
+    "test": "./node_modules/karma/bin/karma start --single-run --browsers jsdom",
     "tracetest": "./scripts/trace_tests.sh",
     "build-web": "./node_modules/.bin/webpack -d",
     "build-watch-web": "./node_modules/.bin/webpack --watch",
     "server": "python ./scripts/simplehttpserver",
     "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
-    "lint": "./node_modules/.bin/eslint test/**/*.js js/*.js --fix"
+    "lint": "./node_modules/.bin/eslint test/**/*.js js/*.js --fix",
+    "validate": "npm ls"
   },
   "browserify": {
     "transform": [
