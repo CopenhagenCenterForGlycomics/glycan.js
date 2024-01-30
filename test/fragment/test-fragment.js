@@ -12,7 +12,7 @@ const FRAGMENTS = require('./fragments');
 
 class IupacSugar extends Mass(Iupac(Sugar)) {}
 
-QUnit.module('Test that we can clone sugars', {
+QUnit.module('Test that we can fragment sugars', {
 });
 
 QUnit.test( 'Generating single chords works' , function( assert ) {

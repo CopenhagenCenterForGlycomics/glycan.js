@@ -1,7 +1,7 @@
 
 import { trace_into_class, TracedMonosaccharide } from './Tracing';
 
-import { C as CSYMB, H as HSYMB, O as OSYMB, MASSES } from './Mass';
+import { C as CSYMB, H as HSYMB, O as OSYMB, MASSES, Mass, UNDERIVATISED, PERMETHYLATED } from './Mass';
 
 const C = MASSES.get(CSYMB);
 const H = MASSES.get(HSYMB);
@@ -9,22 +9,17 @@ const O = MASSES.get(OSYMB);
 
 const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
 
-// const UNDERIVATISED = Symbol('underivatised');
-// const PERMETHYLATED = Symbol('permethylated');
+const AFRAG_MASS = new Map();
 
-// const MONOISOTOPICMASS = Symbol('monoisotopicmass');
-// const AVERAGEMASS = Symbol('averagemass');
-
-const AFRAG_MASS = {
-  UNDERIVATISED : {
+AFRAG_MASS.set(UNDERIVATISED, {
     MONOISOTOPICMASS: 0,
-    AVERAGEMASS: 1
-  },
-  PERMETHYLATED : {
+    AVERAGEMASS: 1  
+});
+
+AFRAG_MASS.set(PERMETHYLATED, {
     MONOISOTOPICMASS: 2,
     AVERAGEMASS: 3
-  }
-};
+});
 
 const aFragMass = {
   'Hex' : {
@@ -91,6 +86,13 @@ const aFragMass = {
     '3,4' : [75.0320282,75.06724,89.0476782,89.09412],
   }
 };
+
+
+const DERIVATIVES = new Map();
+
+DERIVATIVES.set(UNDERIVATISED, Object.freeze([ HSYMB ]));
+
+DERIVATIVES.set(PERMETHYLATED, Object.freeze([ CSYMB, HSYMB, HSYMB, HSYMB ]));
 
 
 const is_linkage_retained = (link,type) => {
@@ -198,7 +200,7 @@ class FragmentResidue extends TracedMonosaccharide {
         let fragtype = cross_type[2];
         let proto = this.original.proto;
         if ( proto ) {
-          fragmass = aFragMass[proto][ends][ AFRAG_MASS.UNDERIVATISED.MONOISOTOPICMASS ];
+          fragmass = aFragMass[proto][ends][ AFRAG_MASS.get(this.original.derivative).MONOISOTOPICMASS ];
         }
         if (fragtype === 'a') {
           return fragmass;
@@ -260,7 +262,7 @@ let Fragmentable = (base) => class extends base {
 
   get mass() {
     let base_mass = this.composition().map( res => res.mass ).reduce((s, v) => s + v );
-    let R = H;
+    let R = DERIVATIVES.get(this.root.original.derivative).map( atom => MASSES.get(atom) ).reduce((s, v) => s + v ,0) ;
     let result_mass = base_mass;
     for (let type of this.type.split('/')) {
       if (type.match(/^y/)) {
@@ -337,7 +339,7 @@ const retains_residue = (composition,res) => {
 
 class Fragmentor {
   static *fragment(target,depth=2) {
-    if ( ! (target.mass) ) {
+    if ( ! ('mass' in target) ) {
       throw new Error('Sugar object class does not derive from Mass class');
     }
     const base = target.constructor;
