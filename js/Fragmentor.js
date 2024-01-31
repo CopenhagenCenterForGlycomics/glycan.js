@@ -338,6 +338,25 @@ const retains_residue = (composition,res) => {
 };
 
 class Fragmentor {
+
+  static getFragment(target,type) {
+    const base = target.constructor;
+    const Fragment = Fragmentable(base);
+
+    let fragment_template = trace_into_class(target,Fragment);
+    let fragment = fragment_template.clone();
+    let chord = type.split('/').map( frag_type => {
+      let type = frag_type;
+      if (type.match(/\d+,\d+-[x]/)) {
+        type = type.replace(/\d+,\d+-[x]/,'y');
+      }
+      return target.locate_monosaccharide(type);
+    });
+    fragment.chord = { root: target.root, chord };
+    fragment.type = type;
+    return fragment;
+  }
+
   static *fragment(target,depth=2) {
     if ( ! ('mass' in target) ) {
       throw new Error('Sugar object class does not derive from Mass class');
