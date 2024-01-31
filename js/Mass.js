@@ -91,12 +91,12 @@ terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OOH
 name:IdoA
 type:HexA
 
-terminii:r2:OH;1ax:OOH;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:OH
+terminii:1ax:OOH;r2:OH;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:OH
 name:NeuAc
 type:NeuAc
 composition:C:11;H:17;N:1;O:8
 
-terminii:r2:OH;1ax:OOH;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:OH
+terminii:1ax:OOH;r2:OH;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:OH
 name:NeuGc
 type:NeuGc
 composition:C:11;H:17;N:1;O:9
@@ -186,6 +186,38 @@ const parse_terminii = (terminii) => {
   }
   Object.freeze(ring);
   return ring;
+};
+
+const calculate_a_fragment_composition = (atoms,start,end,sialic=false) => {
+  if (sialic && start > 0) {
+    start = start + 1;
+  }
+  if (sialic && end > 0) {
+    end = end + 1
+  }
+  let result = Array.from(atoms);
+  let looper = start;
+  while(looper < end) {
+    result[++looper] = [];
+  }
+  if (result[1].length > 0) {
+    // console.log('Swapping keeping', result.map( (pos,i) => pos.length == 0 ? i : null ));
+    result = result.map( (pos,i) => pos.length == 0 ? atoms[i] : []);
+  }
+  let end_fill_start = sialic? 6 : 5;
+  if (end >= end_fill_start) {
+    let fill = atoms.length;
+    while (fill >= (end_fill_start+1)) {
+      if (atoms[fill]) {
+        result[fill] = atoms[fill];
+      }
+      fill = fill - 1;
+    }
+  }
+  if (sialic && (start == 0 || end >= 5)) {
+    result = result.concat([H]);
+  }
+  return result;
 };
 
 const summarise_composition = (composition) => {
@@ -388,4 +420,4 @@ const Mass = (base) => {
   };
 };
 
-export { C, H, O, N, NA, MASSES, Mass, UNDERIVATISED, PERMETHYLATED };
+export { C, H, O, N, NA, MASSES, Mass, UNDERIVATISED, PERMETHYLATED, calculate_a_fragment_composition, summarise_composition };
