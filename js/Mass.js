@@ -79,24 +79,24 @@ terminii:r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:GlcNAc
 type:HexNAc
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OOH
+terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OO
 name:HexA
 composition:C:6;H:8;O:6
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OOH
+terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OO
 name:GlcA
 type:HexA
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OOH
+terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OO
 name:IdoA
 type:HexA
 
-terminii:1ax:OOH;r2:OH;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:OH
+terminii:1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH
 name:NeuAc
 type:NeuAc
 composition:C:11;H:17;N:1;O:8
 
-terminii:1ax:OOH;r2:OH;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:OH
+terminii:1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:HOH
 name:NeuGc
 type:NeuGc
 composition:C:11;H:17;N:1;O:9
@@ -143,6 +143,9 @@ const parse_atoms = (composition) => {
   if (composition === 'H') {
     return [ H ];
   }
+  if (composition === 'O') {
+    return [ O ];
+  }
 
   if (composition === 'OH') {
     return [ O, H ];
@@ -150,7 +153,7 @@ const parse_atoms = (composition) => {
   if (composition === 'HOH') {
     return [ H, O, H ];
   }
-  if (composition === 'OOH') {
+  if (composition === 'OO') {
     return [ O, O ];
   }
   if (composition === 'NH2') {
@@ -175,7 +178,7 @@ const parse_terminii = (terminii) => {
   let ring = new Map();
   for (let position of terminii.split(';')) {
     if (position.match(/^r/)) {
-      ring.set(parseInt( position[1] ) ,  { atoms: [ C, H, O, H ], reducing: true });
+      ring.set(parseInt( position[1] ) ,  { atoms: [ C, H ].concat( parse_atoms(position.split(':')[1])), reducing: true });
       continue;
     }
     if (position.match(/-/)) {
@@ -213,9 +216,6 @@ const calculate_a_fragment_composition = (atoms,start,end,sialic=false) => {
       }
       fill = fill - 1;
     }
-  }
-  if (sialic && (start == 0 || end >= 5)) {
-    result = result.concat([H]);
   }
   return result;
 };

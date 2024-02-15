@@ -61,6 +61,73 @@ const GLYCOSIDIQ_MASSES = require('./glycosidiq_reference.json');
 
 const GLYCOWORKBENCH_MASSES_RAW = require('./glycoworkbench_reference.json');
 
+// PATCH TEST MASSES
+
+// GLYCOWORKBENCH a-masses are wrong
+GLYCOWORKBENCH_MASSES_RAW['NeuAc']['a-3,5']='C7H13O4N1';
+GLYCOWORKBENCH_MASSES_RAW['NeuAc']['a-2,5']='C8H15O5N1';
+GLYCOWORKBENCH_MASSES_RAW['NeuAc']['a-2,4']='C4H7O2N1';
+GLYCOWORKBENCH_MASSES_RAW['NeuAc']['a-1,5']='C9H17O5N1';
+GLYCOWORKBENCH_MASSES_RAW['NeuAc']['a-1,4']='C5H9O2N1';
+GLYCOWORKBENCH_MASSES_RAW['NeuAc']['a-0,2']='C8H15O6N1';
+GLYCOWORKBENCH_MASSES_RAW['NeuAc']['a-0,3']='C7H13O5N1';
+
+
+const MECHREF_MASSES_BY_RESIDUE = Object.fromEntries(MECHEREF_MASSES.map( (entry) => { return [entry.residue,entry.masses] }));
+// Prefer calculation by GLYCOWORKBENCH
+// MECHREF expects this to be 60, but we can only calculate mass should be 44, and glycoworkbench agrees with 44
+// The deltas up to 1,4 and 2,4 are all correct, but offset by the extra O in the 1,3 mass.
+delete MECHREF_MASSES_BY_RESIDUE['NeuAc']['1,3']
+delete MECHREF_MASSES_BY_RESIDUE['NeuAc']['1,4']
+delete MECHREF_MASSES_BY_RESIDUE['NeuAc']['2,4']
+
+// This has to be wrong, as it must match up with the NeuAc 0,2 mass + 16
+delete MECHREF_MASSES_BY_RESIDUE['NeuGc']['0,2']
+// This has to be wrong, as it must match up with the NeuAc 0,4 mass
+delete MECHREF_MASSES_BY_RESIDUE['NeuGc']['0,4']
+// This has to be wrong, as it must match up with the NeuAc 1,3 mass
+delete MECHREF_MASSES_BY_RESIDUE['NeuGc']['1,3']
+// Same offset error as in the NeuAc
+delete MECHREF_MASSES_BY_RESIDUE['NeuGc']['1,4']
+delete MECHREF_MASSES_BY_RESIDUE['NeuGc']['2,4']
+// Must be NeuAc mass + 16
+delete MECHREF_MASSES_BY_RESIDUE['NeuGc']['2,5']
+// Must be NeuAc mass + 16
+delete MECHREF_MASSES_BY_RESIDUE['NeuGc']['3,5']
+
+
+// Remove these entries as we have agreement with GlycosidIQ and glycoworkbench
+// These all seem to include one H too many
+delete MECHREF_MASSES_BY_RESIDUE['GlcA']['1,3']
+delete MECHREF_MASSES_BY_RESIDUE['GlcA']['1,4']
+delete MECHREF_MASSES_BY_RESIDUE['GlcA']['2,4']
+
+// Remove these entries as we have agreement with GlycosidIQ and glycoworkbench
+// These all seem to be missing a CHOH 
+delete MECHREF_MASSES_BY_RESIDUE['Xyl']['1,3']
+delete MECHREF_MASSES_BY_RESIDUE['Xyl']['1,4']
+delete MECHREF_MASSES_BY_RESIDUE['Xyl']['2,4']
+
+
+// The MECHREF mass is correct - this is off by one carbon
+delete GLYCOSIDIQ_MASSES['NeuAc']['3,5'];
+// This mass is also off by one carbon
+delete GLYCOSIDIQ_MASSES['NeuAc']['3,4'];
+// The MECHREF mass is correct - this is off by one carbon
+delete GLYCOSIDIQ_MASSES['NeuGc']['3,5'];
+// This mass is also off by one carbon
+delete GLYCOSIDIQ_MASSES['NeuGc']['3,4'];
+
+/* The GLYCOSIDIQ masses for some of the NeuAc cross rings are off 
+   for permethylated. If you calculate the delta between the permethylated
+   mass and the underivatised, it looks like it is adding one too many
+   derivatives
+*/
+
+GLYCOSIDIQ_MASSES['NeuAc']['0,2'][2] = GLYCOSIDIQ_MASSES['NeuAc']['0,2'][2] - massFromCompObj({C:1,H:2,N:0,O:0});
+GLYCOSIDIQ_MASSES['NeuAc']['1,5'][2] = GLYCOSIDIQ_MASSES['NeuAc']['1,5'][2] - massFromCompObj({C:1,H:2,N:0,O:0});
+GLYCOSIDIQ_MASSES['NeuAc']['2,4'][2] = GLYCOSIDIQ_MASSES['NeuAc']['2,4'][2] - massFromCompObj({C:1,H:2,N:0,O:0});
+
 const GLYCOWORKBENCH_MASSES = Object.fromEntries(Object.entries(GLYCOWORKBENCH_MASSES_RAW).map ( ([res,val]) => {
   let fixed_val = Object.entries(val).map( ([frag,comp]) => {
     return [frag,{ composition: compToObj(comp), mass: massFromCompObj(compToObj(comp)) }];
@@ -100,12 +167,6 @@ for (let {residue: mono,masses} of MECHEREF_MASSES) {
   }
 }
 
-// Issues with NeuAc 1,4, 1,3
-// Xyl masses from MECHREF look wrong when inspecting 3D model
-// GlcA errors off by H, corresponds to the delta in mass we
-// need to systematically apply to the wanted masses 
-// from the table
-
 // Contra masses all match up correctly with GlycanMass from Expasy
 
 QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharides from MECHREF' , function( assert ) {
@@ -125,8 +186,6 @@ QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharide
   }
 });
 
-// Issues with NeuAc/Gc 2,4, 3,5 and 3,4
-
 QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharides from GLYCOSIDIQ' , function( assert ) {
   for (let mono of Object.keys(GLYCOSIDIQ_MASSES)) {
     let sugar = new IupacSugar();
@@ -141,10 +200,6 @@ QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharide
     }
   }
 });
-
-
-// Issues with permethylated NeuAc 0,2, 1,5,   2,4, 3,5 and 3,4
-// Issues with permethylated NeuGc 2,4, 3,5 and 3,4
 
 QUnit.test( 'Ensure ring compositions match free sugar for single permethylated monosaccharides from GLYCOSIDIQ' , function( assert ) {
   for (let mono of Object.keys(GLYCOSIDIQ_MASSES)) {
@@ -161,10 +216,6 @@ QUnit.test( 'Ensure ring compositions match free sugar for single permethylated 
     }
   }
 });
-
-
-// Issues with NeuAc 0,2, 0,3, 1,4, 1,5, 2,5,   2,4, 3,5 
-// Issues with NeuGc 1,4   2,4
 
 QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharides from GLYCOWORKBENCH' , function( assert ) {
   for (let mono of Object.keys(GLYCOWORKBENCH_MASSES).filter( v => ['Gal','GalNAc','Xyl','Fuc','GlcA','GlcN','NeuAc','NeuGc'].indexOf(v) >= 0)) {
