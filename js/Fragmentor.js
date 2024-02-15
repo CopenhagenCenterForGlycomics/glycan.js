@@ -1,11 +1,7 @@
 
 import { trace_into_class, TracedMonosaccharide } from './Tracing';
 
-import { C as CSYMB, H as HSYMB, O as OSYMB, MASSES, Mass, UNDERIVATISED, PERMETHYLATED } from './Mass';
-
-const C = MASSES.get(CSYMB);
-const H = MASSES.get(HSYMB);
-const O = MASSES.get(OSYMB);
+import { C as CSYMB, H as HSYMB, O as OSYMB, Mass, UNDERIVATISED, PERMETHYLATED } from './Mass';
 
 const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
 
