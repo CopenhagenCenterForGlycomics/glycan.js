@@ -409,7 +409,7 @@ const Mass = (base) => {
       // Only the parent sugar gets to add back in the masses
       const monosaccharide_mass = this.composition().map( res => res.mass ).reduce( (a,b) => a + b,0);
       const derivative_type = this.composition().map( res => res.derivative ).filter( (o,i,a) => a.indexOf(o) == i )[0];
-      const reducing_end = REDUCING_ENDS.get(derivative_type).map ( atom => MASSES.get(atom) ).reduce( (a,b) => a + b, 0);
+      const reducing_end = composition_to_mass(REDUCING_ENDS.get(derivative_type));
       return reducing_end + monosaccharide_mass;
     }
     derivatise(derivative) {
@@ -420,4 +420,4 @@ const Mass = (base) => {
   };
 };
 
-export { C, H, O, N, NA, MASSES, Mass, UNDERIVATISED, PERMETHYLATED, calculate_a_fragment_composition, summarise_composition };
+export { C, H, O, N, NA, Mass, UNDERIVATISED, PERMETHYLATED, calculate_a_fragment_composition, summarise_composition };

@@ -1,7 +1,7 @@
 /*global QUnit*/
 
 import Sugar from '../../js/Sugar';
-import { Mass, C , H , O , N, PERMETHYLATED, MASSES, summarise_composition, calculate_a_fragment_composition as a_frag_for }  from '../../js/Mass';
+import { Mass, C , H , O , N, PERMETHYLATED, summarise_composition, calculate_a_fragment_composition as a_frag_for }  from '../../js/Mass';
 import {IO as Iupac} from '../../js/CondensedIupac';
 
 const mass_diff = (a,b,tolerance=1e-04) => {
