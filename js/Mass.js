@@ -21,15 +21,6 @@ MASSES.set(O,15.99491463);
 MASSES.set(N,14.003074);
 MASSES.set(NA,22.989771)
 
-// const UNDERIVATISED = Symbol('underivatised');
-// const PERMETHYLATED = Symbol('permethylated');
-// const DERIV_2AB     = Symbol('2AB');
-// const DERIV_AMMONIA_AMIDATION = Symbol('Ammonia amidation');
-// const DERIV_ETHYL_ESTER = Symbol('Ethyl esterification');
-
-// const REDUCING_ENDS = new Map();
-
-
 class RemovableAtom {
   constructor(atom) {
     this.atom = atom;
@@ -71,7 +62,11 @@ class Derivative {
 
 }
 
-const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms=[]) => {
+const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms) => {
+  if (! reducing_end_atoms && deriv_atoms ) {
+    // These atoms are for the reducing end (OH), and one capping on non-reducing end (H)
+    reducing_end_atoms = [ O, [H].concat(deriv_atoms) , [H].concat(deriv_atoms) ].flat();
+  }
   let new_derivative = class extends Derivative {
     constructor() {
       super(name);
@@ -79,6 +74,11 @@ const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms=[
     get reducing_end_atoms() {
       return reducing_end_atoms;
     }
+
+    get derivative_atoms() {
+      return deriv_atoms;
+    }
+
     can_accept(atoms,position) {
       return accept(atoms,position);
     }
@@ -94,36 +94,19 @@ const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms=[
   return Object.freeze(new new_derivative());
 }
 
-const can_accept_derivative = (atoms) => {
+const can_accept_permethylation = (atoms) => {
   return (atoms.indexOf(O) >= 0 && atoms.indexOf(H) >= 0) || (atoms.indexOf(N) >= 0 && atoms.indexOf(H) >= 0);
 }
 
-const UNDERIVATISED = make_derivative('underivatised',v=>v,[],[O,H,H]);
-const PERMETHYLATED = make_derivative('permethylated',can_accept_derivative,[C,H,H],[ O, C, H, H, H, C, H, H, H ]);
+const UNDERIVATISED = make_derivative('underivatised');
+const PERMETHYLATED = make_derivative('permethylated',can_accept_permethylation,[C,H,H]);
 const DERIV_2AB = make_derivative('2AB',v => v, [],[ C, C, C, C, C, C, C, // C7
                                                      H, H, H, H, H, H, H, H, // H8
                                                      N, N, // N2
                                                      O ]); // O
 
 const DERIV_ETHYL_ESTER = make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], [] );
-const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ]);
-
-// REDUCING_ENDS.set(UNDERIVATISED, [ O, H, H ]);
-// REDUCING_ENDS.set(PERMETHYLATED, [ O, C, H, H, H, C, H, H, H ]);
-// REDUCING_ENDS.set(DERIV_2AB, [ C, C, C, C, C, C, C, // C7
-//                                H, H, H, H, H, H, H, H, // H8
-//                                N, N, // N2
-//                                O ]); // O
-
-
-// const DERIVATISATION_DELTAS = new Map();
-
-// DERIVATISATION_DELTAS.set(UNDERIVATISED, []);
-// DERIVATISATION_DELTAS.set(PERMETHYLATED, [C,H,H]);
-// DERIVATISATION_DELTAS.set(DERIV_2AB, []);
-// DERIVATISATION_DELTAS.set(DERIV_ETHYL_ESTER, [C, C, H, H, H, H]);
-// DERIVATISATION_DELTAS.set(DERIV_AMMONIA_AMIDATION, [H, N]); // Also removes an O
-
+const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ], []);
 
 const DEFINITIONS =`
 terminii:r1:x;2:x;3:x;4:x
@@ -427,15 +410,6 @@ const get_ring_atoms_for = (identifier,derivative=UNDERIVATISED,reducing=true) =
   }
   return Object.freeze([]);
 };
-
-const count_derivative_positions = (ring, free) => {
-  let count = ring.filter( can_accept_derivative ).length;
-  if (free) {
-    return count;
-  } else {
-    return count - 1;
-  }
-}
 
 const get_composition_for = (identifier,derivative) => {
   let def = get_prototype_for(identifier);

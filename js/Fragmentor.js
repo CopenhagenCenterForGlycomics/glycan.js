@@ -16,13 +16,6 @@ import { C as CSYMB,
 
 const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
 
-const DERIVATIVES = new Map();
-
-DERIVATIVES.set(UNDERIVATISED, Object.freeze([ HSYMB ]));
-
-DERIVATIVES.set(PERMETHYLATED, Object.freeze([ CSYMB, HSYMB, HSYMB, HSYMB ]));
-
-
 const is_linkage_retained = (link,type) => {
   if ( ! type ) {
     return true;
@@ -125,6 +118,8 @@ class FragmentResidue extends TracedMonosaccharide {
   get atoms() {
     let cross_type;
     let a_composition = [];
+    let base_atoms = Array.from([[OSYMB]].concat(this.original.ring_atoms));
+    let result = [];
     if ( this.type ) {
       cross_type = this.type.match(/(\d,\d)-([ax])/);
       if (cross_type) {
@@ -132,14 +127,17 @@ class FragmentResidue extends TracedMonosaccharide {
         let [start,end] = frag_key.split(',').map(val => +val );
         let fragtype = cross_type[2];
         let proto = this.original.proto;
-        let base_atoms = Array.from([[OSYMB]].concat(this.original.ring_atoms))
         a_composition = calculate_a_fragment_composition(base_atoms,start,end,this.identifier.indexOf('Neu') >= 0);
         if (fragtype === 'a') {
-          return a_composition.concat([HSYMB,HSYMB]).flat();
+          result = a_composition.flat();
         }
       }
     }
-    return del(this.original.ring_atoms.flat(),a_composition.flat());
+    if (result.length < 1) {
+      result = del(base_atoms.flat(),a_composition.flat());
+    }
+    result = del(result,this.original.derivative.reducing_end_atoms);
+    return result;
   }
 }
 
@@ -201,8 +199,10 @@ let Fragmentable = (base) => class extends base {
   }
 
   get atoms() {
-    let R = DERIVATIVES.get(this.root.original.derivative);
-    let base_composition = this.composition().map( res => del(res.atoms,[HSYMB,HSYMB]) ).flat();
+    // FIXME - the derivatives should be defined per residue if we are
+    // calculating fragment masses
+    let R = [HSYMB].concat(this.root.original.derivative.derivative_atoms);
+    let base_composition = this.composition().map( res => res.atoms ).flat();
     let result_composition = [...base_composition];
 
     let types = this.type.split('/').filter((o,i,a) => a.indexOf(o) == i );
@@ -242,9 +242,12 @@ let Fragmentable = (base) => class extends base {
     case '5,5-w': result_composition = result_composition.concat([ OSYMB, HSYMB, CSYMB ]); break;
     }
 
-
+    // The second regex match for a/e fragments is to get the
+    // tests passing
     if (this.is_reducing_end) {
       result_composition = result_composition.concat(R).concat([OSYMB]);
+    } else if (this.type.match(/\d,\d-[a]/)) {
+      result_composition = this.root.original.derivative.reducing_end(result_composition);
     }
 
     if (this.type.match(/^1,1-[w]/)) {

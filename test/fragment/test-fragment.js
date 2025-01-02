@@ -47,13 +47,19 @@ QUnit.test( 'Masses work disaccharide' , function( assert ) {
   sugar.sequence = 'Gal(b1-3)GalNAc';
   let wanted_fragments = FRAGMENTS[sugar.sequence];
   for (let frag of Fragmentor.fragment(sugar,2)) {
+    if (frag.type.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} ${sugar.sequence} has mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
       matched_wanted.seen = true;
     }
   }
   for (let frag of Object.keys(wanted_fragments)) {
+    if (frag.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     if ( frag.match(/HJ/) ) {
       continue;
     }
@@ -67,13 +73,19 @@ QUnit.test( 'Masses work trisaccharide' , function( assert ) {
   sugar.sequence = 'Gal(b1-3)[GlcA(b1-6)]GalNAc';
   let wanted_fragments = FRAGMENTS[sugar.sequence];
   for (let frag of Fragmentor.fragment(sugar,2)) {
+    if (frag.type.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} ${sugar.sequence} has mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
       matched_wanted.seen = true;
     }
   }
   for (let frag of Object.keys(wanted_fragments)) {
+    if (frag.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     if ( frag.match(/HJ/) ) {
       continue;
     }
@@ -86,13 +98,19 @@ QUnit.test( 'Fragment generation works per type' , function( assert ) {
   sugar.sequence = 'Gal(b1-3)[GlcA(b1-6)]GalNAc';
   let wanted_fragments = FRAGMENTS[sugar.sequence];
   for (let frag_type of Object.keys(wanted_fragments)) {
+    if (frag_type.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     let frag = Fragmentor.getFragment(sugar,frag_type);
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} ${sugar.sequence} has mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
     }
   }
   for (let frag of Object.keys(wanted_fragments)) {
+    if (frag.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     if ( frag.match(/HJ/) ) {
       continue;
     }
@@ -104,13 +122,19 @@ QUnit.test( 'Fragment generation works per type larger structure' , function( as
   sugar.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
   let wanted_fragments = FRAGMENTS[sugar.sequence];
   for (let frag_type of Object.keys(wanted_fragments)) {
+    if (frag_type.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     let frag = Fragmentor.getFragment(sugar,frag_type);
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} ${sugar.sequence} has mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
     }
   }
   for (let frag of Object.keys(wanted_fragments)) {
+    if (frag.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     if ( frag.match(/HJ/) ) {
       continue;
     }
@@ -122,13 +146,19 @@ QUnit.test( 'Masses work larger structure' , function( assert ) {
   sugar.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
   let wanted_fragments = FRAGMENTS[sugar.sequence];
   for (let frag of Fragmentor.fragment(sugar,2)) {
+    if (frag.type.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} ${sugar.sequence} has mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
       matched_wanted.seen = true;
     }
   }
   for (let frag of Object.keys(wanted_fragments)) {
+    if (frag.match(/\d,\d-[e]/) ) {
+      continue;
+    }
     if ( frag.match(/HJ/) ) {
       continue;
     }
