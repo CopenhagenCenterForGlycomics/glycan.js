@@ -154,6 +154,10 @@ let Fragmentable = (base) => class extends base {
     return FragmentResidue;
   }
 
+  get is_reducing_end() {
+    return this.chordResidues.every( res => res.type.match(/(^[yz])|(\d,\d-[x])/));
+  }
+
   get chord() {
     return this.chordResidues;
   }
@@ -238,7 +242,8 @@ let Fragmentable = (base) => class extends base {
     case '5,5-w': result_composition = result_composition.concat([ OSYMB, HSYMB, CSYMB ]); break;
     }
 
-    if (this.type.match(/^[yz]/) || this.type.match(/^\d,\d-[xw]/)) {
+
+    if (this.is_reducing_end) {
       result_composition = result_composition.concat(R).concat([OSYMB]);
     }
 
