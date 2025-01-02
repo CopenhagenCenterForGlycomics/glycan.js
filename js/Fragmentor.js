@@ -193,6 +193,10 @@ let Fragmentable = (base) => class extends base {
   }
 
   get mass() {
+    return composition_to_mass(this.atoms);
+  }
+
+  get atoms() {
     let R = DERIVATIVES.get(this.root.original.derivative);
     let base_composition = this.composition().map( res => del(res.atoms,[HSYMB,HSYMB]) ).flat();
     let result_composition = [...base_composition];
@@ -208,8 +212,7 @@ let Fragmentable = (base) => class extends base {
         result_composition = del(result_composition,[HSYMB]);
       }
       if (type.match(/^z/)) {
-        result_composition = del(result_composition,[HSYMB]);
-        result_composition = del(result_composition,[OSYMB]);
+        result_composition = del(result_composition,[OSYMB,HSYMB]);
       }
       if (type.match(/^c/)) {
         result_composition = result_composition.concat(R).concat([ HSYMB, OSYMB ]);
@@ -245,9 +248,8 @@ let Fragmentable = (base) => class extends base {
 
     result_composition = del(result_composition, Array(types.length - 1).fill(R).flat());
 
-    let result_mass = composition_to_mass(result_composition);
+    return result_composition;
 
-    return result_mass;
   }
 
 };

@@ -2,7 +2,7 @@
 // Generated on Mon Apr 20 2015 22:29:04 GMT+0200 (CEST)
 const webpack = require('./webpack.config.js');
 
-webpack.devtool = 'cheap-module-source-map';
+webpack.devtool = 'inline-source-map';
 webpack.mode = 'development';
 
 const DEFAULT_TEST_FILES = [

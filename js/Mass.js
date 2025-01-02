@@ -21,26 +21,108 @@ MASSES.set(O,15.99491463);
 MASSES.set(N,14.003074);
 MASSES.set(NA,22.989771)
 
-const UNDERIVATISED = Symbol('underivatised');
-const PERMETHYLATED = Symbol('permethylated');
-const DERIV_2AB     = Symbol('2AB');
+// const UNDERIVATISED = Symbol('underivatised');
+// const PERMETHYLATED = Symbol('permethylated');
+// const DERIV_2AB     = Symbol('2AB');
+// const DERIV_AMMONIA_AMIDATION = Symbol('Ammonia amidation');
+// const DERIV_ETHYL_ESTER = Symbol('Ethyl esterification');
+
+// const REDUCING_ENDS = new Map();
 
 
-const REDUCING_ENDS = new Map();
+class RemovableAtom {
+  constructor(atom) {
+    this.atom = atom;
+  }
+}
 
-REDUCING_ENDS.set(UNDERIVATISED, [ O, H, H ]);
-REDUCING_ENDS.set(PERMETHYLATED, [ O, C, H, H, H, C, H, H, H ]);
-REDUCING_ENDS.set(DERIV_2AB, [ C, C, C, C, C, C, C, // C7
-                               H, H, H, H, H, H, H, H, // H8
-                               N, N, // N2
-                               O ]); // O
+class Derivative {
+  constructor(name) {
+    this.name = name;
+  }
+
+  can_accept(atoms,position) {
+    return true;
+  }
+
+  apply(atoms) {
+    return [].concat(atoms);
+  }
+
+  reducing_end(atoms) {
+    return atoms;
+  }
+
+  static Apply(atoms,new_atoms) {
+    let result = Array.from(atoms);
+    for (let item of new_atoms) {
+      if (item instanceof RemovableAtom) {
+        let idx = result.indexOf(item.atom);
+        if (idx < 0) {
+          throw new Error('Bad index');
+        }
+        result.splice(idx,1);
+      } else {
+        result.push(item);
+      }
+    }
+    return result;
+  }
+
+}
+
+const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms=[]) => {
+  let new_derivative = class extends Derivative {
+    constructor() {
+      super(name);
+    }
+    get reducing_end_atoms() {
+      return reducing_end_atoms;
+    }
+    can_accept(atoms,position) {
+      return accept(atoms,position);
+    }
+    apply(atoms) {
+      let result = super.apply(atoms);
+      return Derivative.Apply(result,deriv_atoms);
+    }
+    reducing_end(atoms) {
+      let result = super.apply(atoms);
+      return Derivative.Apply(result,reducing_end_atoms);
+    }
+  }
+  return Object.freeze(new new_derivative());
+}
+
+const can_accept_derivative = (atoms) => {
+  return (atoms.indexOf(O) >= 0 && atoms.indexOf(H) >= 0) || (atoms.indexOf(N) >= 0 && atoms.indexOf(H) >= 0);
+}
+
+const UNDERIVATISED = make_derivative('underivatised',v=>v,[],[O,H,H]);
+const PERMETHYLATED = make_derivative('permethylated',can_accept_derivative,[C,H,H],[ O, C, H, H, H, C, H, H, H ]);
+const DERIV_2AB = make_derivative('2AB',v => v, [],[ C, C, C, C, C, C, C, // C7
+                                                     H, H, H, H, H, H, H, H, // H8
+                                                     N, N, // N2
+                                                     O ]); // O
+
+const DERIV_ETHYL_ESTER = make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], [] );
+const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ]);
+
+// REDUCING_ENDS.set(UNDERIVATISED, [ O, H, H ]);
+// REDUCING_ENDS.set(PERMETHYLATED, [ O, C, H, H, H, C, H, H, H ]);
+// REDUCING_ENDS.set(DERIV_2AB, [ C, C, C, C, C, C, C, // C7
+//                                H, H, H, H, H, H, H, H, // H8
+//                                N, N, // N2
+//                                O ]); // O
 
 
-const DERIVATISATION_DELTAS = new Map();
+// const DERIVATISATION_DELTAS = new Map();
 
-DERIVATISATION_DELTAS.set(UNDERIVATISED, []);
-DERIVATISATION_DELTAS.set(PERMETHYLATED, [C,H,H]);
-DERIVATISATION_DELTAS.set(DERIV_2AB, []);
+// DERIVATISATION_DELTAS.set(UNDERIVATISED, []);
+// DERIVATISATION_DELTAS.set(PERMETHYLATED, [C,H,H]);
+// DERIVATISATION_DELTAS.set(DERIV_2AB, []);
+// DERIVATISATION_DELTAS.set(DERIV_ETHYL_ESTER, [C, C, H, H, H, H]);
+// DERIVATISATION_DELTAS.set(DERIV_AMMONIA_AMIDATION, [H, N]); // Also removes an O
 
 
 const DEFINITIONS =`
@@ -316,15 +398,19 @@ const get_prototype_for = (identifier) => {
   return def;
 }
 
-const can_accept_derivative = (atoms) => {
-  return (atoms.indexOf(O) >= 0 && atoms.indexOf(H) >= 0) || (atoms.indexOf(N) >= 0 && atoms.indexOf(H) >= 0);
-}
-
-const add_derivative = (atoms,derivative) => {
+const add_derivative = (atoms,position,derivative) => {
   let result = Array.from(atoms);
-  if ( can_accept_derivative(atoms) ) {
-    result = result.concat( DERIVATISATION_DELTAS.get(derivative) )
+  if ( derivative.can_accept(atoms,position) ) {
+    result = derivative.apply(atoms) //result.concat( DERIVATISATION_DELTAS.get(derivative) )
   }
+  // if ( atoms === [ O, O ] && derivative == DERIV_ETHYL_ESTER ) { // Position 1
+  //   result = Array.from(atoms);
+  //   result = result.concat( DERIVATISATION_DELTAS.get(derivative) ) // C C H H H H
+  // }
+  // if ( atoms === [ O, O ] && derivative == DERIV_AMMONIA_AMIDATION ) { // Position 1
+  //   result = [ O ]; // Remove O
+  //   result = result.concat( DERIVATISATION_DELTAS.get(derivative) ) // H N
+  // }
   return result;
 };
 
@@ -335,7 +421,7 @@ const get_ring_atoms_for = (identifier,derivative=UNDERIVATISED,reducing=true) =
       Array.from(def.ring.values())
       .filter( val => reducing || (!val.reducing) )
       .map( position => Array.from(position.atoms) )
-      .map( atoms => add_derivative(atoms,derivative) )
+      .map( (atoms,idx) => add_derivative(atoms,idx+1,derivative) )
       .map( res => Object.freeze(res) )
     );
   }
@@ -351,21 +437,13 @@ const count_derivative_positions = (ring, free) => {
   }
 }
 
-const get_mass_for = (identifier,derivative) => {
-  return composition_to_mass(get_composition_for(identifier,derivative));
-};
-
 const get_composition_for = (identifier,derivative) => {
   let def = get_prototype_for(identifier);
   if ( ! def ) {
     return Object.freeze([]);
   }
-  const base_composition = def.composition;
-  let derivative_composition = [];
-
-  const delta = DERIVATISATION_DELTAS.get(derivative);
-  let oh_count = count_derivative_positions(get_ring_atoms_for(identifier,UNDERIVATISED,false),false);
-  derivative_composition = Array(oh_count).fill( delta ).flat();
+  const base_composition = [O];
+  let derivative_composition = get_ring_atoms_for(identifier,derivative,true).flat();
   return [...base_composition, ...derivative_composition ];
 };
 
@@ -390,6 +468,11 @@ Skip r2, Then COOH,OH,NHAc,OH,OH,OH2 - 1 = 5*14
 
 */
 
+/*
+https://www.nist.gov/static/glyco-mass-calc/
+
+*/
+
 const derivative_info = Symbol('derivative')
 
 
@@ -397,7 +480,7 @@ const Mass = (base) => {
 
   class MonosaccharideMass extends base.Monosaccharide {
     get mass() {
-      return get_mass_for(this.identifier,this.derivative);
+      return composition_to_mass(this.atoms);
     }
 
     get derivative() {
@@ -412,7 +495,16 @@ const Mass = (base) => {
     }
 
     get atoms() {
-      return [...this.ring_atoms].flat();
+      let res = [O,...this.ring_atoms].flat();
+
+      // We should remove the reducing end atoms from the composition
+      // for all residues, and then add it back on to the
+      // root at the end
+      res = delete_composition(res,this.derivative.reducing_end_atoms);
+
+
+      return res;
+
     }
 
     get ring_atoms() {
@@ -426,13 +518,19 @@ const Mass = (base) => {
 
   return class SugarMass extends base {
     static get Monosaccharide() { return MonosaccharideMass; }
+
+    get atoms() {
+      const monosaccharide_atoms = this.composition().
+                                      map( res => res.atoms ).flat();
+
+      // Only the parent sugar gets to add back in the reducing end atoms
+      const result = this.root.derivative.reducing_end(monosaccharide_atoms);
+
+      return result;
+    }
+
     get mass() {
-      // Only the parent sugar gets to add back in the masses
-      const monosaccharide_mass = this.composition().
-                                      map( res => res.mass ).
-                                      reduce( (a,b) => a + b,0);
-      const reducing_end = composition_to_mass(REDUCING_ENDS.get(this.root.derivative));
-      return reducing_end + monosaccharide_mass;
+      return composition_to_mass(this.atoms);
     }
     derivatise(derivative) {
       for (let res of this.composition()) {

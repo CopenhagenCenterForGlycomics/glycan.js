@@ -14,8 +14,8 @@ fi
 
 if [[ -f "$KARMA_SPECS" && $(command -v watch_path) ]]; then
 	echo "Running tests only for $KARMA_SPECS" 
-	(node $node_args ./node_modules/.bin/karma start | browser_color_to_ansi) & watch_path "js/*.js" "touch $KARMA_SPECS"
+	(node $node_args ./node_modules/.bin/karma start) & watch_path "js/*.js" "touch $KARMA_SPECS"
 else
-	node $node_args ./node_modules/.bin/karma start | browser_color_to_ansi
+	node $node_args ./node_modules/.bin/karma start
 fi
 

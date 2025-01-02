@@ -9,7 +9,7 @@ const mass_diff = (a,b,tolerance=1e-04) => {
 };
 
 const to_mass = (atoms) => {
-  return composition_to_mass(atoms.flat(Infinity));
+  return composition_to_mass(atoms.flat());
 }
 
 class IupacSugar extends Mass(Iupac(Sugar)) {}
