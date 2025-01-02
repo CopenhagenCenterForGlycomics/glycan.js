@@ -23,17 +23,24 @@ MASSES.set(NA,22.989771)
 
 const UNDERIVATISED = Symbol('underivatised');
 const PERMETHYLATED = Symbol('permethylated');
+const DERIV_2AB     = Symbol('2AB');
 
 
 const REDUCING_ENDS = new Map();
 
 REDUCING_ENDS.set(UNDERIVATISED, [ O, H, H ]);
 REDUCING_ENDS.set(PERMETHYLATED, [ O, C, H, H, H, C, H, H, H ]);
+REDUCING_ENDS.set(DERIV_2AB, [ C, C, C, C, C, C, C, // C7
+                               H, H, H, H, H, H, H, H, // H8
+                               N, N, // N2
+                               O ]); // O
+
 
 const DERIVATISATION_DELTAS = new Map();
 
 DERIVATISATION_DELTAS.set(UNDERIVATISED, []);
 DERIVATISATION_DELTAS.set(PERMETHYLATED, [C,H,H]);
+DERIVATISATION_DELTAS.set(DERIV_2AB, []);
 
 
 const DEFINITIONS =`
@@ -173,6 +180,16 @@ const parse_atoms = (composition) => {
     return [ N, H, C, O, C, H, H, O, H ];
   }
 };
+
+const delete_composition = (a,objs) => {
+  for (let element of objs) {
+    let pos = a.indexOf(element);
+    if (pos >= 0) {
+      a.splice(pos,1);
+    }
+  }
+  return a;
+}
 
 const parse_terminii = (terminii) => {
   let ring = new Map();
@@ -352,6 +369,10 @@ const get_composition_for = (identifier,derivative) => {
   return [...base_composition, ...derivative_composition ];
 };
 
+const ReferenceComposition = (monosaccharide) => {
+  return get_composition_for(monosaccharide.identifier, monosaccharide.derivative);
+};
+
 // Permethylated masses:
 /*
 terminii:r1:HOH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:OH
@@ -391,7 +412,7 @@ const Mass = (base) => {
     }
 
     get atoms() {
-      return get_composition_for(this.identifier, this.derivative);
+      return [...this.ring_atoms].flat();
     }
 
     get ring_atoms() {
@@ -407,9 +428,10 @@ const Mass = (base) => {
     static get Monosaccharide() { return MonosaccharideMass; }
     get mass() {
       // Only the parent sugar gets to add back in the masses
-      const monosaccharide_mass = this.composition().map( res => res.mass ).reduce( (a,b) => a + b,0);
-      const derivative_type = this.composition().map( res => res.derivative ).filter( (o,i,a) => a.indexOf(o) == i )[0];
-      const reducing_end = composition_to_mass(REDUCING_ENDS.get(derivative_type));
+      const monosaccharide_mass = this.composition().
+                                      map( res => res.mass ).
+                                      reduce( (a,b) => a + b,0);
+      const reducing_end = composition_to_mass(REDUCING_ENDS.get(this.root.derivative));
       return reducing_end + monosaccharide_mass;
     }
     derivatise(derivative) {
@@ -420,4 +442,4 @@ const Mass = (base) => {
   };
 };
 
-export { C, H, O, N, NA, Mass, UNDERIVATISED, PERMETHYLATED, calculate_a_fragment_composition, summarise_composition };
+export { C, H, O, N, NA, Mass, UNDERIVATISED, PERMETHYLATED, DERIV_2AB, calculate_a_fragment_composition, summarise_composition, composition_to_mass, delete_composition, ReferenceComposition };

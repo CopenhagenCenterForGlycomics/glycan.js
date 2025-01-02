@@ -2,13 +2,31 @@
 
 import Sugar from '../../js/Sugar';
 
-import { Mass, UNDERIVATISED, PERMETHYLATED, MASSES, NA } from '../../js/Mass';
+import { Mass, UNDERIVATISED, PERMETHYLATED, NA } from '../../js/Mass';
 
 import Fragmentor from '../../js/Fragmentor';
 
 import {IO as Iupac} from '../../js/CondensedIupac';
 
 class IupacSugar extends Mass(Iupac(Sugar)) {}
+
+/**
+ * Compare numbers taking in account an error
+ *
+ * @param  {Float} number
+ * @param  {Float} expected
+ * @param  {Float} error    Optional
+ * @param  {String} message  Optional
+ */
+QUnit.assert.close = function(number, expected, error=1e-04, message) {
+  if (error === void 0 || error === null) {
+    error = 0.00001 // default error
+  }
+
+  var result = number == expected || (number < expected + error && number > expected - error) || false
+
+  this.pushResult({ result, actual: number.toFixed(4), expected: `${expected.toFixed(4)} +/- ${error}`, message});
+}
 
 QUnit.module('Test that we can fragment permethylated sugars', {
 });
@@ -21,9 +39,10 @@ QUnit.test( 'Fragmentation is idempotent' , function( assert ) {
   let fragment_ref = Fragmentor.getFragment(sugar,'z2a');
 
   let fragment = Fragmentor.getFragment(sugar,'z2a/z2a');
-  assert.ok( fragment.mass == fragment_ref.mass, 'Multiple fragments of the same type should give the same result' )
+  assert.close( fragment.mass, fragment_ref.mass, 0, 'Multiple fragments of the same type should give the same result' )
 
 });
+
 
 
 QUnit.test( 'Masses work trisaccharide' , function( assert ) {
@@ -38,5 +57,5 @@ QUnit.test( 'Masses work trisaccharide' , function( assert ) {
   assert.ok( types.indexOf('1,3-x2a/z3a') >= 0, 'Generates a x/z fragment' );
 
   let specific_frag = Fragmentor.getFragment(sugar,'1,3-x2a/z3a'); // Should be equal to 549.2787
-  assert.ok( Math.abs(specific_frag.mass - 549.2787) < 1e-04, 'Fragment mass is correct' );
+  assert.close( specific_frag.mass , 549.2787, 1e-04, 'Fragment mass is correct' );
 });

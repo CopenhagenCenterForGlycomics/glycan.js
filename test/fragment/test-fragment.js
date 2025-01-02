@@ -12,6 +12,25 @@ const FRAGMENTS = require('./fragments');
 
 class IupacSugar extends Mass(Iupac(Sugar)) {}
 
+
+/**
+ * Compare numbers taking in account an error
+ *
+ * @param  {Float} number
+ * @param  {Float} expected
+ * @param  {Float} error    Optional
+ * @param  {String} message  Optional
+ */
+QUnit.assert.close = function(number, expected, error=1e-04, message) {
+  if (error === void 0 || error === null) {
+    error = 0.00001 // default error
+  }
+
+  var result = number == expected || (number < expected + error && number > expected - error) || false
+
+  this.pushResult({ result, actual: number.toFixed(4), expected: `${expected.toFixed(4)} +/- ${error}`, message});
+}
+
 QUnit.module('Test that we can fragment sugars', {
 });
 
@@ -30,7 +49,7 @@ QUnit.test( 'Masses work disaccharide' , function( assert ) {
   for (let frag of Fragmentor.fragment(sugar,2)) {
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.ok(Math.abs(matched_wanted.val - frag.mass) < 1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
       matched_wanted.seen = true;
     }
   }
@@ -50,7 +69,7 @@ QUnit.test( 'Masses work trisaccharide' , function( assert ) {
   for (let frag of Fragmentor.fragment(sugar,2)) {
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.ok(Math.abs(matched_wanted.val - frag.mass) < 1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
       matched_wanted.seen = true;
     }
   }
@@ -62,6 +81,42 @@ QUnit.test( 'Masses work trisaccharide' , function( assert ) {
   }
 });
 
+QUnit.test( 'Fragment generation works per type' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'Gal(b1-3)[GlcA(b1-6)]GalNAc';
+  let wanted_fragments = FRAGMENTS[sugar.sequence];
+  for (let frag_type of Object.keys(wanted_fragments)) {
+    let frag = Fragmentor.getFragment(sugar,frag_type);
+    let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
+    if (matched_wanted) {
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+    }
+  }
+  for (let frag of Object.keys(wanted_fragments)) {
+    if ( frag.match(/HJ/) ) {
+      continue;
+    }
+  }
+});
+
+QUnit.test( 'Fragment generation works per type larger structure' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
+  let wanted_fragments = FRAGMENTS[sugar.sequence];
+  for (let frag_type of Object.keys(wanted_fragments)) {
+    let frag = Fragmentor.getFragment(sugar,frag_type);
+    let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
+    if (matched_wanted) {
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+    }
+  }
+  for (let frag of Object.keys(wanted_fragments)) {
+    if ( frag.match(/HJ/) ) {
+      continue;
+    }
+  }
+});
+
 QUnit.test( 'Masses work larger structure' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
@@ -69,7 +124,7 @@ QUnit.test( 'Masses work larger structure' , function( assert ) {
   for (let frag of Fragmentor.fragment(sugar,2)) {
     let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
     if (matched_wanted) {
-      assert.ok(Math.abs(matched_wanted.val - frag.mass) < 1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
+      assert.close(frag.mass,matched_wanted.val,1e-04, `${frag.type} has right mass delta ${Math.abs(matched_wanted.val - frag.mass)}`);
       matched_wanted.seen = true;
     }
   }
@@ -80,3 +135,4 @@ QUnit.test( 'Masses work larger structure' , function( assert ) {
     assert.ok( wanted_fragments[frag].seen, `We did not see test fragment ${frag}` );
   }
 });
+

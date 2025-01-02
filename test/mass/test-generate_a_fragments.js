@@ -1,7 +1,7 @@
 /*global QUnit*/
 
 import Sugar from '../../js/Sugar';
-import { Mass, C , H , O , N, PERMETHYLATED, summarise_composition, calculate_a_fragment_composition as a_frag_for }  from '../../js/Mass';
+import { Mass, C , H , O , N, PERMETHYLATED, summarise_composition, composition_to_mass, calculate_a_fragment_composition as a_frag_for }  from '../../js/Mass';
 import {IO as Iupac} from '../../js/CondensedIupac';
 
 const mass_diff = (a,b,tolerance=1e-04) => {
@@ -9,7 +9,7 @@ const mass_diff = (a,b,tolerance=1e-04) => {
 };
 
 const to_mass = (atoms) => {
-  return atoms.flat().map( symb => MASSES.get(symb)).reduce((a,b) => a+b,0);
+  return composition_to_mass(atoms.flat(Infinity));
 }
 
 class IupacSugar extends Mass(Iupac(Sugar)) {}
@@ -50,7 +50,8 @@ function compToObj(str) {
 }
 
 function massFromCompObj(comp) {
-  return comp.C * MASSES.get(C) + comp.H * MASSES.get(H) + comp.N * MASSES.get(N) + comp.O * MASSES.get(O);
+  let comparray = [ ...Array(comp.C).fill( C ).flat(), ...Array(comp.H).fill( H ).flat(), ...Array(comp.N).fill( N ).flat(), ...Array(comp.O).fill( O ).flat() ] ;
+  return composition_to_mass(comparray);
 }
 
 
@@ -161,11 +162,12 @@ for (let {residue: mono,masses} of MECHEREF_MASSES) {
   let contra_mass = sugar.root.mass;
   for (let frag_key of Object.keys(masses)) {
     // Apply a systematic fix to the delta mass
-    let wanted = masses[frag_key] - MASSES.get(H);
+    let wanted = masses[frag_key] - composition_to_mass([H]);
     let [start,end] = frag_key.split(',').map(val => +val );
     REFERENCE_MASSES.push(["mechref", mono, `a${start}-${end}`, contra_mass - wanted ]);
   }
 }
+
 
 // Contra masses all match up correctly with GlycanMass from Expasy
 
@@ -178,7 +180,7 @@ QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharide
     for (let frag_key of Object.keys(masses)) {
 
       // Apply a systematic fix to the delta mass
-      let wanted = masses[frag_key] - MASSES.get(H);
+      let wanted = masses[frag_key] - composition_to_mass([H]);
       let [start,end] = frag_key.split(',').map(val => +val );
       let calculated_mass = to_mass(a_frag_for(atom_composition,start,end,mono.indexOf('Neu') >= 0));
       assert.close( calculated_mass, contra_mass - wanted, 1e-01 , mono+','+frag_key );
@@ -231,5 +233,4 @@ QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharide
     }
   }
 });
-
 

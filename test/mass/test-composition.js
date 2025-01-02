@@ -1,7 +1,7 @@
 /*global QUnit*/
 
 import Sugar from '../../js/Sugar';
-import { Mass, C , H , O , N, PERMETHYLATED }  from '../../js/Mass';
+import { Mass, C , H , O , N, PERMETHYLATED, ReferenceComposition }  from '../../js/Mass';
 import {IO as Iupac} from '../../js/CondensedIupac';
 
 
@@ -27,7 +27,7 @@ QUnit.test( 'Ensure ring compositions match free sugar for single monosaccharide
   for (let mono of ['Gal','Glc','Man','GalNAc','GlcNAc','NeuAc','NeuGc','GlcA','IdoA','GlcN','Fuc','Xyl']) {
     let sugar = new IupacSugar();
     sugar.sequence = mono;
-    assert.deepEqual( summarise_composition([O].concat(sugar.root.ring_atoms.flat())), summarise_composition([O,H,H].concat(sugar.root.atoms)), 'Compositions match for '+mono );
+    assert.deepEqual( summarise_composition([O].concat(sugar.root.ring_atoms.flat())), summarise_composition([O,H,H].concat(ReferenceComposition(sugar.root))), 'Compositions match for '+mono );
   }
 });
 
@@ -37,6 +37,6 @@ QUnit.test( 'Ensure ring compositions match free sugar compositions for single p
     let sugar = new IupacSugar();
     sugar.sequence = mono;
     sugar.derivatise(PERMETHYLATED);
-    assert.deepEqual( summarise_composition([O].concat(sugar.root.ring_atoms.flat())), summarise_composition([O,H,H,C,H,H,C,H,H].concat(sugar.root.atoms)), 'Compositions match for permethylated '+mono );
+    assert.deepEqual( summarise_composition([O].concat(sugar.root.ring_atoms.flat())), summarise_composition([O,H,H,C,H,H,C,H,H].concat(ReferenceComposition(sugar.root))), 'Compositions match for permethylated '+mono );
   }
 });

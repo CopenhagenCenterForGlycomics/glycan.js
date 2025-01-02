@@ -1,88 +1,20 @@
 
 import { trace_into_class, TracedMonosaccharide } from './Tracing';
 
-import { C as CSYMB, H as HSYMB, O as OSYMB, Mass, UNDERIVATISED, PERMETHYLATED } from './Mass';
+import { C as CSYMB,
+         H as HSYMB,
+         O as OSYMB,
+         N as NSYMB,
+         Mass,
+         UNDERIVATISED,
+         PERMETHYLATED,
+         composition_to_mass,
+         calculate_a_fragment_composition,
+         delete_composition as del,
+         summarise_composition
+       } from './Mass';
 
 const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
-
-const AFRAG_MASS = new Map();
-
-AFRAG_MASS.set(UNDERIVATISED, {
-    MONOISOTOPICMASS: 0,
-    AVERAGEMASS: 1  
-});
-
-AFRAG_MASS.set(PERMETHYLATED, {
-    MONOISOTOPICMASS: 2,
-    AVERAGEMASS: 3
-});
-
-const aFragMass = {
-  'Hex' : {
-    '0,2' : [120.0422584,120.10512,162.0892084,162.18576],
-    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
-    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
-    '1,5' : [134.0579084,134.132,190.1205084,190.23952],
-    '3,5' : [74.0367792,74.07944,102.0680792,102.1332],
-    '0,4' : [60.0211292,60.05256,74.0367792,74.07944],
-    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
-  },
-  'HexNAc' : {
-    '0,2' : [120.0422584,120.10512,162.0892084,162.18576],
-    '1,3' : [101.0476782,101.10512,129.0789782,129.15888],
-    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
-    '1,5' : [175.0844574,175.18456,231.1470574,231.29208],
-    '3,5' : [74.0367792,74.07944,102.0680792,102.1332],
-    '0,4' : [60.0211292,60.05256,74.0367792,74.07944],
-    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
-  },
-  'Pent' : {
-    '0,2' : [90.0316938,90.07884,118.0629938,118.1326],
-    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
-    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
-    '1,5' : [104.0473438,104.10572,146.0942938,146.18636],
-    '3,5' : [44.0262146,44.05316,58.0418646,58.08004],
-    '0,4' : [30.0105646,30.02628,30.0105646,30.02628],
-    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
-  },
-  'dHex' : {
-    '0,2' : [104.0473438,104.10572,132.0786438,132.15948],
-    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
-    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
-    '1,5' : [118.0629938,118.1326,160.1099438,160.21324],
-    '3,5' : [58.0418646,58.08004,72.0575146,72.10692],
-    '0,4' : [44.0262146,44.05316,44.0262146,44.05316],
-    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
-  },
-  'HexA' : {
-    '0,2' : [134.021523,134.08864,176.068473,176.16928],
-    '1,3' : [60.0211292,60.05256,88.0524292,88.10632],
-    '2,4' : [60.0211292,60.05256,88.0524292,88.10632],
-    '1,5' : [148.037173,148.11552,204.099773,204.22304],
-    '3,5' : [88.0160438,88.06296,116.0473438,116.11672],
-    '0,4' : [74.0003938,74.03608,88.0160438,88.06296],
-    '3,4' : [30.0105646,30.02628,44.0262146,44.05316],
-  },
-  'NeuAc' : {
-    '0,2' : [221.0899366,221.21024,305.1838366,305.37152],
-    '1,3' : [44.0262146,44.05316,58.0418646,58.08004],
-    '2,4' : [101.0476782,101.10512,143.0946282,143.18576],
-    '1,5' : [219.110672,219.23772,303.204572,303.399],
-    '3,5' : [163.0844574,163.17356,233.1627074,233.30796],
-    '0,4' : [120.0422584,120.10512,162.0892084,162.18576],
-    '3,4' : [59.0371136,59.06784,87.0684136,87.1216],
-  },
-  'NeuGc' : {
-    '0,2' : [237.0848512,237.20964,307.1631012,307.34404],
-    '1,3' : [44.0262146,44.05316,58.0418646,58.08004],
-    '2,4' : [117.0425928,117.10452,145.0738928,145.15828],
-    '1,5' : [235.1055866,235.23712,305.1838366,305.37152],
-    '3,5' : [179.079372,179.17296,235.141972,235.28048],
-    '0,4' : [120.0422584,120.10512,162.0892084,162.18576],
-    '3,4' : [75.0320282,75.06724,89.0476782,89.09412],
-  }
-};
-
 
 const DERIVATIVES = new Map();
 
@@ -163,7 +95,6 @@ const children_with_fragment = (parent_type,children) => {
       let i = parseInt(positions[1]);
       let j = parseInt(positions[2]);
       let reducing = positions[3] === 'x';
-
       surviving_kids = surviving_kids.filter( res => {
         let link = res.parent.linkageOf(res);
         let retained_test_res = retained_test(link > 5 ? 5: link,i,j);
@@ -186,24 +117,29 @@ class FragmentResidue extends TracedMonosaccharide {
     }
     return super.parent;
   }
+
   get mass() {
+    return composition_to_mass(this.atoms);
+  }
+
+  get atoms() {
     let cross_type;
-    let fragmass = 0;
+    let a_composition = [];
     if ( this.type ) {
       cross_type = this.type.match(/(\d,\d)-([ax])/);
       if (cross_type) {
-        let ends = cross_type[1];
+        let frag_key = cross_type[1];
+        let [start,end] = frag_key.split(',').map(val => +val );
         let fragtype = cross_type[2];
         let proto = this.original.proto;
-        if ( proto ) {
-          fragmass = aFragMass[proto][ends][ AFRAG_MASS.get(this.original.derivative).MONOISOTOPICMASS ];
-        }
+        let base_atoms = Array.from([[OSYMB]].concat(this.original.ring_atoms))
+        a_composition = calculate_a_fragment_composition(base_atoms,start,end,this.identifier.indexOf('Neu') >= 0);
         if (fragtype === 'a') {
-          return fragmass;
+          return a_composition.concat([HSYMB,HSYMB]).flat();
         }
       }
     }
-    return this.original.mass - fragmass;
+    return del(this.original.ring_atoms.flat(),a_composition.flat());
   }
 }
 
@@ -257,24 +193,29 @@ let Fragmentable = (base) => class extends base {
   }
 
   get mass() {
-    let base_mass = this.composition().map( res => res.mass ).reduce((s, v) => s + v );
-    let R = DERIVATIVES.get(this.root.original.derivative).map( atom => MASSES.get(atom) ).reduce((s, v) => s + v ,0) ;
-    let result_mass = base_mass;
-    for (let type of this.type.split('/')) {
+    let R = DERIVATIVES.get(this.root.original.derivative);
+    let base_composition = this.composition().map( res => del(res.atoms,[HSYMB,HSYMB]) ).flat();
+    let result_composition = [...base_composition];
+
+    let types = this.type.split('/').filter((o,i,a) => a.indexOf(o) == i );
+
+    for (let type of types) {
       if (type.match(/^y/)) {
-        result_mass += H;
+        result_composition.push(HSYMB);
       }
       if (type.match(/^b/)) {
-        result_mass += R - H;
+        result_composition = result_composition.concat(R);
+        result_composition = del(result_composition,[HSYMB]);
       }
       if (type.match(/^z/)) {
-        result_mass += 0 - O - H;
+        result_composition = del(result_composition,[HSYMB]);
+        result_composition = del(result_composition,[OSYMB]);
       }
       if (type.match(/^c/)) {
-        result_mass += O + H + R;
+        result_composition = result_composition.concat(R).concat([ HSYMB, OSYMB ]);
       }
       if (type.match(/^\d,\d-[xw]/)) {
-        result_mass += R;
+        result_composition = result_composition.concat(R);
       }
     }
 
@@ -283,21 +224,28 @@ let Fragmentable = (base) => class extends base {
     linear_base = linear_base ? linear_base[1] : null;
 
     switch (linear_base) {
-    case '1,1-e': result_mass += 0 + O; break;
-    case '3,3-e': result_mass += 0 + O; break;
-    case '5,5-e': result_mass += 0 - O - 2 * H - C; break;
-    case '3,5-e': result_mass += 0 + 2 * H + C; break;
-    case '1,1-w': result_mass += 0 - 2 * H - O; break;
-    case '2,2-w': result_mass += 0 - 2 * H; break;
-    case '3,3-w': result_mass += 0 - 2 * H - O; break;
-    case '4,4-w': result_mass += 0 - 2 * H; break;
-    case '5,5-w': result_mass += 0 + O + C + H; break;
+    case '1,1-e': result_composition.push(OSYMB); break;
+    case '3,3-e': result_composition.push(OSYMB); break;
+    case '5,5-e': result_composition = del(result_composition,[ OSYMB, HSYMB, HSYMB, CSYMB ]); break;
+    case '3,5-e': result_composition = result_composition.concat([ HSYMB, HSYMB, CSYMB ]); break;
+    case '1,1-w': result_composition = del(result_composition,[ OSYMB, HSYMB, HSYMB ]); break;
+    case '2,2-w': result_composition = del(result_composition,[ HSYMB, HSYMB ]); break;
+    case '3,3-w': result_composition = del(result_composition,[ OSYMB, HSYMB, HSYMB ]); break;
+    case '4,4-w': result_composition = del(result_composition,[ HSYMB, HSYMB ]); break;
+    case '5,5-w': result_composition = result_composition.concat([ OSYMB, HSYMB, CSYMB ]); break;
     }
 
     if (this.type.match(/^[yz]/) || this.type.match(/^\d,\d-[xw]/)) {
-      result_mass += O + R;
+      result_composition = result_composition.concat(R).concat([OSYMB]);
     }
-    result_mass += -1 * (this.type.split('/').length - 1) * R;
+
+    if (this.type.match(/^1,1-[w]/)) {
+      result_composition = del(result_composition,[HSYMB]);
+    }
+
+    result_composition = del(result_composition, Array(types.length - 1).fill(R).flat());
+
+    let result_mass = composition_to_mass(result_composition);
 
     return result_mass;
   }
@@ -342,13 +290,25 @@ class Fragmentor {
     let fragment_template = trace_into_class(target,Fragment);
     let fragment = fragment_template.clone();
     let chord = type.split('/').map( frag_type => {
-      let type = frag_type;
-      if (type.match(/\d+,\d+-[x]/)) {
-        type = type.replace(/\d+,\d+-[x]/,'y');
+      let sub_type = frag_type;
+      let match = frag_type.match(/(\d+,\d+-[xw]|[yz])(\d+)(.*)/);
+      if (match) {
+        sub_type = `y${(+match[2]+1)}${match[3]}`;
       }
-      return target.locate_monosaccharide(type);
+      match = frag_type.match(/(\d+,\d+-[ae]|[bc])(\d+)(.*)/);
+      if (match) {
+        let max_depth = Math.max(...target.leaves().map( res => res.depth ));
+        sub_type = `y${(max_depth - match[2] + 1)}${match[3]}`;
+      }
+      return target.locate_monosaccharide(sub_type);
     });
-    fragment.chord = { root: target.root, chord };
+    let chord_root = target.root;
+    let non_reducing_frags = chord.filter( (frag,i) => type.split('/')[i].match(/^(\d+,\d+-[ae]|[bc])/) );
+    if (non_reducing_frags.length > 0) {
+      chord_root = non_reducing_frags[0];
+    }
+
+    fragment.chord = { root: chord_root, chord };
     fragment.type = type;
     return fragment;
   }
