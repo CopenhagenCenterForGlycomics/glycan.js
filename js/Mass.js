@@ -64,7 +64,8 @@ class Derivative {
 
 const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms) => {
   if (! reducing_end_atoms && deriv_atoms ) {
-    // These atoms are for the reducing end (OH), and one capping on non-reducing end (H)
+    // These atoms are for the reducing end (OR), and one capping on non-reducing end (R)
+    // FIXME - the derivative atoms should include the H! 
     reducing_end_atoms = [ O, [H].concat(deriv_atoms) , [H].concat(deriv_atoms) ].flat();
   }
   let new_derivative = class extends Derivative {
@@ -100,10 +101,14 @@ const can_accept_permethylation = (atoms) => {
 
 const UNDERIVATISED = make_derivative('underivatised');
 const PERMETHYLATED = make_derivative('permethylated',can_accept_permethylation,[C,H,H]);
-const DERIV_2AB = make_derivative('2AB',v => v, [],[ C, C, C, C, C, C, C, // C7
+
+const REDUCING_END_2AB = make_derivative('2AB',v => v, [],[ C, C, C, C, C, C, C, // C7
                                                      H, H, H, H, H, H, H, H, // H8
                                                      N, N, // N2
                                                      O ]); // O
+const REDUCING_END_FREE = null;
+
+const REDUCING_END_REDUCED = null;
 
 const DERIV_ETHYL_ESTER = make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], [] );
 const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ], []);
@@ -383,17 +388,11 @@ const get_prototype_for = (identifier) => {
 
 const add_derivative = (atoms,position,derivative) => {
   let result = Array.from(atoms);
+  // FIXME - the derivative should include the H, so that
+  // the underivatised atoms includes the H.
   if ( derivative.can_accept(atoms,position) ) {
     result = derivative.apply(atoms) //result.concat( DERIVATISATION_DELTAS.get(derivative) )
   }
-  // if ( atoms === [ O, O ] && derivative == DERIV_ETHYL_ESTER ) { // Position 1
-  //   result = Array.from(atoms);
-  //   result = result.concat( DERIVATISATION_DELTAS.get(derivative) ) // C C H H H H
-  // }
-  // if ( atoms === [ O, O ] && derivative == DERIV_AMMONIA_AMIDATION ) { // Position 1
-  //   result = [ O ]; // Remove O
-  //   result = result.concat( DERIVATISATION_DELTAS.get(derivative) ) // H N
-  // }
   return result;
 };
 
@@ -506,6 +505,11 @@ const Mass = (base) => {
     get mass() {
       return composition_to_mass(this.atoms);
     }
+
+    set reducing_end(reduction=FREE_REDUCING_END) {
+
+    }
+
     derivatise(derivative) {
       for (let res of this.composition()) {
         res.derivative = derivative;
