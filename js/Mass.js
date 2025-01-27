@@ -518,4 +518,4 @@ const Mass = (base) => {
   };
 };
 
-export { C, H, O, N, NA, Mass, UNDERIVATISED, PERMETHYLATED, DERIV_2AB, calculate_a_fragment_composition, summarise_composition, composition_to_mass, delete_composition, ReferenceComposition };
+export { C, H, O, N, NA, Mass, UNDERIVATISED, PERMETHYLATED, calculate_a_fragment_composition, summarise_composition, composition_to_mass, delete_composition, ReferenceComposition };

@@ -245,7 +245,9 @@ class SVGRenderer extends Renderer {
 
   renderLinkageGroup(canvas,sugar,residue) {
     let group = canvas.group();
-    group.element.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
+    const location = sugar.location_for_monosaccharide(residue);
+    group.element.setAttributeNS(GLYCANJSNS,'glycanjs:location',location);
+    group.element.setAttribute('part',`linkage_${location}`);
     return group;
   }
 
@@ -284,9 +286,13 @@ class SVGRenderer extends Renderer {
   renderIcon(container,identifier,residue,sugar) {
     let symbol_prefix = this.icon_prefix ? `${this.icon_prefix}_` : '';
     let icon = container.use(`#${symbol_prefix}${identifier}`,0,0,1,1);
+    const location = sugar.location_for_monosaccharide(residue);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
-    icon.setAttributeNS(GLYCANJSNS,'glycanjs:location',sugar.location_for_monosaccharide(residue));
+    icon.setAttributeNS(GLYCANJSNS,'glycanjs:location', location );
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:parent', residue.parent ? sugar.location_for_monosaccharide(residue.parent) : '');
+
+    icon.setAttribute('part',`residue_location_${location}`);
+
     return {element: icon };
   }
 
