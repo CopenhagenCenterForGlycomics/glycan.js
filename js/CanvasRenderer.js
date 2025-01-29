@@ -472,27 +472,31 @@ class CanvasRenderer extends Renderer {
 
 }
 
-CanvasRenderer[all_symbols] = null;
-CanvasRenderer[performing_import] = false;
+const import_status = new WeakMap();
 
 import_icons = function() {
 
+  let renderer_class = this.constructor;
+
   let icons = document.createElement('svg');
-  if (CanvasRenderer[performing_import]) {
+  if (import_status.has(renderer_class)) {
     return new Promise( (resolve) => {
       setTimeout( () => {
         import_icons.call(this).then( resolve );
       },0);
     });
   }
-  if (CanvasRenderer[all_symbols] !== null) {
-    this.symbols = CanvasRenderer[all_symbols];
+
+  if (typeof renderer_class[all_symbols] !== 'undefined') {
+    this.symbols = renderer_class[all_symbols];
     return Promise.resolve();
   }
-  CanvasRenderer[performing_import] = true;
+
+  import_status.set(renderer_class, true);
+
   this.symbols = {};
-  return Promise.resolve()
-    .then( () => icons.innerHTML = SYMBOLS_DEF )
+  return Promise.resolve(renderer_class.SYMBOLS)
+    .then( (symbols_string) => icons.innerHTML = symbols_string )
     .then( () => {
       for (let symbol of icons.querySelectorAll('defs symbol')) {
         let symboltext = symbol.innerHTML.replace(/#/g,'%23');
@@ -500,8 +504,8 @@ import_icons = function() {
         let svg_text = `data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="100px" height="100px">${symboltext}</svg>`;
         this.symbols[symbol.getAttribute('id')] = { svg: svg_text, paths };
       }
-      CanvasRenderer[all_symbols] = this.symbols;
-      CanvasRenderer[performing_import] = false;
+      renderer_class[all_symbols] = this.symbols;
+      import_status.delete(renderer_class);
     });
 };
 

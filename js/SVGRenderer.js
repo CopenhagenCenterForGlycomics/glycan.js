@@ -125,8 +125,8 @@ class SVGRenderer extends Renderer {
       element = element.element.canvas;
     }
 
-    const icons_elements = Promise.resolve(this.SYMBOLS).then( SYMBOLS_DEF => {
-      return (new DOMParser()).parseFromString(SYMBOLS_DEF, 'image/svg+xml');
+    const icons_elements = Promise.resolve(this.SYMBOLS).then( symbols_string => {
+      return (new DOMParser()).parseFromString(symbols_string, 'image/svg+xml');
     }).then( el => {
       return el.querySelectorAll('svg defs');
     });
