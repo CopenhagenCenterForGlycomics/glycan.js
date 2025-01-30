@@ -96,20 +96,20 @@ Red  #ed1c24
     <path stroke="#fff" fill="#fff" d="M54.6,60.1h2.2l3.8-17.9h-2.2L54.6,60.1z"/>
     </symbol>
     <symbol id="hexa" viewBox="0 0 100 100">
-      <polyline fill="#fff" stroke="#000" stroke-width="1" points="50,5 95,50 5,50 50,5"/>
-      <polyline fill="#fff" stroke="#000" stroke-width="1" points="50,95 95,50 5,50 50,95"/>
+      <polyline transform="rotate(90,50,50)" fill="#fff" stroke="#000" stroke-width="1" points="50,5 95,50 5,50 50,5"/>
+      <polyline transform="rotate(90,50,50)" fill="#fff" stroke="#000" stroke-width="1" points="50,95 95,50 5,50 50,95"/>
     </symbol>
     <symbol id="glca" viewBox="0 0 100 100">
-      <polyline fill="#0090bc" stroke="#000" stroke-width="1" points="50,5 95,50 5,50 50,5"/>
-      <polyline fill="#fff" stroke="#000" stroke-width="1" points="50,95 95,50 5,50 50,95"/>
+      <polyline transform="rotate(90,50,50)" fill="#0090bc" stroke="#000" stroke-width="1" points="50,5 95,50 5,50 50,5"/>
+      <polyline transform="rotate(90,50,50)" fill="#fff" stroke="#000" stroke-width="1" points="50,95 95,50 5,50 50,95"/>
     </symbol>
     <symbol id="glcn" viewBox="0 0 100 100">
       <polyline fill="#0090bc" stroke="#000" stroke-width="1" points="10,10 90,10 90,90 10,10"/>
       <polyline fill="#fff" stroke="#000" stroke-width="1" points="10,10 90,90 10,90 10,10"/>
     </symbol>
     <symbol id="idoa" viewBox="0 0 100 100">
-      <polyline fill="#fff" stroke="#000" stroke-width="1" points="50,5 95,50 5,50 50,5"/>
-      <polyline fill="#a17a4d" stroke="#000" stroke-width="1" points="50,95 95,50 5,50 50,95"/>
+      <polyline transform="rotate(90,50,50)" fill="#fff" stroke="#000" stroke-width="1" points="50,5 95,50 5,50 50,5"/>
+      <polyline transform="rotate(90,50,50)" fill="#a17a4d" stroke="#000" stroke-width="1" points="50,95 95,50 5,50 50,95"/>
     </symbol>
     <symbol id="cer" viewBox="0 0 100 100">
       <path fill="#fff" stroke="#000" stroke-width="4" stroke-linecap="round" d="M35.8,15 64.2,15 75.5,27.2 64.2,38.3 75.5,50 64.2,61.1 75.5,72 64.2,83 75.5,94 L75.5,110 L35.8,110"/>

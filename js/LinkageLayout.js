@@ -1,4 +1,4 @@
-import SugarAwareLayout from './SugarAwareLayout';
+import { default as SugarAwareLayout, calculate_layout_hso3 } from './SugarAwareLayout';
 import {IO as Iupac} from './CondensedIupac';
 import Sugar from './Sugar';
 
@@ -26,7 +26,9 @@ const LINEARISE_CHAINS = false;
 class LinkageLayout extends SugarAwareLayout {
   static LayoutMonosaccharide(sugar,res,position,parent_position,layout) {
 
-    const DELTA_Y = 2*this.DELTA_Y;
+    const DELTA_Y_SCALE = 2;
+
+    const DELTA_Y = DELTA_Y_SCALE*this.DELTA_Y;
     const DELTA_X = this.DELTA_X;
 
 
@@ -37,26 +39,7 @@ class LinkageLayout extends SugarAwareLayout {
     }
 
     if ( res.identifier === 'HSO3') {
-      const SULF_DELTA_X = 5/4*DELTA_X;
-      const SULF_DELTA_Y = 1/2*(this.LINKS ? (DELTA_Y / 2) : DELTA_Y) ;
-      position.r = 1/4*DELTA_X;
-      let linkage_pos = res.parent.linkageOf(res);
-      if (linkage_pos === 2 || linkage_pos === 6 || linkage_pos === Monosaccharide.LINKAGES.N) {
-        position.dy = 0.5*SULF_DELTA_Y;
-        position.dx = 0.5*SULF_DELTA_X;
-        if (linkage_pos === 2 || linkage_pos === Monosaccharide.LINKAGES.N) {
-          position.dx *= -1;
-        }
-      }
-      if (linkage_pos === 3 || linkage_pos === 4 ) {
-        position.dy = -0.5*SULF_DELTA_Y;
-        position.dx = 0.5*SULF_DELTA_X;
-        if (linkage_pos === 3) {
-          position.dx *= -1;
-        }
-      }
-      position.ignore_overlap = true;
-      return position;
+      return calculate_layout_hso3.call(this,res,position, DELTA_X, DELTA_Y / DELTA_Y_SCALE);
     }
 
     let matches = sugar.match_sugar_pattern(NLINKED_CORE, identifier_comparator );

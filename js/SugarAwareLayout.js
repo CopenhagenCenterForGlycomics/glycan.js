@@ -9,7 +9,7 @@ import Repeat from './Repeat';
 
 const not_sulf = res => res.identifier !== 'HSO3';
 
-const horizontal_identifiers = [ 'GlcA','IdoA','Xyl','HSO3','Rbo','P','GlcN'];
+const horizontal_identifiers = [ 'Xyl','HSO3','Rbo','P','GlcN'];
 
 class IupacSugar extends Iupac(Sugar) {}
 
@@ -23,6 +23,32 @@ let identifier_comparator = (a,b) => {
   return a.identifier === b.identifier;
 };
 
+
+let calculate_layout_hso3 = function(res,position, DELTA_X, DELTA_Y) {
+  const SULF_DELTA_X = this.LINKS ? 2/3*5/4*DELTA_X : 2 * DELTA_X / 3;
+  const SULF_DELTA_Y = this.LINKS ? 2/3*2/3*DELTA_Y : 2 * DELTA_Y / 3;
+  position.r = 1/4*DELTA_X;
+  let linkage_pos = res.parent.linkageOf(res);
+  if (linkage_pos === 2 || linkage_pos === 6 || linkage_pos === Monosaccharide.LINKAGES.N) {
+    position.dy = 0*SULF_DELTA_Y;
+    position.dx = 0.5*SULF_DELTA_X;
+    if (linkage_pos === 2 || linkage_pos === Monosaccharide.LINKAGES.N) {
+      position.dx *= -1;
+    }
+  }
+  if (linkage_pos === 3 || linkage_pos === 4 ) {
+    position.dy = -1*SULF_DELTA_Y;
+    position.dx = 0.5*SULF_DELTA_X;
+    if (linkage_pos === 3) {
+      position.dx *= -1;
+    }
+    if (linkage_pos === 4) {
+      position.dx = 0*SULF_DELTA_X;
+    }
+  }
+  position.ignore_overlap = true;
+  return position;
+};
 
 const CHECKED_NLINKED = new WeakMap();
 
@@ -139,26 +165,7 @@ class SugarAwareLayout extends CondensedLayout {
     }
 
     if (res.identifier === 'HSO3') {
-      const SULF_DELTA_X = 5/4*DELTA_X;
-      const SULF_DELTA_Y = this.LINKS ? DELTA_Y / 2 : DELTA_Y ;
-      position.r = 1/4*DELTA_X;
-      let linkage_pos = res.parent.linkageOf(res);
-      if (linkage_pos === 2 || linkage_pos === 6 || linkage_pos === Monosaccharide.LINKAGES.N) {
-        position.dy = 0.5*SULF_DELTA_Y;
-        position.dx = 0.5*SULF_DELTA_X;
-        if (linkage_pos === 2 || linkage_pos === Monosaccharide.LINKAGES.N) {
-          position.dx *= -1;
-        }
-      }
-      if (linkage_pos === 3 || linkage_pos === 4 ) {
-        position.dy = -0.5*SULF_DELTA_Y;
-        position.dx = 0.5*SULF_DELTA_X;
-        if (linkage_pos === 3) {
-          position.dx *= -1;
-        }
-      }
-      position.ignore_overlap = true;
-      return position;
+      return calculate_layout_hso3.call(this,res,position, DELTA_X, DELTA_Y);
     }
 
     if (sibs.length == 1 && res.identifier === 'P') {
@@ -226,4 +233,4 @@ class SugarAwareLayout extends CondensedLayout {
   }
 }
 
-export default SugarAwareLayout;
+export { SugarAwareLayout as default, calculate_layout_hso3 };
