@@ -188,6 +188,15 @@ let Fragmentable = (base) => class extends base {
       this.chordResidues[i].type = fragtypes[i];
     }
     this.typestring = type;
+
+    let chord_root = this.base_root;
+    let non_reducing_chord_residues = this.chordResidues.filter( (chord_res,i) => type.split('/')[i].match(/^(\d+,\d+-[ae]|[bc])/) );
+    if (non_reducing_chord_residues.length > 0) {
+      chord_root = non_reducing_chord_residues[0];
+    }
+
+    this.root = chord_root;
+
   }
 
   get type() {
@@ -338,11 +347,18 @@ class Fragmentor {
 
     for (let chord of target.chords(depth)) {
       let base_types = [];
-      if (is_reducing_end(target,chord)) {
-        base_types.push( reducing_types );
-      } else {
-        base_types.push( nonreducing_types );
-      }
+
+      // This is a fix for a test in test-gwb-compatibility
+      // that enables a double reducing end fragment, where
+      // one of the chord residues is closer to the root
+      // than the other chord residue. 
+      // The test is the 'cross ring dual reducing end fragments work'
+      // This is based upon the behaviour of GlycoWorkBench
+      // on a permethylated sugar with a free reducing end
+      //
+
+      base_types = [ reducing_types.concat(nonreducing_types) ];
+
       const all_types = base_types.concat(new Array(chord.chord.length - 1).fill( reducing_types ));
       if (chord.chord.indexOf(target.root) >= 0) {
         if (is_reducing_end(target,chord)) {
