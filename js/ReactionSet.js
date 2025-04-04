@@ -50,6 +50,7 @@ let comparator = (a,b) => {
 
   let same_id = identifier_comparator(a,b);
   let same_linkage = false;
+  let same_anomer = false;
 
   if ( a.parent && b.parent ) {
     if (a.parent.linkageOf(a) === 0 || b.parent.linkageOf(b) === 0) {
@@ -57,13 +58,17 @@ let comparator = (a,b) => {
     } else {
       same_linkage = a.parent.linkageOf(a) === b.parent.linkageOf(b);
     }
+    if (a.anomer === b.anomer) {
+      same_anomer = true;
+    }
   }
 
   if ( ! a.parent && ! b.parent ) {
     same_linkage = true;
+    same_anomer = true;
   }
 
-  return same_id && same_linkage;
+  return same_id && same_linkage && same_anomer;
 };
 
 let filter_with_delta = function(attachments,sugar) {
