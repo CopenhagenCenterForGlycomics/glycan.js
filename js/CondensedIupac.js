@@ -139,7 +139,9 @@ const create_repeat_objects = (sugar,definitions) => {
 
 let parse_sequence = function(sequence) {
   let comment = '';
-  [,sequence,comment]=sequence.match(/([^+]+)(?:\+(".+"))*/);
+  if ( sequence !== '' ) {
+    [,sequence,comment]=sequence.match(/([^+]+)(?:\+(".+"))*/);
+  }
   comment = (comment || '').replace(/^"/,'').replace(/"$/,'');
   const repeat_re = /{([^}@]+)(?:@([a-z]\d+[a-z]))?}([a-z]|\d+)/g;
   let repeat_match;
@@ -165,10 +167,14 @@ let parse_sequence = function(sequence) {
   // We wish to split the units by the linkages
   units = [].concat.apply([],units.map(unit => reverse(unit).split(')').filter( (unit) => unit.length ).map(reverse))).reverse();
 
-  let root = get_monosaccharide( this, units.shift() );
-  create_bold_tree(this,root,units);
 
-  this.root = root;
+  this.root = null;
+  if (units.length > 0) {
+    let root = get_monosaccharide( this, units.shift() );
+    create_bold_tree(this,root,units);
+
+    this.root = root;
+  }
 
   create_repeat_objects(this,repeat_definitions);
 
@@ -176,7 +182,7 @@ let parse_sequence = function(sequence) {
     this.comment = comment;
   }
 
-  return root;
+  return this.root;
 };
 
 let write_monosaccharide = (mono) => {
