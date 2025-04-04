@@ -32,6 +32,9 @@ Red  #ed1c24
     <symbol id="glcnac" viewBox="0 0 100 100">
       <rect x="10" y="10" width="80" height="80" fill="#0090bc" stroke-width="1" stroke="#000"/>
     </symbol>
+    <symbol id="mannac" viewBox="0 0 100 100">
+      <rect x="10" y="10" width="80" height="80" fill="#00a651" stroke-width="1" stroke="#000"/>
+    </symbol>
     <symbol id="man" viewBox="0 0 100 100">
       <circle cx="50" cy="50" fill="#00a651" r="40" stroke-width="1" stroke="#000"/>
     </symbol>
