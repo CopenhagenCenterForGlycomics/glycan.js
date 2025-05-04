@@ -38,7 +38,7 @@ class LinkageLayout extends SugarAwareLayout {
       return position;
     }
 
-    if ( res.identifier === 'HSO3') {
+    if ( res.identifier === 'HSO3' || res.identifier == 'Me' ) {
       return calculate_layout_hso3.call(this,res,position, DELTA_X, DELTA_Y / DELTA_Y_SCALE);
     }
 

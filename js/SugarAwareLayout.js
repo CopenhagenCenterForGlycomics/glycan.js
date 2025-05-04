@@ -63,7 +63,7 @@ class SugarAwareLayout extends CondensedLayout {
     if (parent_linkage === Monosaccharide.LINKAGES.O) {
       parent_linkage = 'O';
     }
-    let residue_suffix = (residue.parent && residue_id === 'hso3' && parent_linkage) ? '.'+parent_linkage : '';
+    let residue_suffix = (residue.parent && (residue_id === 'hso3' || residue_id == 'me' ) && parent_linkage) ? '.'+parent_linkage : '';
     return `${residue_id}${residue_suffix}`;
   }
 
@@ -164,7 +164,7 @@ class SugarAwareLayout extends CondensedLayout {
       position.ignore_overlap = true;
     }
 
-    if (res.identifier === 'HSO3') {
+    if (res.identifier === 'HSO3' || res.identifier === 'Me') {
       return calculate_layout_hso3.call(this,res,position, DELTA_X, DELTA_Y);
     }
 
