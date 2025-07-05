@@ -58,7 +58,7 @@ let comparator = (a,b) => {
     } else {
       same_linkage = a.parent.linkageOf(a) === b.parent.linkageOf(b);
     }
-    if (a.anomer === b.anomer) {
+    if (a.anomer === b.anomer || a.anomer === 'u' || b.anomer === 'u' ) {
       same_anomer = true;
     }
   }
