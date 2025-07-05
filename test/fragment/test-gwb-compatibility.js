@@ -57,16 +57,16 @@ QUnit.test( 'Cross ring dual reducing end fragments works' , function( assert ) 
 
   assert.ok( types.indexOf('1,3-x1a/z2a') >= 0, 'Generates a x/z fragment' );
 
-  assert.close( fragments[types.indexOf('1,3-x1a/z2a')].mass , 549.2787, 2e-04, 'Generator fragment mass is correct');
+  assert.close( fragments[types.indexOf('1,3-x1a/z2a')].mass , 549.2787, 2e-04, 'Generator fragment 1,3-x1a/z2a mass is correct');
 
   let specific_frag = Fragmentor.getFragment(sugar,'1,3-x1a/z2a');
-  assert.close( specific_frag.mass , 549.2787, 2e-04, 'Fragment mass is correct' );
+  assert.close( specific_frag.mass , 549.2787, 2e-04, 'Fragment 1,3-x1a/z2a mass is correct' );
 
   specific_frag = Fragmentor.getFragment(sugar,'1,3-x0a/z2a');
-  assert.close( specific_frag.mass , 549.2787, 2e-04, 'Fragment mass is correct' );
+  assert.close( specific_frag.mass , 549.2787, 2e-04, 'Fragment 1,3-x0a/z2a mass is correct' );
 
   specific_frag = Fragmentor.getFragment(sugar,'0,2-a4a/z2a');
-  assert.close( specific_frag.mass , 549.2787, 2e-04, 'Fragment mass is correct' );
+  assert.close( specific_frag.mass , 549.2787, 2e-04, 'Fragment 0,2-a4a/z2a mass is correct' );
 
 
 });

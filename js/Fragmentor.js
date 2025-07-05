@@ -8,6 +8,7 @@ import { C as CSYMB,
          Mass,
          UNDERIVATISED,
          PERMETHYLATED,
+         REDUCING_END_FREE,
          composition_to_mass,
          calculate_a_fragment_composition,
          delete_composition as del,
@@ -136,7 +137,7 @@ class FragmentResidue extends TracedMonosaccharide {
     if (result.length < 1) {
       result = del(base_atoms.flat(),a_composition.flat());
     }
-    result = del(result,this.original.derivative.reducing_end_atoms);
+    result = del(result, REDUCING_END_FREE.calculate_reducing_end([],this.original.derivative));
     return result;
   }
 }
@@ -218,7 +219,7 @@ let Fragmentable = (base) => class extends base {
 
     for (let type of types) {
       if (type.match(/^y/)) {
-        result_composition.push(HSYMB);
+        result_composition = result_composition.concat([HSYMB]);
       }
       if (type.match(/^b/)) {
         result_composition = result_composition.concat(R);
@@ -254,9 +255,20 @@ let Fragmentable = (base) => class extends base {
     // The second regex match for a/e fragments is to get the
     // tests passing
     if (this.is_reducing_end) {
-      result_composition = result_composition.concat(R).concat([OSYMB]);
+
+      const reducing_end_deriv = this.root.original.reducing_end;
+      const other_derivative = this.root.original.derivative;
+      result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative);
+
+      if (reducing_end_deriv == REDUCING_END_FREE) {
+        result_composition = del(result_composition,[HSYMB].concat(this.root.original.derivative.derivative_atoms));
+      }
+
     } else if (this.type.match(/\d,\d-[a]/)) {
-      result_composition = this.root.original.derivative.reducing_end(result_composition);
+
+      const reducing_end_deriv = this.root.original.reducing_end;
+      const other_derivative = this.root.original.derivative;
+      result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative);
     }
 
     if (this.type.match(/^1,1-[w]/)) {

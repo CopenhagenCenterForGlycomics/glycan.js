@@ -62,18 +62,36 @@ class Derivative {
 
 }
 
-const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms) => {
-  if (! reducing_end_atoms && deriv_atoms ) {
-    // These atoms are for the reducing end (OR), and one capping on non-reducing end (R)
-    // FIXME - the derivative atoms should include the H! 
-    reducing_end_atoms = [ O, [H].concat(deriv_atoms) , [H].concat(deriv_atoms) ].flat();
+class ReducingEnd extends Derivative {
+  calculate_reducing_end(atoms,other_derivative) {
+    let result = super.apply(atoms);
+    let other_derivative_atoms = other_derivative.derivative_atoms;
+    let reducing_end_atoms = [ ];
+    return Derivative.Apply(result, reducing_end_atoms);
   }
+}
+
+class ReducingEndFree extends ReducingEnd {
+  calculate_reducing_end(atoms,other_derivative) {
+    let result = super.apply(atoms);
+    let other_derivative_atoms = other_derivative.derivative_atoms;
+    let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms) ].flat();
+    return Derivative.Apply(result, reducing_end_atoms);
+  }
+}
+
+class ReducingEndReduced extends ReducingEnd {
+  calculate_reducing_end(atoms,other_derivative) {
+    let result = super.apply(atoms);
+    let other_derivative_atoms = other_derivative.derivative_atoms;
+    let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms), [H] ].flat();
+    return Derivative.Apply(result, reducing_end_atoms);
+  }
+}
+const make_derivative = (name,accept= v => v,deriv_atoms=[]) => {
   let new_derivative = class extends Derivative {
     constructor() {
       super(name);
-    }
-    get reducing_end_atoms() {
-      return reducing_end_atoms;
     }
 
     get derivative_atoms() {
@@ -87,10 +105,7 @@ const make_derivative = (name,accept= v => v,deriv_atoms=[],reducing_end_atoms) 
       let result = super.apply(atoms);
       return Derivative.Apply(result,deriv_atoms);
     }
-    reducing_end(atoms) {
-      let result = super.apply(atoms);
-      return Derivative.Apply(result,reducing_end_atoms);
-    }
+
   }
   return Object.freeze(new new_derivative());
 }
@@ -102,13 +117,14 @@ const can_accept_permethylation = (atoms) => {
 const UNDERIVATISED = make_derivative('underivatised');
 const PERMETHYLATED = make_derivative('permethylated',can_accept_permethylation,[C,H,H]);
 
+const REDUCING_END_FREE = (Object.freeze(new ReducingEndFree('Free reducing end')));
+
+const REDUCING_END_REDUCED = (Object.freeze(new ReducingEndReduced('Reduced reducing end')));
+
 const REDUCING_END_2AB = make_derivative('2AB',v => v, [],[ C, C, C, C, C, C, C, // C7
                                                      H, H, H, H, H, H, H, H, // H8
                                                      N, N, // N2
                                                      O ]); // O
-const REDUCING_END_FREE = null;
-
-const REDUCING_END_REDUCED = null;
 
 const DERIV_ETHYL_ESTER = make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], [] );
 const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ], []);
@@ -315,6 +331,24 @@ const summarise_composition = (composition) => {
   return { C: c, N: n, O: o, H: h };
 }
 
+const log_composition_comparison = function(message,from,to) {
+  let messages = [message];
+  if (from.C != to.C) {
+    messages.push(`C: ${to.C - from.C}`);
+  }
+  if (from.H != to.H) {
+    messages.push(`H: ${to.H - from.H}`);
+  }
+  if (from.O != to.O) {
+    messages.push(`O: ${to.O - from.O}`);
+  }
+
+  if (messages.length > 1) {
+    console.log(messages.join(' '));
+  }
+
+}
+
 const parse_composition = (composition) => {
   let atoms = [];
   for (let part of composition.split(';')) {
@@ -447,6 +481,7 @@ https://www.nist.gov/static/glyco-mass-calc/
 */
 
 const derivative_info = Symbol('derivative')
+const reducing_end_info = Symbol('reducing_end')
 
 
 const Mass = (base) => {
@@ -457,7 +492,10 @@ const Mass = (base) => {
     }
 
     get derivative() {
-      return this[derivative_info] || UNDERIVATISED;
+      if (! this[derivative_info] ) {
+        this[derivative_info] = UNDERIVATISED;
+      }
+      return this[derivative_info];
     }
 
     set derivative(derivative) {
@@ -465,6 +503,18 @@ const Mass = (base) => {
         throw new Error('Bad derivative');
       }
       this[derivative_info] = derivative;
+      return;
+    }
+
+    get reducing_end() {
+      if (! this[reducing_end_info]) {
+        this[reducing_end_info] = REDUCING_END_FREE;
+      }
+      return this[reducing_end_info];
+    }
+
+    set reducing_end(reduction) {
+      this[reducing_end_info] = reduction;
     }
 
     get atoms() {
@@ -473,8 +523,10 @@ const Mass = (base) => {
       // We should remove the reducing end atoms from the composition
       // for all residues, and then add it back on to the
       // root at the end
-      res = delete_composition(res,this.derivative.reducing_end_atoms);
 
+      // res = delete_composition(res,this.derivative.reducing_end_atoms);
+
+      res = delete_composition(res, REDUCING_END_FREE.calculate_reducing_end([],this.derivative));
 
       return res;
 
@@ -497,7 +549,9 @@ const Mass = (base) => {
                                       map( res => res.atoms ).flat();
 
       // Only the parent sugar gets to add back in the reducing end atoms
-      const result = this.root.derivative.reducing_end(monosaccharide_atoms);
+      const reducing_end_deriv = this.root.reducing_end;
+      const other_derivative = this.root.derivative;
+      const result = reducing_end_deriv.calculate_reducing_end(monosaccharide_atoms,other_derivative);
 
       return result;
     }
@@ -506,8 +560,8 @@ const Mass = (base) => {
       return composition_to_mass(this.atoms);
     }
 
-    set reducing_end(reduction=FREE_REDUCING_END) {
-
+    set reducing_end(reduction=REDUCING_END_FREE) {
+      this.root.reducing_end = reduction;
     }
 
     derivatise(derivative) {
@@ -518,4 +572,13 @@ const Mass = (base) => {
   };
 };
 
-export { C, H, O, N, NA, Mass, UNDERIVATISED, PERMETHYLATED, calculate_a_fragment_composition, summarise_composition, composition_to_mass, delete_composition, ReferenceComposition };
+export { C, H, O, N, NA,
+         Mass,
+         REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_FREE,
+         UNDERIVATISED, PERMETHYLATED,
+         calculate_a_fragment_composition,
+         summarise_composition,
+         composition_to_mass,
+         delete_composition,
+         ReferenceComposition
+       };

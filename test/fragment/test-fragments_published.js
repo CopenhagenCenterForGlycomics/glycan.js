@@ -2,7 +2,7 @@
 
 import Sugar from '../../js/Sugar';
 
-import { Mass, PERMETHYLATED, H, composition_to_mass } from '../../js/Mass';
+import { Mass, PERMETHYLATED, REDUCING_END_REDUCED, H, composition_to_mass } from '../../js/Mass';
 
 import Fragmentor from '../../js/Fragmentor';
 
@@ -46,8 +46,6 @@ for (let sequence of Object.keys(FRAGMENTS['figure1a'])) {
       let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
       if (matched_wanted) {
         // Reduced should be R + H, where R is H for underivatised
-        console.log([H].concat([H].concat(frag.root.original.derivative.derivative_atoms)))
-        console.log(composition_to_mass([H].concat([H].concat(frag.root.original.derivative.derivative_atoms))));
         assert.close(frag.mass,matched_wanted.val,0.4, `${frag.type} has mass delta ${Math.abs(matched_wanted.val - frag.mass)} ${frag.sequence}`);
       }
     }
@@ -68,8 +66,6 @@ for (let sequence of Object.keys(FRAGMENTS['figure2b'])) {
       let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
       if (matched_wanted) {
         // Reduced should be R + H, where R is CH3 for permethylated
-        console.log([H].concat([H].concat(frag.root.original.derivative.derivative_atoms)))
-        console.log(composition_to_mass([H].concat([H].concat(frag.root.original.derivative.derivative_atoms))));
         assert.close(frag.mass ,matched_wanted.val,0.4, `${frag.type} has mass delta ${Math.abs(matched_wanted.val - frag.mass)} ${frag.sequence}`);
       }
     }
