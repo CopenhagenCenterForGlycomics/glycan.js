@@ -37,13 +37,13 @@ QUnit.assert.close = function(number, expected, error=1e-04, message) {
 
 function compToObj(str) {
   const result = {C:0,H:0,N:0,O:0};
-  
+
   // Find all letters followed by numbers
   str.match(/[A-Z]\d+/g).forEach((match) => {
     // The first character is the element symbol, the rest are its count
     let elemSymbol = match[0];
     let elemCount = parseInt(match.slice(1), 10);
-    
+
     result[elemSymbol] = elemCount;
   });
   return result;

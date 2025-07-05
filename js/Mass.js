@@ -88,6 +88,21 @@ class ReducingEndReduced extends ReducingEnd {
     return Derivative.Apply(result, reducing_end_atoms);
   }
 }
+
+class ReducingEnd2AB extends ReducingEnd {
+  calculate_reducing_end(atoms,other_derivative) {
+    let label = [ C, C, C, C, C, C, C, // C7
+                  H, H, H, H, H, H, H, H, // H8
+                  N, N, // N2
+                  O ];
+
+    let result = super.apply(atoms);
+    let other_derivative_atoms = other_derivative.derivative_atoms;
+    let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms), [H], delete_composition(label, [O,H]) ].flat();
+    return Derivative.Apply(result, reducing_end_atoms);
+  }
+}
+
 const make_derivative = (name,accept= v => v,deriv_atoms=[]) => {
   let new_derivative = class extends Derivative {
     constructor() {
@@ -121,10 +136,7 @@ const REDUCING_END_FREE = (Object.freeze(new ReducingEndFree('Free reducing end'
 
 const REDUCING_END_REDUCED = (Object.freeze(new ReducingEndReduced('Reduced reducing end')));
 
-const REDUCING_END_2AB = make_derivative('2AB',v => v, [],[ C, C, C, C, C, C, C, // C7
-                                                     H, H, H, H, H, H, H, H, // H8
-                                                     N, N, // N2
-                                                     O ]); // O
+const REDUCING_END_2AB = (Object.freeze(new ReducingEnd2AB('2AB labelled reducing end')));
 
 const DERIV_ETHYL_ESTER = make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], [] );
 const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ], []);

@@ -1,19 +1,8 @@
 /*global QUnit*/
 
 import Sugar from '../../js/Sugar';
-import { Mass, C , H , O , N, PERMETHYLATED, ReferenceComposition }  from '../../js/Mass';
+import { Mass, C , H , O , N, PERMETHYLATED, ReferenceComposition, summarise_composition }  from '../../js/Mass';
 import {IO as Iupac} from '../../js/CondensedIupac';
-
-
-
-const summarise_composition = (composition) => {
-  let c = composition.filter( v => v == C).length;
-  let n = composition.filter( v => v == N).length;
-  let o = composition.filter( v => v == O).length;
-  let h = composition.filter( v => v == H).length;
-  return { C: c, N: n, O: o, H: h };
-}
-
 
 class IupacSugar extends Mass(Iupac(Sugar)) {}
 
