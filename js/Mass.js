@@ -84,7 +84,7 @@ class ReducingEndReduced extends ReducingEnd {
   calculate_reducing_end(atoms,other_derivative) {
     let result = super.apply(atoms);
     let other_derivative_atoms = other_derivative.derivative_atoms;
-    let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms), [H] ].flat();
+    let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms), [H], [H] ].flat();
     return Derivative.Apply(result, reducing_end_atoms);
   }
 }
