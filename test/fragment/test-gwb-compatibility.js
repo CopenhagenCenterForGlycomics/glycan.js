@@ -77,17 +77,42 @@ const test_fragment = (assert,sugar,fragment,mass) => {
   assert.close( specific_frag.mass , mass, 1e-04, `Fragment ${fragment} mass is correct` );
 }
 
-QUnit.test( '2AB fragments work' , function( assert ) {
+QUnit.test( 'GWB_output_2ab 2AB fragments work' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
   sugar.reducing_end = REDUCING_END_2AB;
 
-  test_fragment(assert,sugar,'y1a',341.1587);
-  test_fragment(assert,sugar,'z1a',323.1481);
   test_fragment(assert,sugar,'b2b',162.0528);
   test_fragment(assert,sugar,'c2b',180.0634);
-  test_fragment(assert,sugar,'c5a',1525.5288);
+  test_fragment(assert,sugar,'b1a',291.0954);
+  test_fragment(assert,sugar,'z1a',323.1481);
+  test_fragment(assert,sugar,'y1a',341.1587);
+  test_fragment(assert,sugar,'b3b',365.1322);
+  test_fragment(assert,sugar,'c3b',383.1428);
+  test_fragment(assert,sugar,'b2a',453.1482);
+  test_fragment(assert,sugar,'c2a',471.1588);
+  test_fragment(assert,sugar,'z2a',526.2275);
+  test_fragment(assert,sugar,'c4b',545.1956);
+  test_fragment(assert,sugar,'b3a',656.2276);
+  test_fragment(assert,sugar,'c3a',674.2382);
+  test_fragment(assert,sugar,'b4a',818.2804);
+  test_fragment(assert,sugar,'c4a',836.2910);
+  test_fragment(assert,sugar,'z3a',1215.4653);
+  test_fragment(assert,sugar,'y3a',1233.4759);
+  test_fragment(assert,sugar,'z4a',1377.5181);
+  test_fragment(assert,sugar,'y4a',1395.5287);
+  test_fragment(assert,sugar,'z3b',1506.5607);
+  test_fragment(assert,sugar,'b5a',1507.5182);
   test_fragment(assert,sugar,'y3b',1524.5713);
+  test_fragment(assert,sugar,'c5a',1525.5288);
+  test_fragment(assert,sugar,'z5a',1580.5975);
+  test_fragment(assert,sugar,'y5a',1598.6081);
+  test_fragment(assert,sugar,'z4b',1668.6135);
+  test_fragment(assert,sugar,'y4b',1686.6241);
+  test_fragment(assert,sugar,'c6a',1728.6082);
+  test_fragment(assert,sugar,'z6a',1742.6503);
+  test_fragment(assert,sugar,'y6a',1760.6609);
+  test_fragment(assert,sugar,'z5b',1871.6929);
   test_fragment(assert,sugar,'y5b',1889.7035);
 
 
