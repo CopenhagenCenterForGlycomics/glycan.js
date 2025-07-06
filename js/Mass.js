@@ -62,6 +62,10 @@ class Derivative {
 
 }
 
+class NonReducingDerivative extends Derivative {
+
+}
+
 class ReducingEnd extends Derivative {
   calculate_reducing_end(atoms,other_derivative) {
     let result = super.apply(atoms);
@@ -89,6 +93,20 @@ class ReducingEndReduced extends ReducingEnd {
   }
 }
 
+class ReducingEnd2AA extends ReducingEnd {
+  calculate_reducing_end(atoms,other_derivative) {
+    let label = [ C, C, C, C, C, C, C, // C7
+                  H, H, H, H, H, H, H, // H7
+                  N,
+                  O, O ]; // O2
+
+    let result = super.apply(atoms);
+    let other_derivative_atoms = other_derivative.derivative_atoms;
+    let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms), [H], delete_composition(label, [O,H]) ].flat();
+    return Derivative.Apply(result, reducing_end_atoms);
+  }
+}
+
 class ReducingEnd2AB extends ReducingEnd {
   calculate_reducing_end(atoms,other_derivative) {
     let label = [ C, C, C, C, C, C, C, // C7
@@ -103,8 +121,8 @@ class ReducingEnd2AB extends ReducingEnd {
   }
 }
 
-const make_derivative = (name,accept= v => v,deriv_atoms=[]) => {
-  let new_derivative = class extends Derivative {
+const make_derivative = (name,accept= v => v,deriv_atoms=[],base=Derivative) => {
+  let new_derivative = class extends base {
     constructor() {
       super(name);
     }
@@ -136,10 +154,13 @@ const REDUCING_END_FREE = (Object.freeze(new ReducingEndFree('Free reducing end'
 
 const REDUCING_END_REDUCED = (Object.freeze(new ReducingEndReduced('Reduced reducing end')));
 
+const REDUCING_END_2AA = (Object.freeze(new ReducingEnd2AA('2AA labelled reducing end')));
+
 const REDUCING_END_2AB = (Object.freeze(new ReducingEnd2AB('2AB labelled reducing end')));
 
-const DERIV_ETHYL_ESTER = make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], [] );
-const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ], []);
+
+const DERIV_ETHYL_ESTER =       make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], NonReducingDerivative );
+const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ], NonReducingDerivative);
 
 const DEFINITIONS =`
 terminii:r1:x;2:x;3:x;4:x
@@ -511,7 +532,15 @@ const Mass = (base) => {
     }
 
     set derivative(derivative) {
-      if ([ UNDERIVATISED, PERMETHYLATED ].indexOf(derivative) < 0) {
+      let valid_derivative = [ UNDERIVATISED, PERMETHYLATED ].indexOf(derivative) >= 0;
+      if (derivative === DERIV_ETHYL_ESTER) {
+        valid_derivative = this.identifier == 'NeuAc' && this.parent && this.parent.linkageOf(this) == 6;
+      }
+      if (derivative === DERIV_AMMONIA_AMIDATION) {
+        valid_derivative = this.identifier == 'NeuAc' && this.parent && this.parent.linkageOf(this) == 3;
+      }
+
+      if (!valid_derivative) {
         throw new Error('Bad derivative');
       }
       this[derivative_info] = derivative;
@@ -537,8 +566,11 @@ const Mass = (base) => {
       // root at the end
 
       // res = delete_composition(res,this.derivative.reducing_end_atoms);
-
-      res = delete_composition(res, REDUCING_END_FREE.calculate_reducing_end([],this.derivative));
+      let derivative = this.derivative;
+      if (this.derivative instanceof NonReducingDerivative) {
+        derivative = UNDERIVATISED;
+      }
+      res = delete_composition(res, REDUCING_END_FREE.calculate_reducing_end([],derivative));
 
       return res;
 
@@ -586,7 +618,8 @@ const Mass = (base) => {
 
 export { C, H, O, N, NA,
          Mass,
-         REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_FREE,
+         REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_2AA, REDUCING_END_FREE,
+         DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION,
          UNDERIVATISED, PERMETHYLATED,
          calculate_a_fragment_composition,
          summarise_composition,
