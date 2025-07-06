@@ -9,6 +9,7 @@ import { C as CSYMB,
          UNDERIVATISED,
          PERMETHYLATED,
          REDUCING_END_FREE,
+         REDUCING_END_2AB,
          composition_to_mass,
          calculate_a_fragment_composition,
          delete_composition as del,
@@ -260,7 +261,7 @@ let Fragmentable = (base) => class extends base {
       const other_derivative = this.root.original.derivative;
       result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative);
 
-      if (reducing_end_deriv == REDUCING_END_FREE) {
+      if (reducing_end_deriv == REDUCING_END_FREE || reducing_end_deriv == REDUCING_END_2AB) {
         result_composition = del(result_composition,[HSYMB].concat(this.root.original.derivative.derivative_atoms));
       }
 

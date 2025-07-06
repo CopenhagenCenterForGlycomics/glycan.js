@@ -2,7 +2,7 @@
 
 import Sugar from '../../js/Sugar';
 
-import { Mass, UNDERIVATISED, PERMETHYLATED, NA } from '../../js/Mass';
+import { Mass, UNDERIVATISED, PERMETHYLATED, REDUCING_END_2AB, NA } from '../../js/Mass';
 
 import Fragmentor from '../../js/Fragmentor';
 
@@ -67,6 +67,28 @@ QUnit.test( 'Cross ring dual reducing end fragments works' , function( assert ) 
 
   specific_frag = Fragmentor.getFragment(sugar,'0,2-a4a/z2a');
   assert.close( specific_frag.mass , 549.2787, 2e-04, 'Fragment 0,2-a4a/z2a mass is correct' );
+
+
+});
+
+
+const test_fragment = (assert,sugar,fragment,mass) => {
+  let specific_frag = Fragmentor.getFragment(sugar,fragment);
+  assert.close( specific_frag.mass , mass, 1e-04, `Fragment ${fragment} mass is correct` );
+}
+
+QUnit.test( '2AB fragments work' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
+  sugar.reducing_end = REDUCING_END_2AB;
+
+  test_fragment(assert,sugar,'y1a',341.1587);
+  test_fragment(assert,sugar,'z1a',323.1481);
+  test_fragment(assert,sugar,'b2b',162.0528);
+  test_fragment(assert,sugar,'c2b',180.0634);
+  test_fragment(assert,sugar,'c5a',1525.5288);
+  test_fragment(assert,sugar,'y3b',1524.5713);
+  test_fragment(assert,sugar,'y5b',1889.7035);
 
 
 });

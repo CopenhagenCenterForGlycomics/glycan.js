@@ -35,16 +35,17 @@ QUnit.test( 'Fragmentation worsk' , function( assert ) {
   sugar.reducing_end = REDUCING_END_2AB;
 
 
-  // The bug here is that dual cross-ring types are not valid types generated
+  // https://sciex.com/content/dam/SCIEX/pdf/tech-notes/all/released-N-linked-glycans.pdf
+  // M+H masses in spectra
 
   let specific_frag = Fragmentor.getFragment(sugar,'y4a');
-  assert.close( specific_frag.mass , 1380.5319, 1e-02, 'Fragment y4a mass is correct' );
+  assert.close( specific_frag.mass , 1380.5319 - composition_to_mass([H]), 1e-02, 'Fragment y4a mass is correct' );
 
   specific_frag = Fragmentor.getFragment(sugar,'y4a/y4b');
-  assert.close( specific_frag.mass , 1177.4562, 1e-02, 'Fragment y4a/y4b mass is correct' );
+  assert.close( specific_frag.mass , 1177.4562 - composition_to_mass([H]), 1e-02, 'Fragment y4a/y4b mass is correct' );
 
   specific_frag = Fragmentor.getFragment(sugar,'y4a/y4b');
-  assert.close( specific_frag.mass , 1177.4562, 1e-02, 'Fragment y4a/y4b mass is correct' );
+  assert.close( specific_frag.mass , 1177.4562 - composition_to_mass([H]), 1e-02, 'Fragment y4a/y4b mass is correct' );
 
   specific_frag = Fragmentor.getFragment(sugar,'y3a/b4a');
   assert.close( specific_frag.mass , 731.2688 - composition_to_mass([H]), 1e-02, 'Fragment y3a/b4a mass is correct' );
