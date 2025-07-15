@@ -9,17 +9,11 @@ const S = Symbol('S');
 
 const NA = Symbol('Na');
 
-// const C = 12;
-// const H = 1.0078250;
-// const O = 15.9949146;
+import * as DEFAULT_MASS_PROVIDER from './mass_provider';
 
-const MASSES = new Map();
+let CURRENT_MASS_PROVIDER = DEFAULT_MASS_PROVIDER;
 
-MASSES.set(C,12);
-MASSES.set(H,1.007825035);
-MASSES.set(O,15.99491463);
-MASSES.set(N,14.003074);
-MASSES.set(NA,22.989771)
+CURRENT_MASS_PROVIDER.importSymbols({'C' : C, 'H': H, 'O': O, 'N': N, 'P': P, 'S': S, 'NA': NA });
 
 class RemovableAtom {
   constructor(atom) {
@@ -441,10 +435,6 @@ let read_definitions = () => {
 
 const MONOSACCHARIDES = read_definitions();
 
-const composition_to_mass = (composition) => {
-  return composition.map( atom => MASSES.get(atom) ).reduce( (a,b) => a + b, 0);
-};
-
 const get_prototype_for = (identifier) => {
   let def = MONOSACCHARIDES[ identifier ];
   if (def && def.type) {
@@ -475,6 +465,19 @@ const get_ring_atoms_for = (identifier,derivative=UNDERIVATISED,reducing=true) =
     );
   }
   return Object.freeze([]);
+};
+
+const composition_to_map = (composition) => {
+  let comp = new Map();
+  for (let symbol of composition) {
+    let curr = comp.get(symbol) || 0;
+    comp.set(symbol,curr + 1);
+  }
+  return comp;
+}
+
+const composition_to_mass = (composition) => {
+  return Mass.MASS_PROVIDER.composition_to_mass(composition_to_map(composition));
 };
 
 const get_composition_for = (identifier,derivative) => {
@@ -616,6 +619,17 @@ const Mass = (base) => {
   };
 };
 
+Object.defineProperty(Mass, 'MASS_PROVIDER', {
+  set(provider) {
+    CURRENT_MASS_PROVIDER = provider;
+    CURRENT_MASS_PROVIDER.importSymbols({'C' : C, 'H': H, 'O': O, 'N': N, 'P': P, 'S': S, 'NA': NA });
+  },
+  get() {
+    return CURRENT_MASS_PROVIDER;
+  }
+});
+
+
 export { C, H, O, N, NA,
          Mass,
          REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_2AA, REDUCING_END_FREE,
@@ -624,6 +638,7 @@ export { C, H, O, N, NA,
          calculate_a_fragment_composition,
          summarise_composition,
          composition_to_mass,
+         composition_to_map,
          delete_composition,
          ReferenceComposition
        };

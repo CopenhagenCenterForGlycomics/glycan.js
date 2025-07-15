@@ -34,4 +34,4 @@ export {default as SVGCanvas} from './SVGCanvas';
 
 export {default as Fragmentor } from './Fragmentor';
 
-export {Mass as Mass } from './Mass';
+export { Mass as Mass } from './Mass';
