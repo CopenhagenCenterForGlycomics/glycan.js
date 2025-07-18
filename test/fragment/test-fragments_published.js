@@ -72,3 +72,43 @@ for (let sequence of Object.keys(FRAGMENTS['figure2b'])) {
   });
 
 }
+
+for (let sequence of Object.keys(FRAGMENTS['figure2c'])) {
+
+  QUnit.test( 'Fragments calclulated correctly for figure2c' , function( assert ) {
+    let sugar = new IupacSugar();
+    sugar.sequence = sequence;
+    sugar.derivatise(PERMETHYLATED);
+    sugar.reducing_end = REDUCING_END_REDUCED;
+    let wanted_fragments = FRAGMENTS['figure2c'][sugar.sequence];
+    for (let frag_type of Object.keys(wanted_fragments)) {
+      let frag = Fragmentor.getFragment(sugar,frag_type);
+      let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
+      if (matched_wanted) {
+        // Reduced should be R + H, where R is CH3 for permethylated
+        assert.close(frag.mass ,matched_wanted.val,0.4, `${frag.type} has mass delta ${Math.abs(matched_wanted.val - frag.mass)} ${frag.sequence}`);
+      }
+    }
+  });
+
+}
+
+for (let sequence of Object.keys(FRAGMENTS['figure2e'])) {
+
+  QUnit.test( 'Fragments calclulated correctly for figure2e' , function( assert ) {
+    let sugar = new IupacSugar();
+    sugar.sequence = sequence;
+    sugar.derivatise(PERMETHYLATED);
+    sugar.reducing_end = REDUCING_END_REDUCED;
+    let wanted_fragments = FRAGMENTS['figure2e'][sugar.sequence];
+    for (let frag_type of Object.keys(wanted_fragments)) {
+      let frag = Fragmentor.getFragment(sugar,frag_type);
+      let matched_wanted = wanted_fragments[frag.type] || wanted_fragments[frag.type.split('/').reverse().join('/')];
+      if (matched_wanted) {
+        // Reduced should be R + H, where R is CH3 for permethylated
+        assert.close(frag.mass ,matched_wanted.val,0.4, `${frag.type} has mass delta ${Math.abs(matched_wanted.val - frag.mass)} ${frag.sequence}`);
+      }
+    }
+  });
+
+}

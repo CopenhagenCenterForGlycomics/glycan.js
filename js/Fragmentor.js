@@ -231,7 +231,8 @@ let Fragmentable = (base) => class extends base {
         result_composition = del(result_composition,[OSYMB,HSYMB]);
       }
       if (type.match(/^c/)) {
-        result_composition = result_composition.concat(R).concat([ HSYMB, OSYMB ]);
+        result_composition = result_composition.concat(R);
+        result_composition = result_composition.concat([ HSYMB, OSYMB ]);
       }
       if (type.match(/^\d,\d-[xw]/)) {
         result_composition = result_composition.concat(R);
@@ -262,13 +263,7 @@ let Fragmentable = (base) => class extends base {
       const other_derivative = this.root.original.derivative;
       result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative);
 
-      if (reducing_end_deriv == REDUCING_END_FREE || reducing_end_deriv == REDUCING_END_2AB) {
-        result_composition = del(result_composition,[HSYMB].concat(this.root.original.derivative.derivative_atoms));
-      }
-
-      if (reducing_end_deriv == REDUCING_END_REDUCED) {
-        result_composition = del(result_composition,[HSYMB]);
-      }
+      result_composition = del(result_composition,[HSYMB].concat(this.root.original.derivative.derivative_atoms));
 
 
     } else if (this.type.match(/\d,\d-[a]/)) {

@@ -21,7 +21,17 @@ GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcN
 GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc	b4a/y4a	1103.7
 GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc	b4a	1362.8
 GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc	y4a	1570.8
-`
+`;
+
+const FIGURE_2C1 = `
+GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc	b5a	1566.8
+GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc	y1a	468.4
+GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc	y4a	1775.0
+`;
+
+const FIGURE_2E1 = `
+Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc	y6a	1112.5
+`;
 
 const FRAGMENTS = {};
 
@@ -29,7 +39,7 @@ function splitlines(textblock) {
 	return textblock.split('\n').filter(line => line.trim()).filter( line => line != '' ).map( line => line.split('\t'))
 }
 
-function populateFragments(figure,frags) {
+function populateFragments(figure,frags,charge=1) {
 	if ( ! FRAGMENTS[figure]) {
 		FRAGMENTS[figure] = {};
 	}
@@ -37,12 +47,14 @@ function populateFragments(figure,frags) {
 	  if ( ! FRAGMENTS[figure][frag[0]] ) {
 	    FRAGMENTS[figure][frag[0]] = {};
 	  }
-	  FRAGMENTS[figure][frag[0]][frag[1]] = { val: parseFloat(frag[2]) - composition_to_mass([H]) };
+	  FRAGMENTS[figure][frag[0]][frag[1]] = { val: charge * (parseFloat(frag[2]) - composition_to_mass([H])) };
 	}
 }
 
-populateFragments('figure1a', splitlines(FIGURE_1A) );
-populateFragments('figure2b', splitlines(FIGURE_2B) );
+populateFragments('figure1a', splitlines(FIGURE_1A), 1 );
+populateFragments('figure2b', splitlines(FIGURE_2B), 1 );
+populateFragments('figure2c', splitlines(FIGURE_2C1), 1 );
+populateFragments('figure2e', splitlines(FIGURE_2E1), 2 );
 
 
 

@@ -167,3 +167,22 @@ QUnit.test( 'GWB_output_reduced REDUCED fragments work' , function( assert ) {
   assert.close(sugar.mass,1933.7032,1e-04,'Full sugar mass is correct');
 
 });
+
+QUnit.test( 'GWB_output_reduced_permethylated REDUCED/PERMETHYLATED fragments work' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc';
+  sugar.derivatise(PERMETHYLATED);
+
+  assert.close(sugar.mass,2582.309,1e-04,'Full sugar mass is correct without derivatisation');
+
+
+  sugar.reducing_end = REDUCING_END_REDUCED;
+
+  test_fragment(assert,sugar,'b3b',824.4154);
+  test_fragment(assert,sugar,'b2b',579.2891);
+  test_fragment(assert,sugar,'y5b/b3b',245.1263);
+  test_fragment(assert,sugar,'y4b',1773.9248);
+
+  assert.close(sugar.mass,2598.3402,1e-04,'Full sugar mass is correct');
+
+});
