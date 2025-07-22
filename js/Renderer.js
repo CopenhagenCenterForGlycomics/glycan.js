@@ -146,7 +146,7 @@ const perpendicular_line = (x0,y0,x1,y1,length) => {
   let y = x1 - x0;
   const len = length / Math.hypot(x, y);
   x *= len;
-  y *= len; 
+  y *= len;
   return [x0 + x, y0 + y, x0 - x, y0 - y];
 };
 
@@ -155,7 +155,7 @@ const half_perpendicular_line = (x0,y0,x1,y1,length) => {
   let y = x1 - x0;
   const len = length / Math.hypot(x, y);
   x *= len;
-  y *= len; 
+  y *= len;
   return [x0 - x, y0 - y, x0, y0];
 };
 

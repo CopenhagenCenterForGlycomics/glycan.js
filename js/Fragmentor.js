@@ -413,4 +413,6 @@ class Fragmentor {
   }
 }
 
+export { FragmentResidue };
+
 export default Fragmentor;

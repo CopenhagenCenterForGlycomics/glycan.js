@@ -29,6 +29,7 @@ export { LinkageLayoutFishEye };
 
 export {default as SVGRenderer} from './SVGRenderer';
 export {default as CanvasRenderer} from './CanvasRenderer';
+export { FragmentRenderer } from './FragmentRenderer';
 
 export {default as SVGCanvas} from './SVGCanvas';
 
