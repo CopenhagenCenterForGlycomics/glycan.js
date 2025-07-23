@@ -144,6 +144,8 @@ class FragmentResidue extends TracedMonosaccharide {
   }
 }
 
+const FRAGMENT_ORIGNAL_MAP = new WeakMap();
+
 let Fragmentable = (base) => class extends base {
 
   constructor() {
@@ -153,6 +155,14 @@ let Fragmentable = (base) => class extends base {
 
   static get Monosaccharide() {
     return FragmentResidue;
+  }
+
+  get original() {
+    return FRAGMENT_ORIGNAL_MAP.get(this);
+  }
+
+  set original(original) {
+    FRAGMENT_ORIGNAL_MAP.set(this,original);
   }
 
   get is_reducing_end() {
@@ -341,6 +351,8 @@ class Fragmentor {
       chord_root = non_reducing_frags[0];
     }
 
+
+    fragment.original = target;
     fragment.chord = { root: chord_root, chord };
     fragment.type = type;
     return fragment;
@@ -395,6 +407,8 @@ class Fragmentor {
         fragment.type = null;
         fragment.chord = chord;
         fragment.type = type.map(coords).join('/');
+        fragment.original = target;
+
         let curr_composition = fragment.composition();
         if ( fragment.chordResidues.some(retains_residue.bind(null,curr_composition)) ) {
           continue;

@@ -372,7 +372,7 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 class Renderer {
   constructor(container,layout) {
     if (container && layout) {
-      this[layout_engine] = layout;
+      this.LayoutEngine = layout;
       this[layout_cache] = new WeakMap();
     }
     this[rendered_sugars_symbol] = [];
@@ -481,5 +481,6 @@ class Renderer {
 
 }
 
+export { point_along_line, perpendicular_line, half_perpendicular_line, str };
 
 export default Renderer;
