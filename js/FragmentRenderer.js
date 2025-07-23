@@ -130,6 +130,14 @@ const FragmentLayout = (baselayout) => class extends baselayout {
                     original_layout.dx = 0;
                     original_layout.dy = 0;
                 }
+                if (renderable.chord.indexOf(residue) >= 0) {
+                    let type = renderable.type.split('/')[renderable.chord.indexOf(residue)];
+                    if (type.match(/\d+,\d+/)) {
+                        original_layout.keep_horizontal = true;
+                    }
+                }
+
+
                 result.set(residue, original_layout);
             }
             return result;
