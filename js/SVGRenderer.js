@@ -119,16 +119,16 @@ class SVGRenderer extends Renderer {
     this.constructor.AppendSymbols(this);
   }
 
-  static AppendSymbols(element) {
+  static AppendSymbols(element,SYMBOLS_STRING=this.SYMBOLS) {
 
     if (element instanceof SVGRenderer) {
       element = element.element.canvas;
     }
 
-    const icons_elements = Promise.resolve(this.SYMBOLS).then( symbols_string => {
+    const icons_elements = Promise.resolve(SYMBOLS_STRING).then( symbols_string => {
       return (new DOMParser()).parseFromString(symbols_string, 'image/svg+xml');
     }).then( el => {
-      return el.querySelectorAll('svg defs');
+      return el.querySelectorAll('svg defs > *');
     });
 
     if (! (element instanceof SVGDefsElement)) {
@@ -138,7 +138,6 @@ class SVGRenderer extends Renderer {
     }
 
     return icons_elements.then( symbols => {
-      console.log(symbols);
       for (let symbol of symbols ) {
         element.appendChild(symbol.cloneNode(true));
       }
