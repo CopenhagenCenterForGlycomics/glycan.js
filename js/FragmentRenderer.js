@@ -236,7 +236,6 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
                     let base_layout = this.LayoutEngine.PerformLayout(fragment.original);
                     this.renderGlycosidicCleavage(container,base_layout.get(residue.original),base_layout.get(residue.original.parent), residue.original, residue.original.parent, true );
                 }
-                console.log(type,identifier,resolved_identifier);
             }
             if (fragment.chord.map( res => res.parent ).indexOf(residue) >= 0) {
                 let chord_parents = fragment.chord.map( res => res.parent );
@@ -248,7 +247,6 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
                     if (! type.match(/^[yz]/)) {
                         continue;
                     }
-                    console.log(sugar,type);
                     this.renderGlycosidicCleavage(container,base_layout.get(chord_residue.original),base_layout.get(residue.original), chord_residue.original, residue.original );
                 }
             }
