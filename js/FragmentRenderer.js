@@ -232,7 +232,7 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
                     let clean_type = type.replace(/[\,\-]/g,'_').replace(/\d+[a-z]$/,'');
                     resolved_identifier = `fragment_${clean_type}`;
                 }
-                if (type.match(/^[bz]/)) {
+                if (type.match(/^[bcyz]/)) {
                     let base_layout = this.LayoutEngine.PerformLayout(fragment.original);
                     this.renderGlycosidicCleavage(container,base_layout.get(residue.original),base_layout.get(residue.original.parent), residue.original, residue.original.parent, true );
                 }
