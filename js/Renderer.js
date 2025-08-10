@@ -32,6 +32,9 @@ const FULL_REFRESH = true;
 
 const str = (num) => num.toFixed(PRECISION);
 
+const BRACKET_STROKE_DEFAULT_COLOR = 'rgba(153,153,153,1)';
+const LINKAGE_STROKE_DEFAULT_COLOR = 'rgba(51,51,51,1)';
+
 const calculate_moved_residues = function(layout,residue) {
   if (! layout ) {
     // We don't have a layout specified, so we
@@ -172,7 +175,7 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
   ];
   let group = this.renderLinkageGroup(canvas,sugar,child);
   canvas.sendToBack(group);
-  group.line(...positions, { 'stroke-width': str(SCALE/100), 'stroke': '#333' });
+  group.line(...positions, { 'stroke-width': str(SCALE/100), 'stroke': LINKAGE_STROKE_DEFAULT_COLOR });
 
   if ( show_labels ) {
     render_link_label.call(this,child.anomer,parent.linkageOf(child),child_pos,parent_pos,group);
@@ -202,9 +205,9 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
     const cap = half_perpendicular_line( ...perpendicular , reverse_cap*SCALE * child_pos.width / 8 );
     const cap_end = half_perpendicular_line( perpendicular[2],perpendicular[3],perpendicular[0],perpendicular[1] , reverse_cap*-1*SCALE * child_pos.width / 8 );
 
-    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
-    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
-    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': BRACKET_STROKE_DEFAULT_COLOR });
+    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': BRACKET_STROKE_DEFAULT_COLOR });
+    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': BRACKET_STROKE_DEFAULT_COLOR });
 
   }
 
@@ -231,9 +234,9 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
     const cap = half_perpendicular_line( ...perpendicular , reverse_cap*SCALE * child_pos.width / 8 );
     const cap_end = half_perpendicular_line( perpendicular[2],perpendicular[3],perpendicular[0],perpendicular[1] , reverse_cap*-1*SCALE * child_pos.width / 8 );
 
-    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
-    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
-    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': '#999' });
+    group.line(...perpendicular, { 'stroke-width': str(5*SCALE/100), 'stroke': BRACKET_STROKE_DEFAULT_COLOR });
+    group.line(...cap, { 'stroke-width': str(5*SCALE/100), 'stroke': BRACKET_STROKE_DEFAULT_COLOR });
+    group.line(...cap_end, { 'stroke-width': str(5*SCALE/100), 'stroke': BRACKET_STROKE_DEFAULT_COLOR });
 
     if (child_repeat) {
       group.text( cap[2] , cap[3], child.repeat.identifier, { 'font-size' : str(Math.floor(SCALE/3)), 'text-anchor' : this.rotate ? 'middle' : 'end', 'dy' : this.rotate ? '1em':'0.25em', 'dx' : this.rotate ? '-0.25em' : '-0.25em' } );
@@ -482,5 +485,7 @@ class Renderer {
 }
 
 export { point_along_line, perpendicular_line, half_perpendicular_line, str };
+
+export { BRACKET_STROKE_DEFAULT_COLOR, LINKAGE_STROKE_DEFAULT_COLOR };
 
 export default Renderer;
