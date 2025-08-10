@@ -141,6 +141,7 @@ class SVGRenderer extends Renderer {
       for (let symbol of symbols ) {
         element.appendChild(symbol.cloneNode(true));
       }
+      use_css_variables(element);
     });
 
   }
@@ -351,5 +352,7 @@ StaticSVGRenderer = class extends SVGRenderer {
 
 
 SVGRenderer.DEFAULT_PADDING = DEFAULT_PADDING;
+
+export { use_css_variables };
 
 export default SVGRenderer;

@@ -1,6 +1,6 @@
 
 import { FragmentResidue } from './Fragmentor';
-import SVGRenderer  from './SVGRenderer';
+import SVGRenderer, { use_css_variables } from './SVGRenderer';
 import { perpendicular_line, half_perpendicular_line, point_along_line, str } from './Renderer';
 
 const FRAGMENT_SYMBOLS = `
@@ -24,7 +24,7 @@ const FRAGMENT_SYMBOLS = `
         <path d="M50 50 10 50 30 15.36 50 50z" fill="#999"/>
         <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
     </symbol>
-    <symbol id="fragment_1_3_x" viewBox="0 0 100 100">
+    <symbol id="fragment_1_3_a" viewBox="0 0 100 100">
         <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
         <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
         <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
@@ -33,7 +33,7 @@ const FRAGMENT_SYMBOLS = `
         <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
         <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
     </symbol>
-    <symbol id="fragment_1_3_a" viewBox="0 0 100 100">
+    <symbol id="fragment_1_3_x" viewBox="0 0 100 100">
         <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
         <path d="M90 50 50 50 70 15.36 90 50z" fill="#999"/>
         <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
@@ -158,6 +158,8 @@ const fix_rotate = function(position) {
     }
 }
 
+const FRAGMENT_MONOSACCHARIDE = Symbol('removed');
+
 const FragmentRenderer = (baserenderer) => class extends baserenderer {
 
     static async AppendSymbols(element) {
@@ -172,6 +174,25 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
 
     set LayoutEngine(engine) {
       super.LayoutEngine = FragmentLayout(engine);
+    }
+
+    addSugar(sugar) {
+        if (sugar.original) {
+            for (let residue of sugar.original.composition()) {
+                residue.setTag(FRAGMENT_MONOSACCHARIDE,null);
+            }
+            super.addSugar(sugar.original);
+            for (let mono of sugar.composition()) {
+                mono.original.setTag(FRAGMENT_MONOSACCHARIDE);
+            }
+            for ( let residue of sugar.chord ) {
+                let type = sugar.type.split('/')[sugar.chord.indexOf(residue)];
+                if (type.indexOf(',') >= 0) {
+                    residue.original.setTag(FRAGMENT_MONOSACCHARIDE);
+                }
+            }
+        }
+        super.addSugar(sugar);
     }
 
     renderGlycosidicCleavage(canvas,child_pos,parent_pos,child,parent,flip) {
@@ -204,7 +225,7 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
         let group = canvas.group();
 
 
-        let extent_fraction = flip ? 0.75 : 0.25;
+        let extent_fraction = flip ? 0.5 : 0.5;
 
         const bracket_position = point_along_line(...extents, extent_fraction );
         const perpendicular = perpendicular_line( bracket_position[0],bracket_position[1], extents[2],extents[3] , SCALE * child_pos.width * bracket_scale );
@@ -251,8 +272,15 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
                 }
             }
         }
-        const baseIcon = super.renderIcon(container,resolved_identifier,residue,sugar);
 
+        const baseIcon = super.renderIcon(container,resolved_identifier,residue,sugar);
+        if ( ! (residue instanceof FragmentResidue) ) {
+            if (!residue.getTag(FRAGMENT_MONOSACCHARIDE)) {
+                baseIcon.element.setAttribute('style','--fill-color: #eee;');
+            } else {
+                baseIcon.element.style.opacity =  0;
+            }
+        }
         return baseIcon;
     }
 };
