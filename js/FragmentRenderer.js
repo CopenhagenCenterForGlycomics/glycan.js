@@ -7,111 +7,111 @@ const FRAGMENT_SYMBOLS = `
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs>
     <symbol id="fragment_3_5_x" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
         <path d="M90 50 50 50 70 15.36 90 50z" fill="#999"/>
         <path d="M90 50 70 84.64 50 50 90 50z" fill="#999"/>
         <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="#999"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);" />
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);" />
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);" />
     </symbol>
     <symbol id="fragment_3_5_a" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M50 50 10 50 30 15.36 50 50z" fill="#999"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);"/>
     </symbol>
     <symbol id="fragment_1_3_a" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="#999"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);"/>
     </symbol>
     <symbol id="fragment_1_3_x" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
         <path d="M90 50 50 50 70 15.36 90 50z" fill="#999"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M50 50 10 50 30 15.36 50 50z" fill="#999"/>
         <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="#999"/>
     </symbol>
     <symbol id="fragment_1_5_x" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
         <path d="M90 50 50 50 70 15.36 90 50z" fill="#999"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);"/>
     </symbol>
     <symbol id="fragment_1_5_a" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="#999"/>
         <path d="M50 50 30 84.64 10 50 50 50z" fill="#999"/>
         <path d="M50 50 10 50 30 15.36 50 50z" fill="#999"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);"/>
     </symbol>
     <symbol id="fragment_2_4_x" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
         <path d="M90 50 50 50 70 15.36 90 50z" fill="#999"/>
         <path d="M90 50 70 84.64 50 50 90 50z" fill="#999"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="#999"/>
     </symbol>
     <symbol id="fragment_2_4_a" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
         <path d="M50 50 30 84.64 10 50 50 50z" fill="#999"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);"/>
     </symbol>
     <symbol id="fragment_0_2_x" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M90 50 70 84.64 50 50 90 50z" fill="#999"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);"/>
     </symbol>
     <symbol id="fragment_0_2_a" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
         <path d="M50 50 30 84.64 10 50 50 50z" fill="#999"/>
         <path d="M50 50 10 50 30 15.36 50 50z" fill="#999"/>
         <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="#999"/>
     </symbol>
     <symbol id="fragment_0_4_x" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M90 50 70 84.64 50 50 90 50z" fill="#999"/>
         <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="#999"/>
         <path d="M50 50 30 84.64 10 50 50 50z" fill="#999"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
-        <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="none"/>
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 15.36 50 50 30 15.36 70 15.36z" style="fill: rgba(0,0,0,0);"/>
     </symbol>
     <symbol id="fragment_0_4_a" viewBox="0 0 100 100">
-        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" fill="#fff" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
-        <path d="M90 50 50 50 70 15.36 90 50z" fill="none"/>
-        <path d="M90 50 70 84.64 50 50 90 50z" fill="none"/>
-        <path d="M70 84.64 30 84.64 50 50 70 84.64z" fill="none"/>
-        <path d="M50 50 30 84.64 10 50 50 50z" fill="none"/>
-        <path d="M50 50 10 50 30 15.36 50 50z" fill="none"/>
+        <path d="M70 15.36 30 15.36 10 50 30 84.64 70 84.64 90 50 70 15.36z" style="fill: #fff;" stroke="#aaa" stroke-miterlimit="10" stroke-width="3"/>
+        <path d="M90 50 50 50 70 15.36 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M90 50 70 84.64 50 50 90 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M70 84.64 30 84.64 50 50 70 84.64z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 30 84.64 10 50 50 50z" style="fill: rgba(0,0,0,0);"/>
+        <path d="M50 50 10 50 30 15.36 50 50z" style="fill: rgba(0,0,0,0);"/>
         <path d="M70 15.36 50 50 30 15.36 70 15.36z" fill="#999"/>
     </symbol>
     </defs>
@@ -232,11 +232,11 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
         const cap = half_perpendicular_line( ...perpendicular , reverse_cap*SCALE * child_pos.width / 8 );
         const cap_end = half_perpendicular_line( perpendicular[2],perpendicular[3],perpendicular[0],perpendicular[1] , reverse_cap*-1*SCALE * child_pos.width / 8 );
 
-        group.line(...perpendicular, { 'stroke-width': str(10*SCALE/100), 'stroke': '#f00' });
+        group.line(...perpendicular, { 'stroke-width': str(10*SCALE/100), 'stroke': 'var(--fragment-stroke-color,#f00)' });
         if (is_angled <= 0) {
-            group.line(...cap_end, { 'stroke-width': str(10*SCALE/100), 'stroke': '#f00' });
+            group.line(...cap_end, { 'stroke-width': str(10*SCALE/100), 'stroke': 'var(--fragment-stroke-color,#f00)' });
         } else {
-            group.line(...cap, { 'stroke-width': str(10*SCALE/100), 'stroke': '#f00' });
+            group.line(...cap, { 'stroke-width': str(10*SCALE/100), 'stroke': 'var(--fragment-stroke-color,#f00)' });
         }
 
     }
@@ -276,14 +276,16 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
         const baseIcon = super.renderIcon(container,resolved_identifier,residue,sugar);
         if ( ! (residue instanceof FragmentResidue) ) {
             if (!residue.getTag(FRAGMENT_MONOSACCHARIDE)) {
-                baseIcon.element.setAttribute('style','--fill-color: #eee;');
+                baseIcon.element.setAttribute('style','--fill-color: var(--fragment-removed-color, initial )');
             } else {
                 baseIcon.element.style.opacity =  0;
             }
+        } else {
+            baseIcon.element.setAttribute('style','--fill-color: var(--fragment-color , initial )');
         }
+
         return baseIcon;
     }
 };
-
 
 export { FragmentRenderer, FRAGMENT_SYMBOLS };
