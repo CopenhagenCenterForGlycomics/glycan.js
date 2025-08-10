@@ -276,12 +276,12 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
         const baseIcon = super.renderIcon(container,resolved_identifier,residue,sugar);
         if ( ! (residue instanceof FragmentResidue) ) {
             if (!residue.getTag(FRAGMENT_MONOSACCHARIDE)) {
-                baseIcon.element.setAttribute('style','--fill-color: var(--fragment-removed-color, initial )');
+                baseIcon.element.style.setProperty('--fill-color','var(--fragment-removed-color)');
             } else {
                 baseIcon.element.style.opacity =  0;
             }
         } else {
-            baseIcon.element.setAttribute('style','--fill-color: var(--fragment-color , initial )');
+            baseIcon.element.style.setProperty('--fill-color','var(--fragment-color)');
         }
 
         return baseIcon;
