@@ -7,6 +7,10 @@
   "directories": {
     "test": "test"
   },
+  "exports" : {
+    "." : "./js/main.js",
+    "./fragmentor" : "./js/Fragmentor.js"
+  },
   "dependencies": {
     "debug-any-level": "^0.3.0",
     "es6-tween": "^5.5.11",

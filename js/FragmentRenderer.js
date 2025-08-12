@@ -253,14 +253,14 @@ const FragmentRenderer = (baserenderer) => class extends baserenderer {
                     let clean_type = type.replace(/[\,\-]/g,'_').replace(/\d+[a-z]$/,'');
                     resolved_identifier = `fragment_${clean_type}`;
                 }
-                if (type.match(/^[bcyz]/)) {
+                if (type.match(/^[bc]/)) {
                     let base_layout = this.LayoutEngine.PerformLayout(fragment.original);
                     this.renderGlycosidicCleavage(container,base_layout.get(residue.original),base_layout.get(residue.original.parent), residue.original, residue.original.parent, true );
                 }
             }
             if (fragment.chord.map( res => res.parent ).indexOf(residue) >= 0) {
                 let chord_parents = fragment.chord.map( res => res.parent );
-                let chord_indices = chord_parents.map( res => res == residue ).map( (o,i) => i );
+                let chord_indices = chord_parents.map( (res,idx) => res == residue ? idx : -1 ).filter( idx => idx > -1 );
                 let base_layout = this.LayoutEngine.PerformLayout(fragment.original);
                 for (let chord_index of chord_indices) {
                     let chord_residue = fragment.chord[chord_index]

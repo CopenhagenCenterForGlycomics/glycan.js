@@ -423,6 +423,11 @@ class Renderer {
     this[rendered_sugars_symbol].push(sugar);
   }
 
+  removeAllSugars() {
+    cleanup_residues.bind(this)(Array.prototype.concat(...this[rendered_sugars_symbol].map(sug => sug.composition())));
+    this[rendered_sugars_symbol].length = 0;
+  }
+
   get sugars() {
     return Object.freeze([].concat( this[rendered_sugars_symbol] ));
   }
