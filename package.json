@@ -9,7 +9,8 @@
   },
   "exports" : {
     "." : "./js/main.js",
-    "./fragmentor" : "./js/Fragmentor.js"
+    "./fragmentor" : "./js/Fragmentor.js",
+    "./mass" : "./js/Mass.js"
   },
   "dependencies": {
     "debug-any-level": "^0.3.0",

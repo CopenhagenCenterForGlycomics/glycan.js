@@ -43,7 +43,13 @@ let parseReaction = (sugar) => {
   let [ subseq, location ] = comment.split('@');
   subseq = subseq.replace(/[{}]/g,'');
 
-  let reaction_class = rewrite_sequence(Sugar.CopyIO(sugar));
+  const minimal_subclass = class extends Sugar {
+    static get Monosaccharide() {
+      return sugar.constructor.Monosaccharide;
+    }
+  };
+
+  let reaction_class = rewrite_sequence(minimal_subclass.CopyIO(sugar));
 
   let subsugar = new reaction_class();
   sugar[negative_symbol] = negative_flag;

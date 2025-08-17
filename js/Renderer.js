@@ -291,6 +291,11 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
   for (let residue of (layout ? new_residues : [])) {
 
     let position = layout.get(residue);
+
+    if ( ! position ) {
+      continue;
+    }
+
     let xval = position.x;
     let yval = position.y;
     if (ROTATE) {
@@ -425,6 +430,7 @@ class Renderer {
 
   removeAllSugars() {
     cleanup_residues.bind(this)(Array.prototype.concat(...this[rendered_sugars_symbol].map(sug => sug.composition())));
+    this.rendered.clear();
     this[rendered_sugars_symbol].length = 0;
   }
 
