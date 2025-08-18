@@ -612,7 +612,14 @@ const Mass = (base) => {
     }
 
     set reducing_end(reduction=REDUCING_END_FREE) {
+      if (! this.root) {
+        return;
+      }
       this.root.reducing_end = reduction;
+    }
+
+    get reducing_end() {
+      return this.root?.reducing_end;
     }
 
     derivatise(derivative) {
