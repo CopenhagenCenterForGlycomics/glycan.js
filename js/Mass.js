@@ -586,6 +586,13 @@ const Mass = (base) => {
     get proto() {
       return (MONOSACCHARIDES[this.identifier] || {}).type;
     }
+
+    clone() {
+      let cloned = super.clone();
+      cloned[reducing_end_info] = this[reducing_end_info];
+      cloned[derivative_info] = this[derivative_info];
+      return cloned;
+    }
   }
 
   return class SugarMass extends base {
