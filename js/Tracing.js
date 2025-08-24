@@ -1,8 +1,8 @@
 'use strict';
 
-import debug from './Debug';
+import debug from './Debug.js';
 
-import Monosaccharide from './Monosaccharide';
+import Monosaccharide from './Monosaccharide.js';
 
 const module_string='glycanjs:tracing';
 

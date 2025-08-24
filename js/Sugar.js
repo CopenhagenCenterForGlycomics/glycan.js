@@ -1,12 +1,12 @@
 'use strict';
-import Monosaccharide from './Monosaccharide';
-import Repeat from './Repeat';
+import Monosaccharide from './Monosaccharide.js';
+import Repeat from './Repeat.js';
 
-import { Tracer } from './Tracing';
+import { Tracer } from './Tracing.js';
 
-import { CachingSearcher, CacheTrace } from './Searching';
+import { CachingSearcher, CacheTrace } from './Searching.js';
 
-import get_residue_chords from './residue_chords';
+import get_residue_chords from './residue_chords.js';
 
 let root_symbol = Symbol('root');
 

@@ -9,7 +9,7 @@ const S = Symbol('S');
 
 const NA = Symbol('Na');
 
-import * as DEFAULT_MASS_PROVIDER from './mass_provider';
+import * as DEFAULT_MASS_PROVIDER from './mass_provider.js';
 
 let CURRENT_MASS_PROVIDER = DEFAULT_MASS_PROVIDER;
 

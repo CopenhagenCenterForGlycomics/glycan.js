@@ -1,13 +1,13 @@
 
-import Reaction from './Reaction';
+import Reaction from './Reaction.js';
 
-import { CacheTrace } from './Searching';
+import { CacheTrace } from './Searching.js';
 
-import { EpimerisableMonosaccharide } from './Epimerisation';
+import { EpimerisableMonosaccharide } from './Epimerisation.js';
 
-import { SKIP_CACHE_TAG } from './Searching';
+import { SKIP_CACHE_TAG } from './Searching.js';
 
-import debug from './Debug';
+import debug from './Debug.js';
 
 const reactions = Symbol('reactions');
 

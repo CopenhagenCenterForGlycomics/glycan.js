@@ -1,5 +1,5 @@
 
-import { trace_into_class, TracedMonosaccharide } from './Tracing';
+import { trace_into_class, TracedMonosaccharide } from './Tracing.js';
 
 import { C as CSYMB,
          H as HSYMB,

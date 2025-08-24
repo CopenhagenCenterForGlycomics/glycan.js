@@ -1,7 +1,7 @@
 /*global */
 'use strict';
 
-import * as Glycan from './main';
+import * as Glycan from './main.js';
 
 let Iupac = Glycan.CondensedIupac.IO;
 

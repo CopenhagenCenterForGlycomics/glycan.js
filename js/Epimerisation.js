@@ -1,4 +1,4 @@
-import { default as Monosaccharide } from './Monosaccharide';
+import { default as Monosaccharide } from './Monosaccharide.js';
 
 const epimerised_identifier_symbol = Symbol('epimerised_identifier');
 

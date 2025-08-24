@@ -5,10 +5,10 @@ import { Tween, autoPlay, onTick } from 'es6-tween';
 
 import debug from './Debug';
 
-import Renderer from './Renderer';
-import Canvas from './CanvasCanvas';
+import Renderer from './Renderer.js';
+import Canvas from './CanvasCanvas.js';
 
-import CanvasMouse from '../lib/canvas-mouse';
+import CanvasMouse from '../lib/canvas-mouse.js';
 
 const module_string='glycanjs:canvasrenderer';
 

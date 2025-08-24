@@ -1,10 +1,10 @@
 /*global */
 'use strict';
-import debug from './Debug';
+import debug from './Debug.js';
 
-import SVGCanvas from './SVGCanvas';
+import SVGCanvas from './SVGCanvas.js';
 
-import Renderer from './Renderer';
+import Renderer from './Renderer.js';
 
 const module_string='glycanjs:svgrenderer';
 

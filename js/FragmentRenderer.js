@@ -1,7 +1,7 @@
 
-import { FragmentResidue } from './Fragmentor';
-import SVGRenderer, { use_css_variables } from './SVGRenderer';
-import { perpendicular_line, half_perpendicular_line, point_along_line, str } from './Renderer';
+import { FragmentResidue } from './Fragmentor.js';
+import SVGRenderer, { use_css_variables } from './SVGRenderer.js';
+import { perpendicular_line, half_perpendicular_line, point_along_line, str } from './Renderer.js';
 
 const FRAGMENT_SYMBOLS = `
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

@@ -1,6 +1,6 @@
-import QuadTree from '../lib/QuadTree';
+import QuadTree from '../lib/QuadTree.js';
 
-import debug from './Debug';
+import debug from './Debug.js';
 
 const module_string='glycanjs:condensedlayout';
 

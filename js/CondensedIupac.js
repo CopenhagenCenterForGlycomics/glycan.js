@@ -1,6 +1,6 @@
 
-import Monosaccharide from './Monosaccharide';
-import Repeat from './Repeat';
+import Monosaccharide from './Monosaccharide.js';
+import Repeat from './Repeat.js';
 
 let follow_bold_branch, create_bold_tree;
 

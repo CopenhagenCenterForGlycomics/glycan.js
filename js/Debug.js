@@ -1,2 +1,3 @@
-const debug = require('debug-any-level');
+import debug from 'debug-any-level';
+
 export { debug as default };

@@ -1,10 +1,10 @@
 'use strict';
 
-import debug from './Debug';
+import debug from './Debug.js';
 
-import Monosaccharide from './Monosaccharide';
+import Monosaccharide from './Monosaccharide.js';
 
-import Repeat from './Repeat';
+import Repeat from './Repeat.js';
 
 const module_string='glycanjs:renderer';
 

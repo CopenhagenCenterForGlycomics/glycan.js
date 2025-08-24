@@ -1,6 +1,6 @@
-import debug from './Debug';
+import debug from './Debug.js';
 
-import SugarAwareLayout from './SugarAwareLayout';
+import SugarAwareLayout from './SugarAwareLayout.js';
 
 const module_string='glycanjs:fisheyelayout';
 

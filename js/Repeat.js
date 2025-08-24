@@ -24,11 +24,11 @@ const repeat_symbol = Symbol('repeat');
 
 const counter_symbol = Symbol('counter');
 
-import { default as Monosaccharide, calculateSiblingOrder } from './Monosaccharide';
+import { default as Monosaccharide, calculateSiblingOrder } from './Monosaccharide.js';
 
-import { TracedMonosaccharide } from './Tracing';
+import { TracedMonosaccharide } from './Tracing.js';
 
-import MixedTupleMap from '../lib/MixedTupleMap';
+import MixedTupleMap from '../lib/MixedTupleMap.js';
 
 /*
 

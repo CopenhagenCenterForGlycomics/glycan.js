@@ -1,8 +1,8 @@
 'use strict';
 
-import debug from './Debug';
+import debug from './Debug.js';
 // import MixedTupleMap from '../lib/MixedTupleMap';
-import TupleCache from './TupleCache';
+import TupleCache from './TupleCache.js';
 
 const module_string='glycanjs:searching';
 

@@ -1,9 +1,9 @@
 
-import Sugar from './Sugar';
+import Sugar from './Sugar.js';
 
-import { EpimerisableMonosaccharide } from './Epimerisation';
-import Repeat from './Repeat';
-import { comparator } from './ReactionSet';
+import { EpimerisableMonosaccharide } from './Epimerisation.js';
+import Repeat from './Repeat.js';
+import { comparator } from './ReactionSet.js';
 
 let comment_symbol = Symbol('comment_string');
 let negative_symbol = Symbol('is_negative');

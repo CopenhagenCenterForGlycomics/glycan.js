@@ -1,8 +1,8 @@
-import { default as SugarAwareLayout, calculate_layout_hso3 } from './SugarAwareLayout';
-import {IO as Iupac} from './CondensedIupac';
-import Sugar from './Sugar';
+import { default as SugarAwareLayout, calculate_layout_hso3 } from './SugarAwareLayout.js';
+import {IO as Iupac} from './CondensedIupac.js';
+import Sugar from './Sugar.js';
 
-import Monosaccharide from './Monosaccharide';
+import Monosaccharide from './Monosaccharide.js';
 
 
 class IupacSugar extends Iupac(Sugar) {}

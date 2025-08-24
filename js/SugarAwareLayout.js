@@ -1,11 +1,11 @@
-import CondensedLayout from './CondensedLayout';
+import CondensedLayout from './CondensedLayout.js';
 
-import Monosaccharide from './Monosaccharide';
+import Monosaccharide from './Monosaccharide.js';
 
-import {IO as Iupac} from './CondensedIupac';
-import Sugar from './Sugar';
+import {IO as Iupac} from './CondensedIupac.js';
+import Sugar from './Sugar.js';
 
-import Repeat from './Repeat';
+import Repeat from './Repeat.js';
 
 const not_sulf = res => res.identifier !== 'HSO3';
 
