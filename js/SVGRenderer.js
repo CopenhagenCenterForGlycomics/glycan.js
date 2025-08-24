@@ -24,7 +24,13 @@ const DEFAULT_PADDING= { side: 1, top: 1 };
 
 const isNodejs = () => { return typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node !== 'undefined'; };
 
-const SYMBOLS_DEF = ( ! isNodejs() ) ? require('../sugars.svg').default : '';
+let symbols_def = '';
+
+if (! isNodejs() ) {
+  symbols_def = (await import('../sugars.svg', { with: { type: 'text' } }))?.default || '';
+}
+
+const SYMBOLS_DEF = symbols_def;
 
 const str = (num) => num.toFixed(PRECISION);
 
