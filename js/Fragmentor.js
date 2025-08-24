@@ -15,7 +15,7 @@ import { C as CSYMB,
          calculate_a_fragment_composition,
          delete_composition as del,
          summarise_composition
-       } from './Mass';
+       } from './Mass.js';
 
 const retained_test = (n,i,j) => ((n <= j && i === 0) || ((n <= i || n > j) && i !== 0));
 
