@@ -123,6 +123,9 @@ class FragmentResidue extends TracedMonosaccharide {
     let a_composition = [];
     let base_atoms = Array.from([[OSYMB]].concat(this.original.ring_atoms));
     let result = [];
+    if (base_atoms.length < 2) {
+      return result;
+    }
     if ( this.type ) {
       cross_type = this.type.match(/(\d,\d)-([ax])/);
       if (cross_type) {
@@ -422,6 +425,7 @@ class Fragmentor {
       fragment.type = null;
       fragment.chord = { root: target.root, chord: [ target.root ] };
       fragment.type = type+'0a';
+      fragment.original = target;
       yield fragment;
     }
   }
