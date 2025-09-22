@@ -27,7 +27,7 @@ const isNodejs = () => { return typeof process === 'object' && typeof process.ve
 let symbols_def = '';
 
 if (! isNodejs() ) {
-  symbols_def = (await import('../sugars.svg', { with: { type: 'text' } }))?.default || '';
+  symbols_def = (await import('../sugars.svg'))?.default || '';
 }
 
 const SYMBOLS_DEF = symbols_def;
