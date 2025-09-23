@@ -311,6 +311,10 @@ class CanvasRenderer extends Renderer {
     }
   }
 
+  static async AppendSymbols(element,SYMBOLS_STRING=this.SYMBOLS) {
+    return element.ready;
+  }
+
   static get Canvas() {
     return Canvas;
   }

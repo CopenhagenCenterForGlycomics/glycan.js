@@ -462,6 +462,10 @@ class Renderer {
     return Promise.resolve();
   }
 
+  appendSymbols() {
+    this.constructor.AppendSymbols(this);
+  }
+
   setupContainer() {
   }
 

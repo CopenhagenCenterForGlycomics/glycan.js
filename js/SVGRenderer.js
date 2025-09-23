@@ -113,21 +113,16 @@ class SVGRenderer extends Renderer {
     return SCALE;
   }
 
-  appendSymbols() {
-    this.constructor.AppendSymbols(this);
-  }
-
-  static AppendSymbols(element,SYMBOLS_STRING=this.SYMBOLS) {
+  static async AppendSymbols(element,SYMBOLS_STRING=this.SYMBOLS) {
 
     if (element instanceof SVGRenderer) {
       element = element.element.canvas;
     }
 
-    const icons_elements = Promise.resolve(SYMBOLS_STRING).then( symbols_string => {
-      return (new DOMParser()).parseFromString(symbols_string, 'image/svg+xml');
-    }).then( el => {
-      return el.querySelectorAll('svg defs > *');
-    });
+    const symbols_string = await Promise.resolve(SYMBOLS_STRING);
+    const doc = (new DOMParser()).parseFromString(symbols_string, 'image/svg+xml');
+
+    const symbols = doc.querySelectorAll('svg defs > *');
 
     if (! (element instanceof SVGDefsElement)) {
       let el = element.ownerDocument.createElementNS('http://www.w3.org/2000/svg','defs');
@@ -135,12 +130,11 @@ class SVGRenderer extends Renderer {
       element = el;
     }
 
-    return icons_elements.then( symbols => {
-      for (let symbol of symbols ) {
+    for (let symbol of symbols) {
         element.appendChild(symbol.cloneNode(true));
-      }
-      use_css_variables(element);
-    });
+    }
+
+    use_css_variables(element);
 
   }
 
