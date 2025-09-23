@@ -4,25 +4,19 @@
   "description": "A tiny library for drawing glycans",
   "main": "./js/index.js",
   "module": "./js/main.js",
-  "type" : "module",
+  "type": "module",
   "directories": {
     "test": "test"
   },
-  "exports" : {
+  "exports": {
     ".": {
-      "node": {
-        "import": "./js/index.js"
-      },
-      "browser": {
-        "import": "./js/main.js"
-      },
-      "default": "./js/index.mjs"
+      "browser" : "./js/main.js",
+      "node" : "./js/main-node.js"
     },
-    "." : "./js/main.js",
-    "./sugar" : "./js/Sugar.js",
-    "./iupac" : "./js/CondensedIupac.js",
-    "./fragmentor" : "./js/Fragmentor.js",
-    "./mass" : "./js/Mass.js"
+    "./sugar": "./js/Sugar.js",
+    "./iupac": "./js/CondensedIupac.js",
+    "./fragmentor": "./js/Fragmentor.js",
+    "./mass": "./js/Mass.js"
   },
   "dependencies": {
     "debug": "^4.4.1",

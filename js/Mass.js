@@ -607,7 +607,7 @@ const Mass = (base) => {
                                       map( res => res.atoms ).flat();
 
       // Only the parent sugar gets to add back in the reducing end atoms
-      const reducing_end_deriv = this.root?.reducing_end;
+      const reducing_end_deriv = this.root ? this.root.reducing_end : null;
       const other_derivative = this.root.derivative;
       const result = reducing_end_deriv.calculate_reducing_end(monosaccharide_atoms,other_derivative);
 
@@ -626,7 +626,7 @@ const Mass = (base) => {
     }
 
     get reducing_end() {
-      return this.root?.reducing_end;
+      return this.root ? this.root.reducing_end : null;
     }
 
     derivatise(derivative) {

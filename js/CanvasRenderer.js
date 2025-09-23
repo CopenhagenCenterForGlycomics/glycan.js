@@ -10,19 +10,11 @@ import Canvas from './CanvasCanvas.js';
 
 import CanvasMouse from '../lib/canvas-mouse.js';
 
+import SYMBOLS_DEF from '../sugars.svg';
+
 const module_string='glycanjs:canvasrenderer';
 
 const container_symbol = Symbol('document_container');
-
-const isNodejs = () => { return typeof process === 'object' && typeof process.versions === 'object' && typeof process.versions.node !== 'undefined'; };
-
-let symbols_def = '';
-
-if (! isNodejs() ) {
-  symbols_def = (await import('../sugars.svg'))?.default || '';
-}
-
-const SYMBOLS_DEF = symbols_def;
 
 const SCALE = 100;
 
