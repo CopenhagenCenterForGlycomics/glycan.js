@@ -28,6 +28,7 @@
     "@babel/preset-env": "^7.4.5",
     "babel-loader": "^8.0.5",
     "core-js": "2",
+    "esbuild": "0.25.10",
     "eslint": "^7.5.0",
     "jsdom": "^24.0.0",
     "karma": "^6.4.2",
@@ -43,10 +44,11 @@
     "webpack-dev-server": "^4.15.1"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start --single-run --browsers jsdom",
+    "test": "./node_modules/karma/bin/karma start karma.conf.cjs --single-run --browsers jsdom",
+    "test-watch": "./node_modules/karma/bin/karma start karma.conf.cjs --browsers jsdom",
     "tracetest": "./scripts/trace_tests.sh",
-    "build-web": "./node_modules/.bin/webpack -d",
-    "build-watch-web": "./node_modules/.bin/webpack --watch",
+    "build-web": "./node_modules/.bin/webpack -d --config webpack.config.cjs",
+    "build-watch-web": "./node_modules/.bin/webpack --watch --config webpack.config.cjs",
     "server": "python ./scripts/simplehttpserver",
     "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
     "lint": "./node_modules/.bin/eslint test/**/*.js js/*.js --fix",

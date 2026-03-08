@@ -1,6 +1,8 @@
 /*global QUnit*/
 
-import * as debug from 'debug-any-level';
+import debug from '../js/Debug.js';
+
+// import * as debug from 'debug-any-level';
 
 // Polyfill in the bind function, just in case we
 // don't have it available

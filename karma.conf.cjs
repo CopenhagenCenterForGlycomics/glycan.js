@@ -1,6 +1,6 @@
 // Karma configuration
 // Generated on Mon Apr 20 2015 22:29:04 GMT+0200 (CEST)
-const webpack = require('./webpack.config.js');
+const webpack = require('./webpack.config.cjs');
 
 webpack.devtool = 'inline-source-map';
 webpack.mode = 'development';
@@ -45,7 +45,7 @@ module.exports = function(config) {
     files: getSpecs(process.env.KARMA_SPECS),
 
     client: {
-        qunit: { debug: process.env.DEBUG }
+        qunit: { debug: process.env.DEBUG, filter: process.env.TEST_FILTER }
     },
 
     // list of files to exclude

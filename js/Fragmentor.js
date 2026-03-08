@@ -399,17 +399,20 @@ class Fragmentor {
       let types = cartesian.apply(null,all_types);
       let coordinates = chord.chord.map(get_coord_for_res.bind(null,target));
       let coords = get_coordinate.bind(null,coordinates,max_depth);
-      for (let type of types) {
-        if ( ! Array.isArray(type) ){
-          type = [type];
+      for (let f_type of types) {
+        if ( ! Array.isArray(f_type) ){
+          f_type = [f_type];
         }
-        if ( type[0].match(/^[bc]/) && chord.root === target.root) {
+        if ( f_type[0].match(/^[bc]/) && chord.root === target.root) {
+          continue;
+        }
+        if ( f_type.length < 2 && chord.root !== chord.chord[0] ) {
           continue;
         }
         let fragment = fragment_template.clone();
         fragment.type = null;
         fragment.chord = chord;
-        fragment.type = type.map(coords).join('/');
+        fragment.type = f_type.map(coords).join('/');
         fragment.original = target;
 
         let curr_composition = fragment.composition();
@@ -420,11 +423,11 @@ class Fragmentor {
       }
     }
 
-    for (let type of [ '3,5-x','1,3-x','1,5-x','2,4-x','0,2-x','0,4-x', '1,1-w','2,2-w', '3,3-w', '4,4-w', '5,5-w' ]) {
+    for (let f_type of [ '3,5-x','1,3-x','1,5-x','2,4-x','0,2-x','0,4-x', '1,1-w','2,2-w', '3,3-w', '4,4-w', '5,5-w' ]) {
       let fragment = fragment_template.clone();
       fragment.type = null;
       fragment.chord = { root: target.root, chord: [ target.root ] };
-      fragment.type = type+'0a';
+      fragment.type = f_type+'0a';
       fragment.original = target;
       yield fragment;
     }

@@ -93,6 +93,20 @@ QUnit.test( 'Masses work trisaccharide' , function( assert ) {
   }
 });
 
+QUnit.test( 'Generates the right number of fragments' , function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'Gal(b1-3)[GlcA(b1-6)]GalNAc';
+  let wanted_fragments = FRAGMENTS[sugar.sequence];
+  let types = [];
+  for (let frag of Fragmentor.fragment(sugar,2)) {
+    if (frag.type.match(/\d,\d-[awxe]/) ) {
+      continue;
+    }
+    types.push(frag.type);
+  }
+  assert.deepEqual(types.sort(),['y1a','z1a','b1a','c1a','y1b','z1b','b1b','c1b','y1a/y1b','y1a/z1b','z1a/y1b','z1a/z1b'].sort())
+});
+
 QUnit.test( 'Fragment generation works per type' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'Gal(b1-3)[GlcA(b1-6)]GalNAc';

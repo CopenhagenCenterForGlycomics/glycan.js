@@ -135,7 +135,7 @@ EHJ
 FHI
 FHJ`;
 
-QUnit.module('Test that we can clone sugars', {
+QUnit.module('Test that we can get chords', {
 });
 
 QUnit.test( 'Generating single chords works' , function( assert ) {
