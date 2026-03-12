@@ -30,6 +30,10 @@ class Derivative {
     return true;
   }
 
+  accepts_residue(monosaccharide) {
+    return true;
+  }
+
   apply(atoms) {
     return [].concat(atoms);
   }
@@ -54,6 +58,27 @@ class Derivative {
     return result;
   }
 
+}
+
+class DerivativeSet {
+  #derivatives = [];
+  #label = '';
+
+  constructor(label,...derivatives) {
+    this.#label = label;
+    for (let deriv of derivatives) {
+      this.#derivatives.push(deriv);
+    }
+  }
+
+  firstValid(monosaccharide) {
+    for (let deriv of this.#derivatives) {
+      if (deriv.accepts_residue(monosaccharide)) {
+        return deriv;
+      }
+    }
+    return;
+  }
 }
 
 class NonReducingDerivative extends Derivative {
@@ -115,7 +140,7 @@ class ReducingEnd2AB extends ReducingEnd {
   }
 }
 
-const make_derivative = (name,accept= v => v,deriv_atoms=[],base=Derivative) => {
+const make_derivative = (name,accept= v => v,deriv_atoms=[],base=Derivative, acceptance_test = r => true ) => {
   let new_derivative = class extends base {
     constructor() {
       super(name);
@@ -123,6 +148,10 @@ const make_derivative = (name,accept= v => v,deriv_atoms=[],base=Derivative) => 
 
     get derivative_atoms() {
       return deriv_atoms;
+    }
+
+    accepts_residue(monosaccharide) {
+      return acceptance_test(monosaccharide);
     }
 
     can_accept(atoms,position) {
@@ -152,9 +181,19 @@ const REDUCING_END_2AA = (Object.freeze(new ReducingEnd2AA('2AA labelled reducin
 
 const REDUCING_END_2AB = (Object.freeze(new ReducingEnd2AB('2AB labelled reducing end')));
 
+const DERIV_ETHYL_ESTER =       make_derivative('ethyl ester',
+                                                (a,p) => p == 1,
+                                                [C,C,H,H,H,H],
+                                                NonReducingDerivative,
+                                                r =>  r.identifier == 'NeuAc' && r.parent && r.parent.linkageOf(r) == 6 );
 
-const DERIV_ETHYL_ESTER =       make_derivative('ethyl ester', (a,p) => p == 1, [C,C,H,H,H,H], NonReducingDerivative );
-const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation', (a,p) => p == 1, [H, N, new RemovableAtom(O) ], NonReducingDerivative);
+const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation',
+                                                (a,p) => p == 1,
+                                                [H, N, new RemovableAtom(O) ],
+                                                NonReducingDerivative,
+                                                r => r.identifier == 'NeuAc' && r.parent && r.parent.linkageOf(r) == 3 );
+
+const DERIV_SIALIC_ACID = Object.freeze(new DerivativeSet('Sialic acid esterification, amidation',DERIV_ETHYL_ESTER,DERIV_AMMONIA_AMIDATION));
 
 const DEFINITIONS =`
 terminii:r1:x;2:x;3:x;4:x
@@ -535,16 +574,10 @@ const Mass = (base) => {
     }
 
     set derivative(derivative) {
-      let valid_derivative = [ UNDERIVATISED, PERMETHYLATED ].indexOf(derivative) >= 0;
-      if (derivative === DERIV_ETHYL_ESTER) {
-        valid_derivative = this.identifier == 'NeuAc' && this.parent && this.parent.linkageOf(this) == 6;
-      }
-      if (derivative === DERIV_AMMONIA_AMIDATION) {
-        valid_derivative = this.identifier == 'NeuAc' && this.parent && this.parent.linkageOf(this) == 3;
-      }
+      let valid_derivative = derivative.accepts_residue(this);
 
       if (!valid_derivative) {
-        throw new Error('Bad derivative');
+        return;
       }
       this[derivative_info] = derivative;
       return;
@@ -631,7 +664,15 @@ const Mass = (base) => {
 
     derivatise(derivative) {
       for (let res of this.composition()) {
-        res.derivative = derivative;
+        if (derivative instanceof DerivativeSet) {
+          let valid_derivative = derivative.firstValid(res);
+          if (!valid_derivative) {
+            continue;
+          }
+          res.derivative = valid_derivative;
+        } else {
+          res.derivative = derivative;
+        }
       }
     }
   };
@@ -651,7 +692,7 @@ Object.defineProperty(Mass, 'MASS_PROVIDER', {
 export { C, H, O, N, NA,
          Mass,
          REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_2AA, REDUCING_END_FREE,
-         DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION,
+         DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION, DERIV_SIALIC_ACID,
          UNDERIVATISED, PERMETHYLATED,
          calculate_a_fragment_composition,
          summarise_composition,
