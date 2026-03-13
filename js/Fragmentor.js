@@ -142,7 +142,8 @@ class FragmentResidue extends TracedMonosaccharide {
     if (result.length < 1) {
       result = del(base_atoms.flat(),a_composition.flat());
     }
-    result = del(result, REDUCING_END_FREE.calculate_reducing_end([],this.original.derivative));
+    let reducing_end_atoms = REDUCING_END_FREE.calculate_reducing_end([],this.original.derivative,this);
+    result = del(result, reducing_end_atoms);
     return result;
   }
 }
@@ -274,7 +275,7 @@ let Fragmentable = (base) => class extends base {
 
       const reducing_end_deriv = this.root.original.reducing_end;
       const other_derivative = this.root.original.derivative;
-      result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative);
+      result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative,this.root);
 
       result_composition = del(result_composition,[HSYMB].concat(this.root.original.derivative.derivative_atoms));
 
@@ -283,7 +284,7 @@ let Fragmentable = (base) => class extends base {
 
       const reducing_end_deriv = this.root.original.reducing_end;
       const other_derivative = this.root.original.derivative;
-      result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative);
+      result_composition = reducing_end_deriv.calculate_reducing_end(result_composition,other_derivative,this.root);
     }
 
     if (this.type.match(/^1,1-[w]/)) {

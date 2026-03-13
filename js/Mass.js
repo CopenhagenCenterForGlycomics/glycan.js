@@ -47,10 +47,13 @@ class Derivative {
     for (let item of new_atoms) {
       if (item instanceof RemovableAtom) {
         let idx = result.indexOf(item.atom);
+
         if (idx < 0) {
-          throw new Error('Bad index');
+          throw new Error('Cannot remove atom');
+        } else {
+          result.splice(idx,1);
+
         }
-        result.splice(idx,1);
       } else {
         result.push(item);
       }
@@ -86,7 +89,7 @@ class NonReducingDerivative extends Derivative {
 }
 
 class ReducingEnd extends Derivative {
-  calculate_reducing_end(atoms,other_derivative) {
+  calculate_reducing_end(atoms,other_derivative,monosaccharide) {
     let result = super.apply(atoms);
     let other_derivative_atoms = other_derivative.derivative_atoms;
     let reducing_end_atoms = [ ];
@@ -95,13 +98,50 @@ class ReducingEnd extends Derivative {
 }
 
 class ReducingEndFree extends ReducingEnd {
-  calculate_reducing_end(atoms,other_derivative) {
+  calculate_reducing_end(atoms,other_derivative,monosaccharide) {
     let result = super.apply(atoms);
     let other_derivative_atoms = other_derivative.derivative_atoms;
-    let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms) ].flat();
-    return Derivative.Apply(result, reducing_end_atoms);
+    let reducing_end_atoms = [H];
+    let mono_ring_atoms = monosaccharide.original ? monosaccharide.original.ring_atoms : monosaccharide.ring_atoms;
+
+    // FIXME - is this actually brittle?
+    // The free reducing end really means that
+    // you are adding 18 (O+H+H) when underivatised, that caps at the start and the end
+
+    // This code below works, but it is weird that we need to add the other_derivative_atoms here
+    // when it doesn't actually have anything to do with a free reducing end.
+    // in get atoms() from MonosaccharideMass, it looks like it is being removed again!
+
+    // res = delete_composition(res, REDUCING_END_FREE.calculate_reducing_end([],derivative,this));
+
+    // And the same in FragmentResidue and Fragmentable from Fragmentor.js
+
+    if ((typeof monosaccharide.parent_linkage == 'undefined') || other_derivative.can_accept([O,...mono_ring_atoms].flat(),monosaccharide.parent_linkage)) {
+      reducing_end_atoms = reducing_end_atoms.concat(other_derivative_atoms);
+    }
+    let reducing_and_non_reducing_end_atom_correction = [ O, reducing_end_atoms, [H].concat(other_derivative_atoms) ].flat();
+    let reducing_end_value = Derivative.Apply(result, reducing_and_non_reducing_end_atom_correction);
+    return reducing_end_value;
   }
 }
+
+// FIXME - I am not sure what the correct thing to do with derivatives that do not cleanly apply
+// to all H atoms should do here. This code only really works below because permethylation is applied to
+// all residues, and doesn't care where the derivatisation occurs on the ring
+// If you take the examples of the ethyl ester or ammonia amidation, these
+// are only applied to specific positions on the ring, so this will end up adding way too
+// much mass
+
+// POSSIBLE SOLUTION - treat the reducing_end_atoms as the atoms at some fictional positions on the ring for Reduced / 2AA / 2AB as apprporiate,
+// and test if the derivative can be applied there.
+// e.g., reducing_end_atoms = [ [O] , [OH], [OH], [H], [OH] ]
+
+// Add the extra O to the above array so permethylation can be accepted on those elements
+
+// delete([O,O,O], reducing_end_atoms.map( atoms => add_derivative(atoms,-1,other_derivative) ).flat() )
+
+
+// Permethylation should really be a transformation of the H to CHHH
 
 class ReducingEndReduced extends ReducingEnd {
   calculate_reducing_end(atoms,other_derivative) {
@@ -516,7 +556,10 @@ const composition_to_map = (composition) => {
 }
 
 const composition_to_mass = (composition) => {
-  return Mass.MASS_PROVIDER.composition_to_mass(composition_to_map(composition));
+  let regular_atoms = composition.filter( atom => !(atom instanceof RemovableAtom));
+  let removable_atoms = composition.filter( atom => atom instanceof RemovableAtom ).map( removable => removable.atom );
+  regular_atoms = delete_composition(regular_atoms,removable_atoms);
+  return Mass.MASS_PROVIDER.composition_to_mass(composition_to_map(regular_atoms));
 };
 
 const get_composition_for = (identifier,derivative) => {
@@ -606,7 +649,7 @@ const Mass = (base) => {
       if (this.derivative instanceof NonReducingDerivative) {
         derivative = UNDERIVATISED;
       }
-      res = delete_composition(res, REDUCING_END_FREE.calculate_reducing_end([],derivative));
+      res = delete_composition(res, REDUCING_END_FREE.calculate_reducing_end([],derivative,this));
 
       return res;
 
@@ -642,7 +685,7 @@ const Mass = (base) => {
       // Only the parent sugar gets to add back in the reducing end atoms
       const reducing_end_deriv = this.root ? this.root.reducing_end : null;
       const other_derivative = this.root.derivative;
-      const result = reducing_end_deriv.calculate_reducing_end(monosaccharide_atoms,other_derivative);
+      const result = reducing_end_deriv.calculate_reducing_end(monosaccharide_atoms,other_derivative,this.root);
 
       return result;
     }
