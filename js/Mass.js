@@ -248,7 +248,7 @@ composition:S:1;H:1;O:3
 
 terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:Hex
-composition:C:6;H:10;O:5
+composition:C:6;H:12;O:6
 
 terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HOH
 name:Gal
@@ -258,12 +258,20 @@ terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:Glc
 type:Hex
 
-terminii:r1:OH;2eq:OH;3ax:OH;4eq:OH;5eq:-;6eq:HOH
+terminii:r1:OH;2ax:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:Man
 type:Hex
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HOH
+terminii:r1:OH;2eq:OH;3ax:OH;4ax:CHOHCHHOH
 name:Galf
+type:Hex
+
+terminii:r1:OH;2eq:OH;3eq:OH;4ax:CHOHCHHOH
+name:Glcf
+type:Hex
+
+terminii:r1:OH;2ax:OH;3eq:OH;4ax:CHOHCHHOH
+name:Manf
 type:Hex
 
 terminii:r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
