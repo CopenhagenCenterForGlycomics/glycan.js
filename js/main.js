@@ -36,3 +36,6 @@ export {default as SVGCanvas} from './SVGCanvas.js';
 export {default as Fragmentor } from './Fragmentor.js';
 
 export { Mass as Mass, REDUCING_END_2AB } from './Mass.js';
+
+export { MONOSACCHARIDE } from './reference_monosaccharides.js';
+export { readGlycoCT, writeGlycoCT } from './io/glycoct.js';

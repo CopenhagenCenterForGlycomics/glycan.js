@@ -1,5 +1,7 @@
 'use strict';
 
+import { MONOSACCHARIDE } from './reference_monosaccharides.js';
+
 const LINKAGES = { 'O' : -100, 'N' : -200 };
 
 let anomer_symbol = Symbol('anomer');
@@ -104,6 +106,10 @@ export default class Monosaccharide {
 
   get identifier() {
     return this[identifier_symbol];
+  }
+
+  get monosaccharide() {
+    return MONOSACCHARIDE[this.identifier] ?? null;
   }
 
   get anomer() {

@@ -10,6 +10,7 @@ const S = Symbol('S');
 const NA = Symbol('Na');
 
 import * as DEFAULT_MASS_PROVIDER from './mass_provider.js';
+import { MONOSACCHARIDE } from './reference_monosaccharides.js';
 
 let CURRENT_MASS_PROVIDER = DEFAULT_MASS_PROVIDER;
 
@@ -225,13 +226,13 @@ const DERIV_ETHYL_ESTER =       make_derivative('ethyl ester',
                                                 (a,p) => p == 1,
                                                 [C,C,H,H,H,H],
                                                 NonReducingDerivative,
-                                                r =>  r.identifier == 'NeuAc' && r.parent && r.parent.linkageOf(r) == 6 );
+                                                r =>  r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 6 );
 
 const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation',
                                                 (a,p) => p == 1,
                                                 [H, N, new RemovableAtom(O) ],
                                                 NonReducingDerivative,
-                                                r => r.identifier == 'NeuAc' && r.parent && r.parent.linkageOf(r) == 3 );
+                                                r => r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 3 );
 
 const DERIV_SIALIC_ACID = Object.freeze(new DerivativeSet('Sialic acid esterification, amidation',DERIV_ETHYL_ESTER,DERIV_AMMONIA_AMIDATION));
 

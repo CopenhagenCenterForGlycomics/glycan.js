@@ -1,6 +1,7 @@
 import CondensedLayout from './CondensedLayout.js';
 
 import Monosaccharide from './Monosaccharide.js';
+import { MONOSACCHARIDE } from './reference_monosaccharides.js';
 
 import {IO as Iupac} from './CondensedIupac.js';
 import Sugar from './Sugar.js';
@@ -109,12 +110,12 @@ class SugarAwareLayout extends CondensedLayout {
 
     let sibs = res.siblings;
 
-    if ( (sibs.filter(not_sulf).length == 1 && (res.identifier == 'Fuc' || res.identifier == 'NeuAc')) ||
-          ( res.parent && res.parent.endsRepeatUnit && res.parent.repeat.mode == Repeat.MODE_MINIMAL && res.identifier == 'Fuc')
+    if ( (sibs.filter(not_sulf).length == 1 && (res.monosaccharide === MONOSACCHARIDE.Fuc || res.monosaccharide === MONOSACCHARIDE.NeuAc)) ||
+          ( res.parent && res.parent.endsRepeatUnit && res.parent.repeat.mode == Repeat.MODE_MINIMAL && res.monosaccharide === MONOSACCHARIDE.Fuc)
       ) {
       // Stubby NeuAc and Fuc along a chain
       // Stubby Fuc at the end of a repeat unit
-      if (res.identifier == 'NeuAc' && sibs.filter(not_sulf)[0].identifier == 'Fuc') {
+      if (res.monosaccharide === MONOSACCHARIDE.NeuAc && sibs.filter(not_sulf)[0].monosaccharide === MONOSACCHARIDE.Fuc) {
         position.dx = 0;
         position.dy = -1 * DELTA_Y;
         position.dy -= position.r; // Make room for linkage
@@ -123,7 +124,7 @@ class SugarAwareLayout extends CondensedLayout {
       position.dy = 0;
       position.dx = [2,3].indexOf(res.parent.linkageOf(res)) >= 0 ? -1 * DELTA_X : DELTA_X;
 
-      if (res.identifier == 'Fuc') {
+      if (res.monosaccharide === MONOSACCHARIDE.Fuc) {
         position.rotate = (position.dx < 0 ) ? 90 : -90;
         position.dx = position.dx < 0 ? -0.75: 0.75;
         return position;
@@ -186,8 +187,8 @@ class SugarAwareLayout extends CondensedLayout {
     }
 
     // If only a single sibling is Fuc or NeuAc make it a stub
-    if (sibs.filter(not_sulf).filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) < 0 ).length == 0 &&
-        sibs.filter(not_sulf).filter( sibling => ['Fuc','NeuAc'].indexOf(sibling.identifier) >= 0 ).length <= 1
+    if (sibs.filter(not_sulf).filter( sibling => sibling.monosaccharide !== MONOSACCHARIDE.Fuc && sibling.monosaccharide !== MONOSACCHARIDE.NeuAc ).length == 0 &&
+        sibs.filter(not_sulf).filter( sibling => sibling.monosaccharide === MONOSACCHARIDE.Fuc || sibling.monosaccharide === MONOSACCHARIDE.NeuAc ).length <= 1
     ) {
       position.dx = 0;
     }
@@ -197,13 +198,13 @@ class SugarAwareLayout extends CondensedLayout {
     }
 
     if ( sibs.length === 2 &&
-          [ res ].concat(sibs).map( res => res.identifier ).indexOf( 'Fuc' ) >= 0 &&
-          [ res ].concat(sibs).map( res => res.identifier ).indexOf( 'HSO3' ) >= 0 &&
-          ['Fuc'].indexOf(res.identifier) >= 0) {
+          [ res ].concat(sibs).some( r => r.monosaccharide === MONOSACCHARIDE.Fuc ) &&
+          [ res ].concat(sibs).map( r => r.identifier ).indexOf( 'HSO3' ) >= 0 &&
+          res.monosaccharide === MONOSACCHARIDE.Fuc) {
       position.dy = 0;
       position.dx = res.parent.linkageOf(res) >= 4 ? DELTA_X : -1 * DELTA_X;
 
-      if (res.identifier == 'Fuc') {
+      if (res.monosaccharide === MONOSACCHARIDE.Fuc) {
         position.rotate = (position.dx < 0 ) ? 90 : -90;
         position.ignore_overlap = true;
       }
