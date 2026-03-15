@@ -7,7 +7,7 @@ export * from './ReactionSet.js';
 
 export {default as Repeat} from './Repeat.js';
 
-import * as CondensedIupac from './CondensedIupac.js';
+import * as CondensedIupac from './io/CondensedIupac.js';
 export { CondensedIupac };
 
 export {default as CondensedLayout} from './CondensedLayout.js';

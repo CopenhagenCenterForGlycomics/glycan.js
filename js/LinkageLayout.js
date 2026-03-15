@@ -1,5 +1,5 @@
 import { default as SugarAwareLayout, calculate_layout_hso3 } from './SugarAwareLayout.js';
-import {IO as Iupac} from './CondensedIupac.js';
+import {IO as Iupac} from './io/CondensedIupac.js';
 import Sugar from './Sugar.js';
 
 import Monosaccharide from './Monosaccharide.js';

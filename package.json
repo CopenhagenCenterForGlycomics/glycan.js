@@ -14,7 +14,8 @@
       "node" : "./js/main-node.js"
     },
     "./sugar": "./js/Sugar.js",
-    "./iupac": "./js/CondensedIupac.js",
+    "./iupac": "./js/io/CondensedIupac.js",
+    "./io/condensediupac": "./js/io/CondensedIupac.js",
     "./fragmentor": "./js/Fragmentor.js",
     "./mass": "./js/Mass.js",
     "./io/glycoct": "./js/io/glycoct.js",

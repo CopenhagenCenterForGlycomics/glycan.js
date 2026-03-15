@@ -1,6 +1,6 @@
 import { MONOSACCHARIDE } from '../reference_monosaccharides.js';
 import Sugar from '../Sugar.js';
-import { IO as IupacIO } from '../CondensedIupac.js';
+import { IO as IupacIO } from './CondensedIupac.js';
 
 // ---------------------------------------------------------------------------
 // Translation tables

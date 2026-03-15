@@ -3,7 +3,7 @@ import CondensedLayout from './CondensedLayout.js';
 import Monosaccharide from './Monosaccharide.js';
 import { MONOSACCHARIDE } from './reference_monosaccharides.js';
 
-import {IO as Iupac} from './CondensedIupac.js';
+import {IO as Iupac} from './io/CondensedIupac.js';
 import Sugar from './Sugar.js';
 
 import Repeat from './Repeat.js';
