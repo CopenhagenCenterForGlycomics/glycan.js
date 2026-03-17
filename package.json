@@ -62,9 +62,10 @@
       "babelify"
     ]
   },
+  "files": ["js/", "lib/", "package.json"],
   "repository": {
     "type": "git",
-    "url": "git@github.com:hirenj/glycan.js.git"
+    "url": "git+https://github.com/hirenj/glycan.js.git"
   },
   "author": "",
   "license": "TBD",
