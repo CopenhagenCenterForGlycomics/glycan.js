@@ -362,32 +362,22 @@ class Fragmentor {
     return fragment;
   }
 
-  static *fragment(target,depth=2) {
-    if ( ! ('mass' in target) ) {
-      throw new Error('Sugar object class does not derive from Mass class');
-    }
-    const base = target.constructor;
-    const Fragment = Fragmentable(base);
-
-    let fragment_template = trace_into_class(target,Fragment);
-
+  /**
+   * Yields { chord, typeString } for every candidate (chord, type) pair after
+   * structural early-exit guards, but before the retains_residue check (which
+   * needs a Fragment instance). Shared by fragment() and FragmentorMass.
+   *
+   * Note on root-chord cross-ring types: the comment in the original fragment()
+   * explains this is a fix for GlycoWorkBench compatibility — double reducing-end
+   * fragments where one chord residue is closer to the root than the other.
+   */
+  static *_candidateChordTypes(target, depth) {
     const max_depth = Math.max(...target.leaves().map( res => res.depth ));
-
-    const get_coord_for_res = (target,res) => target.location_for_monosaccharide(res).substring(1);
+    const get_coord_for_res = (tgt, res) => tgt.location_for_monosaccharide(res).substring(1);
 
     for (let chord of target.chords(depth)) {
-      let base_types = [];
-
-      // This is a fix for a test in test-gwb-compatibility
-      // that enables a double reducing end fragment, where
-      // one of the chord residues is closer to the root
-      // than the other chord residue. 
-      // The test is the 'cross ring dual reducing end fragments work'
-      // This is based upon the behaviour of GlycoWorkBench
-      // on a permethylated sugar with a free reducing end
-      //
-
-      base_types = [ reducing_types.concat(nonreducing_types) ];
+      // See GlycoWorkBench compatibility note above.
+      let base_types = [ reducing_types.concat(nonreducing_types) ];
 
       const all_types = base_types.concat(new Array(chord.chord.length - 1).fill( reducing_types ));
       if (chord.chord.indexOf(target.root) >= 0) {
@@ -397,11 +387,12 @@ class Fragmentor {
           all_types[ chord.chord.indexOf(target.root) ] = all_types[ chord.chord.indexOf(target.root) ].concat([ '1,1-e','2,2-e', '3,3-e', '4,4-e', '5,5-e', '3,5-e','1,3-e','2,4-e']);
         }
       }
-      let types = cartesian.apply(null,all_types);
-      let coordinates = chord.chord.map(get_coord_for_res.bind(null,target));
-      let coords = get_coordinate.bind(null,coordinates,max_depth);
+      const types = cartesian.apply(null, all_types);
+      const coordinates = chord.chord.map(get_coord_for_res.bind(null, target));
+      const coords = get_coordinate.bind(null, coordinates, max_depth);
+
       for (let f_type of types) {
-        if ( ! Array.isArray(f_type) ){
+        if ( ! Array.isArray(f_type) ) {
           f_type = [f_type];
         }
         if ( f_type[0].match(/^[bc]/) && chord.root === target.root) {
@@ -410,31 +401,58 @@ class Fragmentor {
         if ( f_type.length < 2 && chord.root !== chord.chord[0] ) {
           continue;
         }
+        yield { chord, typeString: f_type.map(coords).join('/') };
+      }
+    }
+
+    const rootChord = { root: target.root, chord: [ target.root ] };
+    for (const f_type of [ '3,5-x','1,3-x','1,5-x','2,4-x','0,2-x','0,4-x', '1,1-w','2,2-w', '3,3-w', '4,4-w', '5,5-w' ]) {
+      yield { chord: rootChord, typeString: f_type+'0a' };
+    }
+  }
+
+  static *fragment(target, depth=2, visitor) {
+    if ( ! ('mass' in target) ) {
+      throw new Error('Sugar object class does not derive from Mass class');
+    }
+    const Fragment = Fragmentable(target.constructor);
+    const fragment_template = trace_into_class(target, Fragment);
+
+    // Single working clone reused across all chord/type combinations when a
+    // visitor is provided (fast path).  Without a visitor, a fresh clone is
+    // yielded per valid fragment so callers own independent Fragment objects.
+    const working = visitor ? fragment_template.clone() : null;
+    if (working) working.original = target;
+
+    for (const { chord, typeString } of Fragmentor._candidateChordTypes(target, depth)) {
+      if (visitor) {
+        working.chord = chord;
+        working.type = null;
+        working.type = typeString;
+
+        const curr_composition = working.composition();
+        if ( working.chordResidues.some(retains_residue.bind(null, curr_composition)) ) {
+          continue;
+        }
+        yield visitor(working);
+      } else {
         let fragment = fragment_template.clone();
         fragment.type = null;
         fragment.chord = chord;
-        fragment.type = f_type.map(coords).join('/');
+        fragment.type = typeString;
         fragment.original = target;
 
-        let curr_composition = fragment.composition();
-        if ( fragment.chordResidues.some(retains_residue.bind(null,curr_composition)) ) {
+        const curr_composition = fragment.composition();
+        if ( fragment.chordResidues.some(retains_residue.bind(null, curr_composition)) ) {
           continue;
         }
         yield fragment;
       }
     }
-
-    for (let f_type of [ '3,5-x','1,3-x','1,5-x','2,4-x','0,2-x','0,4-x', '1,1-w','2,2-w', '3,3-w', '4,4-w', '5,5-w' ]) {
-      let fragment = fragment_template.clone();
-      fragment.type = null;
-      fragment.chord = { root: target.root, chord: [ target.root ] };
-      fragment.type = f_type+'0a';
-      fragment.original = target;
-      yield fragment;
-    }
   }
+
 }
 
-export { FragmentResidue };
+export { Fragmentable, FragmentResidue };
 
 export default Fragmentor;
