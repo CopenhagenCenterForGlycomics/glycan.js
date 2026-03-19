@@ -19,7 +19,9 @@
     "./fragmentor": "./js/Fragmentor.js",
     "./mass": "./js/Mass.js",
     "./io/glycoct": "./js/io/glycoct.js",
-    "./reference_monosaccharides": "./js/reference_monosaccharides.js"
+    "./reference_monosaccharides": "./js/reference_monosaccharides.js",
+    "./io/carbbank": "./js/io/carbbank.js",
+    "./renderers/text": "./js/SugarTextRenderer.js"
   },
   "dependencies": {
     "debug": "^4.4.1",
