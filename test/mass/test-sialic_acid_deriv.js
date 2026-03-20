@@ -11,6 +11,12 @@ class IupacSugar extends Mass(Iupac(Sugar)) {}
 QUnit.module('Test that monosaccharides have the right composition', {
 });
 
+QUnit.test('Test can generate mass for NeuAc(a2-8)NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-6)]GalNAc', function (assert) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';
+  assert.close(sugar.mass,2222.7830,1e-04,'Has a defined mass');
+});
+
 QUnit.test( 'Ensure sialic acid derivatisation works for ethyl ester' , function( assert ) {
   let sugar = new IupacSugar();
   sugar.sequence = 'NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc';

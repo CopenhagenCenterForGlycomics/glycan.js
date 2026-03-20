@@ -11,6 +11,7 @@ const NA = Symbol('Na');
 
 import * as DEFAULT_MASS_PROVIDER from './mass_provider.js';
 import { MONOSACCHARIDE } from './reference_monosaccharides.js';
+import { TracedMonosaccharide } from './Tracing.js';
 
 let CURRENT_MASS_PROVIDER = DEFAULT_MASS_PROVIDER;
 
@@ -681,6 +682,7 @@ const Mass = (base) => {
       }
 
       const monosaccharide_atoms = this.composition().
+                                      map( res => res instanceof TracedMonosaccharide ? res.original : res ).
                                       map( res => res.atoms ).flat();
 
       // Only the parent sugar gets to add back in the reducing end atoms
