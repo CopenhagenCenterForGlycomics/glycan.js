@@ -36,10 +36,13 @@ const CARBBANK_META = {
 // ── Residue label ─────────────────────────────────────────────────────────────
 
 function residueLabel(residue) {
-  const meta    = CARBBANK_META[residue.identifier] ?? { dl: 'D', ring: 'p', abbrev: residue.identifier };
-  const anm     = residue.anomer ?? 'u';
-  const plinkage = residue.parent_linkage;
-  const linkStr  = (plinkage != null && plinkage > 0) ? `-(1-${plinkage})` : '';
+  const meta     = CARBBANK_META[residue.identifier] ?? { dl: 'D', ring: 'p', abbrev: residue.identifier };
+  const anm      = residue.anomer ?? 'u';
+  const donor    = residue.parent_linkage;                                // e.g. 1 for GlcNAc, 2 for NeuAc
+  const acceptor = residue.parent ? residue.parent.linkageOf(residue) : null;
+  const linkStr  = (donor != null && donor > 0 && acceptor != null && acceptor > 0)
+    ? `-(${donor}-${acceptor})`
+    : '';
   return `${anm}-${meta.dl}-${meta.abbrev}${meta.ring}${linkStr}`;
 }
 
@@ -78,7 +81,7 @@ function computeExtents(node, extentMap) {
   let belowTotal = 0;
   for (let i = 0; i < sorted.length; i++) {
     const childExt = computeExtents(sorted[i], extentMap);
-    const span = childExt.above + childExt.below + 2;
+    const span = childExt.above + childExt.below + 1;
     if (i % 2 === 0) aboveTotal += span;
     else             belowTotal += span;
   }
@@ -112,12 +115,12 @@ function assignRows(node, parentRow, rowMap, extentMap) {
     let childRow;
     if (i % 2 === 0) {
       // above
-      aboveOffset += childExt.below + 2;
+      aboveOffset += childExt.below + 1;
       childRow     = parentRow - aboveOffset;
       aboveOffset += childExt.above;
     } else {
       // below
-      belowOffset += childExt.above + 2;
+      belowOffset += childExt.above + 1;
       childRow     = parentRow + belowOffset;
       belowOffset += childExt.below;
     }

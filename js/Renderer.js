@@ -429,7 +429,7 @@ class Renderer {
   }
 
   removeAllSugars() {
-    cleanup_residues.bind(this)(Array.prototype.concat(...this[rendered_sugars_symbol].map(sug => sug.composition())));
+    cleanup_residues.bind(this)([]);
     this.rendered.clear();
     this[rendered_sugars_symbol].length = 0;
   }
