@@ -64,7 +64,7 @@
       "babelify"
     ]
   },
-  "files": ["js/", "lib/", "package.json"],
+  "files": ["js/", "lib/", "package.json", "sugars.svg"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hirenj/glycan.js.git"
