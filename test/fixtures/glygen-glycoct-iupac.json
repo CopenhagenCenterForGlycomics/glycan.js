@@ -1,0 +1,1002 @@
+[
+  {
+    "accession": "G00024MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dglc-HEX-1:5\n3b:b-dglc-HEX-1:5\nLIN\n1:1o(3+1)2d\n2:2o(3+1)3d",
+    "iupac": "Glc(b1-3)Glc(b1-3)Glc"
+  },
+  {
+    "accession": "G00025MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dglc-HEX-1:5\n3b:b-dglc-HEX-1:5\n4b:b-dglc-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d\n3:3o(4+1)4d",
+    "iupac": "Glc(b1-4)Glc(b1-4)Glc(b1-4)Glc"
+  },
+  {
+    "accession": "G00027MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dman-HEX-1:5\n4b:a-dman-HEX-1:5\n5b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+1)4d\n4:3o(6+1)5d",
+    "iupac": "Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00030SF",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:a-dgal-HEX-1:4\n3b:a-dgal-HEX-1:4\nLIN\n1:1o(4+1)2d\n2:2o(2+1)3d",
+    "iupac": "Galf(a1-2)Galf(a1-4)Gal"
+  },
+  {
+    "accession": "G00030VN",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-lgal-HEX-1:5|6:d\n7b:a-dgal-HEX-1:5\n8s:n-acetyl\n9b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n10s:n-glycolyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(2+1)6d\n6:5o(3+1)7d\n7:7d(2+1)8n\n8:1o(6+2)9d\n9:9d(5+1)10n",
+    "iupac": "Fuc(a1-2)[GalNAc(a1-3)]Gal(b1-4)GlcNAc(b1-3)[NeuGc(a2-6)]GalNAc"
+  },
+  {
+    "accession": "G00031MO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d",
+    "iupac": "Gal(b1-3)GalNAc"
+  },
+  {
+    "accession": "G00033MO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(6+1)4d\n4:4d(2+1)5n",
+    "iupac": "Gal(b1-3)[GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00035MO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n",
+    "iupac": "GlcNAc(b1-3)GalNAc"
+  },
+  {
+    "accession": "G00037MO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:1o(6+1)5d\n5:5d(2+1)6n",
+    "iupac": "GlcNAc(b1-3)[GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00039MO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:a-dgal-HEX-1:5\n4s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n",
+    "iupac": "GalNAc(a1-3)GalNAc"
+  },
+  {
+    "accession": "G00041MO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(6+1)3d\n3:3d(2+1)4n",
+    "iupac": "GlcNAc(b1-6)GalNAc"
+  },
+  {
+    "accession": "G00043MO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:a-dgal-HEX-1:5\n4s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(6+1)3d\n3:3d(2+1)4n",
+    "iupac": "GalNAc(a1-6)GalNAc"
+  },
+  {
+    "accession": "G00048MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-lgal-HEX-1:5|6:d\n5b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(2+1)4d\n4:1o(4+1)5d",
+    "iupac": "Fuc(a1-2)Gal(b1-3)[Fuc(a1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00049MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d",
+    "iupac": "Gal(b1-3)GlcNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00050MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-lgal-HEX-1:5|6:d\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:5o(2+1)6d",
+    "iupac": "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00051MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d",
+    "iupac": "Fuc(a1-3)[Gal(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00052MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dgal-HEX-1:5\n5b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4o(2+1)5d",
+    "iupac": "Fuc(a1-3)[Fuc(a1-2)Gal(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00053MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-acetyl\n6b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n\n5:1o(4+1)6d",
+    "iupac": "NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00054MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dgal-HEX-1:5\n5b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n6s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4o(3+2)5d\n5:5d(5+1)6n",
+    "iupac": "Fuc(a1-3)[NeuAc(a2-3)Gal(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00055MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d",
+    "iupac": "Gal(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00056MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d",
+    "iupac": "Gal(b1-3)GlcNAc"
+  },
+  {
+    "accession": "G00057MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n",
+    "iupac": "GalNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00058MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00059MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d",
+    "iupac": "Gal(a1-4)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00060MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dgal-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(4+1)6d",
+    "iupac": "Gal(a1-4)Gal(b1-4)GalNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00061MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgal-HEX-1:5\n4b:b-dgal-HEX-1:5\n5s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n",
+    "iupac": "GalNAc(b1-3)Gal(a1-4)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00062MO",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:b-dglc-HEX-1:5\n3s:n-acetyl\n4b:b-dgal-HEX-1:5\n5b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8s:n-acetyl\nLIN\n1:1o(3+1)2d\n2:2d(2+1)3n\n3:2o(4+1)4d\n4:4o(3+2)5d\n5:5d(5+1)6n\n6:4o(4+1)7d\n7:7d(2+1)8n",
+    "iupac": "NeuAc(a2-3)[GalNAc(b1-4)]Gal(b1-4)GlcNAc(b1-3)Gal"
+  },
+  {
+    "accession": "G00063MO",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7s:n-acetyl\n8b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n9s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n\n5:3o(4+1)6d\n6:6d(2+1)7n\n7:1o(6+2)8d\n8:8d(5+1)9n",
+    "iupac": "NeuAc(a2-3)[GalNAc(b1-4)]Gal(b1-3)[NeuAc(a2-6)]GalNAc"
+  },
+  {
+    "accession": "G00064MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgal-HEX-1:5\n4b:b-dgal-HEX-1:5\n5s:n-acetyl\n6b:a-dglc-HEX-1:5\n7s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d\n6:6d(2+1)7n",
+    "iupac": "GlcNAc(a1-3)GalNAc(b1-3)Gal(a1-4)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00065MO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00066MO",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:a-lgal-HEX-1:5|6:d\n3b:a-dgal-HEX-1:5\n4s:n-acetyl\nLIN\n1:1o(2+1)2d\n2:1o(3+1)3d\n3:3d(2+1)4n",
+    "iupac": "Fuc(a1-2)[GalNAc(a1-3)]Gal"
+  },
+  {
+    "accession": "G00067MO",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:a-lgal-HEX-1:5|6:d\n3b:b-dgal-HEX-1:5\nLIN\n1:1o(2+1)2d\n2:1o(3+1)3d",
+    "iupac": "Fuc(a1-2)[Gal(b1-3)]Gal"
+  },
+  {
+    "accession": "G00068MO",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:a-lgal-HEX-1:5|6:d\nLIN\n1:1o(2+1)2d",
+    "iupac": "Fuc(a1-2)Gal"
+  },
+  {
+    "accession": "G00076PK",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(4+1)4d",
+    "iupac": "Gal(a1-4)Gal(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00091RT",
+    "glycoct": "RES\n1b:a-dman-HEX-1:5\n2b:a-dman-HEX-1:5\n3b:a-dman-HEX-1:5\n4b:a-dman-HEX-1:5\n5b:a-dman-HEX-1:5\nLIN\n1:1o(3+1)2d\n2:2o(2+1)3d\n3:1o(6+1)4d\n4:4o(2+1)5d",
+    "iupac": "Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-6)]Man"
+  },
+  {
+    "accession": "G00094SE",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-lgal-HEX-1:5|6:d\n5b:a-dgal-HEX-1:5\n6s:n-acetyl\n7b:a-dgal-HEX-1:5\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(2+1)4d\n4:3o(3+1)5d\n5:5d(2+1)6n\n6:5o(3+1)7d\n7:1o(6+1)8d\n8:8d(2+1)9n\n9:8o(3+1)10d\n10:10d(2+1)11n",
+    "iupac": "Fuc(a1-2)[Gal(a1-3)GalNAc(a1-3)]Gal(b1-3)[GlcNAc(b1-3)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00097DN",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2b:a-dxyl-PEN-1:5\nLIN\n1:1o(6+1)2d",
+    "iupac": "Xyl(a1-6)Glc"
+  },
+  {
+    "accession": "G00125TX",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n",
+    "iupac": "GlcNAc(b1-3)Gal(b1-4)Gal"
+  },
+  {
+    "accession": "G00139WK",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(4+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d",
+    "iupac": "Gal(b1-3)GlcNAc(b1-4)Gal(b1-3)GalNAc"
+  },
+  {
+    "accession": "G00152LK",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dglc-HEX-1:5\n3b:a-dglc-HEX-1:5\n4b:b-dglc-HEX-1:5\n5b:b-dglc-HEX-1:5\n6b:b-dglc-HEX-1:5\nLIN\n1:1o(3+1)2d\n2:2o(3+1)3d\n3:3o(3+1)4d\n4:4o(3+1)5d\n5:5o(3+1)6d",
+    "iupac": "Glc(b1-3)Glc(b1-3)Glc(b1-3)Glc(a1-3)Glc(b1-3)Glc"
+  },
+  {
+    "accession": "G00153LJ",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dgal-HEX-1:5\nLIN\n1:1o(2+1)2d\n2:2o(2+1)3d",
+    "iupac": "Gal(b1-2)Gal(b1-2)Gal"
+  },
+  {
+    "accession": "G00157WT",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-acetyl\n8b:a-lgal-HEX-1:5|6:d\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:b-dgal-HEX-1:5\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-lgal-HEX-1:5|6:d\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:5o(3+2)6d\n6:6d(5+1)7n\n7:3o(4+1)8d\n8:2o(6+1)9d\n9:9d(2+1)10n\n10:9o(4+1)11d\n11:11o(3+1)12d\n12:12d(2+1)13n\n13:12o(3+1)14d\n14:12o(4+1)15d",
+    "iupac": "NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)[Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00176HZ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:a-dman-HEX-1:5\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dglc-HEX-1:5\n15s:n-acetyl\n16b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:6o(4+1)9d\n9:9d(2+1)10n\n10:5o(6+1)11d\n11:11o(2+1)12d\n12:12d(2+1)13n\n13:11o(6+1)14d\n14:14d(2+1)15n\n15:1o(6+1)16d",
+    "iupac": "GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-2)[GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00199JR",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dman-HEX-1:5\n4b:a-dman-HEX-1:5\n5b:a-dman-HEX-1:5\n6b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+1)4d\n4:3o(6+1)5d\n5:5o(3+1)6d",
+    "iupac": "Man(a1-3)[Man(a1-3)Man(a1-6)]Man(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00272VU",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:a-lgal-HEX-1:5|6:d\n10b:b-dgal-HEX-1:5\n11b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:7o(3+1)9d\n9:7o(4+1)10d\n10:1o(6+1)11d",
+    "iupac": "Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-4)Man(a1-3)Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00294TN",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:b-dglc-HEX-1:5\n3s:n-acetyl\n4b:b-dgal-HEX-1:5\n5b:a-lgal-HEX-1:5|6:d\nLIN\n1:1o(3+1)2d\n2:2d(2+1)3n\n3:2o(3+1)4d\n4:4o(2+1)5d",
+    "iupac": "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)Gal"
+  },
+  {
+    "accession": "G00305KO",
+    "glycoct": "RES\n1b:b-dxyl-PEN-1:5\n2b:b-dxyl-PEN-1:5\n3b:b-dglc-HEX-1:5\nLIN\n1:1o(3+1)2d\n2:2o(3+1)3d",
+    "iupac": "Glc(b1-3)Xyl(b1-3)Xyl"
+  },
+  {
+    "accession": "G00320ZP",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n13s:n-acetyl\n14b:a-dman-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:b-dgal-HEX-1:5\n18b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n19s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(3+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n\n11:7o(6+2)12d\n12:12d(5+1)13n\n13:5o(6+1)14d\n14:14o(2+1)15d\n15:15d(2+1)16n\n16:15o(3+1)17d\n17:17o(3+2)18d\n18:18d(5+1)19n",
+    "iupac": "NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-6)]GlcNAc(b1-2)Man(a1-3)[NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00335DM",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:5o(6+1)8d\n8:8o(2+1)9d\n9:9o(2+1)10d",
+    "iupac": "Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00348IY",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\n12b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:5o(4+1)8d\n8:8d(2+1)9n\n9:5o(6+1)10d\n10:10o(3+1)11d\n11:10o(6+1)12d",
+    "iupac": "Man(a1-2)Man(a1-3)[GlcNAc(b1-4)][Man(a1-3)[Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00356FQ",
+    "glycoct": "RES\n1b:b-dman-HEX-1:5\n2b:a-dman-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d\n3:3d(2+1)4n",
+    "iupac": "GlcNAc(b1-4)Man(a1-4)Man"
+  },
+  {
+    "accession": "G00368HM",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n14s:n-glycolyl\n15b:a-dman-HEX-1:5\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:b-dgal-HEX-1:5\n19b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:6o(4+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:12o(3+2)13d\n13:13d(5+1)14n\n14:5o(6+1)15d\n15:15o(2+1)16d\n16:16d(2+1)17n\n17:16o(4+1)18d\n18:1o(6+1)19d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)[NeuGc(a2-3)Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00370EI",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n8s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+2)7d\n7:7d(5+1)8n",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00371DJ",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:3o(4+1)6d",
+    "iupac": "Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)GalNAc"
+  },
+  {
+    "accession": "G00395FS",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:a-dglc-HEX-1:5\n3b:a-dglc-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d",
+    "iupac": "Glc(a1-4)Glc(a1-4)Glc"
+  },
+  {
+    "accession": "G00395TQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(6+1)6d\n6:1o(6+1)7d",
+    "iupac": "Man(a1-6)Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00399LG",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-dgal-HEX-1:5\n4s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n",
+    "iupac": "GalNAc(a1-4)GlcNAc"
+  },
+  {
+    "accession": "G00413UF",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n16s:n-acetyl\n17b:a-dman-HEX-1:5\n18b:b-dglc-HEX-1:5\n19s:n-acetyl\n20b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(6+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:14o(6+2)15d\n15:15d(5+1)16n\n16:5o(6+1)17d\n17:17o(2+1)18d\n18:18d(2+1)19n\n19:18o(4+1)20d",
+    "iupac": "NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00432WW",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(6+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n",
+    "iupac": "GlcNAc(b1-3)Man(a1-6)Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00458CW",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-lgal-HEX-1:5|6:d\n4b:b-dgal-HEX-1:5\n5b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n6s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4o(3+2)5d\n5:5d(5+1)6n",
+    "iupac": "Fuc(b1-3)[NeuAc(a2-3)Gal(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00463XD",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:a-dman-HEX-1:5\n14b:b-dglc-HEX-1:5\n15s:n-acetyl\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:6o(6+1)9d\n9:9d(2+1)10n\n10:5o(4+1)11d\n11:11d(2+1)12n\n12:5o(6+1)13d\n13:13o(2+1)14d\n14:14d(2+1)15n\n15:13o(4+1)16d\n16:16d(2+1)17n\n17:1o(6+1)18d",
+    "iupac": "GlcNAc(b1-2)[GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00468NI",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n8s:n-glycolyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(6+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+2)7d\n7:7d(5+1)8n",
+    "iupac": "Gal(b1-3)[NeuGc(a2-3)Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00480IB",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:a-dman-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7o(2+1)8d\n8:8d(2+1)9n\n9:7o(4+1)10d\n10:10d(2+1)11n\n11:6o(6+1)12d\n12:12o(2+1)13d\n13:13d(2+1)14n\n14:12o(4+1)15d\n15:15d(2+1)16n",
+    "iupac": "Fuc(a1-3)[GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00506NQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dglc-HEX-1:5\n3s:n-acetyl\n4b:a-lgal-HEX-1:5|6:d\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:a-lgal-HEX-1:5|6:d\n9b:b-dgal-HEX-1:5\n10b:a-lgal-HEX-1:5|6:d\nLIN\n1:1o(3+1)2d\n2:2d(2+1)3n\n3:2o(3+1)4d\n4:2o(4+1)5d\n5:5o(3+1)6d\n6:6d(2+1)7n\n7:6o(3+1)8d\n8:6o(4+1)9d\n9:9o(2+1)10d",
+    "iupac": "Fuc(a1-3)[Fuc(a1-3)[Fuc(a1-2)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-3)Glc"
+  },
+  {
+    "accession": "G00514XC",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n16s:n-acetyl\n17b:a-dman-HEX-1:5\n18b:b-dglc-HEX-1:5\n19s:n-acetyl\n20b:b-dgal-HEX-1:5\n21b:b-dglc-HEX-1:5\n22s:n-acetyl\n23b:b-dgal-HEX-1:5\n24b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n25s:n-acetyl\n26b:b-dglc-HEX-1:5\n27s:n-acetyl\n28b:b-dgal-HEX-1:5\n29b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n30s:n-acetyl\n31b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(6+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:14o(6+2)15d\n15:15d(5+1)16n\n16:5o(6+1)17d\n17:17o(2+1)18d\n18:18d(2+1)19n\n19:18o(4+1)20d\n20:20o(4+1)21d\n21:21d(2+1)22n\n22:21o(4+1)23d\n23:23o(6+2)24d\n24:24d(5+1)25n\n25:17o(6+1)26d\n26:26d(2+1)27n\n27:26o(4+1)28d\n28:28o(6+2)29d\n29:29d(5+1)30n\n30:1o(6+1)31d",
+    "iupac": "NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-4)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00536FZ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:a-dman-HEX-1:5\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:b-dgal-HEX-1:5\n18b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:6o(4+1)9d\n9:9d(2+1)10n\n10:5o(6+1)11d\n11:11o(2+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:11o(6+1)15d\n15:15d(2+1)16n\n16:15o(4+1)17d\n17:1o(6+1)18d",
+    "iupac": "GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00572SI",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:b-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-acetyl\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:b-dgal-HEX-1:5\n11b:b-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n12s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:5o(3+2)6d\n6:6d(5+1)7n\n7:2o(6+1)8d\n8:8d(2+1)9n\n9:8o(4+1)10d\n10:10o(3+2)11d\n11:11d(5+1)12n",
+    "iupac": "NeuAc(b2-3)Gal(b1-3)GlcNAc(b1-3)[NeuAc(b2-3)Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00586UK",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2b:a-dglc-HEX-1:5\n3b:a-dglc-HEX-1:5\n4b:a-dglc-HEX-1:5\n5b:a-dglc-HEX-1:5\n6b:a-dglc-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d\n3:2o(6+1)4d\n4:4o(4+1)5d\n5:5o(4+1)6d",
+    "iupac": "Glc(a1-4)[Glc(a1-4)Glc(a1-4)Glc(a1-6)]Glc(a1-4)Glc"
+  },
+  {
+    "accession": "G00590OY",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d\n6:6o(2+1)7d",
+    "iupac": "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)Gal(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00601VC",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:b-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:5o(6+1)7d\n7:7o(3+1)8d",
+    "iupac": "Man(b1-3)[Man(a1-3)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00619DD",
+    "glycoct": "RES\n1b:a-dman-HEX-1:5\n2b:a-dman-HEX-1:5\n3b:a-dman-HEX-1:5\nLIN\n1:1o(3+1)2d\n2:1o(6+1)3d",
+    "iupac": "Man(a1-3)[Man(a1-6)]Man"
+  },
+  {
+    "accession": "G00647RA",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n4s:n-glycolyl\n5b:b-dgal-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-lgal-HEX-1:5|6:d\n9b:a-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(3+2)3d\n3:3d(5+1)4n\n4:2o(4+1)5d\n5:5d(2+1)6n\n6:5o(3+1)7d\n7:7o(2+1)8d\n8:7o(3+1)9d",
+    "iupac": "NeuGc(a2-3)[Fuc(a1-2)[Gal(a1-3)]Gal(b1-3)GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00659GQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dgal-HEX-1:5\n5b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n6s:n-acetyl\n7s:sulfate\n8s:sulfate\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4o(3+2)5d\n5:5d(5+1)6n\n6:4o(6+1)7n\n7:1o(6+1)8n",
+    "iupac": "Fuc(a1-3)[NeuAc(a2-3)[HSO3(u?-6)]Gal(b1-4)][HSO3(u?-6)]GlcNAc"
+  },
+  {
+    "accession": "G00662IB",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:a-dman-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dgal-HEX-1:5\n16b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n17s:n-acetyl\n18b:b-dglc-HEX-1:5\n19s:n-acetyl\n20b:b-dgal-HEX-1:5\n21b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n22s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n\n11:5o(6+1)12d\n12:12o(2+1)13d\n13:13d(2+1)14n\n14:13o(4+1)15d\n15:15o(6+2)16d\n16:16d(5+1)17n\n17:12o(4+1)18d\n18:18d(2+1)19n\n19:18o(4+1)20d\n20:20o(3+2)21d\n21:21d(5+1)22n",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-4)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00666EC",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-lgal-HEX-1:5|6:d\n11b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n12s:n-acetyl\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dgal-HEX-1:5\n16b:a-lgal-HEX-1:5|6:d\n17b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n18s:n-acetyl\n19b:b-dglc-HEX-1:5\n20s:n-acetyl\n21b:a-dman-HEX-1:5\n22b:b-dglc-HEX-1:5\n23s:n-acetyl\n24b:b-dgal-HEX-1:5\n25b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n26s:n-acetyl\n27b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(2+1)10d\n10:9o(6+2)11d\n11:11d(5+1)12n\n12:6o(6+1)13d\n13:13d(2+1)14n\n14:13o(4+1)15d\n15:15o(2+1)16d\n16:15o(6+2)17d\n17:17d(5+1)18n\n18:5o(4+1)19d\n19:19d(2+1)20n\n20:5o(6+1)21d\n21:21o(2+1)22d\n22:22d(2+1)23n\n23:22o(4+1)24d\n24:24o(6+2)25d\n25:25d(5+1)26n\n26:1o(6+1)27d",
+    "iupac": "Fuc(a1-2)[NeuAc(a2-6)]Gal(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[NeuAc(a2-6)]Gal(b1-4)GlcNAc(b1-6)]Man(a1-3)[GlcNAc(b1-4)][NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00667FG",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dman-HEX-1:5\n4b:b-dman-HEX-1:5\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(6+1)4d\n4:4o(2+1)5d\n5:5d(2+1)6n\n6:4o(6+1)7d\n7:7d(2+1)8n",
+    "iupac": "GlcNAc(b1-2)[GlcNAc(b1-6)]Man(b1-6)Man(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00672PE",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dgal-HEX-1:5\n5b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n6s:n-acetyl\n7s:sulfate\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4o(3+2)5d\n5:5d(5+1)6n\n6:4o(6+1)7n",
+    "iupac": "Fuc(a1-3)[NeuAc(a2-3)[HSO3(u?-6)]Gal(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00673KJ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n4s:n-glycolyl\n5b:b-dgal-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:b-dgal-HEX-1:5\n11b:a-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(3+2)3d\n3:3d(5+1)4n\n4:2o(4+1)5d\n5:5d(2+1)6n\n6:5o(3+1)7d\n7:7o(3+1)8d\n8:8d(2+1)9n\n9:8o(4+1)10d\n10:10o(3+1)11d",
+    "iupac": "NeuGc(a2-3)[Gal(a1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-3)GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00691LW",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2b:b-lgal-HEX-1:5|6:d\nLIN\n1:1o(6+1)2d",
+    "iupac": "Fuc(b1-6)Gal"
+  },
+  {
+    "accession": "G00693YK",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:6o(6+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:3o(6+1)13d\n13:13d(2+1)14n\n14:13o(4+1)15d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00702NP",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:a-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:5o(6+1)8d\n8:8o(3+1)9d\n9:8o(6+1)10d",
+    "iupac": "Man(a1-2)Man(a1-3)[Man(a1-3)[Man(a1-6)]Man(a1-6)]Man(a1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00706VT",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:a-dman-HEX-1:5\n14b:a-dman-HEX-1:5\n15b:a-dman-HEX-1:5\n16b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:6o(4+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:5o(6+1)13d\n13:13o(3+1)14d\n14:13o(6+1)15d\n15:1o(6+1)16d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Man(a1-3)[Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00721IC",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00728SN",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-acetyl\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:a-lgal-HEX-1:5|6:d\n12b:b-dgal-HEX-1:5\n13b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n14s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n\n5:1o(6+1)6d\n6:6d(2+1)7n\n7:6o(4+1)8d\n8:8o(3+1)9d\n9:9d(2+1)10n\n10:9o(3+1)11d\n11:9o(4+1)12d\n12:12o(3+2)13d\n13:13d(5+1)14n",
+    "iupac": "NeuAc(a2-3)Gal(b1-3)[Fuc(a1-3)[NeuAc(a2-3)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00738BQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:a-dman-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dgal-HEX-1:5\n16b:a-dgal-HEX-1:5\n17b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(6+2)10d\n10:10d(5+1)11n\n11:5o(6+1)12d\n12:12o(2+1)13d\n13:13d(2+1)14n\n14:13o(4+1)15d\n15:15o(4+1)16d\n16:1o(6+1)17d",
+    "iupac": "NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(a1-4)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00743WU",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10s:n-acetyl\n11b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n12s:n-acetyl\n13b:a-dman-HEX-1:5\n14b:b-dglc-HEX-1:5\n15s:n-acetyl\n16b:b-dgal-HEX-1:5\n17s:n-acetyl\n18b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9d(2+1)10n\n10:9o(6+2)11d\n11:11d(5+1)12n\n12:5o(6+1)13d\n13:13o(2+1)14d\n14:14d(2+1)15n\n15:14o(4+1)16d\n16:16d(2+1)17n\n17:1o(6+1)18d",
+    "iupac": "NeuAc(a2-6)GalNAc(b1-4)GlcNAc(b1-2)Man(a1-3)[GalNAc(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00754TS",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-lgal-HEX-1:5|6:d\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:a-lgal-HEX-1:5|6:d\n9s:sulfate\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(2+1)4d\n4:3o(3+1)5d\n5:1o(6+1)6d\n6:6d(2+1)7n\n7:6o(3+1)8d\n8:6o(6+1)9n",
+    "iupac": "Fuc(a1-2)[Gal(b1-3)]Gal(b1-3)[Fuc(a1-3)[HSO3(u?-6)]GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00797ZX",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-lgal-HEX-1:5|6:d\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\n14b:a-lgal-HEX-1:5|6:d\n15b:a-dgal-HEX-1:5\n16b:a-dman-HEX-1:5\n17b:b-dglc-HEX-1:5\n18s:n-acetyl\n19b:b-dgal-HEX-1:5\n20b:a-lgal-HEX-1:5|6:d\n21b:a-dgal-HEX-1:5\n22b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(2+1)10d\n10:6o(4+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d\n13:13o(2+1)14d\n14:13o(3+1)15d\n15:5o(6+1)16d\n16:16o(2+1)17d\n17:17d(2+1)18n\n18:17o(4+1)19d\n19:19o(2+1)20d\n20:19o(3+1)21d\n21:1o(6+1)22d",
+    "iupac": "Fuc(a1-2)Gal(b1-4)GlcNAc(b1-2)[Fuc(a1-2)[Gal(a1-3)]Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Fuc(a1-2)[Gal(a1-3)]Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00817BI",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:a-dman-HEX-1:5\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:b-dgal-HEX-1:5\n19b:b-dglc-HEX-1:5\n20s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:6o(4+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:5o(4+1)13d\n13:13d(2+1)14n\n14:5o(6+1)15d\n15:15o(2+1)16d\n16:16d(2+1)17n\n17:16o(4+1)18d\n18:15o(6+1)19d\n19:19d(2+1)20n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-4)][Gal(b1-4)GlcNAc(b1-2)[GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00826SV",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:a-dman-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dgal-HEX-1:5\n16b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(4+1)10d\n10:10d(2+1)11n\n11:5o(6+1)12d\n12:12o(4+1)13d\n13:13d(2+1)14n\n14:13o(4+1)15d\n15:1o(6+1)16d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-4)Man(a1-3)[GlcNAc(b1-4)][Gal(b1-4)GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00850LT",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(6+1)7d\n7:5o(6+1)8d",
+    "iupac": "Man(a1-6)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00851XQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:a-lgal-HEX-1:5|6:d\n12b:b-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6d(2+1)7n\n7:6o(4+1)8d\n8:8o(3+1)9d\n9:9d(2+1)10n\n10:9o(3+1)11d\n11:9o(4+1)12d",
+    "iupac": "Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G00876GU",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:b-dglc-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\n12b:a-dman-HEX-1:5\n13b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7o(2+1)8d\n8:8o(3+1)9d\n9:5o(6+1)10d\n10:10o(3+1)11d\n11:10o(6+1)12d\n12:12o(2+1)13d",
+    "iupac": "Glc(b1-3)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00883DO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(6+1)10d\n10:10o(4+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-4)Man(a1-3)[Gal(b1-4)GlcNAc(b1-4)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00884ZO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:a-dman-HEX-1:5\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:b-dgal-HEX-1:5\n19b:b-dglc-HEX-1:5\n20s:n-acetyl\n21b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:6o(3+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:5o(4+1)13d\n13:13d(2+1)14n\n14:5o(6+1)15d\n15:15o(2+1)16d\n16:16d(2+1)17n\n17:16o(4+1)18d\n18:18o(3+1)19d\n19:19d(2+1)20n\n20:19o(4+1)21d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-3)]Man(a1-3)[GlcNAc(b1-4)][Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00887EN",
+    "glycoct": "RES\n1b:b-dman-HEX-1:5\n2b:a-dman-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\nLIN\n1:1o(6+1)2d\n2:2o(6+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6d(2+1)7n\n7:6o(4+1)8d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-6)Man(a1-6)Man"
+  },
+  {
+    "accession": "G00891MP",
+    "glycoct": "RES\n1b:a-dman-HEX-1:5\n2b:a-dman-HEX-1:5\nLIN\n1:1o(3+1)2d",
+    "iupac": "Man(a1-3)Man"
+  },
+  {
+    "accession": "G00909GK",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:a-dman-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:5o(6+1)9d\n9:9o(2+1)10d\n10:10d(2+1)11n\n11:9o(6+1)12d\n12:12d(2+1)13n",
+    "iupac": "GlcNAc(b1-4)Man(a1-3)[GlcNAc(b1-2)[GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00909PI",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n14s:n-acetyl\n15b:a-dman-HEX-1:5\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:b-dgal-HEX-1:5\n19b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n20s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:6o(4+1)10d\n10:10d(2+1)11n\n11:10o(3+1)12d\n12:12o(3+2)13d\n13:13d(5+1)14n\n14:5o(6+1)15d\n15:15o(2+1)16d\n16:16d(2+1)17n\n17:16o(4+1)18d\n18:18o(3+2)19d\n19:19d(5+1)20n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-3)GlcNAc(b1-4)]Man(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00924FH",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-lgal-HEX-1:5|6:d\n7b:a-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(2+1)6d\n6:5o(3+1)7d",
+    "iupac": "Fuc(a1-2)[Gal(a1-3)]Gal(b1-4)GlcNAc(b1-3)GalNAc"
+  },
+  {
+    "accession": "G00925PQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dman-HEX-1:5\n7b:b-dxyl-PEN-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(2+1)7d\n7:6o(3+1)8d\n8:8o(6+1)9d",
+    "iupac": "Fuc(a1-3)[Xyl(b1-2)[Man(a1-6)Man(a1-3)]Man(b1-4)GlcNAc(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G00943OF",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dgal-HEX-1:5\n9b:b-dgal-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7o(4+1)8d\n8:6o(4+1)9d\n9:6o(6+1)10d\n10:1o(6+1)11d",
+    "iupac": "Fuc(a1-3)[Gal(a1-4)Man(a1-3)[Gal(b1-4)][Man(a1-6)]Man(b1-4)GlcNAc(b1-4)][Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00944OL",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-acetyl\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:b-dgal-HEX-1:5\n12b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n13s:n-acetyl\n14b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n\n5:1o(6+1)6d\n6:6d(2+1)7n\n7:6o(4+1)8d\n8:8o(3+1)9d\n9:9d(2+1)10n\n10:9o(3+1)11d\n11:11o(3+2)12d\n12:12d(5+1)13n\n13:9o(4+1)14d",
+    "iupac": "NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-3)Gal(b1-3)[Fuc(a1-4)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00948WV",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:a-dman-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:b-dgal-HEX-1:5\n18b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n19s:n-acetyl\n20b:b-dglc-HEX-1:5\n21s:n-acetyl\n22b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:5o(6+1)14d\n14:14o(2+1)15d\n15:15d(2+1)16n\n16:15o(4+1)17d\n17:17o(3+2)18d\n18:18d(5+1)19n\n19:14o(6+1)20d\n20:20d(2+1)21n\n21:1o(6+1)22d",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)[GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G00951UF",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:a-dman-HEX-1:5\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dglc-HEX-1:5\n15s:n-acetyl\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:5o(4+1)9d\n9:9d(2+1)10n\n10:5o(6+1)11d\n11:11o(2+1)12d\n12:12d(2+1)13n\n13:11o(4+1)14d\n14:14d(2+1)15n\n15:11o(6+1)16d\n16:16d(2+1)17n",
+    "iupac": "GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][GlcNAc(b1-2)[GlcNAc(b1-4)][GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G00977CB",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:a-dxyl-PEN-1:5\nLIN\n1:1o(6+1)2d",
+    "iupac": "Xyl(a1-6)Glc"
+  },
+  {
+    "accession": "G00978GW",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:a-lgal-HEX-1:5|6:d\n7b:b-dgal-HEX-1:5\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:a-lgal-HEX-1:5|6:d\n11b:b-dgal-HEX-1:5\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:a-lgal-HEX-1:5|6:d\n15b:b-dgal-HEX-1:5\n16b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n17s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(6+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d\n6:4o(4+1)7d\n7:7o(3+1)8d\n8:8d(2+1)9n\n9:8o(3+1)10d\n10:8o(4+1)11d\n11:11o(3+1)12d\n12:12d(2+1)13n\n13:12o(3+1)14d\n14:12o(4+1)15d\n15:15o(3+2)16d\n16:16d(5+1)17n",
+    "iupac": "Gal(b1-3)[Fuc(a1-3)[Fuc(a1-3)[Fuc(a1-3)[NeuAc(a2-3)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00979XR",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:3o(6+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:1o(6+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]Gal(b1-3)[Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G00986YT",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(6+1)10d\n10:10o(2+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-4)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01055IS",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:a-dglc-HEX-1:5\n3s:n-acetyl\nLIN\n1:1o(3+1)2d\n2:2d(2+1)3n",
+    "iupac": "GlcNAc(a1-3)Glc"
+  },
+  {
+    "accession": "G01056RH",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6s:sulfate\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(6+1)6n\n6:1o(6+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d",
+    "iupac": "HSO3(u?-6)Gal(b1-4)GlcNAc(b1-3)[Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01079TS",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:b-dgal-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\n14b:b-dglc-HEX-1:5\n15s:n-acetyl\n16b:a-dman-HEX-1:5\n17b:a-dman-HEX-1:5\n18b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7o(2+1)8d\n8:8d(2+1)9n\n9:8o(4+1)10d\n10:7o(4+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d\n13:6o(4+1)14d\n14:14d(2+1)15n\n15:6o(6+1)16d\n16:16o(3+1)17d\n17:16o(6+1)18d",
+    "iupac": "Fuc(a1-3)[Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-4)][Man(a1-3)[Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G01116MS",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13s:sulfate\n14s:sulfate\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:10o(6+1)13n\n13:7o(6+1)14n",
+    "iupac": "Gal(b1-4)[HSO3(u?-6)]GlcNAc(b1-3)Gal(b1-4)[HSO3(u?-6)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-3)GalNAc"
+  },
+  {
+    "accession": "G01131OO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-dman-HEX-1:5\n4b:a-dman-HEX-1:5\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(3+1)4d\n4:4o(2+1)5d\n5:5d(2+1)6n\n6:5o(4+1)7d\n7:3o(6+1)8d\n8:8o(2+1)9d\n9:9d(2+1)10n\n10:9o(4+1)11d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(a1-4)GlcNAc"
+  },
+  {
+    "accession": "G01148IL",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(4+1)4d",
+    "iupac": "Gal(b1-4)Glc(b1-3)GlcNAc"
+  },
+  {
+    "accession": "G01191NN",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:a-lgal-HEX-1:5|6:d\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:a-lgal-HEX-1:5|6:d\n16b:b-dgal-HEX-1:5\n17b:b-dglc-HEX-1:5\n18s:n-acetyl\n19b:b-dgal-HEX-1:5\n20b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n21s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6d(2+1)7n\n7:6o(3+1)8d\n8:6o(4+1)9d\n9:9o(3+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:12o(3+1)13d\n13:13d(2+1)14n\n14:13o(3+1)15d\n15:13o(4+1)16d\n16:16o(3+1)17d\n17:17d(2+1)18n\n18:17o(4+1)19d\n19:19o(3+2)20d\n20:20d(5+1)21n",
+    "iupac": "Fuc(a1-3)[Fuc(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01200BW",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:b-dgal-HEX-1:5\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-lgal-HEX-1:5|6:d\n16b:a-dgal-HEX-1:5\n17b:b-dglc-HEX-1:5\n18s:n-acetyl\n19b:b-dgal-HEX-1:5\n20b:a-lgal-HEX-1:5|6:d\n21b:a-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6d(2+1)7n\n7:6o(4+1)8d\n8:8o(3+1)9d\n9:9d(2+1)10n\n10:9o(4+1)11d\n11:11o(3+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:14o(2+1)15d\n15:14o(3+1)16d\n16:8o(6+1)17d\n17:17d(2+1)18n\n18:17o(4+1)19d\n19:19o(2+1)20d\n20:19o(3+1)21d",
+    "iupac": "Fuc(a1-2)[Gal(a1-3)]Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)[Fuc(a1-2)[Gal(a1-3)]Gal(b1-4)GlcNAc(b1-6)]Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01208OM",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dgal-HEX-1:5\n8s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:2o(4+1)7d\n7:7d(2+1)8n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-3)Gal(a1-3)[GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01210SE",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5|6:a\n4b:a-dglc-HEX-1:5\n5s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(4+1)4d\n4:4d(2+1)5n",
+    "iupac": "GlcNAc(a1-4)GlcA(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01220PX",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\n12b:a-dman-HEX-1:5\n13b:a-dman-HEX-1:5\n14b:a-dman-HEX-1:5\n15b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7o(2+1)8d\n8:6o(6+1)9d\n9:9o(6+1)10d\n10:10o(6+1)11d\n11:5o(6+1)12d\n12:12o(3+1)13d\n13:12o(6+1)14d\n14:14o(2+1)15d",
+    "iupac": "Man(a1-2)Man(a1-2)[Man(a1-6)Man(a1-6)Man(a1-6)]Man(a1-3)[Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01237HZ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-lgal-HEX-1:5|6:d\n4b:a-dgal-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(2+1)3d\n3:2o(3+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d",
+    "iupac": "Fuc(a1-2)[Gal(b1-3)GalNAc(a1-3)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01243KR",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-lgal-HEX-1:5|6:d\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:a-lgal-HEX-1:5|6:d\n13b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(2+1)6d\n6:1o(6+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+1)10d\n10:10d(2+1)11n\n11:10o(3+1)12d\n12:10o(4+1)13d",
+    "iupac": "Fuc(a1-2)Gal(b1-4)GlcNAc(b1-3)[Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01244DB",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:a-dman-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:b-dgal-HEX-1:5\n18b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n19s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:5o(6+1)14d\n14:14o(2+1)15d\n15:15d(2+1)16n\n16:15o(4+1)17d\n17:17o(3+2)18d\n18:18d(5+1)19n",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)[GlcNAc(b1-4)]Man(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01257PC",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:a-dman-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:5o(6+1)9d\n9:9o(2+1)10d\n10:10d(2+1)11n\n11:1o(6+1)12d",
+    "iupac": "GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(a1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G01265XZ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(6+1)10d\n10:10o(2+1)11d\n11:11d(2+1)12n\n12:10o(6+1)13d\n13:13d(2+1)14n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-2)[GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01284FH",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n9s:n-acetyl\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-glycolyl\nLIN\n1:1o(4+1)2d\n2:2o(3+2)3d\n3:3d(5+1)4n\n4:2o(4+1)5d\n5:5d(2+1)6n\n6:5o(3+1)7d\n7:7o(3+2)8d\n8:8d(5+1)9n\n9:5o(6+2)10d\n10:10d(5+1)11n",
+    "iupac": "NeuAc(a2-3)[NeuAc(a2-3)Gal(b1-3)[NeuGc(a2-6)]GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01296LJ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:a-lgal-HEX-1:5|6:d\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:3o(4+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n",
+    "iupac": "Fuc(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01308XT",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:a-lgal-HEX-1:5|6:d\n10b:b-dgal-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\n14b:a-dman-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:a-lgal-HEX-1:5|6:d\n18b:b-dgal-HEX-1:5\n19b:b-dglc-HEX-1:5\n20s:n-acetyl\n21b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:7o(3+1)9d\n9:7o(4+1)10d\n10:6o(6+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d\n13:5o(6+1)14d\n14:14o(2+1)15d\n15:15d(2+1)16n\n16:15o(3+1)17d\n17:15o(4+1)18d\n18:14o(6+1)19d\n19:19d(2+1)20n\n20:19o(4+1)21d",
+    "iupac": "Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-4)[Gal(b1-4)GlcNAc(b1-6)]Man(a1-3)[Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01316HN",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n\n8:7o(3+1)9d",
+    "iupac": "Gal(b1-3)GlcNAc(b1-3)Gal(b1-3)GlcNAc(b1-3)Gal(b1-3)GalNAc"
+  },
+  {
+    "accession": "G01342FO",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:a-lgal-HEX-1:5|6:d\n10b:b-dgal-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:a-lgal-HEX-1:5|6:d\n14b:b-dgal-HEX-1:5\n15b:a-dman-HEX-1:5\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:a-lgal-HEX-1:5|6:d\n19b:b-dgal-HEX-1:5\n20b:b-dglc-HEX-1:5\n21s:n-acetyl\n22b:a-lgal-HEX-1:5|6:d\n23b:b-dgal-HEX-1:5\n24b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(3+1)9d\n9:7o(4+1)10d\n10:10o(3+1)11d\n11:11d(2+1)12n\n12:11o(3+1)13d\n13:11o(4+1)14d\n14:5o(6+1)15d\n15:15o(2+1)16d\n16:16d(2+1)17n\n17:16o(3+1)18d\n18:16o(4+1)19d\n19:19o(3+1)20d\n20:20d(2+1)21n\n21:20o(3+1)22d\n22:20o(4+1)23d\n23:1o(6+1)24d",
+    "iupac": "Fuc(a1-3)[Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-2)Man(a1-3)[Fuc(a1-3)[Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G01354KL",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-dman-HEX-1:5\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:b-dgal-HEX-1:5\n19b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n20s:n-acetyl\n21b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:5o(6+1)15d\n15:15o(2+1)16d\n16:16d(2+1)17n\n17:16o(4+1)18d\n18:18o(6+2)19d\n19:19d(5+1)20n\n20:1o(6+1)21d",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G01359SY",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\n12b:a-dman-HEX-1:5\n13b:a-dman-HEX-1:5\n14b:a-dman-HEX-1:5\n15b:a-dman-HEX-1:5\n16b:a-dman-HEX-1:5\n17b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7o(2+1)8d\n8:6o(6+1)9d\n9:9o(2+1)10d\n10:9o(6+1)11d\n11:11o(6+1)12d\n12:12o(2+1)13d\n13:5o(6+1)14d\n14:14o(3+1)15d\n15:14o(6+1)16d\n16:16o(2+1)17d",
+    "iupac": "Man(a1-2)Man(a1-2)[Man(a1-2)[Man(a1-2)Man(a1-6)Man(a1-6)]Man(a1-6)]Man(a1-3)[Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01361SX",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5d(2+1)6n\n6:5o(4+1)7d\n7:7d(2+1)8n",
+    "iupac": "GlcNAc(b1-4)GlcNAc(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01366SQ",
+    "glycoct": "RES\n1b:a-dman-HEX-1:5\n2b:a-dman-HEX-1:5\n3b:a-dman-HEX-1:5\n4b:a-dman-HEX-1:5\n5b:b-dman-HEX-1:5\nLIN\n1:1o(2+1)2d\n2:1o(6+1)3d\n3:3o(2+1)4d\n4:4o(2+1)5d",
+    "iupac": "Man(a1-2)[Man(b1-2)Man(a1-2)Man(a1-6)]Man"
+  },
+  {
+    "accession": "G01369SG",
+    "glycoct": "RES\n1b:a-dman-HEX-1:5\n2b:a-dman-HEX-1:5\n3b:a-dman-HEX-1:5\n4b:a-dman-HEX-1:5\nLIN\n1:1o(6+1)2d\n2:2o(2+1)3d\n3:2o(6+1)4d",
+    "iupac": "Man(a1-2)[Man(a1-6)]Man(a1-6)Man"
+  },
+  {
+    "accession": "G01378OV",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\n14b:a-lgal-HEX-1:5|6:d\n15b:a-dgal-HEX-1:5\n16s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(6+1)10d\n10:10o(2+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d\n13:13o(2+1)14d\n14:13o(3+1)15d\n15:15d(2+1)16n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Fuc(a1-2)[GalNAc(a1-3)]Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01388RZ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(2+1)7d",
+    "iupac": "Fuc(a1-3)[Man(a1-2)Man(a1-4)GlcNAc(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G01447WV",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(6+1)3d",
+    "iupac": "Fuc(b1-6)GlcNAc"
+  },
+  {
+    "accession": "G01450VD",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:b-dgal-HEX-1:5\n11b:a-lgal-HEX-1:5|6:d\n12b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7o(2+1)8d\n8:8d(2+1)9n\n9:8o(4+1)10d\n10:8o(6+1)11d\n11:6o(6+1)12d",
+    "iupac": "Fuc(a1-3)[Gal(b1-4)[Fuc(a1-6)]GlcNAc(b1-2)Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G01457KB",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n9s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:1o(6+1)5d\n5:5d(2+1)6n\n6:5o(4+1)7d\n7:7o(3+2)8d\n8:8d(5+1)9n",
+    "iupac": "GlcNAc(b1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01504UZ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:b-dman-HEX-1:5\n7b:b-dman-HEX-1:5\n8b:b-dman-HEX-1:5\n9b:b-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:5o(6+1)8d\n8:8o(3+1)9d",
+    "iupac": "Man(b1-2)Man(b1-3)[Man(b1-3)Man(b1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01534TU",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d",
+    "iupac": "Gal(b1-3)GalNAc"
+  },
+  {
+    "accession": "G01545QB",
+    "glycoct": "RES\n1b:b-dman-HEX-1:5\n2b:b-dman-HEX-1:5\n3b:b-dman-HEX-1:5\nLIN\n1:1o(2+1)2d\n2:2o(2+1)3d",
+    "iupac": "Man(b1-2)Man(b1-2)Man"
+  },
+  {
+    "accession": "G01546PE",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n8s:n-glycolyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:1o(6+2)7d\n7:7d(5+1)8n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-3)Gal(b1-3)[NeuGc(a2-6)]GalNAc"
+  },
+  {
+    "accession": "G01571OF",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:a-dman-HEX-1:5\n14b:b-dglc-HEX-1:5\n15s:n-acetyl\n16b:b-dgal-HEX-1:5\n17b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n18s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(4+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:5o(6+1)13d\n13:13o(2+1)14d\n14:14d(2+1)15n\n15:14o(4+1)16d\n16:16o(3+2)17d\n17:17d(5+1)18n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-4)][NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01582PV",
+    "glycoct": "RES\n1b:a-dman-HEX-1:5\n2b:b-dglc-HEX-1:5\n3s:n-acetyl\n4b:b-dgal-HEX-1:5\n5b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n6s:n-acetyl\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\nLIN\n1:1o(2+1)2d\n2:2d(2+1)3n\n3:2o(4+1)4d\n4:4o(6+2)5d\n5:5d(5+1)6n\n6:1o(6+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n",
+    "iupac": "NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-6)]Man"
+  },
+  {
+    "accession": "G01590HD",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\n12b:a-dman-HEX-1:5\n13b:a-dman-HEX-1:5\n14b:a-dglc-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(3+1)7d\n7:7o(2+1)8d\n8:6o(6+1)9d\n9:9o(2+1)10d\n10:5o(6+1)11d\n11:11o(2+1)12d\n12:12o(2+1)13d\n13:13o(3+1)14d",
+    "iupac": "Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-3)[Glc(a1-3)Man(a1-2)Man(a1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01599BJ",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:4\n2b:b-dgal-HEX-1:5\nLIN\n1:1o(6+1)2d",
+    "iupac": "Gal(b1-6)Galf"
+  },
+  {
+    "accession": "G01602LO",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dman-HEX-1:5\n4b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3o(2+1)4d",
+    "iupac": "Man(a1-2)Man(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01614ZM",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-acetyl\n6b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n\n5:1o(6+2)6d\n6:6d(5+1)7n",
+    "iupac": "NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-6)]GalNAc"
+  },
+  {
+    "accession": "G01621RQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\n12b:a-dman-HEX-1:5\n13b:a-dman-HEX-1:5\n14b:a-dman-HEX-1:5\n15b:a-dman-HEX-1:5\n16b:a-dman-HEX-1:5\n17b:a-dman-HEX-1:5\n18b:a-dman-HEX-1:5\n19b:a-dman-HEX-1:5\n20b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7o(2+1)8d\n8:8o(2+1)9d\n9:9o(2+1)10d\n10:5o(6+1)11d\n11:11o(3+1)12d\n12:12o(2+1)13d\n13:13o(2+1)14d\n14:14o(2+1)15d\n15:11o(6+1)16d\n16:16o(2+1)17d\n17:17o(2+1)18d\n18:18o(2+1)19d\n19:19o(2+1)20d",
+    "iupac": "Man(a1-2)Man(a1-2)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-2)Man(a1-2)Man(a1-3)[Man(a1-2)Man(a1-2)Man(a1-2)Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01625GQ",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-lgal-HEX-1:5|6:d\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(2+1)4d\n4:3o(3+1)5d\n5:1o(6+1)6d\n6:6d(2+1)7n",
+    "iupac": "Fuc(a1-2)[Gal(b1-3)]Gal(b1-3)[GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01629YL",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:a-dxyl-PEN-1:5\nLIN\n1:1o(3+1)2d",
+    "iupac": "Xyl(a1-3)Glc"
+  },
+  {
+    "accession": "G01633SK",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n9s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+2)3d\n3:3d(5+1)4n\n4:2o(4+1)5d\n5:5d(2+1)6n\n6:5o(3+1)7d\n7:7o(3+2)8d\n8:8d(5+1)9n",
+    "iupac": "NeuAc(a2-3)[NeuAc(a2-3)Gal(b1-3)GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01643LM",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n14s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(6+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:12o(6+2)13d\n13:13d(5+1)14n",
+    "iupac": "Gal(b1-3)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01657UH",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-glycolyl\n6b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-glycolyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n\n5:1o(6+2)6d\n6:6d(5+1)7n",
+    "iupac": "NeuGc(a2-3)Gal(b1-3)[NeuGc(a2-6)]GalNAc"
+  },
+  {
+    "accession": "G01666SB",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n14s:n-glycolyl\n15s:sulfate\n16s:sulfate\n17s:sulfate\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:12o(3+2)13d\n13:13d(5+1)14n\n14:10o(6+1)15n\n15:7o(6+1)16n\n16:4o(6+1)17n",
+    "iupac": "NeuGc(a2-3)Gal(b1-4)[HSO3(u?-6)]GlcNAc(b1-3)Gal(b1-4)[HSO3(u?-6)]GlcNAc(b1-3)Gal(b1-4)[HSO3(u?-6)]GlcNAc(b1-3)Gal(b1-3)GalNAc"
+  },
+  {
+    "accession": "G01669LU",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n14s:n-acetyl\n15b:a-dman-HEX-1:5\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:6o(4+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:12o(3+2)13d\n13:13d(5+1)14n\n14:5o(6+1)15d\n15:15o(2+1)16d\n16:16d(2+1)17n\n17:16o(4+1)18d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01682LD",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dgal-HEX-1:5\n16b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n17s:n-acetyl\n18s:sulfate\n19s:sulfate\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(3+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d\n12:12o(3+1)13d\n13:13d(2+1)14n\n14:13o(4+1)15d\n15:15o(3+2)16d\n16:16d(5+1)17n\n17:13o(6+1)18n\n18:10o(6+1)19n",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)[HSO3(u?-6)]GlcNAc(b1-3)Gal(b1-4)[HSO3(u?-6)]GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-3)GalNAc"
+  },
+  {
+    "accession": "G01701KF",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2b:a-dglc-HEX-1:5\n3b:b-dgal-HEX-1:5\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d",
+    "iupac": "Gal(b1-4)Glc(a1-4)Glc"
+  },
+  {
+    "accession": "G01701XV",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:a-dman-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+2)10d\n10:10d(5+1)11n\n11:5o(4+1)12d\n12:12d(2+1)13n\n13:5o(6+1)14d\n14:14o(2+1)15d\n15:15d(2+1)16n\n16:1o(6+1)17d",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[GlcNAc(b1-4)][GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G01707KB",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(6+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d\n6:6d(2+1)7n",
+    "iupac": "Gal(b1-3)[GalNAc(b1-3)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01708UF",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dgal-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(4+1)3d\n3:3d(2+1)4n\n4:3o(6+1)5d\n5:5o(3+2)6d\n6:6d(5+1)7n",
+    "iupac": "NeuAc(a2-3)Gal(b1-6)GalNAc(b1-4)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01727MH",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\n12b:a-dman-HEX-1:5\n13b:a-dman-HEX-1:5\n14b:a-dman-HEX-1:5\n15b:a-dman-HEX-1:5\n16b:a-dman-HEX-1:5\n17b:a-dman-HEX-1:5\n18b:a-dman-HEX-1:5\n19b:a-dman-HEX-1:5\n20b:a-dman-HEX-1:5\n21b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7o(2+1)8d\n8:6o(6+1)9d\n9:9o(6+1)10d\n10:10o(6+1)11d\n11:11o(6+1)12d\n12:12o(6+1)13d\n13:13o(6+1)14d\n14:14o(6+1)15d\n15:15o(6+1)16d\n16:16o(6+1)17d\n17:5o(6+1)18d\n18:18o(3+1)19d\n19:18o(6+1)20d\n20:20o(2+1)21d",
+    "iupac": "Man(a1-2)Man(a1-2)[Man(a1-6)Man(a1-6)Man(a1-6)Man(a1-6)Man(a1-6)Man(a1-6)Man(a1-6)Man(a1-6)Man(a1-6)]Man(a1-3)[Man(a1-3)[Man(a1-2)Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01727PW",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\n14b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n15s:n-acetyl\n16b:b-dglc-HEX-1:5\n17s:n-acetyl\n18b:b-dgal-HEX-1:5\n19b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n20s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(6+1)10d\n10:10o(2+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d\n13:13o(6+2)14d\n14:14d(5+1)15n\n15:10o(4+1)16d\n16:16d(2+1)17n\n17:16o(4+1)18d\n18:18o(6+2)19d\n19:19d(5+1)20n",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-4)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01744JD",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:a-lgal-HEX-1:5|6:d\n6b:b-dgal-HEX-1:5\n7b:a-lgal-HEX-1:5|6:d\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:a-lgal-HEX-1:5|6:d\n11b:b-dgal-HEX-1:5\n12b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:3o(4+1)6d\n6:6o(2+1)7d\n7:1o(6+1)8d\n8:8d(2+1)9n\n9:8o(3+1)10d\n10:8o(4+1)11d\n11:11o(2+1)12d",
+    "iupac": "Fuc(a1-3)[Fuc(a1-2)Gal(b1-4)]GlcNAc(b1-3)[Fuc(a1-3)[Fuc(a1-2)Gal(b1-4)]GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01748MD",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:b-dglc-HEX-1:5\n3s:n-acetyl\n4b:a-lgal-HEX-1:5|6:d\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:a-lgal-HEX-1:5|6:d\n9b:b-dgal-HEX-1:5\n10b:a-lgal-HEX-1:5|6:d\nLIN\n1:1o(3+1)2d\n2:2d(2+1)3n\n3:2o(3+1)4d\n4:2o(4+1)5d\n5:5o(3+1)6d\n6:6d(2+1)7n\n7:6o(3+1)8d\n8:6o(4+1)9d\n9:9o(2+1)10d",
+    "iupac": "Fuc(a1-3)[Fuc(a1-3)[Fuc(a1-2)Gal(b1-4)]GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-3)Gal"
+  },
+  {
+    "accession": "G01759NM",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(6+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d",
+    "iupac": "Gal(b1-3)[Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01760ZU",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:a-dman-HEX-1:5\n8b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7o(2+1)8d",
+    "iupac": "Man(a1-2)Man(a1-2)Man(a1-3)Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01767JJ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+2)6d\n6:6d(5+1)7n",
+    "iupac": "NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01854VF",
+    "glycoct": "RES\n1b:b-lgal-HEX-1:5|6:d\n2b:b-dglc-HEX-1:5\n3s:n-acetyl\nLIN\n1:1o(3+1)2d\n2:2d(2+1)3n",
+    "iupac": "GlcNAc(b1-3)Fuc"
+  },
+  {
+    "accession": "G01856RL",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-glycolyl\n12b:a-dman-HEX-1:5\n13b:b-dglc-HEX-1:5\n14s:n-acetyl\n15b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(6+2)10d\n10:10d(5+1)11n\n11:5o(6+1)12d\n12:12o(2+1)13d\n13:13d(2+1)14n\n14:13o(4+1)15d",
+    "iupac": "NeuGc(a2-6)Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01859LC",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:a-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dman-HEX-1:5\n10b:b-dglc-HEX-1:5\n11s:n-acetyl\n12b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:5o(6+1)9d\n9:9o(2+1)10d\n10:10d(2+1)11n\n11:10o(4+1)12d",
+    "iupac": "GlcNAc(b1-4)Man(a1-3)[Gal(b1-4)GlcNAc(b1-2)Man(b1-6)]Man(a1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01866TT",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5|6:a\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dglc-HEX-1:5|6:a\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dglc-HEX-1:5|6:a\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(4+1)4d\n4:4d(2+1)5n\n5:4o(3+1)6d\n6:6o(4+1)7d\n7:7d(2+1)8n\n8:7o(3+1)9d",
+    "iupac": "GlcA(b1-3)GlcNAc(b1-4)GlcA(b1-3)GlcNAc(b1-4)GlcA(b1-3)GlcNAc"
+  },
+  {
+    "accession": "G01877VI",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4s:n-acetyl\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:1o(6+1)5d\n5:5d(2+1)6n",
+    "iupac": "GalNAc(b1-3)[GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G01891JS",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n16s:n-acetyl\n17b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(6+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:14o(6+2)15d\n15:15d(5+1)16n\n16:5o(6+1)17d",
+    "iupac": "NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01923XE",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:a-dman-HEX-1:5\n18b:b-dglc-HEX-1:5\n19s:n-acetyl\n20b:b-dgal-HEX-1:5\n21b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(6+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:5o(4+1)15d\n15:15d(2+1)16n\n16:5o(6+1)17d\n17:17o(2+1)18d\n18:18d(2+1)19n\n19:18o(4+1)20d\n20:1o(6+1)21d",
+    "iupac": "NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-4)][Gal(b1-4)GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G01935FK",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:a-lgal-HEX-1:5|6:d\n14b:b-dgal-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(6+1)10d\n10:10o(2+1)11d\n11:11d(2+1)12n\n12:11o(3+1)13d\n13:11o(4+1)14d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)Man(a1-3)[Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-2)Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G01954WK",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n4s:n-glycolyl\n5b:b-dgal-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n9s:n-glycolyl\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+2)3d\n3:3d(5+1)4n\n4:2o(4+1)5d\n5:5d(2+1)6n\n6:5o(3+1)7d\n7:7o(3+2)8d\n8:8d(5+1)9n\n9:5o(6+2)10d\n10:10d(5+1)11n",
+    "iupac": "NeuGc(a2-3)[NeuGc(a2-3)Gal(b1-3)[NeuAc(a2-6)]GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G01995CB",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-dglc-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d",
+    "iupac": "Glc(a1-4)GlcNAc"
+  },
+  {
+    "accession": "G01999JH",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:a-dman-HEX-1:5\n10b:a-dman-HEX-1:5\n11b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:5o(6+1)9d\n9:9o(3+1)10d\n10:9o(6+1)11d",
+    "iupac": "GlcNAc(b1-2)Man(a1-3)[Man(a1-3)[Man(a1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G02000GW",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:b-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(2+1)6d",
+    "iupac": "Man(b1-2)Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G02015FA",
+    "glycoct": "RES\n1b:b-dman-HEX-1:5\n2b:b-dman-HEX-1:5\n3b:a-dman-HEX-1:5\n4b:a-dman-HEX-1:5\n5b:a-dman-HEX-1:5\nLIN\n1:1o(2+1)2d\n2:2o(2+1)3d\n3:3o(2+1)4d\n4:4o(2+1)5d",
+    "iupac": "Man(a1-2)Man(a1-2)Man(a1-2)Man(b1-2)Man"
+  },
+  {
+    "accession": "G02022CE",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4s:n-acetyl\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5d(2+1)6n",
+    "iupac": "GlcNAc(b1-4)GalNAc(b1-4)GalNAc"
+  },
+  {
+    "accession": "G02025MF",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:a-lgal-HEX-1:5|6:d\n10b:a-dgal-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:a-lgal-HEX-1:5|6:d\n14b:b-dgal-HEX-1:5\n15b:b-dglc-HEX-1:5\n16s:n-acetyl\n17b:a-dman-HEX-1:5\n18b:b-dglc-HEX-1:5\n19s:n-acetyl\n20b:a-lgal-HEX-1:5|6:d\n21b:b-dgal-HEX-1:5\n22b:b-dglc-HEX-1:5\n23s:n-acetyl\n24b:a-lgal-HEX-1:5|6:d\n25b:b-dgal-HEX-1:5\n26b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(3+1)9d\n9:7o(4+1)10d\n10:6o(4+1)11d\n11:11d(2+1)12n\n12:11o(3+1)13d\n13:11o(4+1)14d\n14:5o(4+1)15d\n15:15d(2+1)16n\n16:5o(6+1)17d\n17:17o(2+1)18d\n18:18d(2+1)19n\n19:18o(3+1)20d\n20:18o(4+1)21d\n21:17o(6+1)22d\n22:22d(2+1)23n\n23:22o(3+1)24d\n24:22o(4+1)25d\n25:1o(6+1)26d",
+    "iupac": "Fuc(a1-3)[Gal(a1-4)]GlcNAc(b1-2)[Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-4)]Man(a1-3)[GlcNAc(b1-4)][Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-2)[Fuc(a1-3)[Gal(b1-4)]GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G02029PW",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:a-lgal-HEX-1:5|6:d\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dman-HEX-1:5\n7b:b-dxyl-PEN-1:5\n8b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:1o(4+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(2+1)7d\n7:6o(6+1)8d",
+    "iupac": "Fuc(a1-3)[Xyl(b1-2)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)]GlcNAc"
+  },
+  {
+    "accession": "G02032MW",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-lgal-HEX-1:5|6:d\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:5o(2+1)6d\n6:1o(6+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(2+1)10d",
+    "iupac": "Fuc(a1-2)Gal(b1-3)GlcNAc(b1-3)[Fuc(a1-2)Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G02033CE",
+    "glycoct": "RES\n1b:b-dman-HEX-1:5\n2b:a-dman-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\nLIN\n1:1o(6+1)2d\n2:2o(6+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6d(2+1)7n\n7:6o(4+1)8d\n8:8o(3+1)9d\n9:9d(2+1)10n",
+    "iupac": "GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-6)Man(a1-6)Man"
+  },
+  {
+    "accession": "G02038LQ",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\n9s:n-acetyl\n10b:b-dgal-HEX-1:5\n11s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+2)6d\n6:6d(5+1)7n\n7:5o(4+1)8d\n8:8d(2+1)9n\n9:2o(4+1)10d\n10:10d(2+1)11n",
+    "iupac": "NeuAc(a2-3)[GalNAc(b1-4)]Gal(b1-4)GlcNAc(b1-3)[GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G02106OV",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-dgal-HEX-1:5\n16b:a-dman-HEX-1:5\n17b:b-dglc-HEX-1:5\n18s:n-acetyl\n19b:b-dgal-HEX-1:5\n20b:a-dgal-HEX-1:5\n21b:b-dglc-HEX-1:5\n22s:n-acetyl\n23b:b-dgal-HEX-1:5\n24b:a-dgal-HEX-1:5\n25b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(6+2)10d\n10:10d(5+1)11n\n11:6o(4+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:14o(3+1)15d\n15:5o(6+1)16d\n16:16o(2+1)17d\n17:17d(2+1)18n\n18:17o(4+1)19d\n19:19o(3+1)20d\n20:16o(6+1)21d\n21:21d(2+1)22n\n22:21o(4+1)23d\n23:23o(3+1)24d\n24:1o(6+1)25d",
+    "iupac": "NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-2)[Gal(a1-3)Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Gal(a1-3)Gal(b1-4)GlcNAc(b1-2)[Gal(a1-3)Gal(b1-4)GlcNAc(b1-6)]Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G02149VR",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2b:b-dgal-HEX-1:5\n3b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n9s:n-acetyl\n10b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n11s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2o(3+2)3d\n3:3d(5+1)4n\n4:2o(4+1)5d\n5:5d(2+1)6n\n6:5o(3+1)7d\n7:7o(3+2)8d\n8:8d(5+1)9n\n9:5o(6+2)10d\n10:10d(5+1)11n",
+    "iupac": "NeuAc(a2-3)[NeuAc(a2-3)Gal(b1-3)[NeuAc(a2-6)]GalNAc(b1-4)]Gal(b1-4)Glc"
+  },
+  {
+    "accession": "G02150AC",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:b-dglc-HEX-1:5\n5s:n-acetyl\n6b:b-dgal-HEX-1:5\n7b:a-lgal-HEX-1:5|6:d\n8b:b-dglc-HEX-1:5\n9s:n-acetyl\n10b:a-lgal-HEX-1:5|6:d\n11b:b-dgal-HEX-1:5\n12b:b-dglc-HEX-1:5\n13s:n-acetyl\n14b:b-dgal-HEX-1:5\n15b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n16s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+1)4d\n4:4d(2+1)5n\n5:4o(4+1)6d\n6:6o(2+1)7d\n7:1o(6+1)8d\n8:8d(2+1)9n\n9:8o(3+1)10d\n10:8o(4+1)11d\n11:11o(3+1)12d\n12:12d(2+1)13n\n13:12o(4+1)14d\n14:14o(3+2)15d\n15:15d(5+1)16n",
+    "iupac": "Fuc(a1-2)Gal(b1-4)GlcNAc(b1-3)Gal(b1-3)[Fuc(a1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)]GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G02162KR",
+    "glycoct": "RES\n1b:b-dgal-HEX-1:5\n2b:b-dgal-HEX-1:5\n3s:n-acetyl\n4b:b-dgal-HEX-1:5\n5b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n6s:n-acetyl\nLIN\n1:1o(4+1)2d\n2:2d(2+1)3n\n3:2o(3+1)4d\n4:4o(3+2)5d\n5:5d(5+1)6n",
+    "iupac": "NeuAc(a2-3)Gal(b1-3)GalNAc(b1-4)Gal"
+  },
+  {
+    "accession": "G02230VA",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dglc-HEX-1:5\n6s:n-acetyl\n7b:b-dgal-HEX-1:5\n8b:a-lgal-HEX-1:5|6:d\n9b:b-dglc-HEX-1:5\n10s:n-acetyl\n11b:a-lgal-HEX-1:5|6:d\n12b:b-dgal-HEX-1:5\n13b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:1o(6+1)5d\n5:5d(2+1)6n\n6:5o(4+1)7d\n7:7o(2+1)8d\n8:7o(3+1)9d\n9:9d(2+1)10n\n10:9o(3+1)11d\n11:9o(4+1)12d\n12:12o(2+1)13d",
+    "iupac": "GlcNAc(b1-3)[Fuc(a1-2)[Fuc(a1-3)[Fuc(a1-2)Gal(b1-4)]GlcNAc(b1-3)]Gal(b1-4)GlcNAc(b1-6)]GalNAc"
+  },
+  {
+    "accession": "G02252NT",
+    "glycoct": "RES\n1b:a-dglc-HEX-1:5\n2b:b-dxyl-PEN-1:5\nLIN\n1:1o(6+1)2d",
+    "iupac": "Xyl(b1-6)Glc"
+  },
+  {
+    "accession": "G02256MB",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:a-dgal-HEX-1:5\n4s:n-acetyl\n5b:b-dgal-HEX-1:5\n6b:b-dglc-HEX-1:5\n7s:n-acetyl\n8b:b-dgal-HEX-1:5\n9b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n10s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3d(2+1)4n\n4:3o(3+1)5d\n5:3o(6+1)6d\n6:6d(2+1)7n\n7:6o(4+1)8d\n8:8o(3+2)9d\n9:9d(5+1)10n",
+    "iupac": "Gal(b1-3)[NeuAc(a2-3)Gal(b1-4)GlcNAc(b1-6)]GalNAc(a1-3)GalNAc"
+  },
+  {
+    "accession": "G02261YA",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:b-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:b-dman-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\n14b:a-lgal-HEX-1:5|6:d\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:5o(6+1)10d\n10:10o(2+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d\n13:1o(6+1)14d",
+    "iupac": "Gal(b1-4)GlcNAc(b1-2)Man(b1-3)[Gal(b1-4)GlcNAc(b1-2)Man(b1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"
+  },
+  {
+    "accession": "G02273DT",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2b:a-dgal-HEX-1:5\n3s:n-acetyl\nLIN\n1:1o(3+1)2d\n2:2d(2+1)3n",
+    "iupac": "GalNAc(a1-3)Gal"
+  },
+  {
+    "accession": "G02284UY",
+    "glycoct": "RES\n1b:b-dglc-HEX-1:5\n2s:n-acetyl\n3b:b-dglc-HEX-1:5\n4s:n-acetyl\n5b:b-dman-HEX-1:5\n6b:a-dman-HEX-1:5\n7b:b-dglc-HEX-1:5\n8s:n-acetyl\n9b:b-dgal-HEX-1:5\n10b:a-dgal-HEX-1:5\n11b:b-dglc-HEX-1:5\n12s:n-acetyl\n13b:b-dgal-HEX-1:5\n14b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n15s:n-acetyl\n16b:a-dman-HEX-1:5\nLIN\n1:1d(2+1)2n\n2:1o(4+1)3d\n3:3d(2+1)4n\n4:3o(4+1)5d\n5:5o(3+1)6d\n6:6o(2+1)7d\n7:7d(2+1)8n\n8:7o(4+1)9d\n9:9o(3+1)10d\n10:6o(4+1)11d\n11:11d(2+1)12n\n12:11o(4+1)13d\n13:13o(6+2)14d\n14:14d(5+1)15n\n15:5o(6+1)16d",
+    "iupac": "Gal(a1-3)Gal(b1-4)GlcNAc(b1-2)[NeuAc(a2-6)Gal(b1-4)GlcNAc(b1-4)]Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)GlcNAc"
+  },
+  {
+    "accession": "G02288EO",
+    "glycoct": "RES\n1b:a-dgal-HEX-1:5\n2s:n-acetyl\n3b:b-dgal-HEX-1:5\n4b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n5s:n-acetyl\n6b:a-dgro-dgal-NON-2:6|1:a|2:keto|3:d\n7s:n-acetyl\nLIN\n1:1d(2+1)2n\n2:1o(3+1)3d\n3:3o(3+2)4d\n4:4d(5+1)5n\n5:3o(6+2)6d\n6:6d(5+1)7n",
+    "iupac": "NeuAc(a2-3)[NeuAc(a2-6)]Gal(b1-3)GalNAc"
+  }
+]

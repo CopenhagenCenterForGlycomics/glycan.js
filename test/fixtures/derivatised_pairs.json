@@ -1,0 +1,21 @@
+[
+  {
+    "name": "permethylation",
+    "baseName": "GlcNAc",
+    "baseInChI": "InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5+,6+,7-/m1/s1",
+    "derivatisedInChI": "InChI=1S/C14H27NO6/c1-5(16)15-9-11(19)10(18)7(3-17)21-14(9)20-13(6-2,12(20)4-22-5)8(14)20/h7-14H,3-4,6H2,1-2H3,(H,15,16)/t7-,8+,9+,10-,11-,12-/m1/s1",
+    "expectedDeltaPerPosition": { "C": 1, "H": 2 },
+    "expectedAcceptsCount": 4,
+    "symmetric": true
+  },
+  {
+    "name": "ethyl_ester_NeuAc",
+    "baseName": "NeuAc",
+    "baseInChI": "InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)9(17)8(7)16-6(3-13)21-11/h5-10,13,15-17H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8-,9-,10+,11-/m0/s1",
+    "derivatisedInChI": "InChI=1S/C13H23NO9/c1-3-22-11(18)2-13(23-12(19,20)21)10(17)9-8(16)6(14)5-7(15)4(9)13/h4-10,14-17H,2-3,5-6H2,1H3,(H,14)(H,19,20,21)/t4-,5+,6+,7-,8-,9+,10+,13-/m0/s1",
+    "expectedDeltaPerPosition": { "C": 2, "H": 4 },
+    "expectedAcceptsCount": 1,
+    "symmetric": false,
+    "note": "Ethyl ester is position-specific (C1 COOH only). Rule should warn about asymmetry."
+  }
+]
