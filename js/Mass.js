@@ -250,7 +250,7 @@ composition:S:1;H:1;O:3
 
 terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:Hex
-composition:C:6;H:10;O:5
+composition:C:6;H:12;O:6
 
 terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HOH
 name:Gal
@@ -260,12 +260,20 @@ terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:Glc
 type:Hex
 
-terminii:r1:OH;2eq:OH;3ax:OH;4eq:OH;5eq:-;6eq:HOH
+terminii:r1:OH;2ax:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:Man
 type:Hex
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HOH
+terminii:r1:OH;2eq:OH;3ax:OH;4ax:OH;5eq:-;6eq:HOH
 name:Galf
+type:Hex
+
+terminii:r1:OH;2eq:OH;3eq:OH;4ax:CHOHCHHOH
+name:Glcf
+type:Hex
+
+terminii:r1:OH;2ax:OH;3eq:OH;4ax:CHOHCHHOH
+name:Manf
 type:Hex
 
 terminii:r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
@@ -297,10 +305,20 @@ name:NeuAc
 type:NeuAc
 composition:C:11;H:17;N:1;O:8
 
+terminii:1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOHAc
+name:NeuAc9Ac
+type:NeuAc9Ac
+composition:C:12;H:17;N:1;O:8
+
 terminii:1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:HOH
 name:NeuGc
 type:NeuGc
 composition:C:11;H:17;N:1;O:9
+
+terminii:1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:HOHAc
+name:NeuGc9Ac
+type:NeuGc9Ac
+composition:C:11;H:17;N:1;O:8
 
 terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH
 name:dHex
@@ -364,6 +382,15 @@ const parse_atoms = (composition) => {
   if (composition === 'HH') {
     return [ H, H ];
   }
+
+  if (composition === 'Ac') {
+    return [ C, O, C, H, H ];
+  }
+
+  if (composition === 'HOHAc') {
+    return [ H,O, H, C, O, C, H, H ];
+  }
+
   if (composition === 'NAc') {
     return [ N, H, C, O, C, H, H, H ];
   }

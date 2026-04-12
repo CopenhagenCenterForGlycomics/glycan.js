@@ -57,8 +57,7 @@ LIN
 QUnit.module('readGlycoCT / writeGlycoCT', {});
 
 QUnit.test('G00051MO produces correct Lewis X residues and linkages', function(assert) {
-  const sugar = new GlycoCTRead();
-  sugar.sequence = G00051MO;
+  const sugar = readGlycoCT(G00051MO);
   const seq = sugar.sequence;
   assert.ok(seq.includes('Fuc(a1-3)[Gal(b1-4)]GlcNAc'),'Contains correct sequence');
   assert.ok(seq.includes('Gal(b1-4)'),   'Gal beta-1-4 linkage');
