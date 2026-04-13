@@ -1,6 +1,19 @@
 
 import Monosaccharide from '../Monosaccharide.js';
 import Repeat from '../Repeat.js';
+import { MONOSACCHARIDE } from '../reference_monosaccharides.js';
+
+// Map alternative identifier strings to canonical MONOSACCHARIDE values so
+// that sequences from sources such as Glygen (which uses Neu5Ac/Neu5Gc) are
+// recognised without requiring a separate conversion step.
+const IDENTIFIER_ALIASES = {
+  'Neu5Ac':  MONOSACCHARIDE.NeuAc,
+  'Neu5Gc':  MONOSACCHARIDE.NeuGc,
+};
+
+// Sulfate position digit extracted from shorthands like GlcNAc6S, GalNAc4S.
+// Only positions 3, 4 and 6 are recognised.
+const SULFATE_RE = /^(.+?)([346])S$/;
 
 let follow_bold_branch, create_bold_tree;
 
@@ -24,22 +37,25 @@ let parse_link = link_string => {
 };
 
 let get_monosaccharide = (sugar,proto) => {
-  // There should be a per-object
-  // and per-class override of the
-  // class that we use here to allow
-  // for specific functionality
-  // for some sugars
   let mono_class = sugar.constructor.Monosaccharide;
 
-  // If the mono class is an ImmutableMonosaccharide
-  // delete the removeChild method
-  // delete the set parent
-  // delete the set anomer
-  // delete the set parent_linkage
+  // Check for sulfate position shorthand before alias resolution,
+  // e.g. GlcNAc6S → GlcNAc with HSO3 child at position 6.
+  const sulfateMatch = proto.match(SULFATE_RE);
+  if (sulfateMatch) {
+    const baseId   = IDENTIFIER_ALIASES[sulfateMatch[1]] ?? sulfateMatch[1];
+    const sulfPos  = parseInt(sulfateMatch[2]);
+    const mono     = new mono_class(baseId);
+    const hso3     = new mono_class(MONOSACCHARIDE.HSO3);
+    hso3.anomer         = 'u';
+    hso3.parent_linkage = 0;   // unknown; written as '?'
+    mono.addChild(sulfPos, hso3);
+    return mono;
+  }
 
-  // move the addChild method into a symbol
-
-  return new mono_class(proto);
+  // Apply identifier alias (e.g. Neu5Ac → NeuAc).
+  const canonical = IDENTIFIER_ALIASES[proto] ?? proto;
+  return new mono_class(canonical);
 };
 
 follow_bold_branch = (sugar,units) => {

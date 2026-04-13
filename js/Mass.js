@@ -12,6 +12,8 @@ const NA = Symbol('Na');
 import * as DEFAULT_MASS_PROVIDER from './mass_provider.js';
 import { MONOSACCHARIDE } from './reference_monosaccharides.js';
 import { TracedMonosaccharide } from './Tracing.js';
+import monosaccharideData from './data/monosaccharides.json';
+import { inchiToTerminii } from './InChITerminii.js';
 
 let CURRENT_MASS_PROVIDER = DEFAULT_MASS_PROVIDER;
 
@@ -237,108 +239,6 @@ const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation',
 
 const DERIV_SIALIC_ACID = Object.freeze(new DerivativeSet('Sialic acid esterification, amidation',DERIV_ETHYL_ESTER,DERIV_AMMONIA_AMIDATION));
 
-const DEFINITIONS =`
-terminii:r1:x;2:x;3:x;4:x
-name:P
-type:ion
-composition:P:1;H:2;O:3
-
-terminii:r1:x;2:x;3:x;4:x
-name:S
-type:ion
-composition:S:1;H:1;O:3
-
-terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
-name:Hex
-composition:C:6;H:10;O:5
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HOH
-name:Gal
-type:Hex
-
-terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH
-name:Glc
-type:Hex
-
-terminii:r1:OH;2eq:OH;3ax:OH;4eq:OH;5eq:-;6eq:HOH
-name:Man
-type:Hex
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HOH
-name:Galf
-type:Hex
-
-terminii:r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
-name:HexNAc
-composition:C:8;H:13;N:1;O:5
-
-terminii:r1:OH;2eq:NAc;3eq:OH;4ax:OH;5eq:-;6eq:HOH
-name:GalNAc
-type:HexNAc
-
-terminii:r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
-name:GlcNAc
-type:HexNAc
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OO
-name:HexA
-composition:C:6;H:8;O:6
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OO
-name:GlcA
-type:HexA
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OO
-name:IdoA
-type:HexA
-
-terminii:1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH
-name:NeuAc
-type:NeuAc
-composition:C:11;H:17;N:1;O:8
-
-terminii:1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:HOH
-name:NeuGc
-type:NeuGc
-composition:C:11;H:17;N:1;O:9
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH
-name:dHex
-composition:C:6;H:10;O:4
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH
-name:Fuc
-type:dHex
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH
-name:Rha
-type:dHex
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
-name:Pent
-composition:C:5;H:8;O:4
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
-name:Xyl
-type:Pent
-
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
-name:Ara
-type:Pent
-
-terminii:r1:OH;2eq:NH2;3eq:OH;4eq:OH;5eq:-;6eq:HOH
-name:HexN
-composition:C:6;H:11;N:1;O:4
-
-terminii:r1:OH;2eq:NH2;3eq:OH;4eq:OH;5eq:-;6eq:HOH
-name:GlcN
-type:HexN
-
-terminii:r1:H
-name:Me
-type:alkyl
-composition:C:1;H:3
-`;
 
 const parse_atoms = (composition) => {
   if (composition === 'H') {
@@ -364,6 +264,19 @@ const parse_atoms = (composition) => {
   if (composition === 'HH') {
     return [ H, H ];
   }
+
+  if (composition === 'CHOHCHHOH') {
+    return [ C, H, O, H, C, H, H, O, H ];
+  }
+
+  if (composition === 'Ac') {
+    return [ C, O, C, H, H ];
+  }
+
+  if (composition === 'HOHAc') {
+    return [ H,O, H, C, O, C, H, H ];
+  }
+
   if (composition === 'NAc') {
     return [ N, H, C, O, C, H, H, H ];
   }
@@ -488,33 +401,27 @@ const parse_composition = (composition) => {
   return atoms;
 };
 
-let read_definitions = () => {
-  let parsed = {};
-  for (let block of DEFINITIONS.replace(/^\n/,'').split('\n\n')) {
-    let definition = {};
-    for (let line of block.split('\n')) {
-      let [field, value] = line.split(/^([^:]+):/).slice(1);
-      switch (field) {
-      case 'name' :
-        definition.name = value;
-        break;
-      case 'terminii' :
-        definition.ring = parse_terminii(value);
-        break;
-      case 'type' :
-        definition.type = value;
-        break;
-      case 'composition':
-        definition.composition = parse_composition(value);
-      }
+const load_definitions = () => {
+  const parsed = {};
+  for (const entry of monosaccharideData) {
+    let terminiiStr;
+    if (entry.inchi && !entry.terminii) {
+      terminiiStr = inchiToTerminii(entry.name, entry.inchi).terminii;
+    } else {
+      terminiiStr = entry.terminii;
     }
-    parsed[ definition.name ] = definition;
-    Object.freeze(definition);
+    const definition = {
+      name: entry.name,
+      ring: parse_terminii(terminiiStr),
+      type: entry.type ?? null,
+      composition: entry.composition ? parse_composition(entry.composition) : null,
+    };
+    parsed[entry.name] = Object.freeze(definition);
   }
   return parsed;
 };
 
-const MONOSACCHARIDES = read_definitions();
+const MONOSACCHARIDES = load_definitions();
 
 const get_prototype_for = (identifier) => {
   let def = MONOSACCHARIDES[ identifier ];
@@ -745,5 +652,12 @@ export { C, H, O, N, NA,
          composition_to_mass,
          composition_to_map,
          delete_composition,
-         ReferenceComposition
+         ReferenceComposition,
+         parse_terminii,
+         parse_composition,
+         parse_atoms,
+         make_derivative,
+         MONOSACCHARIDES,
+         RemovableAtom,
+         get_ring_atoms_for,
        };

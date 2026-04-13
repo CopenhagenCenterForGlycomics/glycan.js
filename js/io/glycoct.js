@@ -1,4 +1,7 @@
 import { MONOSACCHARIDE } from '../reference_monosaccharides.js';
+
+// GlycoCT substituent descriptor that maps to an HSO3 tree node.
+const SULFATE_DESCRIPTOR = 'sulfate';
 import Sugar from '../Sugar.js';
 import { IO as IupacIO } from './CondensedIupac.js';
 
@@ -14,24 +17,36 @@ import { IO as IupacIO } from './CondensedIupac.js';
 // Fuc confirmed against G00051MO and G17689DH:
 //   a-lgal-HEX-1:5|6:d (L-Fucose with C6-deoxy modifier)
 const BACKBONE_TO_IDENTIFIER = {
-  'b-dglc-HEX-1:5+n-acetyl':                           MONOSACCHARIDE.GlcNAc,
-  'a-dglc-HEX-1:5+n-acetyl':                           MONOSACCHARIDE.GlcNAc,
-  'b-dglc-HEX-1:5':                                    MONOSACCHARIDE.Glc,
-  'a-dglc-HEX-1:5':                                    MONOSACCHARIDE.Glc,
-  'b-dgal-HEX-1:5+n-acetyl':                           MONOSACCHARIDE.GalNAc,
-  'a-dgal-HEX-1:5+n-acetyl':                           MONOSACCHARIDE.GalNAc,
-  'b-dgal-HEX-1:5':                                    MONOSACCHARIDE.Gal,
-  'a-dgal-HEX-1:5':                                    MONOSACCHARIDE.Gal,
-  'b-dman-HEX-1:5':                                    MONOSACCHARIDE.Man,
-  'a-dman-HEX-1:5':                                    MONOSACCHARIDE.Man,
-  'a-lgal-HEX-1:5|6:d':                               MONOSACCHARIDE.Fuc,
-  'b-dxyl-PEN-1:4':                                    MONOSACCHARIDE.Xyl,
-  'a-dxyl-PEN-1:4':                                    MONOSACCHARIDE.Xyl,
-  'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+n-acetyl':      MONOSACCHARIDE.NeuAc,
-  'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+n-glycolyl':    MONOSACCHARIDE.NeuGc,
-  'b-dglcA-HEX-1:5':                                   MONOSACCHARIDE.GlcA,
-  'a-lido-HEX-1:5':                                    MONOSACCHARIDE.IdoA,
-  'b-dglc-HEX-1:5+amino':                              MONOSACCHARIDE.GlcN,
+  'b-dglc-HEX-1:5+n-acetyl':                              MONOSACCHARIDE.GlcNAc,
+  'a-dglc-HEX-1:5+n-acetyl':                              MONOSACCHARIDE.GlcNAc,
+  'b-dglc-HEX-1:5':                                       MONOSACCHARIDE.Glc,
+  'a-dglc-HEX-1:5':                                       MONOSACCHARIDE.Glc,
+  'b-dgal-HEX-1:5+n-acetyl':                              MONOSACCHARIDE.GalNAc,
+  'a-dgal-HEX-1:5+n-acetyl':                              MONOSACCHARIDE.GalNAc,
+  'b-dman-HEX-1:5+n-acetyl':                              MONOSACCHARIDE.ManNAc,
+  'b-dgal-HEX-1:5':                                       MONOSACCHARIDE.Gal,
+  'a-dgal-HEX-1:5':                                       MONOSACCHARIDE.Gal,
+  'a-dgal-HEX-1:4':                                       MONOSACCHARIDE.Galf,
+  'b-dgal-HEX-1:4':                                       MONOSACCHARIDE.Galf,
+  'b-dman-HEX-1:5':                                       MONOSACCHARIDE.Man,
+  'a-dman-HEX-1:5':                                       MONOSACCHARIDE.Man,
+  'a-lgal-HEX-1:5|6:d':                                   MONOSACCHARIDE.Fuc,
+  'b-lgal-HEX-1:5|6:d':                                   MONOSACCHARIDE.Fuc,
+  'b-dxyl-PEN-1:5':                                       MONOSACCHARIDE.Xyl,
+  'a-dxyl-PEN-1:5':                                       MONOSACCHARIDE.Xyl,
+  'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+n-acetyl':          MONOSACCHARIDE.NeuAc,
+  'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+n-glycolyl':        MONOSACCHARIDE.NeuGc,
+  'b-dgro-dgal-NON-2:6|1:a|2:keto|3:d+n-acetyl':          MONOSACCHARIDE.NeuAc,
+  'b-dgro-dgal-NON-2:6|1:a|2:keto|3:d+n-glycolyl':        MONOSACCHARIDE.NeuGc,
+  'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+acetyl+n-acetyl':   MONOSACCHARIDE.NeuAc9Ac,
+  'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+acetyl+n-glycolyl': MONOSACCHARIDE.NeuGc9Ac,
+  'b-dgro-dgal-NON-2:6|1:a|2:keto|3:d+acetyl+n-acetyl':   MONOSACCHARIDE.NeuAc9Ac,
+  'b-dgro-dgal-NON-2:6|1:a|2:keto|3:d+acetyl+n-glycolyl': MONOSACCHARIDE.NeuGc9Ac,
+  'a-dglc-HEX-1:5|6:a':                                   MONOSACCHARIDE.GlcA,
+  'b-dglc-HEX-1:5|6:a':                                   MONOSACCHARIDE.GlcA,
+  'a-lido-HEX-1:5':                                       MONOSACCHARIDE.IdoA,
+  'b-dglc-HEX-1:5+amino':                                 MONOSACCHARIDE.GlcN,
+  'a-dglc-HEX-1:5+amino':                                 MONOSACCHARIDE.GlcN
 };
 
 // For writing: identifier → backbone descriptor template + substituents + anomeric_pos.
@@ -44,12 +59,15 @@ const IDENTIFIER_TO_GLYCOCT = {
   [MONOSACCHARIDE.GlcN]:   { backbone: 'b-dglc-HEX-1:5',                      substituents: [{ name: 'amino',      pos: 2 }], anomeric_pos: 1 },
   [MONOSACCHARIDE.Glc]:    { backbone: 'b-dglc-HEX-1:5',                      substituents: [],                               anomeric_pos: 1 },
   [MONOSACCHARIDE.Gal]:    { backbone: 'b-dgal-HEX-1:5',                      substituents: [],                               anomeric_pos: 1 },
+  [MONOSACCHARIDE.Galf]:   { backbone: 'b-dgal-HEX-1:4',                      substituents: [],                               anomeric_pos: 1 },
   [MONOSACCHARIDE.Man]:    { backbone: 'b-dman-HEX-1:5',                      substituents: [],                               anomeric_pos: 1 },
   [MONOSACCHARIDE.Fuc]:    { backbone: 'a-lgal-HEX-1:5|6:d',                  substituents: [],                               anomeric_pos: 1 },
-  [MONOSACCHARIDE.Xyl]:    { backbone: 'b-dxyl-PEN-1:4',                      substituents: [],                               anomeric_pos: 1 },
+  [MONOSACCHARIDE.Xyl]:    { backbone: 'b-dxyl-PEN-1:5',                      substituents: [],                               anomeric_pos: 1 },
   [MONOSACCHARIDE.NeuAc]:  { backbone: 'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d', substituents: [{ name: 'n-acetyl',   pos: 5 }], anomeric_pos: 2 },
   [MONOSACCHARIDE.NeuGc]:  { backbone: 'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d', substituents: [{ name: 'n-glycolyl', pos: 5 }], anomeric_pos: 2 },
-  [MONOSACCHARIDE.GlcA]:   { backbone: 'b-dglcA-HEX-1:5',                    substituents: [],                               anomeric_pos: 1 },
+  [MONOSACCHARIDE.NeuAc9Ac]:  { backbone: 'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+acetyl', substituents: [{ name: 'n-acetyl',   pos: 5 }], anomeric_pos: 2 },
+  [MONOSACCHARIDE.NeuGc9Ac]:  { backbone: 'a-dgro-dgal-NON-2:6|1:a|2:keto|3:d+acetyl', substituents: [{ name: 'n-glycolyl', pos: 5 }], anomeric_pos: 2 },
+  [MONOSACCHARIDE.GlcA]:   { backbone: 'b-dglc-HEX-1:5|6:a',                 substituents: [],                               anomeric_pos: 1 },
   [MONOSACCHARIDE.IdoA]:   { backbone: 'a-lido-HEX-1:5',                     substituents: [],                               anomeric_pos: 1 },
 };
 
@@ -105,12 +123,21 @@ function build_sequence(text) {
   const { residues, linkages } = parse_glycoct_text(block);
 
   // --- 1. Collect substituents attached to each backbone -------------------
-  const substByBackbone = new Map(); // backbone id → string[]
+  // Sulfate substituents are tracked separately: they become HSO3 child nodes
+  // in the sugar tree rather than being folded into the backbone lookup key.
+  const substByBackbone = new Map(); // backbone id → { normal: string[], sulfates: number[] }
   for (const lnk of linkages) {
-    if (residues.get(lnk.fromId)?.type === 'backbone' &&
-        residues.get(lnk.toId)?.type   === 'substituent') {
-      if (!substByBackbone.has(lnk.fromId)) substByBackbone.set(lnk.fromId, []);
-      substByBackbone.get(lnk.fromId).push(residues.get(lnk.toId).descriptor);
+    const from = residues.get(lnk.fromId);
+    const to   = residues.get(lnk.toId);
+    if (from?.type !== 'backbone' || to?.type !== 'substituent') continue;
+    if (!substByBackbone.has(lnk.fromId)) {
+      substByBackbone.set(lnk.fromId, { normal: [], sulfates: [] });
+    }
+    const info = substByBackbone.get(lnk.fromId);
+    if (to.descriptor === SULFATE_DESCRIPTOR) {
+      info.sulfates.push(lnk.fromPos);
+    } else {
+      info.normal.push(to.descriptor);
     }
   }
 
@@ -118,11 +145,24 @@ function build_sequence(text) {
   const monoById = new Map(); // backbone id → Monosaccharide
   for (const [id, res] of residues) {
     if (res.type !== 'backbone') continue;
-    const substs = (substByBackbone.get(id) ?? []).slice().sort();
+    const info   = substByBackbone.get(id) ?? { normal: [], sulfates: [] };
+    const substs = info.normal.slice().sort();
     const key    = substs.length > 0 ? `${res.descriptor}+${substs.join('+')}` : res.descriptor;
     const identifier = BACKBONE_TO_IDENTIFIER[key];
-    if (!identifier) throw new Error(`[glycoct] Unknown descriptor: "${key}"`);
-    monoById.set(id, new mono_class(identifier));
+    if (!identifier) {
+      throw new Error(`[glycoct] Unknown descriptor: "${key}"`);
+    }
+    const mono = new mono_class(identifier);
+
+    // Sulfate substituents become HSO3 children at the recorded positions.
+    for (const pos of info.sulfates) {
+      const hso3 = new mono_class(MONOSACCHARIDE.HSO3);
+      hso3.anomer         = 'u';
+      hso3.parent_linkage = 0;   // unknown; written as '?' in IUPAC
+      mono.addChild(pos, hso3);
+    }
+
+    monoById.set(id, mono);
   }
 
   // --- 3. Identify root (reducing end = never a backbone link target) ------
@@ -164,6 +204,8 @@ function build_sequence(text) {
 // ---------------------------------------------------------------------------
 function write_sequence() {
   // BFS assigns IDs: reducing end (root) gets id 1.
+  // HSO3 sulfate children are excluded from the backbone BFS — they are
+  // written as s:sulfate substituents alongside their parent backbone entry.
   const idOf  = new Map();
   const order = [];
   let nextId  = 1;
@@ -173,7 +215,9 @@ function write_sequence() {
     const node = queue.shift();
     idOf.set(node, nextId++);
     order.push(node);
-    const children = [...node.children].sort((a, b) => node.linkageOf(a) - node.linkageOf(b));
+    const children = [...node.children]
+      .filter(c => c.identifier !== MONOSACCHARIDE.HSO3)
+      .sort((a, b) => node.linkageOf(a) - node.linkageOf(b));
     queue.push(...children);
   }
 
@@ -194,10 +238,22 @@ function write_sequence() {
     const backbone = def.backbone.replace(/^[a-z]/, anomer);
     resLines.push(`${bId}b:${backbone}`);
 
+    // Regular substituents from the identifier table (e.g. n-acetyl).
     for (const subst of def.substituents) {
       const sId = substId++;
       resLines.push(`${sId}s:${subst.name}`);
       linLines.push(`${linkId++}:${bId}d(${subst.pos}+1)${sId}n`);
+    }
+
+    // HSO3 children → written as sulfate substituents.
+    const sulfates = [...node.children]
+      .filter(c => c.identifier === MONOSACCHARIDE.HSO3)
+      .sort((a, b) => node.linkageOf(a) - node.linkageOf(b));
+    for (const hso3 of sulfates) {
+      const sId = substId++;
+      const pos = node.linkageOf(hso3);
+      resLines.push(`${sId}s:${SULFATE_DESCRIPTOR}`);
+      linLines.push(`${linkId++}:${bId}o(${pos}+1)${sId}n`);
     }
   }
 
