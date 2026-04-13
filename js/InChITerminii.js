@@ -61,7 +61,7 @@ export function classifyMonosaccharide(formula, mLayer) {
   const N = formula.N ?? 0;
   const isL = mLayer === '0';
 
-  if (C === 11 && N === 1) return 'sialic';
+  if (C >= 11 && N === 1) return 'sialic';
   if (C === 8  && N === 1) return 'hexnac';
   if (C === 6  && N === 1) return 'hexn';
   if (C === 8  && N === 0 && O === 7) return 'kdo';
@@ -137,7 +137,7 @@ export const SIALIC_2C5 = {
 
 export function inferC6Substituent(formula) {
   const { C = 0, O = 0, N = 0 } = formula;
-  if (C === 11 && N === 1) return null;     // sialic
+  if (C >= 11 && N === 1) return null;     // sialic
   if (C === 5)              return null;     // pentose
   if (C === 7)              return 'HOH';   // heptose
   if (C === 8 && N === 0)   return null;    // KDO
@@ -199,8 +199,6 @@ export const PROKARYOTIC_OVERRIDES = {
   // Muramic acid
   'MurNAc': 'r1:OH;2eq:NAc;3eq:OLac;4eq:OH;5eq:-;6eq:HOH',
 
-  // Glucuronic acid in 4C1 conformation
-  'GlcA_4C1': 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO',
 };
 
 // ---------------------------------------------------------------------------
@@ -209,7 +207,6 @@ export const PROKARYOTIC_OVERRIDES = {
 
 function buildHexose(name, t, formula, isL, conformationOverride, warnings) {
   const c6sub = inferC6Substituent(formula);
-  const isUronic = c6sub === 'OO';
 
   // /t3 → carb C2: determines mannose (ax) vs gluco (eq) configuration
   const tC2sign = t.get(D_HEXOSE_4C1.carb_C2_from_t_pos);
@@ -217,10 +214,9 @@ function buildHexose(name, t, formula, isL, conformationOverride, warnings) {
 
   // /t4 → carb C4: determines galacto (ax) vs gluco (eq) configuration
   const tC4sign = t.get(D_HEXOSE_4C1.carb_C4_from_t_pos);
-  // For uronic acids: DEFINITIONS models HexA on IdoA 1C4 conformation → C4=ax
-  const c4 = isUronic ? 'ax' : (tC4sign !== undefined ? (D_HEXOSE_4C1.C4[tC4sign] ?? 'eq') : 'eq');
+  const c4 = tC4sign !== undefined ? (D_HEXOSE_4C1.C4[tC4sign] ?? 'eq') : 'eq';
 
-  // C3 is always eq for all DEFINITIONS hexoses/uronic acids
+  // C3 is always eq in 4C1 conformation
   const c2sub = inferC2Substituent(formula, isL ? 'L_hexose' : 'D_hexose');
 
   const parts = [
@@ -414,17 +410,18 @@ function buildHeptose(name, t, formula, isL, warnings) {
 function buildSialic(name, t, formula, warnings) {
   // NeuAc-like: fixed topology.
   // terminii: 1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH
-  // NeuGc differs only at position 5: NHGc instead of NHAc
-  const { N = 0, O = 0 } = formula;
+  //
+  // C/O matrix:
+  //   NeuAc    C11 O9  → C5=NHAc, C9=HOH
+  //   NeuGc    C11 O10 → C5=NHGc, C9=HOH    (extra O from glycolyl)
+  //   NeuAc9Ac C13 O10 → C5=NHAc, C9=HOHAc  (extra C2O from 9-O-acetyl)
+  //   NeuGc9Ac C13 O11 → C5=NHGc, C9=HOHAc  (both modifications)
+  const { C = 0, O = 0 } = formula;
 
-  // Determine if NHAc or NHGc:
-  //   NeuAc: C11H19NO9 = O=9 → NHAc
-  //   NeuGc: C11H19NO10 = O=10 → NHGc (extra O in glycolyl vs acetyl)
-  let c5sub = 'NHAc';
-  if (O >= 10) {
-    c5sub = 'NHGc';
-    warnings.push(`${name}: inferred NHGc from O count ${O}`);
-  }
+  const is9Ac = C >= 13;                          // 9-O-acetylation adds 2 carbons
+  const isGlycolyl = is9Ac ? (O >= 11) : (O >= 10); // within C13, glycolyl adds one more O
+  const c5sub = isGlycolyl ? 'NHGc' : 'NHAc';
+  const c9sub = is9Ac ? 'HOHAc' : 'HOH';
 
   const parts = [
     `1ax:OO`,
@@ -435,7 +432,7 @@ function buildSialic(name, t, formula, warnings) {
     `6eq:-`,
     `7:OH`,
     `8:OH`,
-    `9:HOH`,
+    `9:${c9sub}`,
   ];
   return {
     terminii: parts.join(';'),

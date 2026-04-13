@@ -122,6 +122,13 @@ QUnit.test('NeuAc round-trip', function(assert) {
   assert.equal(terminii, '1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH', 'NeuAc terminii');
 });
 
+// NeuAc9Ac (9-O-acetylneuraminic acid)
+const NEUAC9AC_INCHI = 'InChI=1S/C13H21NO10/c1-5(15)14-9-7(17)3-13(22,12(20)21)24-11(9)10(19)8(18)4-23-6(2)16/h7-11,17-19,22H,3-4H2,1-2H3,(H,14,15)(H,20,21)/t7-,8+,9+,10+,11+,13?/m0/s1';
+QUnit.test('NeuAc9Ac round-trip', function(assert) {
+  const { terminii } = inchiToTerminii('NeuAc9Ac', NEUAC9AC_INCHI);
+  assert.equal(terminii, '1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOHAc', 'NeuAc9Ac terminii');
+});
+
 // Prokaryotic override test
 QUnit.test('Kdo uses override', function(assert) {
   // Any InChI — override should take precedence

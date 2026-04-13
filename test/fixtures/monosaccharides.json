@@ -43,7 +43,7 @@
     "name": "GlcA",
     "pubchemCid": 65533,
     "inchi": "InChI=1S/C6H10O7/c7-2-3(8)4(9)5(10)6(11,12)13-2/h2-5,7-10H,(H,11,12)/t2-,3+,4+,5-/m1/s1",
-    "expectedTerminii": "r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:OO",
+    "expectedTerminii": "r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO",
     "conformation": "4C1",
     "knownDiscrepancy": null
   },

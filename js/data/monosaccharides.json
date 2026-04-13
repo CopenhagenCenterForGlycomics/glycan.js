@@ -1,0 +1,167 @@
+[
+  {
+    "name": "P",
+    "type": "ion",
+    "terminii": "r1:x;2:x;3:x;4:x",
+    "composition": "P:1;H:2;O:3"
+  },
+  {
+    "name": "S",
+    "type": "ion",
+    "terminii": "r1:x;2:x;3:x;4:x",
+    "composition": "S:1;H:1;O:3"
+  },
+  {
+    "name": "Hex",
+    "terminii": "r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH",
+    "composition": "C:6;H:12;O:6"
+  },
+  {
+    "name": "Gal",
+    "type": "Hex",
+    "pubchemCid": 6036,
+    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4-,5+/m1/s1"
+  },
+  {
+    "name": "Glc",
+    "type": "Hex",
+    "pubchemCid": 5793,
+    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-/m1/s1"
+  },
+  {
+    "name": "Man",
+    "type": "Hex",
+    "pubchemCid": 18950,
+    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-/m1/s1"
+  },
+  {
+    "name": "Galf",
+    "type": "Hex",
+    "pubchemCid": 11019448,
+    "inchi": "InChI=1S/C6H12O6/c7-1-2(8)5-3(9)4(10)6(11)12-5/h2-11H,1H2/t2-,3-,4-,5+,6-/m1/s1",
+    "terminii": "r1:OH;2eq:OH;3ax:OH;4ax:CHOHCHHOH"
+  },
+  {
+    "name": "Glcf",
+    "type": "Hex",
+    "pubchemCid": 11309871,
+    "inchi": "InChI=1S/C6H12O6/c7-1-2(8)5-3(9)4(10)6(11)12-5/h2-11H,1H2/t2-,3-,4-,5-,6-/m1/s1",
+    "terminii": "r1:OH;2eq:OH;3eq:OH;4ax:CHOHCHHOH"
+  },
+  {
+    "name": "Manf",
+    "type": "Hex",
+    "pubchemCid": 10965116,
+    "inchi": "InChI=1S/C6H12O6/c7-1-2(8)5-3(9)4(10)6(11)12-5/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1",
+    "terminii": "r1:OH;2ax:OH;3eq:OH;4ax:CHOHCHHOH"
+  },
+  {
+    "name": "HexNAc",
+    "terminii": "r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH",
+    "composition": "C:8;H:13;N:1;O:5"
+  },
+  {
+    "name": "GalNAc",
+    "type": "HexNAc",
+    "pubchemCid": 10137,
+    "inchi": "InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5+,6-,7-/m1/s1"
+  },
+  {
+    "name": "GlcNAc",
+    "type": "HexNAc",
+    "pubchemCid": 439174,
+    "inchi": "InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5+,6+,7-/m1/s1"
+  },
+  {
+    "name": "HexA",
+    "terminii": "r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO",
+    "composition": "C:6;H:8;O:6"
+  },
+  {
+    "name": "GlcA",
+    "type": "HexA",
+    "pubchemCid": 65533,
+    "inchi": "InChI=1S/C6H10O7/c7-2-3(8)4(9)5(10)6(11,12)13-2/h2-5,7-10H,(H,11,12)/t2-,3+,4+,5-/m1/s1"
+  },
+  {
+    "name": "IdoA",
+    "type": "HexA",
+    "pubchemCid": 441039,
+    "inchi" : "InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4+,6?/m0/s1"
+  },
+  {
+    "name": "NeuAc",
+    "type": "NeuAc",
+    "pubchemCid": 65309,
+    "inchi": "InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)9(17)8(7)16-6(3-13)21-11/h5-10,13,15-17H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8-,9-,10+,11-/m0/s1"
+  },
+  {
+    "name": "NeuAc9Ac",
+    "type": "NeuAc9Ac",
+    "pubchemCid": 92042744,
+    "inchi": "InChI=1S/C13H21NO10/c1-5(15)14-9-7(17)3-13(22,12(20)21)24-11(9)10(19)8(18)4-23-6(2)16/h7-11,17-19,22H,3-4H2,1-2H3,(H,14,15)(H,20,21)/t7-,8+,9+,10+,11+,13?/m0/s1"
+  },
+  {
+    "name": "NeuGc",
+    "type": "NeuGc",
+    "pubchemCid": 123802,
+    "inchi": "InChI=1S/C11H19NO10/c13-2-5(16)8(18)9-7(12-6(17)3-14)4(15)1-11(21,22-9)10(19)20/h4-5,7-9,13-16,18,21H,1-3H2,(H,12,17)(H,19,20)/t4-,5+,7+,8+,9+,11-/m0/s1"
+  },
+  {
+    "name": "NeuGc9Ac",
+    "type": "NeuGc9Ac",
+    "terminii": "1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHGc;6eq:-;7:OH;8:OH;9:HOHAc",
+    "composition": "C:11;H:17;N:1;O:8"
+  },
+  {
+    "name": "dHex",
+    "terminii": "r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH",
+    "composition": "C:6;H:10;O:4"
+  },
+  {
+    "name": "Fuc",
+    "type": "dHex",
+    "pubchemCid": 2723808,
+    "inchi": "InChI=1S/C6H12O5/c1-3-4(7)5(8)6(9)2-10-3/h3-9H,2H2,1H3/t3-,4+,5+,6-/m0/s1"
+  },
+  {
+    "name": "Rha",
+    "type": "dHex",
+    "pubchemCid": 25310,
+    "inchi" : "InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3-,4+,5+,6?/m0/s1"
+  },
+  {
+    "name": "Pent",
+    "terminii": "r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H",
+    "composition": "C:5;H:8;O:4"
+  },
+  {
+    "name": "Xyl",
+    "type": "Pent",
+    "pubchemCid": 135191,
+    "inchi": "InChI=1S/C5H10O5/c6-1-2-3(7)4(8)5(9)10-2/h2-9H,1H2/t2-,3+,4-,5+/m1/s1"
+  },
+  {
+    "name": "Ara",
+    "type": "Pent",
+    "pubchemCid": 439195,
+    "inchi": "InChI=1S/C5H10O5/c6-2-1-10-5(9)4(8)3(2)7/h2-9H,1H2/t2-,3-,4+,5?/m0/s1"
+  },
+  {
+    "name": "HexN",
+    "terminii": "r1:OH;2eq:NH2;3eq:OH;4eq:OH;5eq:-;6eq:HOH",
+    "composition": "C:6;H:11;N:1;O:4"
+  },
+  {
+    "name": "GlcN",
+    "type": "HexN",
+    "pubchemCid": 439234,
+    "inchi": "InChI=1S/C6H13NO5/c7-3-5(10)4(9)2(1-8)12-6(3)11/h2-6,8-11H,1,7H2/t2-,3+,4+,5-/m1/s1"
+  },
+  {
+    "name": "Me",
+    "type": "alkyl",
+    "terminii": "r1:H",
+    "composition": "C:1;H:3"
+  }
+]

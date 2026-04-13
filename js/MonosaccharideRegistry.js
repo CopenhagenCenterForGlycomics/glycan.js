@@ -1,4 +1,6 @@
-import { parse_terminii, parse_composition, DEFINITIONS } from './Mass.js';
+import { parse_terminii, parse_composition } from './Mass.js';
+import monosaccharideData from './data/monosaccharides.json';
+import { inchiToTerminii } from './InChITerminii.js';
 
 /**
  * A registry entry for one monosaccharide.
@@ -24,28 +26,29 @@ export class MonosaccharideRegistry {
   #entries = new Map();
 
   /**
-   * Populate from the existing DEFINITIONS string in Mass.js.
-   * This is the bootstrap step and produces the same result as the current
-   * read_definitions() function.
+   * Populate from the monosaccharides.json data array.
+   * Entries with an `inchi` field have their terminii derived via inchiToTerminii;
+   * entries with an explicit `terminii` field use it directly.
    */
-  loadFromDefinitions(definitionsString) {
-    for (const block of definitionsString.replace(/^\n/, '').split('\n\n')) {
-      const def = {};
-      for (const line of block.split('\n')) {
-        const [field, value] = line.split(/^([^:]+):/).slice(1);
-        switch (field) {
-          case 'name':        def.name = value; break;
-          case 'terminii':    def.ring = parse_terminii(value); break;
-          case 'type':        def.type = value; break;
-          case 'composition': def.composition = parse_composition(value); break;
-        }
+  loadFromJSON(data) {
+    for (const entry of data) {
+      let terminiiStr, source;
+      if (entry.inchi && !entry.terminii) {
+        terminiiStr = inchiToTerminii(entry.name, entry.inchi).terminii;
+        source = 'inchi';
+      } else {
+        terminiiStr = entry.terminii;
+        source = 'hardcoded';
       }
-      if (def.name) {
-        this.#entries.set(def.name, new MonosaccharideEntry({
-          ...def,
-          source: 'hardcoded'
-        }));
-      }
+      this.#entries.set(entry.name, new MonosaccharideEntry({
+        name: entry.name,
+        type: entry.type ?? null,
+        ring: parse_terminii(terminiiStr),
+        composition: entry.composition ? parse_composition(entry.composition) : null,
+        inchi: entry.inchi ?? null,
+        conformation: entry.conformation ?? '4C1',
+        source,
+      }));
     }
     return this;
   }
@@ -88,5 +91,5 @@ export class MonosaccharideRegistry {
   }
 }
 
-// Singleton default registry, pre-loaded with the hardcoded DEFINITIONS.
-export const DEFAULT_REGISTRY = new MonosaccharideRegistry().loadFromDefinitions(DEFINITIONS);
+// Singleton default registry, pre-loaded from monosaccharides.json.
+export const DEFAULT_REGISTRY = new MonosaccharideRegistry().loadFromJSON(monosaccharideData);

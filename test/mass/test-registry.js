@@ -13,9 +13,12 @@ QUnit.test('DEFAULT_REGISTRY contains all entries from DEFINITIONS', function(as
 });
 
 QUnit.test('Registry entries have correct source', function(assert) {
-  const entry = DEFAULT_REGISTRY.get('Glc');
-  assert.ok(entry instanceof MonosaccharideEntry, 'Returns MonosaccharideEntry instance');
-  assert.equal(entry.source, 'hardcoded', 'Hardcoded entries have source=hardcoded');
+  const glcEntry = DEFAULT_REGISTRY.get('Glc');
+  assert.ok(glcEntry instanceof MonosaccharideEntry, 'Returns MonosaccharideEntry instance');
+  assert.equal(glcEntry.source, 'inchi', 'InChI-loaded entries have source=inchi');
+
+  const hexEntry = DEFAULT_REGISTRY.get('Hex');
+  assert.equal(hexEntry.source, 'hardcoded', 'Terminii-only entries have source=hardcoded');
 });
 
 QUnit.test('getPrototype follows type chain', function(assert) {
