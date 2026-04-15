@@ -156,7 +156,7 @@ export function inferC2Substituent(formula, classHint) {
   if (classHint === 'sialic') return null;
   if (classHint === 'kdo')    return null;
   if (N === 0) return 'OH';
-  if (N === 1 && C >= 8) return 'NAc';
+  if (N === 1 && C >= 8) return 'NHAc';
   if (N === 1 && C === 6) return 'NH2';
   return 'OH';
 }
@@ -183,21 +183,21 @@ export const PROKARYOTIC_OVERRIDES = {
   'HepII':'r1:OH;2eq:OH;3eq:OH;4eq:OH;5ax:OH;6eq:-;7eq:HOH',
 
   // N-modified hexosamines
-  'FucNAc': 'r1:OH;2eq:NAc;3eq:OH;4ax:OH;5eq:-;6eq:HH',
-  'QuiNAc': 'r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HH',
-  'RhaNAc': 'r1:OH;2eq:NAc;3eq:OH;4ax:OH;5eq:-;6eq:HH',
-  'ManNAc': 'r1:OH;2eq:NAc;3ax:OH;4eq:OH;5eq:-;6eq:HOH',
-  'AllNAc': 'r1:OH;2eq:NAc;3ax:OH;4ax:OH;5eq:-;6eq:HOH',
+  'FucNAc': 'r1:OH;2eq:NHAc;3eq:OH;4ax:OH;5eq:-;6eq:HH',
+  'QuiNAc': 'r1:OH;2eq:NHAc;3eq:OH;4eq:OH;5eq:-;6eq:HH',
+  'RhaNAc': 'r1:OH;2eq:NHAc;3eq:OH;4ax:OH;5eq:-;6eq:HH',
+  'ManNAc': 'r1:OH;2eq:NHAc;3ax:OH;4eq:OH;5eq:-;6eq:HOH',
+  'AllNAc': 'r1:OH;2eq:NHAc;3ax:OH;4ax:OH;5eq:-;6eq:HOH',
 
   // Legionaminic / pseudaminic acids
   'Leg':  '1ax:OO;r2:O;3ax:H;4ax:OH;5eq:NHAc;6eq:-;7:OH;8:NHAc;9:HOH',
   'Pse':  '1ax:OO;r2:O;3ax:H;4ax:OH;5eq:NHAc;6eq:-;7:NHAc;8:OH;9:HOH',
 
   // Bacillosamine
-  'Bac':  'r1:OH;2eq:NAc;3eq:OH;4eq:NAc;5eq:-;6eq:HOH',
+  'Bac':  'r1:OH;2eq:NHAc;3eq:OH;4eq:NHAc;5eq:-;6eq:HOH',
 
   // Muramic acid
-  'MurNAc': 'r1:OH;2eq:NAc;3eq:OLac;4eq:OH;5eq:-;6eq:HOH',
+  'MurNAc': 'r1:OH;2eq:NHAc;3eq:OLac;4eq:OH;5eq:-;6eq:HOH',
 
 };
 
@@ -319,7 +319,7 @@ function buildHexNAc(name, t, formula, warnings) {
 
   const parts = [
     `r1:OH`,
-    `2eq:NAc`,
+    `2eq:NHAc`,
     `3${c3}:OH`,
     `4${c4}:OH`,
     `5eq:-`,

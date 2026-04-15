@@ -100,7 +100,7 @@ QUnit.test('Man round-trip', function(assert) {
 // GlcNAc
 QUnit.test('GlcNAc round-trip', function(assert) {
   const { terminii } = inchiToTerminii('GlcNAc', GLCNAC_INCHI);
-  assert.equal(terminii, 'r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH', 'GlcNAc terminii');
+  assert.equal(terminii, 'r1:OH;2eq:NHAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH', 'GlcNAc terminii');
 });
 
 // Fucose (L-deoxyhex, 1C4)

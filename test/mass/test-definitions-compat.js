@@ -50,15 +50,15 @@ terminii:r1:OH;2ax:OH;3eq:OH;4ax:CHOHCHHOH
 name:Manf
 type:Hex
 
-terminii:r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
+terminii:r1:OH;2eq:NHAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:HexNAc
 composition:C:8;H:13;N:1;O:5
 
-terminii:r1:OH;2eq:NAc;3eq:OH;4ax:OH;5eq:-;6eq:HOH
+terminii:r1:OH;2eq:NHAc;3eq:OH;4ax:OH;5eq:-;6eq:HOH
 name:GalNAc
 type:HexNAc
 
-terminii:r1:OH;2eq:NAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
+terminii:r1:OH;2eq:NHAc;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:GlcNAc
 type:HexNAc
 

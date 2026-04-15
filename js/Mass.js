@@ -225,19 +225,78 @@ const REDUCING_END_2AA = (Object.freeze(new ReducingEnd2AA('2AA labelled reducin
 
 const REDUCING_END_2AB = (Object.freeze(new ReducingEnd2AB('2AB labelled reducing end')));
 
-const DERIV_ETHYL_ESTER =       make_derivative('ethyl ester',
-                                                (a,p) => p == 1,
-                                                [C,C,H,H,H,H],
-                                                NonReducingDerivative,
-                                                r =>  r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 6 );
+// NeuAc ethyl ester: COOH → COOC₂H₅ on α2,6-linked NeuAc.
+// Net mass change: +C₂H₄ (+28.031 Da).
+// C1 only (+2C +4H at position 1).
+const DERIV_ETHYL_ESTER = make_derivative('ethyl ester',
+  (a, p) => p == 1,
+  [C, C, H, H, H, H],
+  NonReducingDerivative,
+  r => r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 6);
 
+// NeuAc ammonia amidation: COOH → CONH₂ on α2,3-linked NeuAc.
+// Net mass change: +H +N −O (−0.984 Da).
+// C1 only (+1H +1N −1O at position 1).
 const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation',
-                                                (a,p) => p == 1,
-                                                [H, N, new RemovableAtom(O) ],
-                                                NonReducingDerivative,
-                                                r => r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 3 );
+  (a, p) => p == 1,
+  [H, N, new RemovableAtom(O)],
+  NonReducingDerivative,
+  r => r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 3);
 
-const DERIV_SIALIC_ACID = Object.freeze(new DerivativeSet('Sialic acid esterification, amidation',DERIV_ETHYL_ESTER,DERIV_AMMONIA_AMIDATION));
+const DERIV_SIALIC_ACID = Object.freeze(new DerivativeSet('Sialic acid esterification, amidation', DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION));
+
+// ── SSAP (linkage-specific sialic acid permethylation) derivatives ────────────
+
+// NeuAc 1,7-lactone: intramolecular ester between C1 carboxylate and C7-OH,
+// formed selectively on α2,3-linked NeuAc. Net mass change: −H₂O (−18.011 Da).
+//
+// Three positions are modified:
+//   C1 (COOH, 2 oxygens): remove 1 O → ester carbonyl only
+//   C7 (OH, 1 oxygen):    remove 1 H → C7-OH loses H into water
+//   C9 (HOH, 1 oxygen):   remove 1 H → mass-bookkeeping correction for the
+//                          fixed [C,H] base at C1 that cannot be removed via
+//                          the terminii model
+//
+// The O-count in apply() distinguishes C1 (≥2 O) from C7/C9 (1 O).
+const DERIV_LACTONE = Object.freeze(new (class extends NonReducingDerivative {
+  constructor() { super('lactone'); }
+  accepts_residue(r) {
+    return r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 3;
+  }
+  can_accept(atoms, position) {
+    return position === 1 || position === 7 || position === 9;
+  }
+  apply(atoms) {
+    const result = super.apply(atoms);
+    const removable = result.filter(a => a === O).length >= 2
+      ? new RemovableAtom(O)   // C1: lose carboxylate –OH oxygen
+      : new RemovableAtom(H);  // C7/C9: lose H
+    return Derivative.Apply(result, [removable]);
+  }
+})());
+
+// NeuAc methyl ester: COOH → COOCH₃ on α2,6-linked NeuAc after permethylation.
+// Net mass change: +CH₂ (+14.016 Da).
+const DERIV_METHYL_ESTER = make_derivative('methyl ester',
+  (a, p) => p == 1,
+  [C, H, H],
+  NonReducingDerivative,
+  r => r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 6);
+
+// NeuAc dimethylamide: COOH → CON(CH₃)₂ on α2,6-linked NeuAc.
+// Net mass change: +N +2C +5H −O (+27.047 Da).
+const DERIV_DIMETHYL_AMIDE = make_derivative('dimethyl amide',
+  (a, p) => p == 1,
+  [N, C, C, H, H, H, H, H, new RemovableAtom(O)],
+  NonReducingDerivative,
+  r => r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 6);
+
+// Composite sets for SSAP protocols:
+//   DERIV_SSAP_METHYL     — α2,3 → lactone, α2,6 → methyl ester (standard SSAP)
+//   DERIV_SSAP_DIMETHYL   — α2,3 → lactone, α2,6 → dimethylamide (Alley protocol)
+// PMID: 28693729
+const DERIV_SSAP_METHYL   = Object.freeze(new DerivativeSet('SSAP methyl ester / lactone',   DERIV_METHYL_ESTER,   DERIV_LACTONE));
+const DERIV_SSAP_DIMETHYL = Object.freeze(new DerivativeSet('SSAP dimethylamide / lactone',  DERIV_DIMETHYL_AMIDE, DERIV_LACTONE));
 
 
 const parse_atoms = (composition) => {
@@ -269,16 +328,13 @@ const parse_atoms = (composition) => {
     return [ C, H, O, H, C, H, H, O, H ];
   }
 
-  if (composition === 'Ac') {
-    return [ C, O, C, H, H ];
-  }
-
   if (composition === 'HOHAc') {
     return [ H,O, H, C, O, C, H, H ];
   }
 
-  if (composition === 'NAc') {
-    return [ N, H, C, O, C, H, H, H ];
+  if (composition === 'OLac') {
+    // O-lactoyl: –O–CH(CH₃)–COOH (C3 substituent in MurNAc)
+    return [ O, C, H, C, H, H, H, C, O, O, H ];
   }
   if (composition === 'NHAc') {
     return [ N, H, C, O, C, H, H, H ];
@@ -646,6 +702,8 @@ export { C, H, O, N, NA,
          Mass,
          REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_2AA, REDUCING_END_FREE,
          DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION, DERIV_SIALIC_ACID,
+         DERIV_LACTONE, DERIV_METHYL_ESTER, DERIV_DIMETHYL_AMIDE,
+         DERIV_SSAP_METHYL, DERIV_SSAP_DIMETHYL,
          UNDERIVATISED, PERMETHYLATED,
          calculate_a_fragment_composition,
          summarise_composition,
