@@ -26,8 +26,14 @@ class RemovableAtom {
 }
 
 class Derivative {
+  #name = '';
+
   constructor(name) {
-    this.name = name;
+    this.#name = name;
+  }
+
+  get name() {
+    return this.#name;
   }
 
   can_accept(atoms,position) {
@@ -69,13 +75,17 @@ class Derivative {
 
 class DerivativeSet {
   #derivatives = [];
-  #label = '';
+  #name = '';
 
-  constructor(label,...derivatives) {
-    this.#label = label;
+  constructor(name,...derivatives) {
+    this.#name = name;
     for (let deriv of derivatives) {
       this.#derivatives.push(deriv);
     }
+  }
+
+  get name() {
+    return this.#name;
   }
 
   firstValid(monosaccharide) {
@@ -214,21 +224,21 @@ const can_accept_permethylation = (atoms) => {
   return (atoms.indexOf(O) >= 0 && atoms.indexOf(H) >= 0) || (atoms.indexOf(N) >= 0 && atoms.indexOf(H) >= 0);
 }
 
-const UNDERIVATISED = make_derivative('underivatised');
-const PERMETHYLATED = make_derivative('permethylated',can_accept_permethylation,[C,H,H]);
+const UNDERIVATISED = make_derivative('Underivatised');
+const PERMETHYLATED = make_derivative('Permethylated',can_accept_permethylation,[C,H,H]);
 
-const REDUCING_END_FREE = (Object.freeze(new ReducingEndFree('Free reducing end')));
+const REDUCING_END_FREE = (Object.freeze(new ReducingEndFree('Free')));
 
-const REDUCING_END_REDUCED = (Object.freeze(new ReducingEndReduced('Reduced reducing end')));
+const REDUCING_END_REDUCED = (Object.freeze(new ReducingEndReduced('Reduced')));
 
-const REDUCING_END_2AA = (Object.freeze(new ReducingEnd2AA('2AA labelled reducing end')));
+const REDUCING_END_2AA = (Object.freeze(new ReducingEnd2AA('2-aminobenzoic acid (2AA)')));
 
-const REDUCING_END_2AB = (Object.freeze(new ReducingEnd2AB('2AB labelled reducing end')));
+const REDUCING_END_2AB = (Object.freeze(new ReducingEnd2AB('2-aminobenzamide (2AB)')));
 
 // NeuAc ethyl ester: COOH → COOC₂H₅ on α2,6-linked NeuAc.
 // Net mass change: +C₂H₄ (+28.031 Da).
 // C1 only (+2C +4H at position 1).
-const DERIV_ETHYL_ESTER = make_derivative('ethyl ester',
+const DERIV_ETHYL_ESTER = make_derivative('Ethyl ester',
   (a, p) => p == 1,
   [C, C, H, H, H, H],
   NonReducingDerivative,
@@ -237,13 +247,16 @@ const DERIV_ETHYL_ESTER = make_derivative('ethyl ester',
 // NeuAc ammonia amidation: COOH → CONH₂ on α2,3-linked NeuAc.
 // Net mass change: +H +N −O (−0.984 Da).
 // C1 only (+1H +1N −1O at position 1).
-const DERIV_AMMONIA_AMIDATION = make_derivative('ammonia amidation',
+const DERIV_AMMONIA_AMIDATION = make_derivative('Ammonia amidation',
   (a, p) => p == 1,
   [H, N, new RemovableAtom(O)],
   NonReducingDerivative,
   r => r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 3);
 
-const DERIV_SIALIC_ACID = Object.freeze(new DerivativeSet('Sialic acid esterification, amidation', DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION));
+
+// Composite sets for EAP protocol:
+// PMID: 31086181
+const DERIV_EEA_SIALIC_ACID = Object.freeze(new DerivativeSet('Ethyl esterification protocol with amidation PMID:31086181', DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION));
 
 // ── SSAP (linkage-specific sialic acid permethylation) derivatives ────────────
 
@@ -259,7 +272,7 @@ const DERIV_SIALIC_ACID = Object.freeze(new DerivativeSet('Sialic acid esterific
 //
 // The O-count in apply() distinguishes C1 (≥2 O) from C7/C9 (1 O).
 const DERIV_LACTONE = Object.freeze(new (class extends NonReducingDerivative {
-  constructor() { super('lactone'); }
+  constructor() { super('Lactone'); }
   accepts_residue(r) {
     return r.monosaccharide === MONOSACCHARIDE.NeuAc && r.parent && r.parent.linkageOf(r) == 3;
   }
@@ -277,7 +290,7 @@ const DERIV_LACTONE = Object.freeze(new (class extends NonReducingDerivative {
 
 // NeuAc methyl ester: COOH → COOCH₃ on α2,6-linked NeuAc after permethylation.
 // Net mass change: +CH₂ (+14.016 Da).
-const DERIV_METHYL_ESTER = make_derivative('methyl ester',
+const DERIV_METHYL_ESTER = make_derivative('Methyl ester',
   (a, p) => p == 1,
   [C, H, H],
   NonReducingDerivative,
@@ -285,7 +298,7 @@ const DERIV_METHYL_ESTER = make_derivative('methyl ester',
 
 // NeuAc dimethylamide: COOH → CON(CH₃)₂ on α2,6-linked NeuAc.
 // Net mass change: +N +2C +5H −O (+27.047 Da).
-const DERIV_DIMETHYL_AMIDE = make_derivative('dimethyl amide',
+const DERIV_DIMETHYL_AMIDE = make_derivative('Dimethyl amide',
   (a, p) => p == 1,
   [N, C, C, H, H, H, H, H, new RemovableAtom(O)],
   NonReducingDerivative,
@@ -295,8 +308,8 @@ const DERIV_DIMETHYL_AMIDE = make_derivative('dimethyl amide',
 //   DERIV_SSAP_METHYL     — α2,3 → lactone, α2,6 → methyl ester (standard SSAP)
 //   DERIV_SSAP_DIMETHYL   — α2,3 → lactone, α2,6 → dimethylamide (Alley protocol)
 // PMID: 28693729
-const DERIV_SSAP_METHYL   = Object.freeze(new DerivativeSet('SSAP methyl ester / lactone',   DERIV_METHYL_ESTER,   DERIV_LACTONE));
-const DERIV_SSAP_DIMETHYL = Object.freeze(new DerivativeSet('SSAP dimethylamide / lactone',  DERIV_DIMETHYL_AMIDE, DERIV_LACTONE));
+const DERIV_SSAP_METHYL   = Object.freeze(new DerivativeSet('SSAP methyl ester / lactone PMID:28693729',   DERIV_METHYL_ESTER,   DERIV_LACTONE));
+const DERIV_SSAP_DIMETHYL = Object.freeze(new DerivativeSet('SSAP dimethylamide / lactone PMID:28693729',  DERIV_DIMETHYL_AMIDE, DERIV_LACTONE));
 
 
 const parse_atoms = (composition) => {
@@ -701,7 +714,7 @@ Object.defineProperty(Mass, 'MASS_PROVIDER', {
 export { C, H, O, N, NA,
          Mass,
          REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_2AA, REDUCING_END_FREE,
-         DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION, DERIV_SIALIC_ACID,
+         DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION, DERIV_EEA_SIALIC_ACID,
          DERIV_LACTONE, DERIV_METHYL_ESTER, DERIV_DIMETHYL_AMIDE,
          DERIV_SSAP_METHYL, DERIV_SSAP_DIMETHYL,
          UNDERIVATISED, PERMETHYLATED,
