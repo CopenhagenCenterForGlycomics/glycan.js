@@ -12,7 +12,7 @@ const NA = Symbol('Na');
 import * as DEFAULT_MASS_PROVIDER from './mass_provider.js';
 import { MONOSACCHARIDE } from './reference_monosaccharides.js';
 import { TracedMonosaccharide } from './Tracing.js';
-import monosaccharideData from './data/monosaccharides.json';
+import monosaccharideData from './data/monosaccharides.json' with { type: 'json' };
 import { inchiToTerminii } from './InChITerminii.js';
 
 let CURRENT_MASS_PROVIDER = DEFAULT_MASS_PROVIDER;
