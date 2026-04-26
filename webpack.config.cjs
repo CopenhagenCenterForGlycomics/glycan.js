@@ -36,6 +36,20 @@ module.exports = {
               },
             }],
           ],
+          plugins: [
+            ['@babel/plugin-syntax-import-attributes', { deprecatedAssertSyntax: true }],
+            function stripImportAttributes() {
+              return {
+                visitor: {
+                  ImportDeclaration(path) {
+                    if (path.node.attributes && path.node.attributes.length > 0) {
+                      path.node.attributes = [];
+                    }
+                  }
+                }
+              };
+            }
+          ],
         },
       },
     }],
