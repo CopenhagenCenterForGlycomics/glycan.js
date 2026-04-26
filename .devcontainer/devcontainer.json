@@ -15,7 +15,11 @@
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "git config --global safe.directory '*' && git submodule init && git submodule update && git config --global safe.directory '*' && npm install",
 
-  "postStartCommand": "./.devcontainer/server.sh"
+  "postStartCommand": "./.devcontainer/server.sh",
+
+  "features": {
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  }
 
   // Configure tool-specific properties.
   // "customizations": {},
