@@ -44,6 +44,94 @@ const find_repeat_unit_for_original = function(start, counter, original) {
   }
 };
 
+const defaultResidueComparator = (a, b) => {
+  if (a.identifier !== b.identifier) return false;
+  if (a.parent_linkage !== b.parent_linkage) return false;
+  if (a.anomer === 'u' || b.anomer === 'u') return true;
+  return a.anomer === b.anomer;
+};
+
+const defaultRootComparator = (a, b) => {
+  if (a.identifier !== b.identifier) return false;
+  if (a.anomer === 'u' || b.anomer === 'u') return true;
+  return a.anomer === b.anomer;
+};
+
+function bipartiteMatch(aKids, bKids, comparator) {
+  const pairs = [];
+  const unmatchedA = [];
+  const bUsed = new Set();
+
+  for (const aKid of aKids) {
+    let matched = null;
+    for (const bKid of bKids) {
+      if (!bUsed.has(bKid) && comparator(aKid, bKid)) {
+        matched = bKid;
+        bUsed.add(bKid);
+        break;
+      }
+    }
+    if (matched !== null) {
+      pairs.push([aKid, matched]);
+    } else {
+      unmatchedA.push(aKid);
+    }
+  }
+
+  const unmatchedB = bKids.filter(b => !bUsed.has(b));
+  return [pairs, unmatchedA, unmatchedB];
+}
+
+function adoptSubtree(compositeParent, sourceRes, linkage, sourceIndex, onAdopt, SugarClass) {
+  const freshSugar = sourceRes.toSugar(SugarClass);
+  const clonedRoot = freshSugar.root;
+  compositeParent.addChild(linkage, clonedRoot);
+
+  const sourceQueue = [sourceRes];
+  const clonedQueue = [clonedRoot];
+  while (sourceQueue.length > 0) {
+    const origRes   = sourceQueue.shift();
+    const clonedRes = clonedQueue.shift();
+    onAdopt(clonedRes, origRes, sourceIndex);
+    for (const child of origRes.children) {
+      sourceQueue.push(child);
+    }
+    for (const child of clonedRes.children) {
+      clonedQueue.push(child);
+    }
+  }
+}
+
+function unionMergeChildren(compositeParent, a, b, comparator, onMerge, onAdopt, SugarClass) {
+  const childrenA = a.child_linkages;
+  const childrenB = b.child_linkages;
+
+  const allLinkages = [...new Set([...childrenA.keys(), ...childrenB.keys()])].sort((x, y) => x - y);
+
+  for (const L of allLinkages) {
+    const aKids = childrenA.get(L) || [];
+    const bKids = childrenB.get(L) || [];
+
+    const [pairs, unmatchedA, unmatchedB] = bipartiteMatch(aKids, bKids, comparator);
+
+    for (const [aKid, bKid] of pairs) {
+      const childComposite = aKid.clone();
+      compositeParent.addChild(L, childComposite);
+      onMerge(childComposite, aKid, 0);
+      onMerge(childComposite, bKid, 1);
+      unionMergeChildren(childComposite, aKid, bKid, comparator, onMerge, onAdopt, SugarClass);
+    }
+
+    for (const aKid of unmatchedA) {
+      adoptSubtree(compositeParent, aKid, L, 0, onAdopt, SugarClass);
+    }
+
+    for (const bKid of unmatchedB) {
+      adoptSubtree(compositeParent, bKid, L, 1, onAdopt, SugarClass);
+    }
+  }
+}
+
 export default class Sugar {
   constructor() {
   }
@@ -252,7 +340,49 @@ export default class Sugar {
   }
 
   // Math functions
-  // FIXME - Union - Create a union sugar from two sugars
+
+  union(other, options = {}) {
+    if (!this.root && !other.root) {
+      return new this.constructor();
+    }
+    if (!other.root) {
+      const result = this.clone();
+      if (options.onMerge) {
+        for (const res of result.breadth_first_traversal()) {
+          options.onMerge(res, res, 0);
+        }
+      }
+      return result;
+    }
+    if (!this.root) {
+      const result = other.clone();
+      if (options.onAdopt) {
+        for (const res of result.breadth_first_traversal()) {
+          options.onAdopt(res, res, 1);
+        }
+      }
+      return result;
+    }
+
+    const comparator     = options.comparator     || defaultResidueComparator;
+    const rootComparator = options.rootComparator || defaultRootComparator;
+    const onMerge = options.onMerge || (() => {});
+    const onAdopt = options.onAdopt || (() => {});
+
+    if (!rootComparator(this.root, other.root)) {
+      throw new Error(`Cannot union sugars: incompatible roots ('${this.root.identifier}' vs '${other.root.identifier}')`);
+    }
+
+    const SugarClass = this.constructor;
+    const composite = new SugarClass();
+    composite.root = this.root.clone();
+    onMerge(composite.root, this.root, 0);
+    onMerge(composite.root, other.root, 1);
+
+    unionMergeChildren(composite.root, this.root, other.root, comparator, onMerge, onAdopt, SugarClass);
+    return composite;
+  }
+
   // FIXME - Subtract - Get residues that aren't common
 
   *residues_to_root(start=this.root) {

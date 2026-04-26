@@ -1,0 +1,217 @@
+/*
+ * glycan.js composite renderer — default stylesheet
+ *
+ * All visual tokens are exposed as CSS custom properties under the
+ * --gjs-composite-* namespace so that host pages can override them
+ * without touching JS.  The .gjs-composite-renderer class scopes all
+ * overrides to renderer root elements.
+ *
+ * Theme variants:
+ *   .theme-cb-safe   — deuteranopia-safe palette
+ *   .theme-print     — high-contrast, no opacity effects
+ *   .theme-dark      — dark-background palette
+ */
+
+/* ------------------------------------------------------------------ */
+/* 1. Root-level defaults                                               */
+/* ------------------------------------------------------------------ */
+
+:root {
+  /* Arc (sialylation) */
+  --gjs-composite-arc-neuac-color:      #a64d79;
+  --gjs-composite-arc-neugc-color:      #7daad8;
+  --gjs-composite-arc-stroke-width:     3px;
+
+  /* Wedge (fucosylation) */
+  --gjs-composite-wedge-fuc-color:      #e74c3c;
+
+  /* Residue fill / opacity */
+  --gjs-composite-residue-opacity:      1;
+  --gjs-composite-residue-fill:         currentColor;
+
+  /* Diverging fill (differential mode) */
+  --gjs-composite-diverging-fill:       #dddddd;
+
+  /* Significance stroke */
+  --gjs-composite-sig-stroke-color:     #222222;
+  --gjs-composite-sig-stroke-width:     2px;
+  --gjs-composite-nonsig-stroke-color:  #999999;
+
+  /* Motif highlight opacity */
+  --gjs-composite-motif-opacity:        0.3;
+
+  /* Motif highlight colors — one per motif slug */
+  --gjs-composite-motif-type-1-chain:       #fde68a;
+  --gjs-composite-motif-type-2-chain:       #bae6fd;
+  --gjs-composite-motif-lacdinac:           #fecaca;
+  --gjs-composite-motif-polylactosamine:    #7dd3fc;
+  --gjs-composite-motif-matriglycan:        #d8b4fe;
+  --gjs-composite-motif-heparan-repeat:     #a7f3d0;
+  --gjs-composite-motif-chondroitin-repeat: #86efac;
+  --gjs-composite-motif-keratan-repeat:     #fbbf24;
+
+  /* Branch labels */
+  --gjs-composite-branch-label-color:       #222222;
+  --gjs-composite-branch-label-font-size:   12px;
+  --gjs-composite-branch-label-font-family: sans-serif;
+  --gjs-composite-branch-label-font-weight: bold;
+
+  /* Count badges */
+  --gjs-composite-count-badge-color:        #0066cc;
+  --gjs-composite-count-badge-font-size:    10px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Renderer root element                                             */
+/* ------------------------------------------------------------------ */
+
+.gjs-composite-renderer {
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.gjs-composite-renderer svg {
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Part-based selectors (::part targets when used inside shadow DOM) */
+/* ------------------------------------------------------------------ */
+
+/*
+ * These selectors work when the renderer root is a custom element.
+ * Outside shadow DOM, the [part] attribute still provides a hook for
+ * advanced host-page selectors.
+ */
+
+.gjs-composite-renderer [part~="arc"] {
+  fill: none;
+  stroke: var(--gjs-composite-arc-neuac-color);
+  stroke-width: var(--gjs-composite-arc-stroke-width);
+}
+
+.gjs-composite-renderer [part~="arc-neuac"] {
+  stroke: var(--gjs-composite-arc-neuac-color);
+}
+
+.gjs-composite-renderer [part~="arc-neugc"] {
+  stroke: var(--gjs-composite-arc-neugc-color);
+}
+
+.gjs-composite-renderer [part~="wedge"] {
+  fill: var(--gjs-composite-wedge-fuc-color);
+}
+
+.gjs-composite-renderer [part~="highlight"] {
+  fill-opacity: var(--gjs-composite-motif-opacity);
+}
+
+.gjs-composite-renderer [part~="residue-significant"] {
+  stroke: var(--gjs-composite-sig-stroke-color);
+  stroke-width: var(--gjs-composite-sig-stroke-width);
+}
+
+.gjs-composite-renderer [part~="residue-not-significant"] {
+  stroke: var(--gjs-composite-nonsig-stroke-color);
+  stroke-dasharray: 3 2;
+}
+
+.gjs-composite-renderer [part~="branch-label"] {
+  fill: var(--gjs-composite-branch-label-color);
+  font-size: var(--gjs-composite-branch-label-font-size);
+  font-family: var(--gjs-composite-branch-label-font-family);
+  font-weight: var(--gjs-composite-branch-label-font-weight);
+}
+
+.gjs-composite-renderer [part~="count-badge"] {
+  fill: var(--gjs-composite-count-badge-color);
+  font-size: var(--gjs-composite-count-badge-font-size);
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. Theme variant: deuteranopia-safe (cb-safe)                        */
+/* ------------------------------------------------------------------ */
+
+.gjs-composite-renderer.theme-cb-safe,
+:root.theme-cb-safe {
+  --gjs-composite-arc-neuac-color:          #882255;
+  --gjs-composite-arc-neugc-color:          #004488;
+  --gjs-composite-wedge-fuc-color:          #cc6677;
+
+  --gjs-composite-motif-type-1-chain:       #eecc66;
+  --gjs-composite-motif-type-2-chain:       #99ddff;
+  --gjs-composite-motif-lacdinac:           #ee99aa;
+  --gjs-composite-motif-polylactosamine:    #44bbff;
+  --gjs-composite-motif-matriglycan:        #bb99ff;
+  --gjs-composite-motif-heparan-repeat:     #77ccaa;
+  --gjs-composite-motif-chondroitin-repeat: #66bb66;
+  --gjs-composite-motif-keratan-repeat:     #ddaa33;
+
+  --gjs-composite-branch-label-color:       #000000;
+  --gjs-composite-sig-stroke-color:         #000000;
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. Theme variant: print                                              */
+/* ------------------------------------------------------------------ */
+
+.gjs-composite-renderer.theme-print,
+:root.theme-print {
+  --gjs-composite-arc-neuac-color:          #000000;
+  --gjs-composite-arc-neugc-color:          #444444;
+  --gjs-composite-wedge-fuc-color:          #000000;
+  --gjs-composite-motif-opacity:            0.15;
+  --gjs-composite-residue-opacity:          1;
+  --gjs-composite-diverging-fill:           #cccccc;
+
+  --gjs-composite-motif-type-1-chain:       #dddddd;
+  --gjs-composite-motif-type-2-chain:       #bbbbbb;
+  --gjs-composite-motif-lacdinac:           #eeeeee;
+  --gjs-composite-motif-polylactosamine:    #aaaaaa;
+  --gjs-composite-motif-matriglycan:        #cccccc;
+  --gjs-composite-motif-heparan-repeat:     #dddddd;
+  --gjs-composite-motif-chondroitin-repeat: #cccccc;
+  --gjs-composite-motif-keratan-repeat:     #eeeeee;
+
+  --gjs-composite-branch-label-color:       #000000;
+  --gjs-composite-sig-stroke-color:         #000000;
+  --gjs-composite-sig-stroke-width:         2px;
+  --gjs-composite-nonsig-stroke-color:      #666666;
+}
+
+@media print {
+  .gjs-composite-renderer {
+    --gjs-composite-motif-opacity:   0.15;
+    --gjs-composite-residue-opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. Theme variant: dark                                               */
+/* ------------------------------------------------------------------ */
+
+.gjs-composite-renderer.theme-dark,
+:root.theme-dark,
+@media (prefers-color-scheme: dark) {
+  .gjs-composite-renderer {
+    --gjs-composite-arc-neuac-color:          #e091b8;
+    --gjs-composite-arc-neugc-color:          #93c5f0;
+    --gjs-composite-wedge-fuc-color:          #f87171;
+
+    --gjs-composite-motif-type-1-chain:       #78580a;
+    --gjs-composite-motif-type-2-chain:       #0e4866;
+    --gjs-composite-motif-lacdinac:           #6b1414;
+    --gjs-composite-motif-polylactosamine:    #0a3d5c;
+    --gjs-composite-motif-matriglycan:        #3d1d6b;
+    --gjs-composite-motif-heparan-repeat:     #0f4030;
+    --gjs-composite-motif-chondroitin-repeat: #0f3d1a;
+    --gjs-composite-motif-keratan-repeat:     #5c3d00;
+
+    --gjs-composite-motif-opacity:            0.45;
+    --gjs-composite-branch-label-color:       #e0e0e0;
+    --gjs-composite-sig-stroke-color:         #ffffff;
+    --gjs-composite-nonsig-stroke-color:      #888888;
+    --gjs-composite-count-badge-color:        #60a5fa;
+  }
+}

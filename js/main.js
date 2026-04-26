@@ -39,3 +39,14 @@ export { Mass as Mass, REDUCING_END_2AB } from './Mass.js';
 
 export { MONOSACCHARIDE } from './reference_monosaccharides.js';
 export { readGlycoCT, writeGlycoCT } from './io/glycoct.js';
+
+export { default as Compositor, compose } from './Compositor.js';
+export { default as CompositeSugar, DEFAULT_MOTIFS } from './Composite.js';
+export {
+  COUNT, WEIGHT, SOURCES, SATURATION, LOG2FC, PVALUE,
+  STATS_PER_SOURCE, BRANCH, CORE_FUCOSE, HIGHLIGHT,
+} from './Composite.js';
+export {
+  CompositeMixin, SVGCompositeRenderer, CanvasCompositeRenderer,
+} from './CompositeRenderer.js';
+export { DEFAULT_THEME, slug } from './CompositeTheme.js';

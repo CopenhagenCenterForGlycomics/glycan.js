@@ -321,6 +321,8 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       icon = current.residue;
     }
 
+    if (!icon) continue;
+
     if (position.z !== 1) {
       zindices.push({ z: position.z, icon: icon });
     }
@@ -483,6 +485,23 @@ class Renderer {
 
   renderLinkage(...args) {
     return render_linkage.call(this,...args);
+  }
+
+  renderArc(container, position, opts) {}
+
+  renderWedge(container, position, opts) {}
+
+  renderHighlightBackground(container, positions, opts) {}
+
+  renderResidueBadge(container, position, text, corner, opts) {}
+
+  setResidueFill(residueElement, fillSpec) {}
+
+  setResidueStroke(residueElement, strokeSpec) {}
+
+  getResiduePosition(residue) {
+    if (!this.global_layout) return null;
+    return this.global_layout.get(residue) || null;
   }
 
   get horizontal() {
