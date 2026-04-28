@@ -114,6 +114,10 @@ class FragmentResidue extends TracedMonosaccharide {
     return super.parent;
   }
 
+  get reducing_end() {
+    return this.original?.reducing_end;
+  }
+
   get mass() {
     return composition_to_mass(this.atoms);
   }
@@ -218,10 +222,6 @@ let Fragmentable = (base) => class extends base {
 
   get type() {
     return this.typestring;
-  }
-
-  get mass() {
-    return composition_to_mass(this.atoms);
   }
 
   get atoms() {
