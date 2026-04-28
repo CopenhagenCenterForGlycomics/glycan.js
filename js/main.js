@@ -50,3 +50,4 @@ export {
   CompositeMixin, SVGCompositeRenderer, CanvasCompositeRenderer,
 } from './CompositeRenderer.js';
 export { DEFAULT_THEME, slug } from './CompositeTheme.js';
+export { GlycoViewerElement } from './elements/GlycoViewerElement.js';

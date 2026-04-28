@@ -50,9 +50,89 @@ function cornerXY(position, corner, offset) {
   return { x: cx, y: cy };
 }
 
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+/**
+ * SVG arc path for a semicircle segment.
+ * Angles are measured from the LEFT end of the semicircle going clockwise
+ * (so 0 = left tip, π = right tip, matching the visual arc orientation).
+ *
+ * @param {number} cx        - centre x
+ * @param {number} cy        - centre y (top of box for 'up', bottom for 'down')
+ * @param {number} r         - radius
+ * @param {number} startAngle - start angle in radians (0 = left)
+ * @param {number} endAngle   - end angle in radians  (π = right)
+ * @param {number} sweep      - 0 = counter-clockwise arc, 1 = clockwise arc
+ */
+function svgArcPathAngled(cx, cy, r, startAngle, endAngle, sweep) {
+  // For 'up' arcs the semicircle opens upward, so we rotate by -π/2 and
+  // mirror so that angle 0 maps to the left tip and π maps to the right tip.
+  //   x = cx - r·cos(angle)   (minus because left→right)
+  //   y = cy - r·sin(angle)   (minus because upward)
+  const x1 = cx - r * Math.cos(startAngle);
+  const y1 = cy - r * Math.sin(startAngle);
+  const x2 = cx - r * Math.cos(endAngle);
+  const y2 = cy - r * Math.sin(endAngle);
+  const largeArc = (endAngle - startAngle) > Math.PI ? 1 : 0;
+  return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2}`;
+}
+
+/**
+ * Closed SVG sector path between two radii and two angles.
+ * Used by renderArcThickness to draw the filled wedge band.
+ */
+function svgSectorPath(cx, cy, r1, r2, startAngle, endAngle, sweep) {
+  const cos0 = Math.cos(startAngle), sin0 = Math.sin(startAngle);
+  const cos1 = Math.cos(endAngle),   sin1 = Math.sin(endAngle);
+
+  const ox1 = cx - r1 * cos0,  oy1 = cy - r1 * sin0;   // outer start
+  const ox2 = cx - r1 * cos1,  oy2 = cy - r1 * sin1;   // outer end
+  const ix1 = cx - r2 * cos0,  iy1 = cy - r2 * sin0;   // inner start
+  const ix2 = cx - r2 * cos1,  iy2 = cy - r2 * sin1;   // inner end
+
+  const largeArc = (endAngle - startAngle) > Math.PI ? 1 : 0;
+  const antiSweep = sweep === 1 ? 0 : 1;
+
+  return [
+    `M ${ox1} ${oy1}`,
+    `A ${r1} ${r1} 0 ${largeArc} ${sweep} ${ox2} ${oy2}`,
+    `L ${ix2} ${iy2}`,
+    `A ${r2} ${r2} 0 ${largeArc} ${antiSweep} ${ix1} ${iy1}`,
+    'Z'
+  ].join(' ');
+}
+
+function svgArcPathFraction(cx, cy, r, fraction, sweep) {
+  // Ghost draws 0→π with sweep.
+  // To fill from the left tip, we draw π→π*(1-fraction) with the OPPOSITE sweep,
+  // which traces backward along the same upward curve starting from the left tip.
+  return svgArcPath(cx, cy, r, Math.PI, Math.PI * (1 - fraction), 1 - sweep);
+}
+
+function svgSectorPathFraction(cx, cy, r, outerR, innerR, sweep, startAngle = Math.PI, endAngle = 0) {
+  const ySign = sweep === 1 ? 1 : -1;
+
+  function pt(radius, angle) {
+    const x = cx + radius * Math.cos(angle);
+    const y = cy + ySign * radius * Math.sin(angle);
+    return `${x.toFixed(1)} ${y.toFixed(1)}`;
+  }
+
+  const spanAngle = Math.abs(startAngle - endAngle);
+  const largeArc = spanAngle > Math.PI ? 1 : 0;
+  return [
+    `M ${pt(outerR, startAngle)}`,
+    `A ${outerR.toFixed(1)} ${outerR.toFixed(1)} 0 ${largeArc} ${1 - sweep} ${pt(outerR, endAngle)}`,
+    `L ${pt(innerR, endAngle)}`,
+    `A ${innerR.toFixed(1)} ${innerR.toFixed(1)} 0 ${largeArc} ${sweep} ${pt(innerR, startAngle)}`,
+    'Z'
+  ].join(' ');
+}
+
+
 export const CompositeMixin = (BaseRenderer) => class extends BaseRenderer {
   constructor(element, layout, options = {}) {
-    super(element, layout);
+    super(element,layout);
     this.theme = Object.assign({}, DEFAULT_THEME, options.theme || {});
     if (options.theme && options.theme.motifColors) {
       this.theme.motifColors = { ...DEFAULT_THEME.motifColors, ...options.theme.motifColors };
@@ -166,10 +246,12 @@ export const CompositeMixin = (BaseRenderer) => class extends BaseRenderer {
         ? this.theme.arcColorNeuAc
         : this.theme.arcColorNeuGc;
 
-      this.renderArc(container, pos, {
+      this.renderArcThickness(container, pos, {
         direction,
         fillFraction,
         color,
+        arcStart: linkage === 3 ? 5*Math.PI/6 : linkage === 6 ? 1*Math.PI/3 : 0,
+        arcLength: Math.PI / 3,
         species: kid.identifier.toLowerCase(),
         style: this.compositeOptions.arcStyle,
         strokeStyle: (linkage > 0 && linkage <= 100) ? 'solid' : 'dashed',
@@ -193,13 +275,27 @@ export const CompositeMixin = (BaseRenderer) => class extends BaseRenderer {
         : 'down';
       const fillFraction = this._fillFractionFor(kid, residue);
 
-      this.renderWedge(container, pos, {
+      this.renderArcThickness(container, pos, {
         direction,
         fillFraction,
         color: this.theme.wedgeColorFuc,
+        arcStart: linkage === 2 ? 5*Math.PI/6 : linkage === 6 ? 1*Math.PI/3 : 0,
+        arcLength: Math.PI / 3,
+        minThickness: 1,
+        species: kid.identifier.toLowerCase(),
         style: this.compositeOptions.wedgeStyle,
+        strokeStyle: (linkage > 0 && linkage <= 100) ? 'solid' : 'dashed',
+        strokeWidth: this.theme.arcStrokeWidth,
         linkage: linkage || 'unknown',
       });
+
+      // this.renderWedge(container, pos, {
+      //   direction,
+      //   fillFraction,
+      //   color: this.theme.wedgeColorFuc,
+      //   style: this.compositeOptions.wedgeStyle,
+      //   linkage: linkage || 'unknown',
+      // });
     }
   }
 
@@ -372,13 +468,12 @@ class SVGCompositeRendererClass extends CompositeMixin(SVGRenderer) {
     }
     return poly;
   }
-
+/*
   renderArc(container, position, opts) {
     const cx = position.x + position.width / 2;
     const cy = opts.direction === 'up' ? position.y : position.y + position.height;
     const r  = position.width * this.theme.arcRadiusFactor;
     const sweep = opts.direction === 'up' ? 0 : 1;
-
     const species = opts.species || 'neuac';
     const colorVar = species === 'neugc'
       ? '--gjs-composite-arc-neugc-color'
@@ -419,6 +514,136 @@ class SVGCompositeRendererClass extends CompositeMixin(SVGRenderer) {
       }
     }
   }
+*/
+
+  renderArc(container, position, opts) {
+    const cx        = position.x + position.width / 2;
+    const cy        = opts.direction === 'up' ? position.y : position.y + position.height;
+    const r         = position.width * this.theme.arcRadiusFactor;
+    const sweep     = opts.direction === 'up' ? 0 : 1;
+    const species   = opts.species || 'neuac';
+    const colorVar  = species === 'neugc'
+      ? '--gjs-composite-arc-neugc-color'
+      : '--gjs-composite-arc-neuac-color';
+    const sw        = (opts.strokeWidth || 3) + 'px';
+
+    // Ghost: full semicircle, faint
+    const ghostPath = svgArcPath(cx, cy, r, 0, Math.PI, sweep);
+    const ghost = this._svgPathElement(container, ghostPath);
+    if (ghost) {
+      ghost.setAttribute('fill', 'none');
+      this._emitStyledAttribute(ghost, 'stroke', colorVar, opts.color);
+      ghost.style.strokeOpacity = '0.2';
+      this._emitStyledAttribute(ghost, 'strokeWidth', '--gjs-composite-arc-stroke-width', sw);
+      this._addPart(ghost, 'arc', `arc-${opts.linkage}`, `arc-${species}`);
+    }
+
+    if (opts.fillFraction > 0) {
+      // Filled portion: left→right using corrected helper
+      const filledPath = svgArcPathFraction(cx, cy, r, opts.fillFraction, sweep);
+      const filled = this._svgPathElement(container, filledPath);
+      if (filled) {
+        filled.setAttribute('fill', 'none');
+        this._emitStyledAttribute(filled, 'stroke', colorVar, opts.color);
+        this._emitStyledAttribute(filled, 'strokeWidth', '--gjs-composite-arc-stroke-width', sw);
+        if (opts.strokeStyle === 'dashed') {
+          filled.setAttribute('stroke-dasharray', this.theme.arcUnknownLinkageDash);
+        }
+        this._addPart(filled, 'arc', `arc-${opts.linkage}`, `arc-${species}`);
+      }
+    }
+  }
+
+  renderArcThickness(container, position, opts) {
+    const cx = position.x + position.width / 2;
+    const cy = opts.direction === 'up' ? position.y + position.height / 2 : position.y + 0.5*position.height;
+    const r  = position.width * this.theme.arcRadiusFactor;
+
+    const toInternal = (a) => Math.PI / 2 - a;
+
+    // arcStart: 0=top, π/2=right, π=bottom (clockwise)
+    // arcLength: how much of the circle to cover, clockwise
+    const arcStart  = opts.arcStart  ?? Math.PI;
+    const arcLength = opts.arcLength ?? Math.PI;
+    const startAngle = toInternal(arcStart);
+    const endAngle   = toInternal(arcStart + arcLength);  // add = clockwise
+    const sweep      = 1;                      // always 1; ySign in pt() handles up/down flipping
+
+    const species  = opts.species || 'neuac';
+    const colorVar = species === 'neugc'
+      ? '--gjs-composite-arc-neugc-color'
+      : '--gjs-composite-arc-neuac-color';
+
+    const minT = opts.minThickness ?? this.theme.arcMinThickness;
+    const maxT = opts.maxThickness ?? this.theme.arcMaxThickness;
+
+    const wedgeOuter = r + maxT / 2;
+    const wedgeInner = r - minT / 2;
+
+    const ghostPath = svgSectorPathFraction(cx, cy, r, wedgeOuter, wedgeInner, sweep, startAngle, endAngle);
+    const ghost = this._svgPathElement(container, ghostPath);
+    if (ghost) {
+      this._emitStyledAttribute(ghost, 'fill', colorVar, opts.color);
+      ghost.setAttribute('stroke', 'black');
+      ghost.setAttribute('stroke-width', '0.5');
+      ghost.style.opacity = '0.15';
+      this._addPart(ghost, 'arc', `arc-${opts.linkage}`, `arc-${species}`);
+    }
+
+    if (opts.fillFraction > 0) {
+      const outerR     = wedgeInner + (wedgeOuter - wedgeInner) * opts.fillFraction;
+      const filledPath = svgSectorPathFraction(cx, cy, r, outerR, wedgeInner, sweep, startAngle, endAngle);
+      const filled = this._svgPathElement(container, filledPath);
+      if (filled) {
+        this._emitStyledAttribute(filled, 'fill', colorVar, opts.color);
+        filled.setAttribute('stroke', 'none');
+        this._addPart(filled, 'arc', `arc-${opts.linkage}`, `arc-${species}`);
+      }
+    }
+  }
+
+  // renderArcThickness(container, position, opts) {
+  //   const cx      = position.x + position.width / 2;
+  //   const cy      = opts.direction === 'up' ? position.y + position.height / 2 : position.y - position.height;
+  //   const r       = position.width * this.theme.arcRadiusFactor;
+  //   const startAngle = opts.direction == 'right' ? Math.PI/3 : 0;
+  //   const endAngle = startAngle - 2*Math.PI/3;
+  //   const sweep   = 1;//opts.direction === 'up' ? 0 : 1;
+  //   const species = opts.species || 'neuac';
+  //   const colorVar = species === 'neugc'
+  //     ? '--gjs-composite-arc-neugc-color'
+  //     : '--gjs-composite-arc-neuac-color';
+
+  //   const minT = opts.minThickness ?? this.theme.arcMinThickness;
+  //   const maxT = opts.maxThickness ?? this.theme.arcMaxThickness;
+
+  //   // Ghost: full semicircle at min thickness, faint
+  //   const wedgeOuter = r + maxT / 2;
+  //   const wedgeInner = r - minT / 2;
+  //   const ghostPath  = svgSectorPathFraction(cx, cy, r, wedgeOuter, wedgeInner, sweep, startAngle, endAngle);
+  //   const ghost = this._svgPathElement(container, ghostPath);
+  //   if (ghost) {
+  //     this._emitStyledAttribute(ghost, 'fill', colorVar, opts.color);
+  //     ghost.setAttribute('stroke', 'black');
+  //     ghost.setAttribute('stroke-width', '0.5');
+  //     ghost.style.opacity = '0.15';
+  //     this._addPart(ghost, 'arc', `arc-${opts.linkage}`, `arc-${species}`);
+  //   }
+
+  //   if (opts.fillFraction > 0) {
+  //     // Full semicircle, but thickness proportional to fillFraction
+  //     const outerR  = wedgeInner + ( wedgeOuter - wedgeInner ) * opts.fillFraction;
+  //     const innerR = wedgeInner;
+  //     console.log(innerR,outerR);
+  //     const filledPath = svgSectorPathFraction(cx, cy, r, outerR, innerR, sweep, startAngle, endAngle);
+  //     const filled = this._svgPathElement(container, filledPath);
+  //     if (filled) {
+  //       this._emitStyledAttribute(filled, 'fill', colorVar, opts.color);
+  //       filled.setAttribute('stroke', 'none');
+  //       this._addPart(filled, 'arc', `arc-${opts.linkage}`, `arc-${species}`);
+  //     }
+  //   }
+  // }
 
   renderWedge(container, position, opts) {
     const cx   = position.x + position.width / 2;

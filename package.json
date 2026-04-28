@@ -57,6 +57,7 @@
     "server": "python ./scripts/simplehttpserver",
     "start": "./node_modules/webpack-dev-server/bin/webpack-dev-server.js",
     "lint": "./node_modules/.bin/eslint test/**/*.js js/*.js --fix",
+    "build-glycoviewer": "node_modules/.bin/esbuild js/elements/GlycoViewerElement.js --bundle --format=esm --outfile=dist/glyco-viewer-element.js --loader:.svg=text",
     "validate": "npm ls"
   },
   "browserify": {
