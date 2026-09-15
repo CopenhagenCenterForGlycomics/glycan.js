@@ -21,7 +21,8 @@
     "./io/glycoct": "./js/io/glycoct.js",
     "./reference_monosaccharides": "./js/reference_monosaccharides.js",
     "./io/carbbank": "./js/io/carbbank.js",
-    "./renderers/text": "./js/SugarTextRenderer.js"
+    "./renderers/text": "./js/SugarTextRenderer.js",
+    "./renderers/fiziko": "./js/Fiziko/FizikoSVGRenderer.js"
   },
   "dependencies": {
     "debug": "^4.4.1",
