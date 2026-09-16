@@ -3,6 +3,9 @@
 import SVGRenderer from '../SVGRenderer.js';
 import FizikoSVGCanvas from './FizikoSVGCanvas.js';
 
+import SYMBOLS_DEF from '../../sugars.svg';
+
+
 // Mirrors rough-glycan.js's RoughCanvasRenderer (swap in a differently
 // drawing canvas for `this.element`, inherit everything else from the base
 // renderer unchanged), with one difference: CanvasCanvas.js's `Canvas` just
@@ -27,6 +30,7 @@ class FizikoSVGRenderer extends SVGRenderer {
       const previousCanvas = this.element.canvas;
       previousCanvas.parentNode.removeChild(previousCanvas);
       this.element = new FizikoSVGCanvas(container);
+      SVGRenderer.AppendSymbols(this,SYMBOLS_DEF);
       this.element.canvas.setAttribute('xmlns:glycanjs', 'https://glycocode.com/glycanjs');
     }
   }

@@ -121,14 +121,22 @@ class FizikoSVGCanvas extends SVGCanvas {
     }
 
     const opts = { ...DEFAULT_OPTIONS, ...requested };
-    const cacheKey = `${ref}::${opts.texture}::${opts.seed}`;
+    // Keyed on the full merged options, not just ref/texture/seed - two
+    // calls that differ only in e.g. spacing or rings are different
+    // icons and must not reuse each other's cached template.
+    const cacheKey = `${ref}::${JSON.stringify(opts)}`;
 
     let templateId = this.iconCache.get(cacheKey);
-    if (!templateId) {
+    if (templateId === undefined) {
       templateId = this.buildTexturedIcon(ref, opts);
       this.iconCache.set(cacheKey, templateId);
     }
 
+    // ref didn't resolve to a real <symbol> (bad/empty identifier) - fall
+    // back to the plain, un-textured <use> rather than throw.
+    if (!templateId) {
+      return super.use(ref, x, y, width, height);
+    }
     return super.use(`#${templateId}`, x, y, width, height);
   }
 
@@ -138,7 +146,18 @@ class FizikoSVGCanvas extends SVGCanvas {
   // constituent shape) is paid once per distinct icon variant, not once
   // per residue drawn.
   buildTexturedIcon(ref, opts) {
-    const symbol = this.canvas.ownerDocument.querySelector(ref);
+    let symbol;
+    const cleaned_ref = ref.replace(/\..*/,'');
+    try {
+      symbol = this.canvas.querySelector(cleaned_ref);
+    } catch (ex) {
+      symbol = null;
+    }
+    if (!symbol) {
+      console.log(`Cant find ${ref}, ${cleaned_ref}`)
+      debugger;
+      return null;
+    }
     const templateId = uniqueId('fiziko-icon');
     const template = this.createElement('symbol');
     template.setAttribute('id', templateId);
@@ -182,12 +201,60 @@ class FizikoSVGCanvas extends SVGCanvas {
         isCircle: true
       };
     }
+    // rect/polygon/polyline shapes carry their exact corners - follow the
+    // real outline instead of falling back to a bounding-circle
+    // approximation (still used below for arbitrary <path> icons).
+    if (shape.points) {
+      const bbox = bboxOfPoints(shape.points);
+      return {
+        bbox,
+        center: { cx: bbox.x + bbox.width / 2, cy: bbox.y + bbox.height / 2 },
+        radius: Math.max(bbox.width, bbox.height) / 2,
+        points: shape.points
+      };
+    }
+    // Arbitrary <path> icon (e.g. Fuc's triangle) with no structured point
+    // list from extraction - sample the actual rendered outline so
+    // ringGeometry can still follow the true silhouette instead of a plain
+    // circle. A bbox-derived circle undershoots any shape whose corners
+    // reach further from center than half its longest bbox side (a
+    // triangle's apex, for instance), leaving unshaded gaps once clipped.
+    const sampled = this.samplePathPoints(el);
+    if (sampled) {
+      const bbox = bboxOfPoints(sampled);
+      return {
+        bbox,
+        center: { cx: bbox.x + bbox.width / 2, cy: bbox.y + bbox.height / 2 },
+        radius: Math.max(bbox.width, bbox.height) / 2,
+        points: sampled
+      };
+    }
     const bbox = el.getBBox();
     return {
       bbox,
       center: { cx: bbox.x + bbox.width / 2, cy: bbox.y + bbox.height / 2 },
       radius: Math.max(bbox.width, bbox.height) / 2
     };
+  }
+
+  // `getPointAtLength` needs the element attached to a real (non-jsdom)
+  // rendered document, same requirement as the getBBox() calls elsewhere
+  // in this file - returns null rather than throwing where unsupported, so
+  // callers can fall back to the plain bbox/circle approximation.
+  samplePathPoints(el, samples = 64) {
+    if (typeof el.getTotalLength !== 'function') {
+      return null;
+    }
+    const total = el.getTotalLength();
+    if (!total) {
+      return null;
+    }
+    const points = [];
+    for (let i = 0; i < samples; i++) {
+      const pt = el.getPointAtLength((i / samples) * total);
+      points.push([pt.x, pt.y]);
+    }
+    return points;
   }
 
   // Shared draw path for both the standalone primitives (circle/polygon)
@@ -211,15 +278,21 @@ class FizikoSVGCanvas extends SVGCanvas {
       this.appendClippedTexture(group, clipEl, geometry, opts, rng);
     }
 
+    // roughness>0 replaces the crisp outline with a width-jittered one
+    // (buildWobblyOutline) rather than drawing both - a plain SVG
+    // stroke-width can't vary along a path, so "jitter" there means a
+    // filled variable-width band instead, and layering that on top of the
+    // flat stroke was redundant (and could show the flat stroke's own
+    // color through/around it wherever `stroke` differs from `fill`).
     if (opts.outline !== false) {
-      outlineSource.setAttribute('fill', 'none');
-      outlineSource.setAttribute('stroke', opts.stroke && opts.stroke !== 'none' ? opts.stroke : opts.fill);
-      outlineSource.setAttribute('stroke-width', opts.strokeWidth);
-      group.appendChild(outlineSource);
-    }
-
-    if (opts.roughness > 0) {
-      group.appendChild(this.buildWobblyOutline(geometry, opts, rng));
+      if (opts.roughness > 0) {
+        group.appendChild(this.buildWobblyOutline(geometry, opts, rng));
+      } else {
+        outlineSource.setAttribute('fill', 'none');
+        outlineSource.setAttribute('stroke', opts.stroke && opts.stroke !== 'none' ? opts.stroke : opts.fill);
+        outlineSource.setAttribute('stroke-width', opts.strokeWidth);
+        group.appendChild(outlineSource);
+      }
     }
 
     return group;
@@ -318,7 +391,14 @@ class FizikoSVGCanvas extends SVGCanvas {
     const widthFn = () => opts.strokeWidth * (1 + (rng() - 0.5) * opts.roughness);
     const outline = this.createElement('path');
     outline.setAttribute('d', variableWidthOutline(points, widthFn));
-    outline.setAttribute('fill', opts.texture === 'solid' ? opts.stroke : opts.fill);
+    // Same color resolution as the crisp outline it replaces - `stroke` if
+    // explicitly set, otherwise `fill` (their common default).
+    outline.setAttribute('fill', opts.stroke && opts.stroke !== 'none' ? opts.stroke : opts.fill);
+    // variableWidthOutline (closed=true) fills two same-direction loops
+    // (outer/inner offset boundaries) - without evenodd the default
+    // nonzero rule treats that as one solid shape instead of a hollow
+    // band, same reason fillPaths sets it for the sphere-ring bands.
+    outline.setAttribute('fill-rule', 'evenodd');
     return outline;
   }
 
