@@ -15,11 +15,15 @@ import {
   variableWidthOutline
 } from './fizikoTextures.js';
 
+// Linkage line width for the fiziko renderer, independent of the
+// SCALE-derived width Renderer.js uses for every other renderer.
+const FIZIKO_LINE_WIDTH = 3;
+
 const DEFAULT_OPTIONS = {
   texture: 'solid',
   fill: '#000',
   stroke: 'none',
-  strokeWidth: 1.5,
+  strokeWidth: 3,
   outline: true,
   roughness: 0,
   hatchAngle: 45,
@@ -109,6 +113,36 @@ class FizikoSVGCanvas extends SVGCanvas {
       return el;
     }
     return this.polygon([[x, y], [x + width, y], [x + width, y + height], [x, y + height]], options);
+  }
+
+  // Replaces the crisp straight linkage line with a hand-drawn wobble,
+  // matching the wobbly outlines already used on residue shapes
+  // (buildWobblyOutline below). Endpoints stay exactly (x,y)/(x2,y2) - the
+  // wobble tapers to 0 at both ends (sin(pi*t) factor) - so linkages still
+  // connect precisely to each residue's attachment point.
+  line(x, y, x2, y2, options = {}) {
+    options = { ...options, 'stroke-width': FIZIKO_LINE_WIDTH };
+    const rng = mulberry32(hashSeed(x, y, x2, y2));
+    const dx = x2 - x, dy = y2 - y;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len, ny = dx / len;
+    const samples = 8;
+    const amplitude = 1.2;
+    const points = [];
+    for (let i = 0; i <= samples; i++) {
+      const t = i / samples;
+      const wobble = Math.sin(Math.PI * t) * amplitude * (rng() - 0.5) * 2;
+      points.push([x + dx * t + nx * wobble, y + dy * t + ny * wobble]);
+    }
+    const path = this.createElement('path');
+    path.setAttribute('d', `M${points.map((p) => p.map((n) => n.toFixed(1)).join(',')).join(' L')}`);
+    path.setAttribute('fill', 'none');
+    for (const key of Object.keys(options)) {
+      path.setAttribute(key, options[key]);
+    }
+    path.setAttribute('stroke-linecap', 'round');
+    this.appendChild(path);
+    return path;
   }
 
   // Transforms an existing sugars.svg icon into the fiziko style on the
@@ -275,6 +309,16 @@ class FizikoSVGCanvas extends SVGCanvas {
       clipEl.setAttribute('stroke', 'none');
       group.appendChild(clipEl);
     } else {
+      // Sparse textures (rings/hatch/woodgrain) leave gaps between their own
+      // strokes/bands by design - without an opaque pass underneath, those
+      // gaps let anything behind the shape (e.g. a linkage line) show
+      // through. Same fix rough-glycan.js's RoughCanvas.js uses: a solid
+      // backing pass before the decorative one.
+      const backing = outlineSource.cloneNode(true);
+      backing.removeAttribute('id');
+      backing.setAttribute('fill', 'white');
+      backing.setAttribute('stroke', 'none');
+      group.appendChild(backing);
       this.appendClippedTexture(group, clipEl, geometry, opts, rng);
     }
 
