@@ -63,6 +63,7 @@ class SNFGFiziko extends FizikoSVGRenderer {
       const wanted_texture = FIZIKO_TEXTURES[clean_ref] || { texture: 'shaded' };
       return wanted_texture;
     };
+    this.element.fillOverride = '#000';
   }
 }
 

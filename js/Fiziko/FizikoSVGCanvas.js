@@ -19,6 +19,11 @@ import {
 // SCALE-derived width Renderer.js uses for every other renderer.
 const FIZIKO_LINE_WIDTH = 3;
 
+// Forces every residue shape to this fill instead of its own SNFG color
+// (e.g. '#000' for black-and-white). Set to null to keep each residue's
+// normal SNFG color.
+const FIZIKO_FILL_OVERRIDE = null;
+
 const DEFAULT_OPTIONS = {
   texture: 'solid',
   fill: '#000',
@@ -57,6 +62,13 @@ class FizikoSVGCanvas extends SVGCanvas {
     // Resolver the caller can override to pick a texture per icon
     // identifier, e.g. `canvas.textureFor = ref => ({texture: 'shaded'})`
     this.textureFor = () => ({ texture: 'solid' });
+    // Linkage line width, independent of the SCALE-derived width
+    // Renderer.js uses for every other renderer.
+    this.lineWidth = FIZIKO_LINE_WIDTH;
+    // Forces every residue shape to this fill instead of its own SNFG
+    // color (e.g. '#000' for black-and-white). Set to null to keep each
+    // residue's normal SNFG color.
+    this.fillOverride = FIZIKO_FILL_OVERRIDE;
     // Textured icon variants are expensive-ish to build (bbox + ring/hatch
     // generation) but cheap to reuse, so each distinct (ref, texture,
     // seed) combination is built once as a <symbol> and referenced with
@@ -121,7 +133,7 @@ class FizikoSVGCanvas extends SVGCanvas {
   // wobble tapers to 0 at both ends (sin(pi*t) factor) - so linkages still
   // connect precisely to each residue's attachment point.
   line(x, y, x2, y2, options = {}) {
-    options = { ...options, 'stroke-width': FIZIKO_LINE_WIDTH };
+    options = { ...options, 'stroke-width': this.lineWidth };
     const rng = mulberry32(hashSeed(x, y, x2, y2));
     const dx = x2 - x, dy = y2 - y;
     const len = Math.hypot(dx, dy) || 1;
@@ -205,8 +217,21 @@ class FizikoSVGCanvas extends SVGCanvas {
       // Attach before measuring: getBBox() needs the element to
       // already be part of the (real, non-jsdom) rendered document.
       template.appendChild(clipEl);
+
+      // Explicitly stroke-only decoration (e.g. Ser/Thr/Asn/Hyl's wavy
+      // backbone line, fill="none" in sugars.svg) is never meant to be
+      // solid - skip the fill/texture/backing pipeline entirely, and skip
+      // fillOverride too, or a black-and-white override would fill in what
+      // must stay an open line.
+      if (shape.fill === 'none') {
+        clipEl.setAttribute('fill', 'none');
+        clipEl.setAttribute('stroke', shape.stroke || opts.fill);
+        clipEl.setAttribute('stroke-width', opts.strokeWidth);
+        return;
+      }
+
       const geometry = this.geometryForShape(shape, clipEl);
-      const shapeOpts = { ...opts, fill: shape.fill || opts.fill, stroke: shape.stroke || opts.stroke };
+      const shapeOpts = { ...opts, fill: this.fillOverride || shape.fill || opts.fill, stroke: shape.stroke || opts.stroke };
       template.appendChild(this.renderTexturedShape(clipEl, geometry, shapeOpts, rng));
     });
 
