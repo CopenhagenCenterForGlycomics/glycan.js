@@ -2,6 +2,7 @@
 
 import SVGCanvas from '../SVGCanvas.js';
 import extractShapes from './extractShapes.js';
+import ROUTED_GOTHIC_BASE64, { ROUTED_GOTHIC_NARROW_HALF_ITALIC_BASE64 } from './fonts/routedGothicFont.js';
 import {
   mulberry32,
   hashSeed,
@@ -23,6 +24,34 @@ const FIZIKO_LINE_WIDTH = 3;
 // (e.g. '#000' for black-and-white). Set to null to keep each residue's
 // normal SNFG color.
 const FIZIKO_FILL_OVERRIDE = null;
+
+// Ser/Thr/Asn/Hyl carry their amino acid name as hand-outlined letter
+// paths in sugars.svg (there's no live <text> there since extractShapes -
+// and every other Fiziko shape - can't see text anyway). Left alone,
+// those letter paths get pulled through the same shading/texture pipeline
+// as an actual sugar shape (they're plain, un-fill-attributed <path>s),
+// making the label an illegible textured blob. Fiziko-only: skip those
+// specific paths and draw a plain live <text> label instead - the base
+// sugars.svg symbol (and every other renderer using it) is untouched.
+const FIZIKO_TEXT_LABELS = {
+  '#ser': 'Ser',
+  '#thr': 'Thr',
+  '#asn': 'Asn',
+  '#hyl': 'HyL'
+};
+
+// Base64-embedded (fonts/routedGothicFont.js) rather than referenced by
+// URL, so an exported SVG (Save SVG/Preview SVG) stays self-contained -
+// no dependency on the viewer having this font installed, or on the app's
+// own asset host still being reachable later. Falls back to ordinary
+// system fonts if the embedded font ever fails to parse/load.
+const FIZIKO_FONT_FAMILY = "'Routed Gothic', Helvetica, Verdana, Arial, Sans-serif";
+
+// Used for linkage/anomer labels ("b1-4" etc.) - narrow + half-italic
+// matches the conventional italic styling of anomeric configuration
+// annotations in glycan diagrams, and distinguishes them from the
+// residue-name labels above at a glance.
+const FIZIKO_LABEL_FONT_FAMILY = "'Routed Gothic Narrow Half Italic', Helvetica, Verdana, Arial, Sans-serif";
 
 const DEFAULT_OPTIONS = {
   texture: 'solid',
@@ -76,6 +105,21 @@ class FizikoSVGCanvas extends SVGCanvas {
     this.iconCache = new Map();
     this.iconDefs = this.createElement('defs');
     this.canvas.appendChild(this.iconDefs);
+
+    // Lives on the <svg> root (not just this in-memory DOM) so it's
+    // captured by whatever clones/serializes `this.canvas` for
+    // save/preview - a plain <style> is ordinary content as far as
+    // XMLSerializer is concerned.
+    const fontStyle = this.createElement('style');
+    fontStyle.textContent = `@font-face {
+      font-family: 'Routed Gothic';
+      src: url(data:font/truetype;charset=utf-8;base64,${ROUTED_GOTHIC_BASE64}) format('truetype');
+    }
+    @font-face {
+      font-family: 'Routed Gothic Narrow Half Italic';
+      src: url(data:font/truetype;charset=utf-8;base64,${ROUTED_GOTHIC_NARROW_HALF_ITALIC_BASE64}) format('truetype');
+    }`;
+    this.canvas.appendChild(fontStyle);
   }
 
   circle(cx, cy, r, options = {}) {
@@ -157,6 +201,16 @@ class FizikoSVGCanvas extends SVGCanvas {
     return path;
   }
 
+  // Linkage/repeat labels (e.g. "b1-4", repeat counts) go through this -
+  // same text, same layout as every other renderer, just swapped to the
+  // narrow half-italic fiziko font (conventional italic styling for
+  // anomeric configuration annotations).
+  text(x, y, text, options = {}) {
+    const el = super.text(x, y, text, options);
+    el.style.fontFamily = FIZIKO_LABEL_FONT_FAMILY;
+    return el;
+  }
+
   // Transforms an existing sugars.svg icon into the fiziko style on the
   // fly. Falls back to the plain SVGCanvas <use> when no texture is
   // requested, so this is a no-op unless `textureFor` says otherwise.
@@ -211,7 +265,15 @@ class FizikoSVGCanvas extends SVGCanvas {
     this.iconDefs.appendChild(template);
 
     const baseSeed = opts.seed ?? stringHash(ref);
+    const label = FIZIKO_TEXT_LABELS[cleaned_ref];
     extractShapes(symbol).forEach((shape, index) => {
+      // Labeled residues: their letter-outline paths (anything but the
+      // wavy backbone line) are replaced wholesale by the <text> label
+      // appended below, so skip extracting them at all.
+      if (label && shape.fill !== 'none') {
+        return;
+      }
+
       const rng = mulberry32(baseSeed + index);
       const clipEl = this.elementForShape(shape);
       // Attach before measuring: getBBox() needs the element to
@@ -234,6 +296,19 @@ class FizikoSVGCanvas extends SVGCanvas {
       const shapeOpts = { ...opts, fill: this.fillOverride || shape.fill || opts.fill, stroke: shape.stroke || opts.stroke };
       template.appendChild(this.renderTexturedShape(clipEl, geometry, shapeOpts, rng));
     });
+
+
+    if (label) {
+      const text = this.createElement('text');
+      text.setAttribute('x', 50);
+      text.setAttribute('y', 92.6);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('font-family', FIZIKO_FONT_FAMILY);
+      text.setAttribute('font-size', 29);
+      text.setAttribute('fill', this.fillOverride || opts.fill);
+      text.textContent = label;
+      template.appendChild(text);
+    }
 
     return templateId;
   }
