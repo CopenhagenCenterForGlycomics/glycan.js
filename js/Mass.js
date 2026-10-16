@@ -711,7 +711,7 @@ Object.defineProperty(Mass, 'MASS_PROVIDER', {
 });
 
 
-export { C, H, O, N, NA,
+export { C, H, O, N, P, S, NA,
          Mass,
          REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_2AA, REDUCING_END_FREE,
          DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION, DERIV_EEA_SIALIC_ACID,

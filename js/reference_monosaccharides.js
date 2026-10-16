@@ -4,6 +4,7 @@ export const MONOSACCHARIDE = Object.freeze({
   GlcNAc:  'GlcNAc',
   GalNAc:  'GalNAc',
   ManNAc:  'ManNAc',
+  MurNAc:  'MurNAc',
   GlcN:    'GlcN',
   Glc:     'Glc',
   Gal:     'Gal',

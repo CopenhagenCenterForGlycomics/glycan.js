@@ -13,6 +13,8 @@ const importSymbols = (symbols_map) => {
   MASSES.set(SYMBOLS.get('O'),15.99491463);
   MASSES.set(SYMBOLS.get('N'),14.003074);
   MASSES.set(SYMBOLS.get('NA'),22.989771);
+  MASSES.set(SYMBOLS.get('P'),30.97376151);
+  MASSES.set(SYMBOLS.get('S'),31.9720707);
 };
 
 const composition_to_mass = (composition) => {
