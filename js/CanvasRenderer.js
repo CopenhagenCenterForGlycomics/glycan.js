@@ -91,7 +91,7 @@ const perform_rendering = function(canvas,renderobj) {
   }
 };
 
-const render = function(canvas,renderobj) {
+const render = function(canvas,renderobj,controller) {
   let coords = get_bounding_boxes(renderobj);
   coords.x = coords.x.map( (val,idx,arr) => { if ((idx % 2) === 0) { return 0.5*(val + arr[idx+1]); } }).filter( x => typeof x !== 'undefined');
   coords.y = coords.y.map( (val,idx,arr) => { if ((idx % 2) === 0) { return 0.5*(val + arr[idx+1]); } }).filter( x => typeof x !== 'undefined');
@@ -135,7 +135,22 @@ const render = function(canvas,renderobj) {
 
   canvas.screenToCanvasMatrix = (new CanvasMatrix([scale,0,0,scale,-1*scale*min_x,-1*scale*min_y])).inverse().multiply(canvas_transforms);
 
-  perform_rendering(canvas,renderobj);
+  // Duck-typed hook for a renderer that wants every residue to sway together
+  // around one shared axis (see WobbleCanvasRenderer) instead of each doing
+  // its own independent, self-centered motion. `controller` is only ever a
+  // renderer instance (passed in from `paint()`) or undefined -- plain
+  // CanvasRenderer and every renderer that isn't wobble-aware has no
+  // `applySway`, so this is a no-op for them and behaviour is unchanged.
+  // The bounding box is already computed above for sizing the canvas, so
+  // this reuses it rather than walking the tree again.
+  if (controller && controller.applySway) {
+    ctx.save();
+    controller.applySway(ctx, { minX: min_x, maxX: max_x, minY: min_y, maxY: max_y });
+    perform_rendering(canvas,renderobj);
+    ctx.restore();
+  } else {
+    perform_rendering(canvas,renderobj);
+  }
 };
 
 const populate_path = (element) => {
@@ -462,7 +477,7 @@ class CanvasRenderer extends Renderer {
   }
 
   paint() {
-    render(this.element.canvas,this.element);
+    render(this.element.canvas,this.element,this);
   }
 
   async refresh() {

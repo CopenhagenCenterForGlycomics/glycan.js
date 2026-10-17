@@ -29,6 +29,7 @@ export { LinkageLayoutFishEye };
 
 export {default as SVGRenderer} from './SVGRenderer.js';
 export {default as CanvasRenderer} from './CanvasRenderer.js';
+export {default as WobbleCanvasRenderer} from './WobbleCanvasRenderer.js';
 export { FragmentRenderer } from './FragmentRenderer.js';
 
 export {default as SVGCanvas} from './SVGCanvas.js';
