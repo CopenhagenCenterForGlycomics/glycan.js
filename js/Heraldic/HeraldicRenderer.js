@@ -24,6 +24,7 @@ class SNFGHeraldic extends FizikoSVGRenderer {
     this.element.textureFor = () => ({
       texture: 'hatch',
       hatchAngle: 0,
+      hatchWeight: 1.6,
       spacing: 4,
       jitter: 0,
       roughness: 1,

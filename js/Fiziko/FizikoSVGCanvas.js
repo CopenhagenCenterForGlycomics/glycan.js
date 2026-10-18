@@ -62,6 +62,7 @@ const DEFAULT_OPTIONS = {
   outline: true,
   roughness: 0,
   hatchAngle: 45,
+  hatchWeight: 1,
   spacing: 4,
   jitter: 0.5,
   lightAngle: -45,
@@ -492,6 +493,10 @@ class FizikoSVGCanvas extends SVGCanvas {
     const textured = this.createElement('g');
     textured.setAttribute('clip-path', `url(#${clipId}-path)`);
     textured.setAttribute('stroke', opts.fill);
+    // Separate from opts.strokeWidth (the shape's own outline) - hatch/
+    // crosshatch lines would otherwise fall back to the SVG default of 1,
+    // with no way to make them bolder independently of the outline.
+    textured.setAttribute('stroke-width', opts.hatchWeight);
     textured.setAttribute('fill', 'none');
     group.appendChild(textured);
 
