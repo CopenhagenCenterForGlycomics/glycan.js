@@ -116,9 +116,30 @@ class FizikoSVGCanvas extends SVGCanvas {
     // Lives on the <svg> root (not just this in-memory DOM) so it's
     // captured by whatever clones/serializes `this.canvas` for
     // save/preview - a plain <style> is ordinary content as far as
-    // XMLSerializer is concerned.
+    // XMLSerializer is concerned. buildFontFaceCSS() is overridable so a
+    // subclass (e.g. HeraldicSVGCanvas) can embed a different font without
+    // touching this construction logic.
     const fontStyle = this.createElement('style');
-    fontStyle.textContent = `@font-face {
+    fontStyle.textContent = this.buildFontFaceCSS();
+    this.canvas.appendChild(fontStyle);
+  }
+
+  // Residue-name label font (Ser/Thr/Asn/Hyl) - see FIZIKO_TEXT_LABELS.
+  // Overridable per subclass; see fontFamily's own comment for why this
+  // isn't just a module constant.
+  get fontFamily() {
+    return FIZIKO_FONT_FAMILY;
+  }
+
+  // Linkage/anomer label font ("b1-4" etc.) - see text(). A getter rather
+  // than a module constant so a subclass swapping fonts (HeraldicSVGCanvas)
+  // can override it without touching text()/buildTexturedIcon.
+  get labelFontFamily() {
+    return FIZIKO_LABEL_FONT_FAMILY;
+  }
+
+  buildFontFaceCSS() {
+    return `@font-face {
       font-family: 'Routed Gothic';
       src: url(data:font/truetype;charset=utf-8;base64,${ROUTED_GOTHIC_BASE64}) format('truetype');
     }
@@ -126,7 +147,6 @@ class FizikoSVGCanvas extends SVGCanvas {
       font-family: 'Routed Gothic Narrow Half Italic';
       src: url(data:font/truetype;charset=utf-8;base64,${ROUTED_GOTHIC_NARROW_HALF_ITALIC_BASE64}) format('truetype');
     }`;
-    this.canvas.appendChild(fontStyle);
   }
 
   circle(cx, cy, r, options = {}) {
@@ -214,7 +234,7 @@ class FizikoSVGCanvas extends SVGCanvas {
   // anomeric configuration annotations).
   text(x, y, text, options = {}) {
     const el = super.text(x, y, text, options);
-    el.style.fontFamily = FIZIKO_LABEL_FONT_FAMILY;
+    el.style.fontFamily = this.labelFontFamily;
     return el;
   }
 
@@ -311,7 +331,7 @@ class FizikoSVGCanvas extends SVGCanvas {
       text.setAttribute('x', 50);
       text.setAttribute('y', 92.6);
       text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('font-family', FIZIKO_FONT_FAMILY);
+      text.setAttribute('font-family', this.fontFamily);
       text.setAttribute('font-size', 29);
       text.setAttribute('fill', this.fillOverride || opts.fill);
       text.textContent = label;

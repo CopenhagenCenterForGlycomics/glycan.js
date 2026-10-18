@@ -29,10 +29,17 @@ class FizikoSVGRenderer extends SVGRenderer {
     if (container && layout) {
       const previousCanvas = this.element.canvas;
       previousCanvas.parentNode.removeChild(previousCanvas);
-      this.element = new FizikoSVGCanvas(container);
+      this.element = this.createCanvas(container);
       SVGRenderer.AppendSymbols(this,SYMBOLS_DEF);
       this.element.canvas.setAttribute('xmlns:glycanjs', 'https://glycocode.com/glycanjs');
     }
+  }
+
+  // Overridable so a subclass (e.g. SNFGHeraldic) can swap in a differently
+  // skinned canvas - different embedded font, different texture set - while
+  // reusing this constructor's canvas-swap/symbol-loading mechanics as-is.
+  createCanvas(container) {
+    return new FizikoSVGCanvas(container);
   }
 }
 
