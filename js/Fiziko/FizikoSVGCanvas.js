@@ -459,7 +459,15 @@ class FizikoSVGCanvas extends SVGCanvas {
     const clipPath = this.createElement('clipPath');
     clipPath.setAttribute('id', `${clipId}-path`);
     clipPath.appendChild(clipEl);
-    group.appendChild(clipPath);
+    // Shared top-level <defs>, not the local <g> - for icon shapes `group`
+    // ends up inside a cached <symbol> (buildTexturedIcon) that's instanced
+    // by every residue of that monosaccharide via <use>. A <clipPath>
+    // nested inside a <symbol> referenced by more than one <use> doesn't
+    // reliably re-resolve its clip geometry per instance in WebKit/Safari -
+    // switching to a new glycan then leaves an old residue's unclipped
+    // backing/texture visibly bleeding through. A single shared, top-level
+    // <clipPath> has no such per-instance ambiguity.
+    this.iconDefs.appendChild(clipPath);
 
     const textured = this.createElement('g');
     textured.setAttribute('clip-path', `url(#${clipId}-path)`);
