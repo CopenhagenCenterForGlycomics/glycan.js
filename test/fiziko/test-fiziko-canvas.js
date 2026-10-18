@@ -117,3 +117,11 @@ QUnit.test('crosshatch honors an explicit hatchAngle2 instead of always +90', fu
   // 180-degree line-direction ambiguity), not the default 45/135 pairing.
   assert.ok(slopes.size <= 2);
 });
+
+QUnit.test('hatch lines can be dashed (e.g. heraldic Orange/Rose/Blue Celeste)', function(assert) {
+  const canvas = new FizikoSVGCanvas(makeContainer());
+  canvas.circle(10, 10, 5, { texture: 'hatch', fill: '#f90', seed: 1, spacing: 3, dasharray: '5,2,1,2' });
+  const lines = [...canvas.canvas.querySelectorAll('g[clip-path] line')];
+  assert.ok(lines.length > 0);
+  assert.ok(lines.every((line) => line.getAttribute('stroke-dasharray') === '5,2,1,2'));
+});

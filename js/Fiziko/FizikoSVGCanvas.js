@@ -512,6 +512,13 @@ class FizikoSVGCanvas extends SVGCanvas {
           line.setAttribute('y1', y1.toFixed(2));
           line.setAttribute('x2', x2.toFixed(2));
           line.setAttribute('y2', y2.toFixed(2));
+          // Lets a hatch line read as dashed/dotted rather than solid - e.g.
+          // heraldic Orange's dot-and-dash vertical lines (a hybrid of
+          // Gules' solid verticals and Or's dots), or Blue Celeste/Rose's
+          // dashed lines distinguishing them from solid Azure/Purpure.
+          if (opts.dasharray) {
+            line.setAttribute('stroke-dasharray', opts.dasharray);
+          }
           target.appendChild(line);
         }
       }

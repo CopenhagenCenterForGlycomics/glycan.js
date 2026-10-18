@@ -47,7 +47,17 @@ const HERALDIC_PATTERNS = {
   vert: { tincture: 'vert', texture: 'hatch', hatchAngle: 45, spacing: 4 },
   purpure: { tincture: 'purpure', texture: 'hatch', hatchAngle: -45, spacing: 4 },
   tenne: { tincture: 'tenne', texture: 'crosshatch', hatchAngle: 0, hatchAngle2: 45, spacing: 5 },
-  sanguine: { tincture: 'sanguine', texture: 'crosshatch', hatchAngle: 45, hatchAngle2: -45, spacing: 5 }
+  sanguine: { tincture: 'sanguine', texture: 'crosshatch', hatchAngle: 45, hatchAngle2: -45, spacing: 5 },
+  // Orange was never allocated a pattern in the 17th-century ("conventional")
+  // system - modern extended/Unicode charts give it vertical dot-and-dash
+  // lines, a hybrid of Gules' solid verticals and Or's dots.
+  orange: { tincture: 'orange', texture: 'hatch', hatchAngle: 90, spacing: 5, dasharray: '5,2,1,2' },
+  // Rose (pale pink) and Blue Celeste (pale blue) are later additions too,
+  // each shown as a dashed variant of an existing direction - Purpure's
+  // diagonal for Rose, Azure's horizontal for Blue Celeste - distinguishing
+  // the paler stain from its solid-line relative.
+  rose: { tincture: 'rose', texture: 'hatch', hatchAngle: -45, spacing: 4, dasharray: '5,3' },
+  blue_celeste: { tincture: 'blue_celeste', texture: 'hatch', hatchAngle: 0, spacing: 4, dasharray: '5,3' }
 };
 
 // Buckets an arbitrary fill color into its nearest named tincture by
@@ -62,11 +72,18 @@ const classifyTincture = (hex) => {
   if (l < 0.15 || s < 0.12) {
     return 'sable';
   }
+  // Red family: Sanguine is traditionally the *darker* blood-red stain and
+  // Rose the *paler* pink one, with vivid Gules in between.
   if (h < 15 || h >= 345) {
-    return l > 0.65 ? 'sanguine' : 'gules';
+    if (l > 0.7) {
+      return 'rose';
+    }
+    return l < 0.35 ? 'sanguine' : 'gules';
   }
+  // Orange family: Tenné is the dull/brownish ("tawny") stain, Orange the
+  // vivid one.
   if (h < 45) {
-    return 'tenne';
+    return (l >= 0.5 && s >= 0.5) ? 'orange' : 'tenne';
   }
   if (h < 65) {
     return 'or';
@@ -74,13 +91,15 @@ const classifyTincture = (hex) => {
   if (h < 170) {
     return 'vert';
   }
+  // Blue family: Blue Celeste is the pale sky-blue stain, Azure the vivid
+  // heraldic blue.
   if (h < 255) {
-    return 'azure';
+    return l > 0.65 ? 'blue_celeste' : 'azure';
   }
   if (h < 320) {
     return 'purpure';
   }
-  return 'sanguine';
+  return l > 0.7 ? 'rose' : 'sanguine';
 };
 
 const tinctureForColor = (hex) => {

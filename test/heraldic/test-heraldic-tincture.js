@@ -14,7 +14,16 @@ QUnit.test('classifies the actual SNFG palette to the expected tinctures', funct
   assert.equal(classifyTincture('#0072bc'), 'azure', 'blue (Glc/GlcNAc)');
   assert.equal(classifyTincture('#a54399'), 'purpure', 'purple (NeuAc)');
   assert.equal(classifyTincture('#ed1c24'), 'gules', 'red (Fuc)');
-  assert.equal(classifyTincture('#f47920'), 'tenne', 'orange (Xyl)');
+  assert.equal(classifyTincture('#f47920'), 'orange', 'vivid orange (Xyl)');
+  assert.equal(classifyTincture('#994a16'), 'tenne', 'dull brown (tawny)');
+});
+
+QUnit.test('classifies the newer stains - Orange, Rose, Blue Celeste', function(assert) {
+  assert.equal(classifyTincture('#ffa500'), 'orange', 'vivid orange');
+  assert.equal(classifyTincture('#f69ea1'), 'rose', 'pale pink');
+  assert.equal(classifyTincture('#8fcce9'), 'blue_celeste', 'pale sky blue');
+  assert.equal(classifyTincture('#7a0a1a'), 'sanguine', 'dark blood-red stays Sanguine');
+  assert.equal(classifyTincture('#0072bc'), 'azure', 'vivid blue stays Azure, not Blue Celeste');
 });
 
 QUnit.test('tinctureForColor returns the matching Petra Sancta pattern', function(assert) {
