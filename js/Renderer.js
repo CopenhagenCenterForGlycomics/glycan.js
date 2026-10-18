@@ -2,8 +2,6 @@
 
 import debug from './Debug.js';
 
-import Monosaccharide from './Monosaccharide.js';
-
 import Repeat from './Repeat.js';
 
 const module_string='glycanjs:renderer';
@@ -248,8 +246,21 @@ const render_linkage = function(child_pos,parent_pos,child,parent,sugar,canvas,s
 
 const cleanup_residues = function(active_residues) {
   let active = new Set(active_residues);
+  // `this.rendered` holds both sugar-level entries (keyed by the Sugar
+  // object itself, set in setupContainer/fromSVGElement) and residue-level
+  // entries (keyed by each Monosaccharide) - only the latter should ever be
+  // torn down here. Checking tracked-sugar membership instead of
+  // `res instanceof Monosaccharide` avoids a cross-module instanceof
+  // mismatch: a residue class built via Mass(base)'s
+  // `class MonosaccharideMass extends base.Monosaccharide` can fail
+  // `instanceof Monosaccharide` if bundling ends up with two copies of
+  // Monosaccharide.js (e.g. a symlinked package dependency resolved via two
+  // different real/symlinked paths) - when that happens every residue is
+  // silently treated as "not a residue" and never cleaned up, leaving the
+  // previous glycan's elements in the DOM forever.
+  let sugars = new Set(this[rendered_sugars_symbol]);
   for (let res of this.rendered.keys()) {
-    if ( ! (res instanceof Monosaccharide) ) {
+    if ( sugars.has(res) ) {
       continue;
     }
     if (! active.has(res)) {
