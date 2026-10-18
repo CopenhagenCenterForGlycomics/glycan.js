@@ -9,6 +9,7 @@ import {
   stringHash,
   circlePoints,
   hatchLines,
+  dotPattern,
   shadedRings,
   latitudeBands,
   longitudeBands,
@@ -91,6 +92,12 @@ class FizikoSVGCanvas extends SVGCanvas {
     // Resolver the caller can override to pick a texture per icon
     // identifier, e.g. `canvas.textureFor = ref => ({texture: 'shaded'})`
     this.textureFor = () => ({ texture: 'solid' });
+    // Optional resolver the caller can override to pick a texture per
+    // shape's own *fill color* instead of (or on top of) textureFor's
+    // per-identifier choice - e.g. heraldic tincture hatching, where the
+    // pattern follows the color, not which monosaccharide it is. Returning
+    // null/undefined for a color leaves textureFor's choice untouched.
+    this.hatchForColor = null;
     // Linkage line width, independent of the SCALE-derived width
     // Renderer.js uses for every other renderer.
     this.lineWidth = FIZIKO_LINE_WIDTH;
@@ -293,7 +300,8 @@ class FizikoSVGCanvas extends SVGCanvas {
       }
 
       const geometry = this.geometryForShape(shape, clipEl);
-      const shapeOpts = { ...opts, fill: this.fillOverride || shape.fill || opts.fill, stroke: shape.stroke || opts.stroke };
+      const colorTexture = this.hatchForColor && this.hatchForColor(shape.fill || opts.fill);
+      const shapeOpts = { ...opts, ...(colorTexture || {}), fill: this.fillOverride || shape.fill || opts.fill, stroke: shape.stroke || opts.stroke };
       template.appendChild(this.renderTexturedShape(clipEl, geometry, shapeOpts, rng));
     });
 
@@ -464,7 +472,10 @@ class FizikoSVGCanvas extends SVGCanvas {
 
   paintTexture(target, geometry, opts, rng) {
     if (opts.texture === 'hatch' || opts.texture === 'crosshatch') {
-      const angles = opts.texture === 'crosshatch' ? [opts.hatchAngle, opts.hatchAngle + 90] : [opts.hatchAngle];
+      // hatchAngle2 lets a crosshatch cross at any second angle (e.g. two
+      // diagonals for heraldic tenné/sanguine), not just the first angle's
+      // perpendicular - defaults to +90 to keep existing callers unchanged.
+      const angles = opts.texture === 'crosshatch' ? [opts.hatchAngle, opts.hatchAngle2 ?? opts.hatchAngle + 90] : [opts.hatchAngle];
       for (const angle of angles) {
         const segments = hatchLines(geometry.bbox, { angle, spacing: opts.spacing, jitter: opts.jitter, rng });
         for (const [x1, y1, x2, y2] of segments) {
@@ -475,6 +486,21 @@ class FizikoSVGCanvas extends SVGCanvas {
           line.setAttribute('y2', y2.toFixed(2));
           target.appendChild(line);
         }
+      }
+      return;
+    }
+
+    if (opts.texture === 'dots') {
+      const radius = opts.dotRadius ?? Math.max(0.6, opts.spacing * 0.18);
+      const dots = dotPattern(geometry.bbox, { spacing: opts.spacing, jitter: opts.jitter, rng });
+      for (const [cx, cy] of dots) {
+        const dot = this.createElement('circle');
+        dot.setAttribute('cx', cx.toFixed(2));
+        dot.setAttribute('cy', cy.toFixed(2));
+        dot.setAttribute('r', radius.toFixed(2));
+        dot.setAttribute('fill', opts.fill);
+        dot.setAttribute('stroke', 'none');
+        target.appendChild(dot);
       }
       return;
     }

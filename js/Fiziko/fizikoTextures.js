@@ -124,6 +124,29 @@ const hatchLines = (bbox, { angle = 45, spacing = 4, jitter = 0.5, rng }) => {
   return segments;
 };
 
+// A grid of dots tiling `bbox`, staggered row-to-row like a real "powdered"
+// heraldic field (Or's bezants) rather than a plain square grid, jittered
+// for the same hand-set feel as hatchLines. Trimming to the real shape
+// happens for free via SVG clip-path, same as hatchLines. O((bbox area) /
+// spacing^2).
+const dotPattern = (bbox, { spacing = 6, jitter = 0.5, rng }) => {
+  const points = [];
+  const startX = bbox.x - spacing;
+  const endX = bbox.x + bbox.width + spacing;
+  const startY = bbox.y - spacing;
+  const endY = bbox.y + bbox.height + spacing;
+  let row = 0;
+  for (let y = startY; y <= endY; y += spacing, row++) {
+    const offset = (row % 2) * (spacing / 2);
+    for (let x = startX + offset; x <= endX; x += spacing) {
+      const jx = (rng() - 0.5) * jitter;
+      const jy = (rng() - 0.5) * jitter;
+      points.push([x + jx, y + jy]);
+    }
+  }
+  return points;
+};
+
 // --- sphere shading, ported from fiziko.mp's sphere()/sphereLat() family ---
 //
 // fiziko's model: a point on a unit sphere has a 3D surface normal (equal
@@ -470,6 +493,7 @@ export {
   stringHash,
   circlePoints,
   hatchLines,
+  dotPattern,
   shadedRings,
   latitudeBands,
   longitudeBands,

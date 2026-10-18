@@ -23,7 +23,9 @@
     "./io/carbbank": "./js/io/carbbank.js",
     "./renderers/text": "./js/SugarTextRenderer.js",
     "./renderers/fiziko": "./js/Fiziko/FizikoSVGRenderer.js",
-    "./renderers/fiziko.js": "./js/Fiziko/FizikoSVGRenderer.js"
+    "./renderers/fiziko.js": "./js/Fiziko/FizikoSVGRenderer.js",
+    "./renderers/heraldic": "./js/Heraldic/HeraldicRenderer.js",
+    "./renderers/heraldic.js": "./js/Heraldic/HeraldicRenderer.js"
   },
   "dependencies": {
     "debug": "^4.4.1",

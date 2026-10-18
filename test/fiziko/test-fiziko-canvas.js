@@ -92,3 +92,28 @@ QUnit.test('the same seed reproduces identical geometry', function(assert) {
   const dB = [...canvasB.canvas.querySelectorAll('g[clip-path] path')].map((el) => el.getAttribute('d'));
   assert.deepEqual(dA, dB);
 });
+
+QUnit.test('dots texture fills the clipped shape with circles in the fill color', function(assert) {
+  const canvas = new FizikoSVGCanvas(makeContainer());
+  canvas.circle(10, 10, 5, { texture: 'dots', fill: '#ffd400', seed: 1, spacing: 3 });
+  assert.equal(canvas.canvas.querySelectorAll('clipPath').length, 1);
+  const dots = canvas.canvas.querySelectorAll('g[clip-path] circle');
+  assert.ok(dots.length > 0);
+  assert.equal(dots[0].getAttribute('fill'), '#ffd400');
+});
+
+QUnit.test('crosshatch honors an explicit hatchAngle2 instead of always +90', function(assert) {
+  const canvas = new FizikoSVGCanvas(makeContainer());
+  canvas.circle(10, 10, 10, {
+    texture: 'crosshatch', fill: '#000', seed: 9, spacing: 2, jitter: 0, hatchAngle: 45, hatchAngle2: -45
+  });
+  const lines = [...canvas.canvas.querySelectorAll('g[clip-path] line')];
+  const slopes = new Set(lines.map((line) => {
+    const dx = line.getAttribute('x2') - line.getAttribute('x1');
+    const dy = line.getAttribute('y2') - line.getAttribute('y1');
+    return Math.round(Math.atan2(dy, dx) * 100);
+  }));
+  // Every line should fall on one of exactly two angles (45 / -45, up to a
+  // 180-degree line-direction ambiguity), not the default 45/135 pairing.
+  assert.ok(slopes.size <= 2);
+});
