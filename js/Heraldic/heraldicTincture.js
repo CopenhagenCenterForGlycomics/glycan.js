@@ -40,7 +40,7 @@ const hexToHsl = (hex) => {
 // conventionally crisp technical line work, not a hand-sketched texture.
 const HERALDIC_PATTERNS = {
   argent: { tincture: 'argent', texture: 'solid' },
-  or: { tincture: 'or', texture: 'dots', spacing: 6, dotRadius: 1.1 },
+  or: { tincture: 'or', texture: 'dots', spacing: 6, dotRadius: 1.6 },
   gules: { tincture: 'gules', texture: 'hatch', hatchAngle: 90, spacing: 4 },
   azure: { tincture: 'azure', texture: 'hatch', hatchAngle: 0, spacing: 4 },
   sable: { tincture: 'sable', texture: 'crosshatch', hatchAngle: 0, hatchAngle2: 90, spacing: 4 },
