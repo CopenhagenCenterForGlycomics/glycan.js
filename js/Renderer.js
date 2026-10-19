@@ -314,6 +314,15 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
       position.y = LTR? xval : -1*(xval + position.width);
     }
 
+    let rotate_angle = 0;
+    if (position.rotate) {
+      rotate_angle = position.rotate;
+    }
+
+    if (ROTATE && ! position.keep_horizontal) {
+      rotate_angle -= (LTR ? -90 : 90);
+    }
+
     xvals.push(position.x);
     xvals.push(position.x+position.width);
     yvals.push(position.y);
@@ -344,15 +353,6 @@ const render_sugar = function(sugar,layout,new_residues=sugar.composition()) {
 
     // Render linkage
     current.linkage = this.renderLinkage(position, residue.parent ? layout.get(residue.parent) : undefined, residue,residue.parent, sugar, container, show_labels && residue.identifier !== 'HSO3' );
-
-    let rotate_angle = 0;
-    if (position.rotate) {
-      rotate_angle = position.rotate;
-    }
-
-    if (ROTATE && ! position.keep_horizontal) {
-      rotate_angle -= (LTR ? -90 : 90);
-    }
 
     this.setIconPosition(icon,position.x*SCALE,position.y*SCALE,position.width*SCALE,position.height*SCALE,rotate_angle);
   }
