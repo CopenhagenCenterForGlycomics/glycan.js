@@ -275,9 +275,14 @@ class SVGRenderer extends Renderer {
     }
   }
 
-  renderIcon(container,identifier,residue,sugar) {
+  renderIcon(container,identifier,residue,sugar,rotation=0) {
     let symbol_prefix = this.icon_prefix ? `${this.icon_prefix}_` : '';
-    let icon = container.use(`#${symbol_prefix}${identifier}`,0,0,1,1);
+    // `rotation` is the angle setIconPosition will apply to this icon's own
+    // transform once position is known - plain SVGCanvas.use() ignores the
+    // extra argument, but FizikoSVGCanvas.use() needs it to counter-rotate
+    // texture/hatch angles so they stay screen-aligned regardless of a
+    // residue's own rotation (see FizikoSVGCanvas.js).
+    let icon = container.use(`#${symbol_prefix}${identifier}`,0,0,1,1,rotation);
     const location = sugar.location_for_monosaccharide(residue);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:identifier',residue.identifier);
     icon.setAttributeNS(GLYCANJSNS,'glycanjs:location', location );

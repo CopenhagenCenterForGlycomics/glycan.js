@@ -242,21 +242,38 @@ class FizikoSVGCanvas extends SVGCanvas {
   // Transforms an existing sugars.svg icon into the fiziko style on the
   // fly. Falls back to the plain SVGCanvas <use> when no texture is
   // requested, so this is a no-op unless `textureFor` says otherwise.
-  use(ref, x, y, width, height) {
+  // `rotation` is the angle degrees setIconPosition will later apply to
+  // this <use>'s own transform (see SVGRenderer.renderIcon) - needed here,
+  // before that transform exists, so hatch-based textures can be built
+  // counter-rotated by that same amount: once the eventual rotate(...)
+  // transform is applied on top, the hatching lands back at its intended
+  // screen angle instead of rotating along with the residue's own
+  // orientation (e.g. fucose's per-linkage tilt, or the horizontal/vertical
+  // layout toggle).
+  use(ref, x, y, width, height, rotation = 0) {
     const requested = this.textureFor(ref) || {};
     if (!requested.texture || requested.texture === 'solid') {
       return super.use(ref, x, y, width, height);
     }
 
     const opts = { ...DEFAULT_OPTIONS, ...requested };
-    // Keyed on the full merged options, not just ref/texture/seed - two
-    // calls that differ only in e.g. spacing or rings are different
-    // icons and must not reuse each other's cached template.
-    const cacheKey = `${ref}::${JSON.stringify(opts)}`;
+    // Only hatch/crosshatch textures actually depend on rotation (via the
+    // hatchAngle/hatchAngle2 counter-rotation in buildTexturedIcon) - every
+    // other texture (shaded/latitude/longitude/woodgrain/dots, i.e. all of
+    // Fiziko's own FIZIKO_TEXTURES) builds an identical icon regardless of
+    // rotation, so treat rotation as 0 for those rather than needlessly
+    // caching a separate, visually-identical <symbol> per rotation angle.
+    const rotationMatters = opts.texture === 'hatch' || opts.texture === 'crosshatch';
+    const effectiveRotation = rotationMatters ? rotation : 0;
+    // Keyed on the full merged options plus rotation, not just ref/texture/
+    // seed - two calls that differ only in e.g. spacing, rings or the final
+    // rotation are different icons and must not reuse each other's cached
+    // template (a hatch angle counter-rotated for 0° is wrong for 90°).
+    const cacheKey = `${ref}::${effectiveRotation}::${JSON.stringify(opts)}`;
 
     let templateId = this.iconCache.get(cacheKey);
     if (templateId === undefined) {
-      templateId = this.buildTexturedIcon(ref, opts);
+      templateId = this.buildTexturedIcon(ref, opts, effectiveRotation);
       this.iconCache.set(cacheKey, templateId);
     }
 
@@ -273,7 +290,7 @@ class FizikoSVGCanvas extends SVGCanvas {
   // <use>, so the cost below (getBBox() + ring/hatch generation per
   // constituent shape) is paid once per distinct icon variant, not once
   // per residue drawn.
-  buildTexturedIcon(ref, opts) {
+  buildTexturedIcon(ref, opts, rotation = 0) {
     let symbol;
     const cleaned_ref = ref.replace(/\..*/,'');
     try {
@@ -323,6 +340,18 @@ class FizikoSVGCanvas extends SVGCanvas {
       const geometry = this.geometryForShape(shape, clipEl);
       const colorTexture = this.hatchForColor && this.hatchForColor(shape.fill || opts.fill);
       const shapeOpts = { ...opts, ...(colorTexture || {}), fill: this.fillOverride || shape.fill || opts.fill, stroke: shape.stroke || opts.stroke };
+      // Counter-rotate the hatch angle(s) by this icon's own eventual
+      // rotation (see use()'s comment) so the lines read as screen-aligned
+      // once that rotation is applied on top, rather than tilting with the
+      // residue's own orientation. Only meaningful for hatch/crosshatch -
+      // harmless to apply unconditionally since other textures ignore
+      // hatchAngle/hatchAngle2 entirely.
+      if (rotation) {
+        shapeOpts.hatchAngle -= rotation;
+        if (shapeOpts.hatchAngle2 !== undefined) {
+          shapeOpts.hatchAngle2 -= rotation;
+        }
+      }
       template.appendChild(this.renderTexturedShape(clipEl, geometry, shapeOpts, rng));
     });
 
