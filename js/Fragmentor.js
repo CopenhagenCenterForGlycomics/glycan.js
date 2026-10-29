@@ -102,6 +102,9 @@ const children_with_fragment = (parent_type,children) => {
   return surviving_kids;
 };
 
+// original monosaccharide → { identifier, derivative, parent_linkage, byType: Map(type → frozen atoms) }
+const RESIDUE_ATOMS_CACHE = new WeakMap();
+
 class FragmentResidue extends TracedMonosaccharide {
   get children() {
     let all_children = super.children;
@@ -122,7 +125,29 @@ class FragmentResidue extends TracedMonosaccharide {
     return composition_to_mass(this.atoms);
   }
 
+  // A residue's atoms depend only on its original residue (identifier,
+  // derivative, parent linkage) and its cleavage type, but are asked for once
+  // per fragment it appears in: thousands of times per glycan at two levels
+  // of fragmentation. Cached per original residue and type; the cache resets
+  // if the original's identifier, derivative or parent linkage changes.
   get atoms() {
+    const original = this.original;
+    let cached = RESIDUE_ATOMS_CACHE.get(original);
+    if (!cached || cached.identifier !== original.identifier || cached.derivative !== original.derivative
+        || cached.parent_linkage !== original.parent_linkage) {
+      cached = { identifier: original.identifier, derivative: original.derivative, parent_linkage: original.parent_linkage, byType: new Map() };
+      RESIDUE_ATOMS_CACHE.set(original, cached);
+    }
+    const key = this.type ?? '';
+    let atoms = cached.byType.get(key);
+    if (!atoms) {
+      atoms = Object.freeze(this.uncachedAtoms());
+      cached.byType.set(key, atoms);
+    }
+    return atoms;
+  }
+
+  uncachedAtoms() {
     let cross_type;
     let a_composition = [];
     let base_atoms = Array.from([[OSYMB]].concat(this.original.ring_atoms));
