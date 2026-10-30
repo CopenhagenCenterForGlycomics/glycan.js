@@ -91,6 +91,44 @@ const perform_rendering = function(canvas,renderobj) {
   }
 };
 
+// Reassigning canvas.width/height -- even to the SAME value -- resets the
+// whole backing store per spec, a real reallocation that's pricier in
+// Firefox than Chromium/WebKit. Harmless for an occasional redraw, but
+// WobbleCanvasRenderer paints on every single animation frame forever, so
+// paying that cost 30-60 times a second was the main source of jank. Only
+// actually resize when the bbox-derived size changed; otherwise just clear
+// the pixels, which is far cheaper.
+const resize_or_clear = function(canvas,ctx,target_width,target_height) {
+  if (canvas.width !== target_width || canvas.height !== target_height) {
+    canvas.width = target_width;
+    canvas.height = target_height;
+    return;
+  }
+  ctx.save();
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.restore();
+};
+
+// getBoundingClientRect() forces a synchronous layout reflow -- also pricier
+// in Firefox, and again not worth repeating every animation frame when the
+// CSS-rendered size only actually changes on a real resize. Cache it on the
+// canvas and refresh via ResizeObserver/window resize instead.
+const get_cached_rect = function(canvas) {
+  if ( ! canvas._rectObserverAttached) {
+    const refresh = () => { canvas._rectCache = canvas.getBoundingClientRect(); };
+    refresh();
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(refresh).observe(canvas);
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize',refresh,{passive: true});
+    }
+    canvas._rectObserverAttached = true;
+  }
+  return canvas._rectCache;
+};
+
 const render = function(canvas,renderobj,controller) {
   let coords = get_bounding_boxes(renderobj);
   coords.x = coords.x.map( (val,idx,arr) => { if ((idx % 2) === 0) { return 0.5*(val + arr[idx+1]); } }).filter( x => typeof x !== 'undefined');
@@ -102,12 +140,14 @@ const render = function(canvas,renderobj,controller) {
 
   let scale = 1;
 
-  canvas.width = scale*(max_x - min_x);
-  canvas.height = scale*(max_y - min_y);
+  let target_width = (scale*(max_x - min_x))|0;
+  let target_height = (scale*(max_y - min_y))|0;
 
   let ctx = canvas.getContext('2d');
 
-  let { width: actual_width, height: actual_height } = canvas.getBoundingClientRect();
+  resize_or_clear(canvas,ctx,target_width,target_height);
+
+  let { width: actual_width, height: actual_height } = get_cached_rect(canvas);
 
   let svg_h = canvas.height;
   let h = actual_height || 1;
