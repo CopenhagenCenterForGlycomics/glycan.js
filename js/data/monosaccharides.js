@@ -1,4 +1,4 @@
-[
+export default [
   {
     "name": "P",
     "type": "ion",
@@ -170,4 +170,4 @@
     "terminii": "r1:H",
     "composition": "C:1;H:3"
   }
-]
+];

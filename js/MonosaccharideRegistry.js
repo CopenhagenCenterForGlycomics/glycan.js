@@ -1,5 +1,5 @@
 import { parse_terminii, parse_composition } from './Mass.js';
-import monosaccharideData from './data/monosaccharides.json' with { type: 'json' };
+import monosaccharideData from './data/monosaccharides.js';
 import { inchiToTerminii } from './InChITerminii.js';
 
 /**

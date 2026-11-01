@@ -9,7 +9,7 @@
  */
 
 import { inchiToTerminii } from '../../js/InChITerminii.js';
-import monosaccharideData from '../../js/data/monosaccharides.json';
+import monosaccharideData from '../../js/data/monosaccharides.js';
 
 const DEFINITIONS = `
 terminii:r1:x;2:x;3:x;4:x
