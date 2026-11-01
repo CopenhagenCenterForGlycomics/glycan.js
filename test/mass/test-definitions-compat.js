@@ -126,6 +126,10 @@ terminii:r1:OH;2eq:NH2;3eq:OH;4eq:OH;5eq:-;6eq:HOH
 name:GlcN
 type:HexN
 
+terminii:r1:OH;2eq:NHAc;3eq:OLac;4eq:OH;5eq:-;6eq:HOH
+name:MurNAc
+composition:C:11;H:17;N:1;O:7
+
 terminii:r1:H
 name:Me
 type:alkyl
