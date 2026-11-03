@@ -194,7 +194,37 @@ class ReducingEnd2AB extends ReducingEnd {
   }
 }
 
-const make_derivative = (name,accept= v => v,deriv_atoms=[],base=Derivative, acceptance_test = r => true ) => {
+// Procainamide: reductive amination like 2AB, net +C13H21N3 (+219.173).
+class ReducingEndProcainamide extends ReducingEnd {
+    calculate_reducing_end(atoms,other_derivative) {
+        let label = [ C, C, C, C, C, C, C, C, C, C, C, C, C, // C13
+                      H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, // H21
+                      N, N, N, // N3
+                      O ];
+
+        let result = super.apply(atoms);
+        let other_derivative_atoms = other_derivative.derivative_atoms;
+        let reducing_end_atoms = [ O, [H].concat(other_derivative_atoms), [H].concat(other_derivative_atoms), [H], delete_composition(label, [O,H]) ].flat();
+        return Derivative.Apply(result, reducing_end_atoms);
+    }
+}
+
+// RapiFluor-MS: a urea on the glycosylamine, not a reductive amination; net +C17H21N5O
+// (+311.175) over the free glycan. Underivatised glycans only.
+class ReducingEndRapiFluorMS extends ReducingEnd {
+    calculate_reducing_end(atoms) {
+        let tag = [ C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, C, // C17
+                    H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, // H21
+                    N, N, N, N, N, // N5
+                    O ];
+
+        let result = super.apply(atoms);
+        let reducing_end_atoms = [ O, H, H, tag ].flat();
+        return Derivative.Apply(result, reducing_end_atoms);
+    }
+}
+
+const make_derivative =(name,accept= v => v,deriv_atoms=[],base=Derivative, acceptance_test = r => true ) => {
   let new_derivative = class extends base {
     constructor() {
       super(name);
@@ -234,6 +264,10 @@ const REDUCING_END_REDUCED = (Object.freeze(new ReducingEndReduced('Reduced')));
 const REDUCING_END_2AA = (Object.freeze(new ReducingEnd2AA('2-aminobenzoic acid (2AA)')));
 
 const REDUCING_END_2AB = (Object.freeze(new ReducingEnd2AB('2-aminobenzamide (2AB)')));
+
+const REDUCING_END_PROCAINAMIDE = (Object.freeze(new ReducingEndProcainamide('Procainamide (ProA)')));
+
+const REDUCING_END_RAPIFLUOR_MS = (Object.freeze(new ReducingEndRapiFluorMS('RapiFluor-MS (RFMS)')));
 
 // NeuAc ethyl ester: COOH → COOC₂H₅ on α2,6-linked NeuAc.
 // Net mass change: +C₂H₄ (+28.031 Da).
@@ -714,6 +748,7 @@ Object.defineProperty(Mass, 'MASS_PROVIDER', {
 export { C, H, O, N, P, S, NA,
          Mass,
          REDUCING_END_REDUCED, REDUCING_END_2AB, REDUCING_END_2AA, REDUCING_END_FREE,
+         REDUCING_END_PROCAINAMIDE, REDUCING_END_RAPIFLUOR_MS,
          DERIV_ETHYL_ESTER, DERIV_AMMONIA_AMIDATION, DERIV_EEA_SIALIC_ACID,
          DERIV_LACTONE, DERIV_METHYL_ESTER, DERIV_DIMETHYL_AMIDE,
          DERIV_SSAP_METHYL, DERIV_SSAP_DIMETHYL,
