@@ -53,7 +53,15 @@ const use_css_variables = (canvas) => {
       shape.style.strokeWidth = `var(--stroke-width,${strokeWidth})`;
     }
     if (stroke) {
-      shape.style.stroke = `var(--stroke-color,${stroke})`;
+      // Deliberately a different variable from the linkage line's
+      // --stroke-color below: sviewer's lite.js has a `:hover` rule on
+      // residues that sets --stroke-color to highlight the LINKAGE LINE
+      // when a residue is hovered. Icon shapes (this loop) also carry a
+      // `glycanjs:location` attribute, matching that same hover selector -
+      // sharing --stroke-color here meant hovering an icon also tinted its
+      // own outline, not just the line. --icon-stroke-color keeps icon
+      // outlines themable independently without that bleed-through.
+      shape.style.stroke = `var(--icon-stroke-color,${stroke})`;
     }
   }
   for (let line of canvas.querySelectorAll('g[*|location] line')) {
