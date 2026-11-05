@@ -105,11 +105,24 @@ class SVGRenderer extends Renderer {
 
     if (container && layout) {
       this[container_symbol] = container;
-      this.element = new SVGCanvas(container);
+      this.element = this.createCanvas(container);
       this.element.canvas.setAttribute('xmlns:glycanjs',GLYCANJSNS);
       wire_canvas_events(this.element.canvas, handle_events.bind(this,this.element.canvas), {passive:true, capture: false } );
     }
 
+  }
+
+  // Overridable so a subclass can swap in a differently-drawing SVGCanvas
+  // subclass (Fiziko/Heraldic's textured canvases, or an external package
+  // like rough-glycan.js's hand-drawn one) while still getting the
+  // glycanjs namespace and mouse/touch event wiring set up right above -
+  // SVGCanvas's constructor always creates and appends a brand-new
+  // <svg>/<symbol>, so building one outside this constructor and discarding
+  // the one created here (the previous workaround, e.g. FizikoSVGRenderer.js
+  // before this existed) left two SVG roots in the container and couldn't
+  // re-attach this class's event wiring, which is private to this file.
+  createCanvas(container) {
+    return new SVGCanvas(container);
   }
 
   static get SYMBOLS() {

@@ -25,7 +25,8 @@
     "./renderers/fiziko": "./js/Fiziko/FizikoSVGRenderer.js",
     "./renderers/fiziko.js": "./js/Fiziko/FizikoSVGRenderer.js",
     "./renderers/heraldic": "./js/Heraldic/HeraldicRenderer.js",
-    "./renderers/heraldic.js": "./js/Heraldic/HeraldicRenderer.js"
+    "./renderers/heraldic.js": "./js/Heraldic/HeraldicRenderer.js",
+    "./svgcanvas": "./js/SVGCanvas.js"
   },
   "dependencies": {
     "debug": "^4.4.1",
