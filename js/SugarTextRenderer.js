@@ -1,5 +1,6 @@
 import SVGRenderer from './SVGRenderer.js';
-import X11_FIXED_BOLD_BASE64 from './fonts/x11FixedFont.js';
+import X11_FIXED_BOLD_BASE64    from './fonts/x11FixedFont.js';
+import X11_FIXED_REGULAR_BASE64 from './fonts/x11FixedRegularFont.js';
 
 const SVGNS      = 'http://www.w3.org/2000/svg';
 const GLYCANJSNS = 'https://glycocode.com/glycanjs';
@@ -13,9 +14,20 @@ const str        = n => n.toFixed(1);
 // the embedded font ever fails to parse/load.
 const SUGAR_TEXT_FONT_FAMILY = "'X11 Fixed Bold', 'Courier New', monospace";
 
+// Same family, regular (medium) weight, used for linkage labels so they
+// read as secondary/annotation text rather than competing with residue
+// names - subsetted to just the characters linkage labels ever render (see
+// fonts/LICENSE-x11-fixed.md), so it stays tiny despite the unsubsetted
+// file being far larger than the bold weight.
+const LINKAGE_FONT_FAMILY = "'X11 Fixed Regular', 'Courier New', monospace";
+
 const buildFontFaceCSS = () => `@font-face {
   font-family: 'X11 Fixed Bold';
   src: url(data:font/truetype;charset=utf-8;base64,${X11_FIXED_BOLD_BASE64}) format('truetype');
+}
+@font-face {
+  font-family: 'X11 Fixed Regular';
+  src: url(data:font/truetype;charset=utf-8;base64,${X11_FIXED_REGULAR_BASE64}) format('truetype');
 }`;
 
 // Same mapping Renderer.js's private render_link_label() uses - duplicated
@@ -26,14 +38,14 @@ const fancyAnomer = anomer => anomer === 'b' ? 'β' : anomer === 'a' ? 'α' : '?
 const point_along_line = (x0, y0, x1, y1, t) => [(1 - t) * x0 + t * x1, (1 - t) * y0 + t * y1];
 
 const RESIDUE_FONT_SIZE = SCALE * 0.4;   // matches renderIcon()'s font-size
-const LINKAGE_FONT_SIZE = SCALE * 0.22;  // smaller than residue labels
+const LINKAGE_FONT_SIZE = SCALE * 0.33;  // smaller than residue labels
 // Both fonts here are monospace (SUGAR_TEXT_FONT_FAMILY), so a residue
 // label's rendered width is predictable from its character count alone -
 // no getBBox() measurement needed (which would also be unreliable in a
 // headless/svgdom export context). ~0.62x font-size is a reasonable advance
 // width for the embedded X11 Fixed Bold/Courier New stack.
 const MONOSPACE_CHAR_WIDTH = 0.62;
-const LABEL_GAP = SCALE * 0.04;
+const LABEL_GAP = SCALE * 0.15;
 const MIN_LABEL_GAP = SCALE * 0.12; // keep the two linkage labels from ever touching on a very short/wordy link
 
 // How far a linkage label must travel from a residue's own center, along
@@ -229,7 +241,7 @@ export class SugarTextRenderer extends SVGRenderer {
       label.setAttribute('y', str(y));
       label.setAttribute('text-anchor',       'middle');
       label.setAttribute('dominant-baseline', 'central');
-      label.setAttribute('font-family',       SUGAR_TEXT_FONT_FAMILY);
+      label.setAttribute('font-family',       LINKAGE_FONT_FAMILY);
       label.setAttribute('font-size',         str(LINKAGE_FONT_SIZE));
       label.setAttribute('fill',              '#333');
       // Same halo technique as the residue labels in renderIcon() above,
