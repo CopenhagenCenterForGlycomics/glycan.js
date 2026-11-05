@@ -6,7 +6,7 @@ import { Tween, autoPlay, onTick } from 'es6-tween';
 import debug from './Debug.js';
 
 import Renderer from './Renderer.js';
-import Canvas from './CanvasCanvas.js';
+import Canvas, { iconsReady, resetIconsReady } from './CanvasCanvas.js';
 
 import CanvasMouse from '../lib/canvas-mouse.js';
 
@@ -146,6 +146,11 @@ const render = function(canvas,renderobj,controller) {
   let ctx = canvas.getContext('2d');
 
   resize_or_clear(canvas,ctx,target_width,target_height);
+
+  // Starts a fresh batch for iconsReady(canvas) (see CanvasCanvas.js) to
+  // track, so a caller awaiting it after this pass only waits on icons
+  // drawn THIS pass, not also every earlier pass's already-resolved ones.
+  resetIconsReady(canvas);
 
   let { width: actual_width, height: actual_height } = get_cached_rect(canvas);
 
@@ -518,6 +523,13 @@ class CanvasRenderer extends Renderer {
 
   paint() {
     render(this.element.canvas,this.element,this);
+    // Exposed so a subclass that post-processes the canvas after paint()
+    // (e.g. legra-glycan.js's LegraCanvasRenderer, which snapshots it) can
+    // await every icon actually finishing its draw first - render_icon()
+    // in CanvasCanvas.js only draws once a (possibly still-loading, for an
+    // icon type never drawn before) Image's 'load' event fires, which can
+    // be well after this synchronous call already returned.
+    this.iconsReady = iconsReady(this.element.canvas);
   }
 
   async refresh() {
