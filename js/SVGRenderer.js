@@ -42,7 +42,10 @@ const upgrade_symbol_elements = (canvas,symbols) => {
 };
 
 const use_css_variables = (canvas) => {
-  for (let shape of canvas.querySelectorAll('symbol *[fill]')) {
+  // data-fixed-fill opts a shape out of --fill-color theming (e.g. the
+  // white background of FragmentRenderer's ring hexagons, whose icons get
+  // --fill-color set to the fragment colour).
+  for (let shape of canvas.querySelectorAll('symbol *[fill]:not([data-fixed-fill])')) {
     let fill = shape.getAttribute('fill');
     let strokeWidth = shape.getAttribute('stroke-width');
     let stroke = shape.getAttribute('stroke');
@@ -74,6 +77,27 @@ const use_css_variables = (canvas) => {
       line.style.stroke = `var(--stroke-color,${stroke})`;
     }
   }
+};
+
+// Parsing sugars.svg (~45 KB) was the single biggest cost of creating a
+// renderer: one DOMParser pass per AppendSymbols call, i.e. per glycan on a
+// page full of small glycans. Parse (and apply the CSS variables) once per
+// distinct symbol string, then each canvas only pays for a deep clone.
+// Keyed by string content, so a re-fetched copy of the same file still hits.
+const parsed_symbols_cache = new Map();
+
+const parsed_symbols_template = (symbols_string) => {
+    let template = parsed_symbols_cache.get(symbols_string);
+    if (! template) {
+        const doc = (new DOMParser()).parseFromString(symbols_string, 'image/svg+xml');
+        template = doc.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        for (let symbol of doc.querySelectorAll('svg defs > *')) {
+            template.appendChild(symbol);
+        }
+        use_css_variables(template);
+        parsed_symbols_cache.set(symbols_string, template);
+    }
+    return template;
 };
 
 const wire_canvas_events = function(canvas,callback) {
@@ -141,21 +165,27 @@ class SVGRenderer extends Renderer {
     }
 
     const symbols_string = await Promise.resolve(SYMBOLS_STRING);
-    const doc = (new DOMParser()).parseFromString(symbols_string, 'image/svg+xml');
+    const template = parsed_symbols_template(symbols_string);
 
-    const symbols = doc.querySelectorAll('svg defs > *');
-
-    if (! (element instanceof SVGDefsElement)) {
-      let el = element.ownerDocument.createElementNS('http://www.w3.org/2000/svg','defs');
-      element.appendChild(el);
-      element = el;
+    // A renderer canvas that copies symbols on demand (see SVGCanvas.js)
+    // only needs to know about the set. Anything else - an icon palette,
+    // a bare <defs>, a canvas class that hasn't opted in - gets it all.
+    const lazy_canvas = SVGCanvas.lazyCanvasFor(element);
+    if (lazy_canvas) {
+      lazy_canvas.addSymbolSource(template);
+      return;
     }
 
-    for (let symbol of symbols) {
-        element.appendChild(symbol.cloneNode(true));
-    }
+    const copy = element.ownerDocument.importNode(template, true);
 
-    use_css_variables(element);
+    if (element instanceof SVGDefsElement) {
+      // Caller-supplied <defs> may already hold other symbols - keep the
+      // old behaviour of re-applying the CSS variables over all of it.
+      element.append(...copy.childNodes);
+      use_css_variables(element);
+    } else {
+      element.appendChild(copy);
+    }
 
   }
 

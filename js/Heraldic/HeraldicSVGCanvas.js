@@ -13,6 +13,12 @@ const HERALDIC_LABEL_FONT_FAMILY = "'Fondamento Italic', Georgia, 'Times New Rom
 
 class HeraldicSVGCanvas extends FizikoSVGCanvas {
 
+  // Inherits FizikoSVGCanvas's findSymbol-only lookups; opt-in is per
+  // class (see SVGCanvas.js).
+  static get LAZY_SYMBOLS() {
+    return true;
+  }
+
   get fontFamily() {
     return HERALDIC_FONT_FAMILY;
   }

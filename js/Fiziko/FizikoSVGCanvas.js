@@ -76,6 +76,72 @@ const DEFAULT_OPTIONS = {
 let nextId = 0;
 const uniqueId = (prefix) => `${prefix}-${nextId++}`;
 
+// Built textured icons, shared by every canvas of the same class on the
+// page. Each canvas used to rebuild every icon itself (texture geometry
+// plus forced-layout getTotalLength/getBBox calls) - on a page of many
+// small glycans that was most of the Fiziko-specific cost. Now the first
+// canvas to need an icon builds it; later canvases deep-clone the result.
+// WeakMap<canvas class, Map<key, detached nodes>>: per class because a
+// subclass can change how icons are drawn (fonts, textures).
+const sharedIconTemplates = new WeakMap();
+
+const sharedTemplatesFor = (canvasClass) => {
+    let templates = sharedIconTemplates.get(canvasClass);
+    if (! templates) {
+        templates = new Map();
+        sharedIconTemplates.set(canvasClass, templates);
+    }
+    return templates;
+};
+
+// Clones a cached icon (its <symbol> plus the top-level <clipPath>s it
+// uses) with fresh ids, so canvases sharing one document (no shadow DOM
+// between them) never end up with duplicate ids. Returns the new symbol id.
+// Cost: one deep clone plus two selector scans of the clone, O(nodes).
+const cloneIconTemplate = (nodes, targetDefs) => {
+    const copies = nodes.map((node) => node.cloneNode(true));
+    // Ids look like "<prefix>-<n>" or "<prefix>-<n>-path"; renumber per
+    // "<prefix>-<n>" so a clip element and its <clipPath> stay paired.
+    const renamedBase = new Map();
+    const rename = (id) => id.replace(/^(.*?)-(\d+)(-path)?$/, (whole, prefix, n, suffix = '') => {
+        const base = `${prefix}-${n}`;
+        if (!renamedBase.has(base)) {
+            renamedBase.set(base, uniqueId(prefix));
+        }
+        return renamedBase.get(base) + suffix;
+    });
+    for (const copy of copies) {
+        for (const el of [copy, ...copy.querySelectorAll('[id]')]) {
+            el.setAttribute('id', rename(el.getAttribute('id')));
+        }
+    }
+    // References: clip-path (line textures) and fill (pattern textures).
+    for (const el of copies[0].querySelectorAll('[clip-path], [fill^="url("]')) {
+        for (const attr of ['clip-path', 'fill']) {
+            const value = el.getAttribute(attr);
+            if (value && value.startsWith('url(')) {
+                el.setAttribute(attr, value.replace(/#([^)]+)/, (whole, id) => `#${rename(id)}`));
+            }
+        }
+    }
+    targetDefs.append(...copies);
+    return copies[0].getAttribute('id');
+};
+
+// Textures hatchPatterns mode can draw as a <pattern> fill.
+const PATTERN_TEXTURES = new Set(['hatch', 'crosshatch', 'dots']);
+
+// hatchAngle2 lets a crosshatch cross at any second angle (e.g. two
+// diagonals for heraldic tenné/sanguine), not just the first angle's
+// perpendicular - defaults to +90.
+const hatchAngles = (opts) => (opts.texture === 'crosshatch'
+    ? [opts.hatchAngle, opts.hatchAngle2 ?? opts.hatchAngle + 90]
+    : [opts.hatchAngle]);
+
+// Font CSS embeds ~165 KB of base64; build that string once per canvas
+// class rather than once per glycan drawn.
+const fontFaceCSSCache = new WeakMap();
+
 const bboxOfPoints = (points) => {
   const xs = points.map((p) => p[0]);
   const ys = points.map((p) => p[1]);
@@ -106,6 +172,13 @@ class FizikoSVGCanvas extends SVGCanvas {
     // color (e.g. '#000' for black-and-white). Set to null to keep each
     // residue's normal SNFG color.
     this.fillOverride = FIZIKO_FILL_OVERRIDE;
+    // Draw hatch/crosshatch/dots textures as SVG <pattern> fills instead of
+    // one <line>/<circle> per stroke/dot: a few nodes per shape rather than
+    // dozens, for views drawing many glycans (fragment lists, chromatogram
+    // annotations). Patterns are perfectly regular, so `jitter` is ignored;
+    // fine for heraldic hatching (jitter 0), a visible change for textures
+    // that rely on jitter. Set before drawing.
+    this.hatchPatterns = false;
     // Textured icon variants are expensive-ish to build (bbox + ring/hatch
     // generation) but cheap to reuse, so each distinct (ref, texture,
     // seed) combination is built once as a <symbol> and referenced with
@@ -121,7 +194,10 @@ class FizikoSVGCanvas extends SVGCanvas {
     // subclass (e.g. HeraldicSVGCanvas) can embed a different font without
     // touching this construction logic.
     const fontStyle = this.createElement('style');
-    fontStyle.textContent = this.buildFontFaceCSS();
+    if (!fontFaceCSSCache.has(this.constructor)) {
+      fontFaceCSSCache.set(this.constructor, this.buildFontFaceCSS());
+    }
+    fontStyle.textContent = fontFaceCSSCache.get(this.constructor);
     this.canvas.appendChild(fontStyle);
   }
 
@@ -269,11 +345,11 @@ class FizikoSVGCanvas extends SVGCanvas {
     // seed - two calls that differ only in e.g. spacing, rings or the final
     // rotation are different icons and must not reuse each other's cached
     // template (a hatch angle counter-rotated for 0° is wrong for 90°).
-    const cacheKey = `${ref}::${effectiveRotation}::${JSON.stringify(opts)}`;
+    const cacheKey = `${ref}::${effectiveRotation}::${this.hatchPatterns}::${JSON.stringify(opts)}`;
 
     let templateId = this.iconCache.get(cacheKey);
     if (templateId === undefined) {
-      templateId = this.buildTexturedIcon(ref, opts, effectiveRotation);
+      templateId = this.sharedTexturedIcon(ref, opts, effectiveRotation, cacheKey);
       this.iconCache.set(cacheKey, templateId);
     }
 
@@ -285,19 +361,56 @@ class FizikoSVGCanvas extends SVGCanvas {
     return super.use(`#${templateId}`, x, y, width, height);
   }
 
+  // Per-canvas cache miss: reuse an icon another canvas already built if
+  // every input that shapes it matches - the source <symbol>'s own markup
+  // (a custom sugars.svg may redefine an id), fillOverride, fonts, and what
+  // hatchForColor returns for this symbol's fills (compared by result, as
+  // e.g. the heraldic renderer hands every instance a fresh closure).
+  sharedTexturedIcon(ref, opts, rotation, cacheKey) {
+    const symbol = this.findSymbol(ref);
+    if (!symbol) {
+      return this.buildTexturedIcon(ref, opts, rotation);
+    }
+    const colorTextures = this.hatchForColor
+      ? extractShapes(symbol).map((shape) => this.hatchForColor(shape.fill || opts.fill) || null)
+      : null;
+    const sharedKey = JSON.stringify([cacheKey, this.fillOverride, this.fontFamily, colorTextures, symbol.outerHTML]);
+    const templates = sharedTemplatesFor(this.constructor);
+    const cached = templates.get(sharedKey);
+    if (cached) {
+      return cloneIconTemplate(cached, this.iconDefs);
+    }
+
+    const templateId = this.buildTexturedIcon(ref, opts, rotation);
+    // buildTexturedIcon appends the <symbol> and then its <clipPath>s to
+    // iconDefs synchronously, so everything from the symbol onward is
+    // this icon's own output.
+    const nodes = [];
+    for (let node = this.iconDefs.querySelector(`#${templateId}`); node; node = node.nextElementSibling) {
+      nodes.push(node.cloneNode(true));
+    }
+    templates.set(sharedKey, nodes);
+    return templateId;
+  }
+
+  // Copies symbols in on demand (SVGCanvas.findSymbol), so every symbol
+  // lookup here goes through findSymbol rather than querying the canvas.
+  static get LAZY_SYMBOLS() {
+    return true;
+  }
+
+  findSymbol(ref) {
+    return super.findSymbol(ref.replace(/\..*/, ''));
+  }
+
   // Builds the textured replacement for a sugars.svg <symbol> once; every
   // later use() for the same (ref, texture, seed) just references it via
   // <use>, so the cost below (getBBox() + ring/hatch generation per
   // constituent shape) is paid once per distinct icon variant, not once
   // per residue drawn.
   buildTexturedIcon(ref, opts, rotation = 0) {
-    let symbol;
     const cleaned_ref = ref.replace(/\..*/,'');
-    try {
-      symbol = this.canvas.querySelector(cleaned_ref);
-    } catch (ex) {
-      symbol = null;
-    }
+    const symbol = this.findSymbol(ref);
     if (!symbol) {
       console.log(`Cant find ${ref}, ${cleaned_ref}`)
       debugger;
@@ -477,7 +590,11 @@ class FizikoSVGCanvas extends SVGCanvas {
       backing.setAttribute('fill', 'white');
       backing.setAttribute('stroke', 'none');
       group.appendChild(backing);
-      this.appendClippedTexture(group, clipEl, geometry, opts, rng);
+      if (this.hatchPatterns && PATTERN_TEXTURES.has(opts.texture)) {
+        this.appendPatternTexture(group, outlineSource, geometry, opts);
+      } else {
+        this.appendClippedTexture(group, clipEl, geometry, opts, rng);
+      }
     }
 
     // roughness>0 replaces the crisp outline with a width-jittered one
@@ -498,6 +615,81 @@ class FizikoSVGCanvas extends SVGCanvas {
     }
 
     return group;
+  }
+
+  // hatchPatterns mode: the shape itself, filled with a <pattern>, once per
+  // hatch angle - no <clipPath>, and one tile instead of a <line> per
+  // stroke. Patterns go in the shared top-level <defs> for the same WebKit
+  // reason as clip paths (see appendClippedTexture).
+  appendPatternTexture(group, shapeEl, geometry, opts) {
+    const patterns = opts.texture === 'dots'
+      ? [this.dotPatternTile(geometry, opts)]
+      : hatchAngles(opts).map((angle) => this.hatchPatternTile(geometry, angle, opts));
+    for (const pattern of patterns) {
+      this.iconDefs.appendChild(pattern);
+      const filled = shapeEl.cloneNode(true);
+      filled.removeAttribute('id');
+      filled.setAttribute('fill', `url(#${pattern.getAttribute('id')})`);
+      filled.setAttribute('stroke', 'none');
+      group.appendChild(filled);
+    }
+  }
+
+  // Same lines hatchLines() draws with jitter 0: along `angle`, `spacing`
+  // apart, phased from the bbox centre at offset -diag (in both directions,
+  // so dashes start where hatchLines' lines start).
+  hatchPatternTile(geometry, angle, opts) {
+    const { bbox, center } = geometry;
+    const diag = Math.hypot(bbox.width, bbox.height) || 1;
+    const spacing = opts.spacing;
+    const dashes = opts.dasharray ? String(opts.dasharray).split(/[\s,]+/).map(Number) : [];
+    // An odd-length dash list repeats only after two passes.
+    const dashPeriod = dashes.reduce((a, b) => a + b, 0) * (dashes.length % 2 ? 2 : 1);
+    const width = dashPeriod || spacing;
+    const pattern = this.createElement('pattern');
+    pattern.setAttribute('id', uniqueId('fiziko-pattern'));
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    pattern.setAttribute('width', width);
+    pattern.setAttribute('height', spacing);
+    pattern.setAttribute('patternTransform',
+      `translate(${center.cx} ${center.cy}) rotate(${angle}) translate(${-diag} ${-diag - spacing / 2})`);
+    const line = this.createElement('line');
+    line.setAttribute('x1', 0);
+    line.setAttribute('y1', spacing / 2);
+    line.setAttribute('x2', width);
+    line.setAttribute('y2', spacing / 2);
+    line.setAttribute('stroke', opts.fill);
+    line.setAttribute('stroke-width', opts.hatchWeight);
+    if (opts.dasharray) {
+      line.setAttribute('stroke-dasharray', opts.dasharray);
+    }
+    pattern.appendChild(line);
+    return pattern;
+  }
+
+  // Same staggered grid dotPattern() draws with jitter 0: rows `spacing`
+  // apart from bbox.y - spacing, odd rows shifted by half a spacing.
+  dotPatternTile(geometry, opts) {
+    const { bbox } = geometry;
+    const s = opts.spacing;
+    const radius = opts.dotRadius ?? Math.max(0.6, s * 0.18);
+    const pattern = this.createElement('pattern');
+    pattern.setAttribute('id', uniqueId('fiziko-pattern'));
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    pattern.setAttribute('x', bbox.x - s - s / 2);
+    pattern.setAttribute('y', bbox.y - s - s / 2);
+    pattern.setAttribute('width', s);
+    pattern.setAttribute('height', 2 * s);
+    // Even-row dot in the middle; odd-row dot split across the side edges.
+    for (const [cx, cy] of [[s / 2, s / 2], [0, 1.5 * s], [s, 1.5 * s]]) {
+      const dot = this.createElement('circle');
+      dot.setAttribute('cx', cx);
+      dot.setAttribute('cy', cy);
+      dot.setAttribute('r', radius.toFixed(2));
+      dot.setAttribute('fill', opts.fill);
+      pattern.appendChild(dot);
+    }
+    return pattern;
   }
 
   appendClippedTexture(group, clipEl, geometry, opts, rng) {
@@ -534,11 +726,7 @@ class FizikoSVGCanvas extends SVGCanvas {
 
   paintTexture(target, geometry, opts, rng) {
     if (opts.texture === 'hatch' || opts.texture === 'crosshatch') {
-      // hatchAngle2 lets a crosshatch cross at any second angle (e.g. two
-      // diagonals for heraldic tenné/sanguine), not just the first angle's
-      // perpendicular - defaults to +90 to keep existing callers unchanged.
-      const angles = opts.texture === 'crosshatch' ? [opts.hatchAngle, opts.hatchAngle2 ?? opts.hatchAngle + 90] : [opts.hatchAngle];
-      for (const angle of angles) {
+      for (const angle of hatchAngles(opts)) {
         const segments = hatchLines(geometry.bbox, { angle, spacing: opts.spacing, jitter: opts.jitter, rng });
         for (const [x1, y1, x2, y2] of segments) {
           const line = this.createElement('line');

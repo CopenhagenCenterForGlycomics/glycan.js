@@ -441,6 +441,15 @@ class Renderer {
 
   removeAllSugars() {
     cleanup_residues.bind(this)([]);
+    // cleanup_residues leaves the sugar-level entries alone (each sugar's
+    // own container group, see setupContainer); without this their empty
+    // groups stayed in the canvas, one more per sugar on every reuse.
+    for (let sugar of this[rendered_sugars_symbol]) {
+      const element = this.rendered.get(sugar)?.element;
+      if (element && element.parentNode) {
+        element.parentNode.removeChild(element);
+      }
+    }
     this.rendered.clear();
     this[rendered_sugars_symbol].length = 0;
   }

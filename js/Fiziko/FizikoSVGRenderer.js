@@ -15,6 +15,8 @@ class FizikoSVGRenderer extends SVGRenderer {
   constructor(container, layout) {
     super(container, layout);
     if (container && layout) {
+      // The canvas copies symbols on demand, so a caller's later
+      // appendSymbols() with this same set (sviewer does) costs nothing.
       SVGRenderer.AppendSymbols(this,SYMBOLS_DEF);
     }
   }
