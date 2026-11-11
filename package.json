@@ -17,6 +17,7 @@
     "./iupac": "./js/io/CondensedIupac.js",
     "./io/condensediupac": "./js/io/CondensedIupac.js",
     "./fragmentor": "./js/Fragmentor.js",
+    "./glycan-class": "./js/GlycanClass.js",
     "./mass": "./js/Mass.js",
     "./io/glycoct": "./js/io/glycoct.js",
     "./reference_monosaccharides": "./js/reference_monosaccharides.js",
