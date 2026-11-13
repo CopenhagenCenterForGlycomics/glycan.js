@@ -140,3 +140,18 @@ QUnit.test( 'Respect sequence branch ordering', function( assert ) {
   assert.deepEqual(sugar.tracker, ['A','B','C','D','E','F'] ,'Tracked residues in the right order');
 
 });
+
+QUnit.test( 'Reading a reducing end with its open linkage (GlyGen)', function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-';
+  assert.equal(sugar.root.identifier, 'GlcNAc', 'The root is the residue, not "GlcNAc(b1-"');
+  assert.equal(sugar.root.anomer, 'b', 'The open linkage gives the root\'s anomer');
+  assert.equal(sugar.composition().length, 4, 'Every residue is read');
+  assert.equal(sugar.sequence, 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc', 'Written without the open linkage');
+});
+
+QUnit.test( 'GlyGen names of O-acetylated sialic acids', function( assert ) {
+  let sugar = new IupacSugar();
+  sugar.sequence = 'Neu5Ac9Ac(a2-3)Gal(b1-';
+  assert.equal(sugar.sequence, 'NeuAc9Ac(a2-3)Gal');
+});

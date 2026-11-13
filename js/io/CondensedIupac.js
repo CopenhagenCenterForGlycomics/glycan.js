@@ -7,9 +7,17 @@ import { MONOSACCHARIDE } from '../reference_monosaccharides.js';
 // that sequences from sources such as Glygen (which uses Neu5Ac/Neu5Gc) are
 // recognised without requiring a separate conversion step.
 const IDENTIFIER_ALIASES = {
-  'Neu5Ac':  MONOSACCHARIDE.NeuAc,
-  'Neu5Gc':  MONOSACCHARIDE.NeuGc,
+  'Neu5Ac':    MONOSACCHARIDE.NeuAc,
+  'Neu5Gc':    MONOSACCHARIDE.NeuGc,
+  'Neu5Ac9Ac': MONOSACCHARIDE.NeuAc9Ac,
+  'Neu5Gc9Ac': MONOSACCHARIDE.NeuGc9Ac,
 };
+
+// The reducing end's own linkage, open to the aglycone, as GlyGen and
+// GlyTouCan write it ("...GlcNAc(b1-"). Without this the root was read as one
+// unknown residue "GlcNAc(b1-". Read as the root's anomer; the root has no
+// parent, so the sequence is written without it.
+const OPEN_REDUCING_END_RE = /\(([abu?])[0-9?]-$/;
 
 // Sulfate position digit extracted from shorthands like GlcNAc6S, GalNAc4S.
 // Only positions 3, 4 and 6 are recognised.
@@ -170,6 +178,11 @@ let parse_sequence = function(sequence) {
   }
   sequence = repeat_free_seq;
 
+  const open_end = sequence.match(OPEN_REDUCING_END_RE);
+  if (open_end) {
+    sequence = sequence.slice(0, -open_end[0].length);
+  }
+
   if (sequence.match(/[\])]$/)) {
     sequence = `${sequence}Root`;
   }
@@ -187,6 +200,9 @@ let parse_sequence = function(sequence) {
   this.root = null;
   if (units.length > 0) {
     let root = get_monosaccharide( this, units.shift() );
+    if (open_end) {
+      root.anomer = open_end[1];
+    }
     create_bold_tree(this,root,units);
 
     this.root = root;
