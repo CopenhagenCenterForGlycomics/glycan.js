@@ -498,6 +498,7 @@ export {
   latitudeBands,
   longitudeBands,
   woodgrainLines,
+  variableWidthBand,
   variableWidthOutline,
   loopToPath
 };

@@ -142,6 +142,10 @@ const hatchAngles = (opts) => (opts.texture === 'crosshatch'
 // class rather than once per glycan drawn.
 const fontFaceCSSCache = new WeakMap();
 
+// Documents whose <head> already has a canvas class's @font-face rules
+// (WeakMap<canvas class, WeakSet<document>>). See registerDocumentFonts.
+const fontDocuments = new WeakMap();
+
 const bboxOfPoints = (points) => {
   const xs = points.map((p) => p[0]);
   const ys = points.map((p) => p[1]);
@@ -199,6 +203,36 @@ class FizikoSVGCanvas extends SVGCanvas {
     }
     fontStyle.textContent = fontFaceCSSCache.get(this.constructor);
     this.canvas.appendChild(fontStyle);
+    this.registerDocumentFonts(fontStyle.textContent);
+  }
+
+  // The <style> above makes a saved SVG self-contained, but a browser
+  // ignores @font-face rules inside a shadow root - where sviewer draws -
+  // so in the page the labels fell back to a system serif. The same
+  // @font-face rules (only those: other rules there are for this <svg>
+  // alone) go once into the page's <head>, where every shadow root can use
+  // them. Cost: one <style> per canvas class per document, on first use.
+  registerDocumentFonts(css) {
+    const doc = this.canvas.ownerDocument;
+    if (!doc || !doc.head) {
+      return;
+    }
+    let docs = fontDocuments.get(this.constructor);
+    if (!docs) {
+      docs = new WeakSet();
+      fontDocuments.set(this.constructor, docs);
+    }
+    if (docs.has(doc)) {
+      return;
+    }
+    docs.add(doc);
+    const faces = css.match(/@font-face\s*{[^}]*}/g);
+    if (!faces) {
+      return;
+    }
+    const style = doc.createElement('style');
+    style.textContent = faces.join('\n');
+    doc.head.appendChild(style);
   }
 
   // Residue-name label font (Ser/Thr/Asn/Hyl) - see FIZIKO_TEXT_LABELS.

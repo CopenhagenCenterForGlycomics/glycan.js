@@ -28,6 +28,8 @@
     "./renderers/fiziko.js": "./js/Fiziko/FizikoSVGRenderer.js",
     "./renderers/heraldic": "./js/Heraldic/HeraldicRenderer.js",
     "./renderers/heraldic.js": "./js/Heraldic/HeraldicRenderer.js",
+    "./renderers/ukiyoe": "./js/Ukiyoe/UkiyoeRenderer.js",
+    "./renderers/ukiyoe.js": "./js/Ukiyoe/UkiyoeRenderer.js",
     "./svgcanvas": "./js/SVGCanvas.js"
   },
   "dependencies": {
