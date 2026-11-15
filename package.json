@@ -30,6 +30,8 @@
     "./renderers/heraldic.js": "./js/Heraldic/HeraldicRenderer.js",
     "./renderers/ukiyoe": "./js/Ukiyoe/UkiyoeRenderer.js",
     "./renderers/ukiyoe.js": "./js/Ukiyoe/UkiyoeRenderer.js",
+    "./renderers/haeckel": "./js/Haeckel/HaeckelRenderer.js",
+    "./renderers/haeckel.js": "./js/Haeckel/HaeckelRenderer.js",
     "./svgcanvas": "./js/SVGCanvas.js"
   },
   "dependencies": {

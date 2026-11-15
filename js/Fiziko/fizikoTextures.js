@@ -498,6 +498,8 @@ export {
   latitudeBands,
   longitudeBands,
   woodgrainLines,
+  lightVector,
+  inkDensityAt,
   variableWidthBand,
   variableWidthOutline,
   loopToPath
