@@ -32,6 +32,8 @@
     "./renderers/ukiyoe.js": "./js/Ukiyoe/UkiyoeRenderer.js",
     "./renderers/haeckel": "./js/Haeckel/HaeckelRenderer.js",
     "./renderers/haeckel.js": "./js/Haeckel/HaeckelRenderer.js",
+    "./renderers/neon": "./js/Neon/NeonRenderer.js",
+    "./renderers/neon.js": "./js/Neon/NeonRenderer.js",
     "./svgcanvas": "./js/SVGCanvas.js"
   },
   "dependencies": {
