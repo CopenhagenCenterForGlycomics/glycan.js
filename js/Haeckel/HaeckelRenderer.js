@@ -16,6 +16,7 @@ const LATTICE_CELL = 0.42;       // honeycomb cell (hexagon circumradius)
 const SPINE_LENGTH = 1.1;
 const HALO_DEPTH = 1.6;          // how far the halo reaches beyond the capsule
 const HALO_DOTS = 400;
+const LABEL_OFFSET = 0.28;       // linkage label: off the bond's midpoint, to its right
 
 // Haeckel renderer: FizikoSVGRenderer with the Haeckel canvas (wash,
 // stipple, hand-drawn sepia ink on cream paper) and a radial layout.
@@ -55,6 +56,37 @@ class SNFGHaeckel extends FizikoSVGRenderer {
 
     set LayoutEngine(engine) {
         super.LayoutEngine = engine ? RadialLayout(engine) : engine;
+    }
+
+    // Linkage labels placed for a radial layout. Renderer's own placement
+    // assumes a tree growing up from the origin (a level bond's label is
+    // pinned near y = 0 - in a radial layout that is the core, so core
+    // fucose's label landed beside the core mannose). Here each label sits
+    // at its bond's midpoint, LABEL_OFFSET to the right of the bond as it
+    // runs from parent to child: the same side of every spoke. The bond
+    // itself (and any repeat brackets) is the base renderer's, drawn with
+    // its label switched off, as SugarTextRenderer does. O(1) per linkage.
+    renderLinkage(child_pos, parent_pos, child, parent, sugar, canvas, show_labels) {
+        const group = super.renderLinkage(child_pos, parent_pos, child, parent, sugar, canvas, false);
+        if (!show_labels || !parent_pos || !group) {
+            return group;
+        }
+        const cx = (child_pos.x + child_pos.width / 2) * SCALE;
+        const cy = (child_pos.y + child_pos.height / 2) * SCALE;
+        const px = (parent_pos.x + parent_pos.width / 2) * SCALE;
+        const py = (parent_pos.y + parent_pos.height / 2) * SCALE;
+        const length = Math.hypot(cx - px, cy - py) || 1;
+        // Right of the direction of travel (y down): (dx, dy) -> (-dy, dx).
+        const nx = -(cy - py) / length;
+        const ny = (cx - px) / length;
+        const anomer = child.anomer === 'b' ? '\u03B2' : child.anomer === 'a' ? '\u03B1' : '?';
+        const linkage = parent.linkageOf(child);
+        const text = anomer + (linkage < 0 ? '' : (linkage || '?'));
+        const label = group.text((px + cx) / 2 + nx * LABEL_OFFSET * SCALE, (py + cy) / 2 + ny * LABEL_OFFSET * SCALE, text);
+        label.setAttribute('font-size', Math.floor(SCALE / 3));
+        label.setAttribute('text-anchor', 'middle');
+        label.firstChild.setAttribute('dy', '0.35em');
+        return group;
     }
 
     refresh() {
