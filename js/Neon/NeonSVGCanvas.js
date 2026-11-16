@@ -313,6 +313,17 @@ class NeonSVGCanvas extends FizikoSVGCanvas {
         el.setAttribute('paint-order', 'stroke');
         return el;
     }
+
+    // The Ser/Thr/Asn/Hyl residue-name label (built by buildTexturedIcon,
+    // not through text() above) gets the same glow instead of the base
+    // class's plain SNFG-coloured fill.
+    styleTextLabel(text) {
+        text.setAttribute('fill', LABEL);
+        text.setAttribute('stroke', LABEL);
+        text.setAttribute('stroke-opacity', 0.3);
+        text.setAttribute('stroke-width', 4);
+        text.setAttribute('paint-order', 'stroke');
+    }
 }
 
 export default NeonSVGCanvas;

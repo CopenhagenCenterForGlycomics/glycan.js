@@ -249,6 +249,14 @@ class FizikoSVGCanvas extends SVGCanvas {
     return FIZIKO_LABEL_FONT_FAMILY;
   }
 
+  // Residue-name label colour (Ser/Thr/Asn/Hyl) - built directly in
+  // buildTexturedIcon above, not through text(), so a subclass overriding
+  // text() for its own label styling (NeonSVGCanvas's glow) needs this too
+  // or this one label is left plain while every linkage label glows.
+  styleTextLabel(text, opts) {
+    text.setAttribute('fill', this.fillOverride || opts.fill);
+  }
+
   buildFontFaceCSS() {
     return `@font-face {
       font-family: 'Routed Gothic';
@@ -510,8 +518,8 @@ class FizikoSVGCanvas extends SVGCanvas {
       text.setAttribute('text-anchor', 'middle');
       text.setAttribute('font-family', this.fontFamily);
       text.setAttribute('font-size', 29);
-      text.setAttribute('fill', this.fillOverride || opts.fill);
       text.textContent = label;
+      this.styleTextLabel(text, opts);
       template.appendChild(text);
     }
 
