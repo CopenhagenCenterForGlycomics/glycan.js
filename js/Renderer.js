@@ -31,7 +31,7 @@ const FULL_REFRESH = true;
 const str = (num) => num.toFixed(PRECISION);
 
 const BRACKET_STROKE_DEFAULT_COLOR = 'rgba(153,153,153,1)';
-const LINKAGE_STROKE_DEFAULT_COLOR = 'rgba(51,51,51,1)';
+const LINKAGE_STROKE_DEFAULT_COLOR = 'light-dark(rgba(51,51,51,1), var(--text-color, #ddd))';
 
 const calculate_moved_residues = function(layout,residue) {
   if (! layout ) {

@@ -147,7 +147,7 @@ export class SugarTextRenderer extends SVGRenderer {
     // text (unlike a solid icon shape) has gaps a line would otherwise show
     // through. var() so a page on a non-white background can override it.
     textEl.setAttribute('paint-order',       'stroke fill');
-    textEl.setAttribute('stroke',            'var(--sugar-text-halo-color, #fff)');
+    textEl.setAttribute('stroke',            'var(--sugar-text-halo-color, light-dark(#fff, var(--page-background, #16141c)))');
     textEl.setAttribute('stroke-width',      str(SCALE * 0.08));
     textEl.setAttribute('stroke-linejoin',   'round');
     // `identifier` is CalculateIdentifier's lowercased form (used by icon
@@ -243,12 +243,12 @@ export class SugarTextRenderer extends SVGRenderer {
       label.setAttribute('dominant-baseline', 'central');
       label.setAttribute('font-family',       LINKAGE_FONT_FAMILY);
       label.setAttribute('font-size',         str(LINKAGE_FONT_SIZE));
-      label.setAttribute('fill',              '#333');
+      label.setAttribute('fill',              'light-dark(#333, var(--text-color, #ddd))');
       // Same halo technique as the residue labels in renderIcon() above,
       // just a thinner stroke since these are single characters, not whole
       // words - occludes the line passing directly behind the label.
       label.setAttribute('paint-order',     'stroke fill');
-      label.setAttribute('stroke',          'var(--sugar-text-halo-color, #fff)');
+      label.setAttribute('stroke',          'var(--sugar-text-halo-color, light-dark(#fff, var(--page-background, #16141c)))');
       label.setAttribute('stroke-width',    str(SCALE * 0.04));
       label.setAttribute('stroke-linejoin', 'round');
       label.textContent = text;
