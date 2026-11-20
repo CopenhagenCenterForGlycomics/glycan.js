@@ -1,5 +1,9 @@
 node_modules
 dist
-
+plans/
+run/
+.devcontainer/.devcontainer.json
+.devcontainer/.devcontainer-lock.json
+.claude
 .sublime
 node_modules
