@@ -270,6 +270,13 @@ class FizikoSVGCanvas extends SVGCanvas {
     return FIZIKO_INK;
   }
 
+  // Opaque fill under sparse textures (see renderTexturedShape). Subclasses
+  // drawing on paper return the paper colour, so a hatched residue's gaps
+  // show the page it's printed on rather than white patches.
+  get backingColor() {
+    return 'white';
+  }
+
   buildFontFaceCSS() {
     return `@font-face {
       font-family: 'Routed Gothic';
@@ -418,7 +425,8 @@ class FizikoSVGCanvas extends SVGCanvas {
 
   // Per-canvas cache miss: reuse an icon another canvas already built if
   // every input that shapes it matches - the source <symbol>'s own markup
-  // (a custom sugars.svg may redefine an id), fillOverride, fonts, and what
+  // (a custom sugars.svg may redefine an id), fillOverride, fonts, backing
+  // and ink colours (a subclass's paper on/off), and what
   // hatchForColor returns for this symbol's fills (compared by result, as
   // e.g. the heraldic renderer hands every instance a fresh closure).
   sharedTexturedIcon(ref, opts, rotation, cacheKey) {
@@ -429,7 +437,7 @@ class FizikoSVGCanvas extends SVGCanvas {
     const colorTextures = this.hatchForColor
       ? extractShapes(symbol).map((shape) => this.hatchForColor(shape.fill || opts.fill) || null)
       : null;
-    const sharedKey = JSON.stringify([cacheKey, this.fillOverride, this.fontFamily, colorTextures, symbol.outerHTML]);
+    const sharedKey = JSON.stringify([cacheKey, this.fillOverride, this.fontFamily, this.backingColor, this.inkColor, colorTextures, symbol.outerHTML]);
     const templates = sharedTemplatesFor(this.constructor);
     const cached = templates.get(sharedKey);
     if (cached) {
@@ -642,7 +650,7 @@ class FizikoSVGCanvas extends SVGCanvas {
       // backing pass before the decorative one.
       const backing = outlineSource.cloneNode(true);
       backing.removeAttribute('id');
-      backing.setAttribute('fill', 'white');
+      backing.setAttribute('fill', this.backingColor);
       backing.setAttribute('stroke', 'none');
       group.appendChild(backing);
       if (this.hatchPatterns && PATTERN_TEXTURES.has(opts.texture)) {

@@ -44,7 +44,7 @@ class HaeckelSVGCanvas extends FizikoSVGCanvas {
         return true;
     }
 
-    // Cream paper behind the drawing; false leaves the page's background.
+    // Paper behind the drawing (cream, or dark sepia in a dark theme); false leaves the page's background.
     set ground(value) {
         this._ground = value;
         this.canvas.style.backgroundColor = value ? PAPER : '';
@@ -58,8 +58,8 @@ class HaeckelSVGCanvas extends FizikoSVGCanvas {
         return FONT_FAMILY;
     }
 
-    // Drawn on paper: the amino-acid label and backbone stay sepia ink in
-    // either page theme, like every other line on the plate.
+    // Drawn on paper: the amino-acid label and backbone use the plate's own
+    // ink, which turns with the paper (haeckelPalette.js), not the page's.
     get inkColor() {
         return INK;
     }

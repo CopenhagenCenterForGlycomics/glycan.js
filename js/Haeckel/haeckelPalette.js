@@ -6,8 +6,14 @@
 // distinct. Cost: a few arithmetic operations per distinct colour (once
 // per cached icon).
 
-const PAPER = '#f3ead6';
-const INK = '#3a2a1f';          // sepia, brown-black
+const PAPER_HEX = '#f3ead6';
+const INK_HEX = '#3a2a1f';      // sepia, brown-black
+// In a dark page theme the plate turns over: dark sepia paper, cream ink.
+// The washes keep their light-paper mix (pigment is pigment), so only these
+// two change. light-dark() resolves per element, so no re-render is needed
+// when the theme flips; saved SVGs and data: URLs resolve to the light pair.
+const PAPER = 'light-dark(#f3ead6, #231b14)';
+const INK = 'light-dark(#3a2a1f, #e8dcc2)';
 
 // '#rrggbb' (or '#rgb') -> [r, g, b]; null for anything else.
 const parseHex = (hex) => {
@@ -62,8 +68,8 @@ const TINT_PAPER = 0.1;         // share of paper mixed in
 const washFor = (snfg) => {
     const rgb = parseHex(snfg) || [200, 200, 200];
     const [h, s, l] = rgbToHsl(rgb);
-    const wash = mix(hslToRgb([h, s * TINT_SATURATION, Math.min(0.95, TINT_LIGHT_FLOOR + TINT_LIGHT_SHARE * l)]), parseHex(PAPER), TINT_PAPER);
-    const pooled = mix(wash, parseHex(INK), 0.35);
+    const wash = mix(hslToRgb([h, s * TINT_SATURATION, Math.min(0.95, TINT_LIGHT_FLOOR + TINT_LIGHT_SHARE * l)]), parseHex(PAPER_HEX), TINT_PAPER);
+    const pooled = mix(wash, parseHex(INK_HEX), 0.35);
     return [toHex(wash), toHex(pooled)];
 };
 

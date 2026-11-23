@@ -21,8 +21,12 @@ import { MACONDO_BASE64, ANOMER_BASE64 } from './fonts/ukiyoeFonts.js';
 // Macondo for the labels; the browser takes the anomer letters, which
 // Macondo lacks, from the Zen Old Mincho subset (fonts/ukiyoeFonts.js).
 const UKIYOE_FONT_FAMILY = "'Macondo', 'Zen Old Mincho Anomers', Georgia, 'Times New Roman', serif";
-const INK = '#231f1c';            // sumi
-const PAPER = '#f1e4c6';          // washi (sampled from a Hiroshige print), what a bokashi fades towards
+const PAPER_HEX = '#f1e4c6';      // washi (sampled from a Hiroshige print), what a bokashi fades towards
+const PAPER_DARK_HEX = '#211d19';
+// In a dark page theme: dark washi and pale ink. light-dark() resolves per
+// element, so no re-render on a theme flip; saved SVGs resolve to light.
+const INK = 'light-dark(#231f1c, #ece0c6)';   // sumi
+const PAPER = `light-dark(${PAPER_HEX}, ${PAPER_DARK_HEX})`;
 const NIB_ANGLE = 35;             // degrees: the brush's flat direction
 const OUTLINE_THIN = 0.3;        // narrowest outline width as a share of the broadest (opts.strokeWidth)
 const LINE_WIDTH = 3.6;             // linkage stroke at its broadest, in canvas units
@@ -111,7 +115,7 @@ const muted = (rgb) => {
     s *= GREEN_SATURATION;
   }
   const lifted = Math.min(1, MUTE_LIGHT_FLOOR + MUTE_LIGHT_SHARE * l + (l > 0.9 ? 0.1 : 0));
-  return mix(hslToRgb([h, s * MUTE_SATURATION, lifted]), parseHex(PAPER), PAPER_WASH);
+  return mix(hslToRgb([h, s * MUTE_SATURATION, lifted]), parseHex(PAPER_HEX), PAPER_WASH);
 };
 
 // A closed loop resampled every `spacing` units along its perimeter, so a
@@ -159,8 +163,8 @@ class UkiyoeSVGCanvas extends FizikoSVGCanvas {
 
   // Labels (residue names and linkages) in Macondo, through the font hooks
   // FizikoSVGCanvas has for this (as HeraldicSVGCanvas does).
-  // Printed on washi: the amino-acid label and backbone stay sumi ink in
-  // either page theme, like the outlines and linkages.
+  // Printed on washi: the amino-acid label and backbone use the print's
+  // own ink, which turns with the paper, like the outlines and linkages.
   get inkColor() {
     return INK;
   }
@@ -217,7 +221,8 @@ class UkiyoeSVGCanvas extends FizikoSVGCanvas {
     }
     const base = muted(parseHex(opts.fill) || [200, 200, 200]);
     const deep = mix(base, [0, 0, 0], 0.35);
-    const paper = parseHex(PAPER);
+    // The wiped fade ends near the paper, whichever paper is showing.
+    const fade = `light-dark(${toHex(mix(base, parseHex(PAPER_HEX), 0.7))}, ${toHex(mix(base, parseHex(PAPER_DARK_HEX), 0.7))})`;
     const id = `ukiyoe-grad-${nextGradient++}`;
     const gradient = this.createElement('linearGradient');
     gradient.setAttribute('id', id);
@@ -231,10 +236,10 @@ class UkiyoeSVGCanvas extends FizikoSVGCanvas {
     gradient.setAttribute('y2', (0.5 + gy).toFixed(3));
     // Printed bokashi: a hard band of deeper colour at the top edge, a
     // short blend into the flat colour, then a wiped fade towards paper.
-    for (const [offset, rgb] of [[0, deep], [0.14, deep], [0.34, base], [0.6, base], [1, mix(base, paper, 0.7)]]) {
+    for (const [offset, colour] of [[0, toHex(deep)], [0.14, toHex(deep)], [0.34, toHex(base)], [0.6, toHex(base)], [1, fade]]) {
       const stop = this.createElement('stop');
       stop.setAttribute('offset', offset);
-      stop.setAttribute('stop-color', toHex(rgb));
+      stop.setAttribute('stop-color', colour);
       gradient.appendChild(stop);
     }
     this.iconDefs.appendChild(gradient);
