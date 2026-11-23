@@ -6,7 +6,7 @@ import { Tween, autoPlay, onTick } from 'es6-tween';
 import debug from './Debug.js';
 
 import Renderer from './Renderer.js';
-import Canvas, { iconsReady, resetIconsReady } from './CanvasCanvas.js';
+import Canvas, { iconsReady, resetIconsReady, resetResolvedColors } from './CanvasCanvas.js';
 
 import CanvasMouse from '../lib/canvas-mouse.js';
 
@@ -151,6 +151,7 @@ const render = function(canvas,renderobj,controller) {
   // track, so a caller awaiting it after this pass only waits on icons
   // drawn THIS pass, not also every earlier pass's already-resolved ones.
   resetIconsReady(canvas);
+  resetResolvedColors(canvas);
 
   let { width: actual_width, height: actual_height } = get_cached_rect(canvas);
 

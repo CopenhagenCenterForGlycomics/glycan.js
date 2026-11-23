@@ -58,6 +58,12 @@ class HaeckelSVGCanvas extends FizikoSVGCanvas {
         return FONT_FAMILY;
     }
 
+    // Drawn on paper: the amino-acid label and backbone stay sepia ink in
+    // either page theme, like every other line on the plate.
+    get inkColor() {
+        return INK;
+    }
+
     get labelFontFamily() {
         return FONT_FAMILY;
     }

@@ -159,6 +159,12 @@ class UkiyoeSVGCanvas extends FizikoSVGCanvas {
 
   // Labels (residue names and linkages) in Macondo, through the font hooks
   // FizikoSVGCanvas has for this (as HeraldicSVGCanvas does).
+  // Printed on washi: the amino-acid label and backbone stay sumi ink in
+  // either page theme, like the outlines and linkages.
+  get inkColor() {
+    return INK;
+  }
+
   get fontFamily() {
     return UKIYOE_FONT_FAMILY;
   }

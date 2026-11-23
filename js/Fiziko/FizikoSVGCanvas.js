@@ -54,6 +54,11 @@ const FIZIKO_FONT_FAMILY = "'Routed Gothic', Helvetica, Verdana, Arial, Sans-ser
 // residue-name labels above at a glance.
 const FIZIKO_LABEL_FONT_FAMILY = "'Routed Gothic Narrow Half Italic', Helvetica, Verdana, Arial, Sans-serif";
 
+// Ink for the Ser/Thr/Asn/Hyl residue-name label and its wavy backbone
+// line: black on a light page, the page's text colour on a dark one (same
+// fallback sugars.svg's own amino-acid icons use).
+const FIZIKO_INK = 'light-dark(#000, var(--text-color, #ddd))';
+
 const DEFAULT_OPTIONS = {
   texture: 'solid',
   fill: '#000',
@@ -253,8 +258,16 @@ class FizikoSVGCanvas extends SVGCanvas {
   // buildTexturedIcon above, not through text(), so a subclass overriding
   // text() for its own label styling (NeonSVGCanvas's glow) needs this too
   // or this one label is left plain while every linkage label glows.
-  styleTextLabel(text, opts) {
-    text.setAttribute('fill', this.fillOverride || opts.fill);
+  styleTextLabel(text) {
+    text.setAttribute('fill', this.fillOverride || this.inkColor);
+  }
+
+  // Colour of the residue-name label and backbone line above. Follows the
+  // page's light/dark theme; a subclass that draws on its own fixed paper
+  // ground (Haeckel, Ukiyo-e) overrides it with that paper's ink so these
+  // stay dark on the paper regardless of the page's theme.
+  get inkColor() {
+    return FIZIKO_INK;
   }
 
   buildFontFaceCSS() {
@@ -487,7 +500,7 @@ class FizikoSVGCanvas extends SVGCanvas {
       // must stay an open line.
       if (shape.fill === 'none') {
         clipEl.setAttribute('fill', 'none');
-        clipEl.setAttribute('stroke', shape.stroke || opts.fill);
+        clipEl.setAttribute('stroke', this.inkColor);
         clipEl.setAttribute('stroke-width', opts.strokeWidth);
         return;
       }

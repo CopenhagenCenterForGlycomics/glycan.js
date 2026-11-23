@@ -36,6 +36,53 @@ class RenderTree {
 
 }
 
+// Canvas 2D's fillStyle/strokeStyle only take plain colours: a
+// light-dark(...)/var(...) value (what sugars.svg and Renderer.js use so
+// the SVG renderers follow the page theme) is silently ignored, leaving
+// whatever colour was set before - black. resolveColor() lets the browser
+// compute the value against the <canvas> element itself (its color-scheme
+// and custom properties), returning '#rrggbb' (or rgba() when translucent).
+// Cached per canvas and cleared at the start of each render pass
+// (resetResolvedColors), so each distinct value costs one style recalc of
+// the canvas element per pass, and a theme switch is picked up on the next
+// pass. Plain values (no '(') skip all of that and are returned as-is.
+const RESOLVED_COLORS = new WeakMap();
+
+const to_hex = (rgb) => {
+  const parts = rgb.match(/[\d.]+/g);
+  if ( ! parts || parts.length < 3 || (parts.length > 3 && parseFloat(parts[3]) < 1)) {
+    return rgb;
+  }
+  return '#' + parts.slice(0,3).map( v => (parseInt(v,10) | 0).toString(16).padStart(2,'0') ).join('');
+};
+
+const resolveColor = function(canvas,css) {
+  if ( ! css || css.indexOf('(') < 0 || ! canvas || ! canvas.style ) {
+    return css;
+  }
+  let cache = RESOLVED_COLORS.get(canvas);
+  if ( ! cache ) {
+    cache = new Map();
+    RESOLVED_COLORS.set(canvas,cache);
+  }
+  if ( ! cache.has(css) ) {
+    const previous = canvas.style.color;
+    canvas.style.color = css;
+    // A detached canvas (e.g. an offscreen buffer) has no computed style:
+    // fall back to the light-theme default ink.
+    const computed = canvas.isConnected ? getComputedStyle(canvas).color : '';
+    canvas.style.color = previous;
+    cache.set(css, computed ? to_hex(computed) : '#111');
+  }
+  return cache.get(css);
+};
+
+const resetResolvedColors = function(canvas) {
+  RESOLVED_COLORS.delete(canvas);
+};
+
+const TEXT_COLOR = 'light-dark(#111, var(--text-color, #ddd))';
+
 const render_text = function(canvas){
   let ctx = canvas.getContext('2d');
   ctx.font = `${this.options['font-size'] || 25}px Helvetica`;
@@ -47,7 +94,7 @@ const render_text = function(canvas){
   if (this.options.dy) {
     ctx.textBaseline = 'middle';
   }
-  ctx.fillStyle = '#111';
+  ctx.fillStyle = resolveColor(canvas, this.options.fill || TEXT_COLOR);
   ctx.fillText(this.text, this.x, this.y);
 };
 
@@ -57,7 +104,7 @@ const render_line = function(canvas){
     ctx.lineWidth = this.options['stroke-width'];
   }
   if (this.options.stroke) {
-    ctx.strokeStyle = this.options.stroke;
+    ctx.strokeStyle = resolveColor(canvas, this.options.stroke);
   }
   ctx.beginPath();
   ctx.moveTo(this.x,this.y);
@@ -134,6 +181,18 @@ const resetIconsReady = function(canvas) {
 };
 
 class Canvas extends RenderTree {
+  // Exposed for the canvas renderer packages (isomer/zdog/phoria-glycan.js),
+  // which only reach this module through CanvasRenderer.Canvas.
+  static resolveColor(canvas,css) {
+    return resolveColor(canvas,css);
+  }
+
+  // For a canvas drawn outside CanvasRenderer's own render() pass (which
+  // already clears its canvas's entry each pass), e.g. legra's onscreen one.
+  static resetResolvedColors(canvas) {
+    resetResolvedColors(canvas);
+  }
+
   constructor(canvas) {
     super();
     if ( canvas ) {
@@ -177,4 +236,4 @@ class Canvas extends RenderTree {
 }
 
 export default Canvas;
-export { iconsReady, resetIconsReady };
+export { iconsReady, resetIconsReady, resolveColor, resetResolvedColors };
