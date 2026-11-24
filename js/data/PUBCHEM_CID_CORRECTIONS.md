@@ -371,4 +371,33 @@ ring stereocentre from the InChI itself -- no hardcoded axial/equatorial value r
 position that is actually a stereocentre. The only literals left anywhere are for positions that
 are genuinely *not* stereocentres (a plain CH2, a terminal CH3/H) or are instance-level/anomeric
 (position 1, set per-glycosidic-linkage rather than per-monosaccharide), which is a different,
-correct kind of "hardcoded."
+correct kind of "hardcoded." (This claim turned out to be one compound too early -- see section 12.)
+
+## 12. MurNAc: a live compound with a real InChI, still being fully intercepted by the override table
+
+The section 11 audit checked every builder function for leftover hardcoded positions, but missed a
+different kind of gap: `PROKARYOTIC_OVERRIDES['MurNAc']` was still being checked *before*
+`inchiToTerminii` ever looks at the formula or InChI at all, even though MurNAc has long been a
+live entry in `js/data/monosaccharides.js` with its own real, correct InChI (CID 5462244). The
+override silently won every time, so MurNAc's terminii were 100% asserted, not derived, despite
+looking like every other live compound from the outside.
+
+Deriving it for real exposed one classification wrinkle: MurNAc's formula (C11H19NO8) has the same
+carbon and nitrogen count as a sialic acid (`C >= 11 && N === 1`), the existing classification
+rule's range for the sialic branch, and would have been misrouted into `buildSialic` (wrong ring
+shape entirely -- MurNAc's anomeric centre is a normal aldose, not a ketose) had the override simply
+been deleted. The actual sialic acids all have more oxygens at that same C/N count (NeuAc O9,
+NeuGc O10) -- MurNAc's O8 is a safe, real differentiator, checked before the generic sialic range.
+Added a dedicated `'muramic'` classification and `buildMurNAc`, which is otherwise identical to
+`buildHexNAc` (same ring shape, same derivable C2/C4 -- MurNAc is just GlcNAc with its C3-OH
+etherified to lactic acid, which doesn't change the ring's own geometry, only C3's substituent
+label from OH to OLac). An existing unit test for `classifyMonosaccharide` happened to use an O:8
+formula to mean "sialic" -- that was never a realistic sialic acid formula (no live sialic compound
+has O8 at C11/N1); corrected to O:9 and added a new test asserting MurNAc's own formula classifies
+as `muramic`, not `sialic`.
+
+Output is byte-identical to the old override string for the one live MurNAc compound -- the
+historical hardcoded value was already chemically correct, now properly derived instead of
+asserted, same as every other case in this file. With this fix, the section 11 claim holds: no
+live compound's terminii are produced by a name-keyed override or a hardcoded literal for any
+position that's an actual stereocentre.

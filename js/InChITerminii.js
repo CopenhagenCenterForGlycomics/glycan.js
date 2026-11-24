@@ -63,6 +63,11 @@ export function classifyMonosaccharide(formula, mLayer) {
   const N = formula.N ?? 0;
   const isL = mLayer === '0';
 
+  // Muramic acid (MurNAc): same C/N count range as a sialic acid but one
+  // fewer oxygen (C11H19NO8 vs sialic's O9/O10) -- it's a HexNAc with a
+  // 3-O-lactyl ether, not a ketose, so it must be checked before the
+  // generic sialic-acid range below.
+  if (C === 11 && N === 1 && O === 8) return 'muramic';
   if (C >= 11 && N === 1) return 'sialic';
   if (C === 8  && N === 1) return 'hexnac';
   if (C === 6  && N === 1) return 'hexn';
@@ -199,8 +204,9 @@ export const PROKARYOTIC_OVERRIDES = {
   // Bacillosamine
   'Bac':  'r1:OH;2eq:NHAc;3eq:OH;4eq:NHAc;5eq:-;6eq:HOH',
 
-  // Muramic acid
-  'MurNAc': 'r1:OH;2eq:NHAc;3eq:OLac;4eq:OH;5eq:-;6eq:HOH',
+  // Muramic acid (MurNAc) used to be hardcoded here, but is now derived
+  // for real by buildMurNAc from its own InChI in js/data/monosaccharides.js
+  // -- see PUBCHEM_CID_CORRECTIONS.md section 12.
 
 };
 
@@ -337,6 +343,31 @@ function buildHexNAc(name, t, formula, warnings, layers) {
     `r1:OH`,
     `2${c2}:NHAc`,
     `3${c3}:OH`,
+    `4${c4}:OH`,
+    `5eq:-`,
+    `6eq:HOH`,
+  ];
+  return {
+    terminii: parts.join(';'),
+    conformation: '4C1',
+    source: 'inchi',
+    warnings,
+  };
+}
+
+function buildMurNAc(name, t, formula, warnings, layers) {
+  // Muramic acid: a GlcNAc with its C3-OH etherified to lactic acid (a
+  // 3-O-lactyl ether). Same ring shape and the same real stereocentres as
+  // any other HexNAc -- only the substituent label at C3 differs (OLac
+  // instead of OH); the ring itself doesn't know or care what's attached.
+  const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
+  const c3 = resolveRingPosition(layers, t, 3, HEXNAC_4C1.ring_C3_from_t_pos, HEXNAC_4C1.C3);
+  const c4 = resolveRingPosition(layers, t, 4, HEXNAC_4C1.ring_C4_from_t_pos, HEXNAC_4C1.C4);
+
+  const parts = [
+    `r1:OH`,
+    `2${c2}:NHAc`,
+    `3${c3}:OLac`,
     `4${c4}:OH`,
     `5eq:-`,
     `6eq:HOH`,
@@ -561,6 +592,8 @@ export function inchiToTerminii(name, inchi, opts = {}) {
       return buildDideoxyhex(name, t, formula, isL, warnings, layers);
     case 'hexnac':
       return buildHexNAc(name, t, formula, warnings, layers);
+    case 'muramic':
+      return buildMurNAc(name, t, formula, warnings, layers);
     case 'hexn':
       return buildHexN(name, t, formula, warnings, layers);
     case 'D_pentose':

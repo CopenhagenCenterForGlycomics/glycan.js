@@ -49,7 +49,16 @@ QUnit.test('classifies HexNAc', function(assert) {
 });
 
 QUnit.test('classifies sialic', function(assert) {
-  assert.equal(classifyMonosaccharide({ C: 11, H: 19, N: 1, O: 8 }, '0'), 'sialic');
+  // O:9 matches a real sialic acid's formula (NeuAc is C11H19NO9); O:8 at
+  // this same C/N count is muramic acid's own real formula instead (see
+  // the 'classifies muramic acid, not sialic, despite the same C/N count'
+  // test below), so this test's formula had to stay realistic once that
+  // distinction was added.
+  assert.equal(classifyMonosaccharide({ C: 11, H: 19, N: 1, O: 9 }, '0'), 'sialic');
+});
+
+QUnit.test('classifies muramic acid, not sialic, despite the same C/N count', function(assert) {
+  assert.equal(classifyMonosaccharide({ C: 11, H: 19, N: 1, O: 8 }, '1'), 'muramic');
 });
 
 QUnit.test('classifies L-deoxyhex', function(assert) {
