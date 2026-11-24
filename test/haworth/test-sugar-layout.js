@@ -58,6 +58,21 @@ QUnit.test('branches get distinct rows; the two Man(a1-3)/Man(a1-6) siblings sha
   assert.ok(byNode.get(man3).x < man1X, 'branch children sit left of their parent (non-reducing direction)');
 });
 
+// Regression test for a bug caught visually: the two branch bond lines
+// crossed. Position 3's vertex sits BELOW its parent's ring center and
+// position 6's (the exocyclic-group vertex) sits ABOVE it (see
+// ringGeometry() -- position 3 is at 120 degrees, position 6 shares
+// position 5's vertex at 240 degrees), so the 1-6 child must be placed
+// above the 1-3 child for their bond lines not to cross -- regardless of
+// which order addChild() happened to be called in (man1.children here
+// returns [man3, man6] in insertion order, the wrong order for this).
+QUnit.test('a position-6 branch is placed above a position-3 branch (matches where each actually bonds, not insertion order)', function(assert) {
+  const { root, man3, man6 } = nGlycanCore();
+  const { residues } = sugarToHaworthInput(root);
+  const byNode = new Map(residues.map((r) => [r.id, r]));
+  assert.ok(byNode.get(man6).y < byNode.get(man3).y, 'Man(a1-6) sits above Man(a1-3), not insertion order');
+});
+
 QUnit.test('the root (reducing end) is the rightmost residue', function(assert) {
   const { root } = nGlycanCore();
   const { residues } = sugarToHaworthInput(root);
