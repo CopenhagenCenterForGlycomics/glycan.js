@@ -26,9 +26,12 @@ QUnit.test('Gal-(1->4)-GlcNAc: exactly one glycosidic bond, no stray OH at the l
 
   // Neither residue draws a normal OH stick at the linkage itself: GlcNAc's
   // C4 (OH) and Gal's C1 (OH) should each be suppressed, leaving exactly
-  // GlcNAc's C1+C3 and Gal's C2+C3+C4 as plain ">OH<" labels (5 total) --
-  // not the 7 there would be without suppression. (">OH<" is an exact tag
-  // match, so it doesn't also match inside "CH2OH" or "NHAc".)
-  const ohCount = (svg.match(/>OH</g) || []).length;
+  // GlcNAc's C1+C3 and Gal's C2+C3+C4 as plain hydroxyl labels (5 total) --
+  // not the 7 there would be without suppression. Written as "OH" or "HO"
+  // depending on which side of the ring the vertex is on (the bonded O
+  // stays nearest its stick either way -- see HaworthSVG.js's orientLabel),
+  // so both spellings count; either is an exact tag match, so neither also
+  // matches inside "CH2OH" or "NHAc".
+  const ohCount = (svg.match(/>OH<|>HO</g) || []).length;
   assert.equal(ohCount, 5, 'no extra OH label at either suppressed linkage position');
 });

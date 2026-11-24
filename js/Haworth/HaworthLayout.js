@@ -178,9 +178,10 @@ export function ringGeometry() {
   const cy = 0;
   // Closer to the published Fuc/glucofuranose references' own proportions
   // (~1.6:1 width:height) than this used to be (rx=95/ry=38 drew a much
-  // flatter, more squashed-looking oval, ~2.9:1).
-  const rx = 80;
-  const ry = 58;
+  // flatter, more squashed-looking oval, ~2.9:1). Kept compact (not just
+  // proportioned) per feedback that the rings read as a bit spacious.
+  const rx = 65;
+  const ry = 47;
   // Angles must be monotonic in ring-bond order (O5-C1-C2-C3-C4-C5-O5) or
   // the polygon self-intersects -- the ring oxygen has to sit angularly
   // between C5 and C1, not "inside" some other edge's arc.
@@ -226,7 +227,9 @@ export function ringGeometry() {
 export function furanoseGeometry() {
   const cx = 0;
   const cy = 0;
-  const r = 78;
+  // Scaled down to match the hexose ring's own size reduction (same ~0.8
+  // factor), per feedback that the rings read as a bit spacious.
+  const r = 63;
   const angles = {
     O4: 270,
     C1: 342,
@@ -239,11 +242,15 @@ export function furanoseGeometry() {
     const rad = (deg * Math.PI) / 180;
     vertices[name] = { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
+  // Front face tapers the same way the hexose ring's does (thin -> bold at
+  // C1-C2, uniform bold through the C2-C3 "middle", bold -> thin at C3-C4),
+  // per feedback that the wedge taper should apply to furanose too, not just
+  // pyranose; the back two edges (O4-C1, C4-O4) stay thin.
   const bonds = [
     { from: 'O4', to: 'C1', widthFrom: 'thin', widthTo: 'thin' },
-    { from: 'C1', to: 'C2', widthFrom: 'bold', widthTo: 'bold' },
+    { from: 'C1', to: 'C2', widthFrom: 'thin', widthTo: 'bold' },
     { from: 'C2', to: 'C3', widthFrom: 'bold', widthTo: 'bold' },
-    { from: 'C3', to: 'C4', widthFrom: 'thin', widthTo: 'thin' },
+    { from: 'C3', to: 'C4', widthFrom: 'bold', widthTo: 'thin' },
     { from: 'C4', to: 'O4', widthFrom: 'thin', widthTo: 'thin' },
   ];
   return { vertices, bonds };

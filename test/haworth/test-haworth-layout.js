@@ -123,14 +123,20 @@ QUnit.module('HaworthLayout - furanoseGeometry', {});
 // Regression test for a tracing error caught by comparing against a
 // second, clearer published reference (alpha/beta-D-glucofuranose) after
 // the first one (alpha-D-ribofuranose) was misread as having a third bold
-// edge.
-QUnit.test('pentagon: 5 vertices (4 ring carbons + the ring oxygen, O4), 2 bold front edges (same as the hexose ring)', function(assert) {
+// edge. The front face now tapers (thin -> bold -> bold -> thin across
+// C1-C2-C3-C4) the same way the hexose ring's own front face does, per
+// feedback that the wedge taper should apply to furanose too.
+QUnit.test('pentagon: 5 vertices (4 ring carbons + the ring oxygen, O4), front face tapers thin-bold-thin across C1-C2-C3-C4', function(assert) {
   const { vertices, bonds } = furanoseGeometry();
   assert.deepEqual(Object.keys(vertices).sort(), ['C1', 'C2', 'C3', 'C4', 'O4'].sort());
-  const bold = bonds.filter((b) => b.widthFrom === 'bold' && b.widthTo === 'bold');
-  assert.equal(bold.length, 2, 'only C1-C2 and C2-C3 are uniformly bold -- matches published alpha/beta-D-ribofuranose and alpha/beta-D-glucofuranose structures');
-  assert.ok(bold.some((b) => b.from === 'C1' && b.to === 'C2'));
-  assert.ok(bold.some((b) => b.from === 'C2' && b.to === 'C3'));
+  const byPair = (from, to) => bonds.find((b) => b.from === from && b.to === to);
+  assert.deepEqual([byPair('C1', 'C2').widthFrom, byPair('C1', 'C2').widthTo], ['thin', 'bold'], 'C1-C2 tapers from thin (at C1) to bold (at C2)');
+  assert.deepEqual([byPair('C2', 'C3').widthFrom, byPair('C2', 'C3').widthTo], ['bold', 'bold'], 'C2-C3 is the uniformly bold middle');
+  assert.deepEqual([byPair('C3', 'C4').widthFrom, byPair('C3', 'C4').widthTo], ['bold', 'thin'], 'C3-C4 tapers from bold (at C3) back to thin (at C4)');
+  for (const [from, to] of [['O4', 'C1'], ['C4', 'O4']]) {
+    const b = byPair(from, to);
+    assert.deepEqual([b.widthFrom, b.widthTo], ['thin', 'thin'], `${from}-${to} is the uniformly thin back of the ring`);
+  }
   assert.equal(bonds.length, 5, '5 ring bonds total');
 });
 

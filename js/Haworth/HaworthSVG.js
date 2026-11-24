@@ -24,7 +24,7 @@ import {
 } from './HaworthLayout.js';
 import { sugarToHaworthInput } from './SugarLayout.js';
 
-const STICK_LENGTH = 34;
+const STICK_LENGTH = 28;
 const PLACEHOLDER_RADIUS = 40;
 
 // Per-shape geometry + substituent-layout builder (see HaworthLayout.js).
@@ -108,6 +108,19 @@ function shortenToward(from, to, gap) {
   return { x: from.x + dx * t, y: from.y + dy * t };
 }
 
+// When a label's text extends to the LEFT of its stick (text-anchor
+// 'end'), the atom actually bonded to the ring needs to stay the character
+// nearest the stick -- i.e. nearest the END of the string, not the start.
+// Every label except a plain hydroxyl already has its bonded atom written
+// first (CH2OH, COOH, NHAc, O-Lactyl...); only "OH" needs reversing to
+// "HO" for a left-extending stick, matching how real structural drawings
+// write it (confirmed in the published glucofuranose and NeuAc/NeuGc
+// reference images used elsewhere in this renderer's own validation).
+function orientLabel(label, anchor) {
+  if (anchor === 'end' && label === 'OH') return 'HO';
+  return label;
+}
+
 const BOND_WIDTH = { thin: THIN_STROKE_WIDTH, bold: BOLD_STROKE_WIDTH };
 
 // A ring bond whose two endpoints have the same width draws as a plain
@@ -181,7 +194,7 @@ function residueSVGParts(layout, offset) {
       `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEnd.x.toFixed(1)}" y2="${stickEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="${THIN_STROKE_WIDTH}"/>`
     );
     parts.push(
-      `<text x="${stickEnd.x.toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${sub.label}</text>`
+      `<text x="${stickEnd.x.toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${orientLabel(sub.label, textAnchor)}</text>`
     );
   }
   return parts;
