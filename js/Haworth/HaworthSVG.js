@@ -90,32 +90,73 @@ function layoutResidue(terminii, inchi, opts = {}) {
   };
 }
 
+const BOLD_STROKE_WIDTH = 4.2;
+const THIN_STROKE_WIDTH = 1.3;
+const RING_LABEL_GAP = 11; // how far a ring bond stops short of a vertex that carries a letter label (the ring oxygen)
+
+// Pull a line's endpoint back by `gap` along its own direction, so it stops
+// just short of a labeled atom instead of running underneath its glyph --
+// standard structural-drawing convention (and the same idea is used for
+// every substituent stick below, where the gap is implicit in how far the
+// label sits from the stick's own endpoint).
+function shortenToward(from, to, gap) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const len = Math.hypot(dx, dy);
+  if (len <= gap) return to;
+  const t = (len - gap) / len;
+  return { x: from.x + dx * t, y: from.y + dy * t };
+}
+
+const BOND_WIDTH = { thin: THIN_STROKE_WIDTH, bold: BOLD_STROKE_WIDTH };
+
+// A ring bond whose two endpoints have the same width draws as a plain
+// line; one whose endpoints differ (the hexose ring's tapered front-face
+// wedge -- see ringGeometry()) draws as a filled trapezoid instead, since
+// plain SVG strokes can't vary in width along their own length.
+function bondPolygonPoints(a, b, wFrom, wTo) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const px = -dy / len;
+  const py = dx / len;
+  const corners = [
+    { x: a.x + (px * wFrom) / 2, y: a.y + (py * wFrom) / 2 },
+    { x: b.x + (px * wTo) / 2, y: b.y + (py * wTo) / 2 },
+    { x: b.x - (px * wTo) / 2, y: b.y - (py * wTo) / 2 },
+    { x: a.x - (px * wFrom) / 2, y: a.y - (py * wFrom) / 2 },
+  ];
+  return corners.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+}
+
 function residueSVGParts(layout, offset) {
   const { vertices, bonds, substituents } = layout;
   const toScreen = (p) => ({ x: p.x + offset.x, y: p.y + offset.y });
   const parts = [];
 
+  const ringOKey = Object.keys(vertices).find((k) => k[0] === 'O');
+
   for (const bond of bonds) {
-    const a = toScreen(vertices[bond.from]);
-    const b = toScreen(vertices[bond.to]);
-    const strokeWidth = bond.bold ? 3 : 1.4;
-    parts.push(
-      `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round"/>`
-    );
+    let a = toScreen(vertices[bond.from]);
+    let b = toScreen(vertices[bond.to]);
+    // Leave room for the ring oxygen's own "O" glyph, drawn at its exact
+    // vertex position below, instead of running the bond lines all the way
+    // under it.
+    if (bond.to === ringOKey) b = shortenToward(a, b, RING_LABEL_GAP);
+    if (bond.from === ringOKey) a = shortenToward(b, a, RING_LABEL_GAP);
+    const wFrom = BOND_WIDTH[bond.widthFrom ?? (bond.bold ? 'bold' : 'thin')];
+    const wTo = BOND_WIDTH[bond.widthTo ?? (bond.bold ? 'bold' : 'thin')];
+    if (wFrom === wTo) {
+      parts.push(
+        `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="currentColor" stroke-width="${wFrom}" stroke-linecap="round"/>`
+      );
+    } else {
+      parts.push(`<polygon points="${bondPolygonPoints(a, b, wFrom, wTo)}" fill="currentColor"/>`);
+    }
   }
   const ringO = toScreen(ringOxygenVertex(vertices));
   parts.push(
-    `<text x="${ringO.x.toFixed(1)}" y="${(ringO.y - 6).toFixed(1)}" text-anchor="middle" font-size="13" fill="currentColor">O</text>`
-  );
-
-  // The ring-junction position bearing the exocyclic chain gets a longer,
-  // composite label (CH2OH, COOH, a furanose's 2-carbon tail, a sialic
-  // acid's 3-carbon tail...) that reads better anchored to one side than
-  // centered -- that's always the highest-numbered ring carbon (5 for the
-  // hexose/sialic hexagon, 4 for the furanose pentagon), found generically
-  // rather than hardcoding either number.
-  const lastRingPosition = Math.max(
-    ...Object.keys(vertices).filter((k) => k[0] === 'C').map((k) => parseInt(k.slice(1), 10))
+    `<text x="${ringO.x.toFixed(1)}" y="${(ringO.y + 4.5).toFixed(1)}" text-anchor="middle" font-size="13" fill="currentColor">O</text>`
   );
 
   for (const sub of substituents) {
@@ -123,23 +164,24 @@ function residueSVGParts(layout, offset) {
     if (!ring) continue;
     const screenRing = toScreen(ring);
     const dy = sub.orientation === 'up' ? -STICK_LENGTH : STICK_LENGTH;
-    // Nudge the stick outward (away from ring center) horizontally too, not
-    // just vertically -- a purely vertical stick from a corner vertex (C5,
-    // the one next to the ring oxygen) can cross back through the ring's
-    // own interior when its orientation points toward the opposite edge
-    // (e.g. IdoA's axial COOH at C5, or a sialic acid's glycerol tail),
-    // overlapping other labels. Real Haworth drawings usually angle these
-    // sticks outward instead of straight up/down; this approximates that
-    // generically from each vertex's own offset from ring center, rather
-    // than special-casing any one shape or position.
-    const stickEndX = screenRing.x + ring.x * 0.35;
-    const labelY = screenRing.y + dy;
-    const textAnchor = sub.position === lastRingPosition ? (dy < 0 ? 'end' : 'start') : 'middle';
+    // Vertical wherever possible, per preference -- even though a purely
+    // vertical stick from a corner vertex (C5, next to the ring oxygen) can
+    // cross back through the ring's own interior when its orientation
+    // points toward the opposite edge (e.g. IdoA's axial COOH at C5, or a
+    // sialic acid's glycerol tail). Known, not fixed here.
+    const stickEnd = { x: screenRing.x, y: screenRing.y + dy };
+    // The label's own first character sits right where its stick ends (a
+    // small vertical clearance only, not a separate floating gap), anchored
+    // toward whichever side of the ring this vertex is on (not the stick's
+    // own, now-vertical, direction) so it reads outward rather than back
+    // over the ring.
+    const textAnchor = ring.x > 1 ? 'start' : ring.x < -1 ? 'end' : 'middle';
+    const textY = stickEnd.y + (dy < 0 ? -3 : 12);
     parts.push(
-      `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEndX.toFixed(1)}" y2="${(labelY + (dy < 0 ? 8 : -8)).toFixed(1)}" stroke="currentColor" stroke-width="1.4"/>`
+      `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEnd.x.toFixed(1)}" y2="${stickEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="${THIN_STROKE_WIDTH}"/>`
     );
     parts.push(
-      `<text x="${stickEndX.toFixed(1)}" y="${(labelY + (dy < 0 ? -2 : 10)).toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${sub.label}</text>`
+      `<text x="${stickEnd.x.toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${sub.label}</text>`
     );
   }
   return parts;

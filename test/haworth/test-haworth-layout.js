@@ -6,6 +6,7 @@ import {
   layoutFuranoseSubstituents,
   furanoseGeometry,
   layoutSialicSubstituents,
+  ringGeometry,
 } from '../../js/Haworth/HaworthLayout.js';
 
 QUnit.module('HaworthLayout - parseTerminii', {});
@@ -16,6 +17,23 @@ QUnit.test('parses ring positions and the exocyclic C6 label separately', functi
   assert.equal(positions.get(2).axEq, 'eq');
   assert.equal(positions.get(4).axEq, 'ax');
   assert.equal(c6Label, 'HOH');
+});
+
+QUnit.module('HaworthLayout - ringGeometry', {});
+
+// The front face (nearest the viewer) is a tapered wedge -- thin at C1,
+// full thickness through C2, tapering back to thin at C4 -- rather than a
+// flat bold/thin split, per visual feedback on the rendered rings.
+QUnit.test('front face tapers thin-bold-thin across C1-C2-C3-C4, not a flat two-edge bold split', function(assert) {
+  const { bonds } = ringGeometry();
+  const byPair = (from, to) => bonds.find((b) => b.from === from && b.to === to);
+  assert.deepEqual([byPair('C1', 'C2').widthFrom, byPair('C1', 'C2').widthTo], ['thin', 'bold'], 'C1-C2 tapers up to full thickness');
+  assert.deepEqual([byPair('C2', 'C3').widthFrom, byPair('C2', 'C3').widthTo], ['bold', 'bold'], 'C2-C3 is the uniform middle');
+  assert.deepEqual([byPair('C3', 'C4').widthFrom, byPair('C3', 'C4').widthTo], ['bold', 'thin'], 'C3-C4 tapers back down');
+  for (const [from, to] of [['O5', 'C1'], ['C4', 'C5'], ['C5', 'O5']]) {
+    const b = byPair(from, to);
+    assert.deepEqual([b.widthFrom, b.widthTo], ['thin', 'thin'], `${from}-${to} stays uniformly thin`);
+  }
 });
 
 QUnit.module('HaworthLayout - layoutSubstituents', {});
@@ -109,8 +127,8 @@ QUnit.module('HaworthLayout - furanoseGeometry', {});
 QUnit.test('pentagon: 5 vertices (4 ring carbons + the ring oxygen, O4), 2 bold front edges (same as the hexose ring)', function(assert) {
   const { vertices, bonds } = furanoseGeometry();
   assert.deepEqual(Object.keys(vertices).sort(), ['C1', 'C2', 'C3', 'C4', 'O4'].sort());
-  const bold = bonds.filter((b) => b.bold);
-  assert.equal(bold.length, 2, 'only C1-C2 and C2-C3 are bold -- matches published alpha/beta-D-ribofuranose and alpha/beta-D-glucofuranose structures');
+  const bold = bonds.filter((b) => b.widthFrom === 'bold' && b.widthTo === 'bold');
+  assert.equal(bold.length, 2, 'only C1-C2 and C2-C3 are uniformly bold -- matches published alpha/beta-D-ribofuranose and alpha/beta-D-glucofuranose structures');
   assert.ok(bold.some((b) => b.from === 'C1' && b.to === 'C2'));
   assert.ok(bold.some((b) => b.from === 'C2' && b.to === 'C3'));
   assert.equal(bonds.length, 5, '5 ring bonds total');

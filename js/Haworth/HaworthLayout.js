@@ -161,14 +161,26 @@ export function layoutSubstituents(terminii, inchi, opts = {}) {
 /**
  * Idealized 2D Haworth hexagon: 6 ring vertices (5 carbons + the ring
  * oxygen) laid out in the standard perspective view -- ring oxygen at back
- * right, numbered clockwise as the reader sees the page, front edge
- * (C1-C2-C3) nearest the viewer and drawn bold.
+ * right, numbered clockwise as the reader sees the page.
+ *
+ * The front of the ring (nearest the viewer) is C1-C2-C3, drawn as a
+ * tapered wedge rather than two uniformly-bold edges: thin at C1, full
+ * thickness through C2, tapering back to thin at C4 -- each bond's
+ * `widthFrom`/`widthTo` names its own two endpoints' thickness ('thin' or
+ * 'bold'), so a renderer draws a plain line where they match and a tapered
+ * polygon where they don't. This is the standard hand-drawn Haworth
+ * perspective cue (the middle of the front face reads as closest to the
+ * viewer, fading out toward the back on both sides), not just a binary
+ * bold/not-bold split.
  */
 export function ringGeometry() {
   const cx = 0;
   const cy = 0;
-  const rx = 95;
-  const ry = 38;
+  // Closer to the published Fuc/glucofuranose references' own proportions
+  // (~1.6:1 width:height) than this used to be (rx=95/ry=38 drew a much
+  // flatter, more squashed-looking oval, ~2.9:1).
+  const rx = 80;
+  const ry = 58;
   // Angles must be monotonic in ring-bond order (O5-C1-C2-C3-C4-C5-O5) or
   // the polygon self-intersects -- the ring oxygen has to sit angularly
   // between C5 and C1, not "inside" some other edge's arc.
@@ -186,12 +198,12 @@ export function ringGeometry() {
     vertices[name] = { x: cx + rx * Math.cos(rad), y: cy + ry * Math.sin(rad) };
   }
   const bonds = [
-    { from: 'O5', to: 'C1', bold: false },
-    { from: 'C1', to: 'C2', bold: true },
-    { from: 'C2', to: 'C3', bold: true },
-    { from: 'C3', to: 'C4', bold: false },
-    { from: 'C4', to: 'C5', bold: false },
-    { from: 'C5', to: 'O5', bold: false },
+    { from: 'O5', to: 'C1', widthFrom: 'thin', widthTo: 'thin' },
+    { from: 'C1', to: 'C2', widthFrom: 'thin', widthTo: 'bold' },
+    { from: 'C2', to: 'C3', widthFrom: 'bold', widthTo: 'bold' },
+    { from: 'C3', to: 'C4', widthFrom: 'bold', widthTo: 'thin' },
+    { from: 'C4', to: 'C5', widthFrom: 'thin', widthTo: 'thin' },
+    { from: 'C5', to: 'O5', widthFrom: 'thin', widthTo: 'thin' },
   ];
   return { vertices, bonds };
 }
@@ -228,11 +240,11 @@ export function furanoseGeometry() {
     vertices[name] = { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
   const bonds = [
-    { from: 'O4', to: 'C1', bold: false },
-    { from: 'C1', to: 'C2', bold: true },
-    { from: 'C2', to: 'C3', bold: true },
-    { from: 'C3', to: 'C4', bold: false },
-    { from: 'C4', to: 'O4', bold: false },
+    { from: 'O4', to: 'C1', widthFrom: 'thin', widthTo: 'thin' },
+    { from: 'C1', to: 'C2', widthFrom: 'bold', widthTo: 'bold' },
+    { from: 'C2', to: 'C3', widthFrom: 'bold', widthTo: 'bold' },
+    { from: 'C3', to: 'C4', widthFrom: 'thin', widthTo: 'thin' },
+    { from: 'C4', to: 'O4', widthFrom: 'thin', widthTo: 'thin' },
   ];
   return { vertices, bonds };
 }
