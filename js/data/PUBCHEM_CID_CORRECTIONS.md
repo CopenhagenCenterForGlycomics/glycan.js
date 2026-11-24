@@ -245,3 +245,44 @@ corrected: Rha's line used to be a copy of Fuc's (`4ax` for both), which was wro
 one of them since they're different compounds -- Rha now reads `2ax;3eq;4eq`, matching D-mannose's
 pattern as it must (Rha is 6-deoxy-L-mannose). Fuc's line was already correct (apparently by
 coincidence, since the old hardcode and the new real derivation agree) and didn't need to change.
+
+## 9. Dideoxyhexoses (Tyv, Abe, Par, Col): fixed for real, and a real discovery about ax/eq itself
+
+Extending the same treatment to `buildDideoxyhex` (3,6-dideoxyhexoses: Tyv, Abe, Par, Col, all
+previously `PROKARYOTIC_OVERRIDES` literals, not live in `monosaccharides.js`). Fetched real
+InChI for all four (verified via PubChem synonyms) and found each one is literally a named
+derivative of a hexose already in this dataset: **Tyv = 3,6-dideoxy-D-mannose, Abe = 3,6-dideoxy-
+D-galactose, Par = 3,6-dideoxy-D-glucose, Col = 3,6-dideoxy-L-galactose.** Since removing C3/C6
+oxygens doesn't touch C2 or C4, each one's C2/C4 axial/equatorial pattern must match its named
+parent's exactly -- and all 8 positions (C2+C4 x 4 compounds) do, against `deriveAxialEquatorial`
+with no changes needed to the method itself (same `shapeNeedsMirrorFlip` logic as Fuc/Rha, since
+C5 still bears a terminal CH3 here too).
+
+This caught a real, independent bug: the old hardcoded override gave all four compounds the same
+`2eq`, but Tyvelose (mannose-configured) needs `2ax`, the same way D-mannose itself does. Fixed in
+`buildDideoxyhex`, and all four added to `monosaccharides.js` as real InChI-backed entries,
+removed from `PROKARYOTIC_OVERRIDES` entirely -- the first worked example of the actual goal
+("adding a monosaccharide is just adding its InChI") for a residue family that used to be 100%
+hand-typed with no InChI at all.
+
+**Separately, investigating ring position 3 (always `H`, the C3 deoxy position) turned up
+something that reframes earlier sections' urgency:** position 3 in a 3,6-dideoxyhexose is not a
+stereocentre at all -- it's a plain CH2 (both substituents are H), confirmed by there being no
+`/t` entry for it in real InChI at all, not even an undefined one. The old code's "use `/t` atom 3
+as a proxy for C3" wasn't just unprincipled, it was reading the wrong atom entirely for this ring
+shape (the same fixed-position mistake that broke GlcA back in section 3). But chasing what that
+label was *supposed* to mean led to checking whether anything downstream actually reads it --
+
+**`Mass.js`'s `parse_terminii` never reads the `ax`/`eq` part of any terminii label, for any
+residue, ever** (`grep -n "'ax'\|'eq'\|axial\|equatorial" js/Mass.js` -- zero matches; the parser
+only extracts the ring position number and the substituent after the colon). This means every
+`ax`/`eq` fix in this document, from section 3 onward, changed zero actual mass-calculation output
+-- `ax`/`eq` is purely documentary in this codebase today, read only by `test-definitions-compat.js`'s
+exact-string check and now by the Haworth renderer, which is the first real consumer of the
+distinction. Worth knowing before assuming a terminii-string diff is behaviourally significant
+anywhere outside those two places.
+
+Given that, position 3's historical `ax`/`eq` label (even disregarding the wrong-atom bug) was never
+going to correspond to real geometry -- there's no second observable state to distinguish at a true
+CH2. It's kept as a fixed, honestly-documented placeholder (`3eq:H`, matching what the historical
+literals already used) rather than guessed at or silently dropped.

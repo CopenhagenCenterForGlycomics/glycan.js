@@ -173,11 +173,9 @@ export function inferC2Substituent(formula, classHint) {
 // Manually curated terminii strings for residues where InChI derivation is
 // ambiguous or formula-based classification is insufficient.
 export const PROKARYOTIC_OVERRIDES = {
-  // 3,6-Dideoxyhexoses
-  'Tyv':  'r1:OH;2eq:OH;3eq:H;4eq:OH;5eq:-;6eq:HH',
-  'Abe':  'r1:OH;2eq:OH;3eq:H;4ax:OH;5eq:-;6eq:HH',
-  'Par':  'r1:OH;2eq:OH;3ax:H;4eq:OH;5eq:-;6eq:HH',
-  'Col':  'r1:OH;2eq:OH;3ax:H;4ax:OH;5eq:-;6eq:HH',
+  // 3,6-Dideoxyhexoses (Tyv, Abe, Par, Col) used to be hardcoded here, but
+  // are now derived for real by buildDideoxyhex from their own InChI in
+  // js/data/monosaccharides.js -- see PUBCHEM_CID_CORRECTIONS.md section 9.
 
   // Keto-sugars
   'Kdo':  '1ax:OO;r2:O;3ax:H;4eq:OH;5eq:OH;6eq:-;7:OH;8:HOH',
@@ -286,23 +284,33 @@ function buildDeoxyhex(name, t, formula, isL, warnings, layers) {
   };
 }
 
-function buildDideoxyhex(name, t, formula, isL, warnings) {
-  // 3,6-dideoxyhexoses: C3 is deoxy (H), C6 is deoxy (HH)
-  // Use same /t→carbon mapping as hexoses: /t4 → carb C4
-  const tC4sign = t.get(D_HEXOSE_4C1.carb_C4_from_t_pos);
-  const c4 = tC4sign !== undefined ? (D_HEXOSE_4C1.C4[tC4sign] ?? 'eq') : 'eq';
-
-  // C3 deoxy position ax/eq: use /t3 (carb C2 pos) as proxy since C3 is the key differentiator
-  const tC3sign = t.get(3);
-  let c3 = 'eq';
-  if (tC3sign !== undefined) {
-    c3 = tC3sign === '+' ? 'eq' : 'ax';
-  }
+function buildDideoxyhex(name, t, formula, isL, warnings, layers) {
+  // 3,6-dideoxyhexose (Tyv, Abe, Par, Col): C2 and C4 are real, derivable
+  // ring stereocentres, validated against each compound's own known parent
+  // hexose (Tyv = 3,6-dideoxy-D-mannose, Abe = 3,6-dideoxy-D-galactose,
+  // Par = 3,6-dideoxy-D-glucose, Col = 3,6-dideoxy-L-galactose, per their
+  // own PubChem synonyms) -- each matches its parent's C2/C4 pattern
+  // exactly, 8/8. This also caught a real bug in the historical hardcoded
+  // version: it gave every one of these four the same "2eq", but Tyvelose
+  // (mannose-configured, not glucose-configured) needs "2ax" at C2, the
+  // same way D-mannose itself does.
+  //
+  // C3 is NOT a stereocentre at all here -- it's a plain CH2 (deoxygenated,
+  // both substituents are H), so standard InChI has no /t entry for it; the
+  // old code's "use /t3 as a proxy" wasn't just unprincipled, it was
+  // reading the wrong atom entirely (InChI atom 3 isn't ring position 3 for
+  // this shape -- same fixed-position assumption that broke GlcA). There is
+  // nothing to derive here, so it's kept as a fixed placeholder; this label
+  // is also never actually read by Mass.js (parse_terminii only looks at
+  // the position number and the substituent, never the ax/eq part of any
+  // label), so it has no effect on mass calculation either way.
+  const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
+  const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
 
   const parts = [
     `r1:OH`,
-    `2eq:OH`,
-    `3${c3}:H`,
+    `2${c2}:OH`,
+    `3eq:H`,
     `4${c4}:OH`,
     `5eq:-`,
     `6eq:HH`,
@@ -524,7 +532,7 @@ export function inchiToTerminii(name, inchi, opts = {}) {
       return buildDeoxyhex(name, t, formula, true, warnings, layers);
     case 'D_dideoxyhex':
     case 'L_dideoxyhex':
-      return buildDideoxyhex(name, t, formula, isL, warnings);
+      return buildDideoxyhex(name, t, formula, isL, warnings, layers);
     case 'hexnac':
       return buildHexNAc(name, t, formula, warnings, layers);
     case 'hexn':

@@ -131,6 +131,35 @@ export default [
     "inchi" : "InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3-,4+,5+,6?/m0/s1"
   },
   {
+    "name": "dideoxyhex",
+    "terminii": "r1:OH;2eq:OH;3eq:H;4eq:OH;5eq:-;6eq:HH",
+    "composition": "C:6;H:12;O:4"
+  },
+  {
+    "name": "Tyv",
+    "type": "dideoxyhex",
+    "pubchemCid": 12303782,
+    "inchi": "InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4+,5+,6?/m1/s1"
+  },
+  {
+    "name": "Abe",
+    "type": "dideoxyhex",
+    "pubchemCid": 160540,
+    "inchi": "InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4-,5-,6?/m1/s1"
+  },
+  {
+    "name": "Par",
+    "type": "dideoxyhex",
+    "pubchemCid": 12303783,
+    "inchi": "InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4+,5-,6?/m1/s1"
+  },
+  {
+    "name": "Col",
+    "type": "dideoxyhex",
+    "pubchemCid": 12303780,
+    "inchi": "InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4-,5-,6?/m0/s1"
+  },
+  {
     "name": "Pent",
     "terminii": "r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H",
     "composition": "C:5;H:8;O:4"

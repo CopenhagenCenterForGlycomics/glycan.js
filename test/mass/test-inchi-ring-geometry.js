@@ -159,3 +159,46 @@ QUnit.test('Fuc matches Gal\'s pattern; Rha matches Man\'s -- not inverted, not 
   assert.equal(deriveAxialEquatorial(rha, rhaT, 3), 'eq');
   assert.equal(deriveAxialEquatorial(rha, rhaT, 4), 'eq');
 });
+
+QUnit.module('InChIRingGeometry - dideoxyhexoses (3,6-dideoxyhexose ring shape)', {});
+
+// Each 3,6-dideoxyhexose is a known parent hexose with C3 and C6 both
+// deoxygenated -- removing those oxygens doesn't touch C2 or C4, so each
+// one's C2/C4 axial/equatorial pattern must match its own parent's exactly
+// (confirmed via each compound's own PubChem synonyms, e.g. "3,6-dideoxy-
+// D-mannopyranose" for Tyvelose). This caught a real bug in the historical
+// hardcoded terminii: it gave Tyvelose the same "2eq" as the other three,
+// but Tyvelose is mannose-configured (ax at C2), not glucose-configured.
+QUnit.test('Tyv matches Man (ax,eq) -- the historical override wrongly had it match Glc instead', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4+,5+,6?/m1/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveAxialEquatorial(layers, t, 2), 'ax', 'C2 ax, matching D-mannose');
+  assert.equal(deriveAxialEquatorial(layers, t, 4), 'eq', 'C4 eq, matching D-mannose');
+});
+
+QUnit.test('Abe matches Gal (eq,ax)', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4-,5-,6?/m1/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveAxialEquatorial(layers, t, 2), 'eq', 'C2 eq, matching D-galactose');
+  assert.equal(deriveAxialEquatorial(layers, t, 4), 'ax', 'C4 ax, matching D-galactose');
+});
+
+QUnit.test('Par matches Glc (eq,eq)', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4+,5-,6?/m1/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveAxialEquatorial(layers, t, 2), 'eq', 'C2 eq, matching D-glucose');
+  assert.equal(deriveAxialEquatorial(layers, t, 4), 'eq', 'C4 eq, matching D-glucose');
+});
+
+QUnit.test('Col matches Gal (eq,ax) -- L-series, same pattern as Abe since ax/eq is D/L-invariant', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4-,5-,6?/m0/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveAxialEquatorial(layers, t, 2), 'eq', 'C2 eq, matching D/L-galactose');
+  assert.equal(deriveAxialEquatorial(layers, t, 4), 'ax', 'C4 ax, matching D/L-galactose');
+});
+
+QUnit.test('ring position 3 (the deoxy CH2) is not a stereocentre: null, not a guessed value', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O4/c1-3-4(7)2-5(8)6(9)10-3/h3-9H,2H2,1H3/t3-,4+,5+,6?/m1/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveAxialEquatorial(layers, t, 3), null, 'no /t entry exists for a plain CH2, so nothing to derive');
+});

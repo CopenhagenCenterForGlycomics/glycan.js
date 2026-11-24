@@ -111,6 +111,37 @@ terminii:r1:OH;2ax:OH;3eq:OH;4eq:OH;5eq:-;6eq:HH
 name:Rha
 type:dHex
 
+terminii:r1:OH;2eq:OH;3eq:H;4eq:OH;5eq:-;6eq:HH
+name:dideoxyhex
+composition:C:6;H:12;O:4
+
+# Tyv, Abe, Par, Col added here 2026-11-24 (they used to be
+# InChITerminii.js PROKARYOTIC_OVERRIDES literals with no DEFINITIONS entry
+# at all, so there's no "original" value for these to differ from). Each
+# one's C2/C4 pattern is cross-checked against its own known parent hexose,
+# confirmed via PubChem synonyms: Tyv = 3,6-dideoxy-D-mannose (so it must
+# share D-mannose's ax,eq pattern at C2/C4 -- NOT D-glucose's eq,eq, which
+# the old hardcoded override wrongly gave it), Abe = 3,6-dideoxy-D-galactose
+# (Gal's eq,ax), Par = 3,6-dideoxy-D-glucose (Glc's eq,eq), Col =
+# 3,6-dideoxy-L-galactose (Gal's eq,ax again -- ax/eq is invariant under
+# D/L mirroring). C3 is not a real stereocentre here (both substituents are
+# H), so it has no derivable value; see PUBCHEM_CID_CORRECTIONS.md section 9.
+terminii:r1:OH;2ax:OH;3eq:H;4eq:OH;5eq:-;6eq:HH
+name:Tyv
+type:dideoxyhex
+
+terminii:r1:OH;2eq:OH;3eq:H;4ax:OH;5eq:-;6eq:HH
+name:Abe
+type:dideoxyhex
+
+terminii:r1:OH;2eq:OH;3eq:H;4eq:OH;5eq:-;6eq:HH
+name:Par
+type:dideoxyhex
+
+terminii:r1:OH;2eq:OH;3eq:H;4ax:OH;5eq:-;6eq:HH
+name:Col
+type:dideoxyhex
+
 terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
 name:Pent
 composition:C:5;H:8;O:4
