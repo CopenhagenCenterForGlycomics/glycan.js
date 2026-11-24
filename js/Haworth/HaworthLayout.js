@@ -179,9 +179,10 @@ export function ringGeometry() {
   // Closer to the published Fuc/glucofuranose references' own proportions
   // (~1.6:1 width:height) than this used to be (rx=95/ry=38 drew a much
   // flatter, more squashed-looking oval, ~2.9:1). Kept compact (not just
-  // proportioned) per feedback that the rings read as a bit spacious.
-  const rx = 65;
-  const ry = 47;
+  // proportioned) per feedback that the rings read as a bit spacious, then
+  // taken down to about 2/3 of that size again per further feedback.
+  const rx = 43;
+  const ry = 31;
   // Angles must be monotonic in ring-bond order (O5-C1-C2-C3-C4-C5-O5) or
   // the polygon self-intersects -- the ring oxygen has to sit angularly
   // between C5 and C1, not "inside" some other edge's arc.
@@ -227,9 +228,10 @@ export function ringGeometry() {
 export function furanoseGeometry() {
   const cx = 0;
   const cy = 0;
-  // Scaled down to match the hexose ring's own size reduction (same ~0.8
-  // factor), per feedback that the rings read as a bit spacious.
-  const r = 63;
+  // Scaled down to match the hexose ring's own size reductions (same
+  // factors, in the same two steps), per feedback that the rings read as
+  // a bit spacious and then should come down to about 2/3 of that again.
+  const r = 42;
   const angles = {
     O4: 270,
     C1: 342,

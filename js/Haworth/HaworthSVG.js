@@ -24,7 +24,7 @@ import {
 } from './HaworthLayout.js';
 import { sugarToHaworthInput } from './SugarLayout.js';
 
-const STICK_LENGTH = 28;
+const STICK_LENGTH = 19;
 const PLACEHOLDER_RADIUS = 40;
 
 // Per-shape geometry + substituent-layout builder (see HaworthLayout.js).
