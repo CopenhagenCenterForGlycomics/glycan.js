@@ -253,3 +253,41 @@ QUnit.test('NeuAc: equatorial at sialic C4/C5/C6 -- matches the well-documented 
   assert.equal(deriveAxialEquatorial(layers, t, 4), 'eq', 'sialic C5 eq');
   assert.equal(deriveAxialEquatorial(layers, t, 5), 'eq', 'sialic C6 eq');
 });
+
+QUnit.module('InChIRingGeometry - pentoses (no exocyclic group at ring position 5)', {});
+
+// A pentose's ring position 5 (sugar C5) has NO exocyclic substituent at
+// all (it's the "H" terminus, not a CH2OH/COOH/CH3) -- a third distinct
+// shape from the hexose/deoxyhexose/ketose cases above, and the one
+// shapeNeedsMirrorFlip's default branch had never actually been validated
+// against: only D-series pentoses (Xyl) had been tested, where getting the
+// flip decision backwards is invisible (the wrong default produces
+// flip=false either way once combined with D-series's /m). The bug only
+// showed up on an L-series pentose (Ara), where it inverted C2/C3 relative
+// to the known-correct D-arabinose reference -- caught by the same ax/eq-
+// invariant-under-mirroring check used throughout this file.
+QUnit.test('pentose ring shape does NOT need the mirror flip', function(assert) {
+  const layers = parseInChI('InChI=1S/C5H10O5/c6-2-1-10-5(9)4(8)3(2)7/h2-9H,1H2/t2-,3+,4-,5?/m1/s1'); // Xyl
+  assert.equal(shapeNeedsMirrorFlip(layers), false);
+});
+
+// D-arabinose (CID 6902, confirmed via D-arabinopyranose / CHEBI:46994 /
+// GlyTouCan:G91625IP) and L-arabinose (CID 439195) share the exact same
+// /t layer and differ only in /m (D is m1, L is m0) -- yet ax/eq must come
+// out IDENTICAL for both, since axial/equatorial classification is
+// invariant under D/L mirroring. Getting shapeNeedsMirrorFlip wrong here
+// would silently invert one of them.
+QUnit.test('D-arabinose and L-arabinose derive identical ax/eq despite opposite /m', function(assert) {
+  const dAra = parseInChI('InChI=1S/C5H10O5/c6-2-1-10-5(9)4(8)3(2)7/h2-9H,1H2/t2-,3-,4+,5?/m1/s1');
+  const lAra = parseInChI('InChI=1S/C5H10O5/c6-2-1-10-5(9)4(8)3(2)7/h2-9H,1H2/t2-,3-,4+,5?/m0/s1');
+  const dT = parseTLayer(dAra.t);
+  const lT = parseTLayer(lAra.t);
+
+  assert.equal(deriveAxialEquatorial(dAra, dT, 2), 'ax', 'D-Ara C2 ax');
+  assert.equal(deriveAxialEquatorial(dAra, dT, 3), 'ax', 'D-Ara C3 ax');
+  assert.equal(deriveAxialEquatorial(dAra, dT, 4), 'eq', 'D-Ara C4 eq');
+
+  assert.equal(deriveAxialEquatorial(lAra, lT, 2), 'ax', 'L-Ara C2 ax, matches D-Ara');
+  assert.equal(deriveAxialEquatorial(lAra, lT, 3), 'ax', 'L-Ara C3 ax, matches D-Ara');
+  assert.equal(deriveAxialEquatorial(lAra, lT, 4), 'eq', 'L-Ara C4 eq, matches D-Ara');
+});

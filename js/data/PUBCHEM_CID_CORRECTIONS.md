@@ -327,3 +327,48 @@ chemically correct, now properly derived instead of asserted. Position 1 (the CO
 orientation -- anomer/instance-level, same situation as every other family's anomeric position)
 and position 3 (C3, a plain CH2, same non-stereocentre situation as a dideoxyhexose's deoxy
 position) are left as documented fixed values, same reasoning as section 9.
+
+## 11. HexNAc/pentose C2 was still hardcoded; the pentose /m-flip default was never actually validated
+
+Continuing the same audit (every live builder function in `InChITerminii.js`, checked for any
+remaining position that isn't actually derived from the InChI): two more gaps, found together.
+
+**`buildHexNAc`'s C2 was still a literal (`2eq:NHAc`), never derived**, for every live HexNAc
+(GalNAc, GlcNAc). HexNAc shares its parent hexose's exact ring shape at C2 (the amide nitrogen
+replaces the hydroxyl but doesn't change the ring stereocentre), so it's derived the same way
+`buildHexose` derives C2, cross-checked against GalNAc/GlcNAc each matching their own parent
+(Gal/Glc, both eq) -- no change in output for either, since `eq` was already the right answer
+here, just asserted instead of derived. **`buildPentose`'s C2 was the same situation**
+(`2eq:OH` literal) -- except here the hardcode turned out to be *wrong* for one live compound,
+which leads to the second bug.
+
+**A second, more serious bug: `shapeNeedsMirrorFlip`'s default for "no exocyclic group at ring
+position 5" (the pentose case, added in section 8) was never properly validated -- only D-series
+pentoses (Xyl) had been tested against it, and the bug is invisible there.** The default was set to
+`true`. Checking it now against an L-series pentose (Ara) the same way every other exception in
+this file was checked -- fetch and identity-verify an independent reference compound, compare its
+known ax/eq pattern, which must be invariant under D/L mirroring -- exposed the bug: D-arabinose
+(CID 6902, confirmed via synonyms `D-arabinopyranose` / `CHEBI:46994` / `GlyTouCan:G91625IP`) has
+a real pattern of C2=ax, C3=ax, C4=eq. Live L-arabinose (CID 439195) was deriving the *exact
+inverse* at C2/C3 (eq, eq) -- consistent with the flip default being backwards, not with any other
+kind of bug, since D- and L-arabinose share the identical `/t` layer and differ only in `/m` (D is
+`/m1`, L is `/m0`; see section 8 on why `/m` is a per-graph canonicalization artifact, not a
+universal invariant). Fixed by changing the default to `false`: a pentose ring position 5 genuinely
+has no exocyclic substituent at all (it's pentose sugar-C5, the "H" terminus, not a CH2OH/COOH/CH3
+like every other shape checked so far), a third distinct case from the hexose and deoxyhexose/
+ketose shapes, and empirically it does not need the flip either.
+
+With both fixes applied together, live Ara's terminii changed from `2eq;3eq;4ax` to the corrected
+`2ax;3ax;4eq` (matching D-arabinose exactly, as required). Xyl, GalNAc, and GlcNAc's derived output
+did not change (their hardcoded C2 values happened to already be correct). `DEFINITIONS` in
+`test/mass/test-definitions-compat.js` updated for Ara; new regression tests added to
+`test/mass/test-inchi-ring-geometry.js` covering the pentose `shapeNeedsMirrorFlip` default and the
+D-arabinose-vs-L-arabinose cross-check, mirroring the existing Fuc-vs-Gal and Tyv-vs-Man tests.
+
+As of this section, every live InChI-backed builder function (`buildHexose`, `buildDeoxyhex`,
+`buildDideoxyhex`, `buildHexN`, `buildHexNAc`, `buildPentose`, `buildSialic`) derives every real
+ring stereocentre from the InChI itself -- no hardcoded axial/equatorial value remains for any
+position that is actually a stereocentre. The only literals left anywhere are for positions that
+are genuinely *not* stereocentres (a plain CH2, a terminal CH3/H) or are instance-level/anomeric
+(position 1, set per-glycosidic-linkage rather than per-monosaccharide), which is a different,
+correct kind of "hardcoded."

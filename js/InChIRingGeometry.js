@@ -199,26 +199,42 @@ export function ringWalk(inchiLayers, ringSize = 6) {
  * index `length - 2` is the last ring *carbon* (ring position 5 for a
  * pyranose): the one bonded to the ring oxygen on the non-anomeric side.
  *
- * Two known exceptions where the flip does NOT apply, found by cross-
- * checking against independently-known chemistry rather than guessed at:
+ * Three known exceptions where the flip does NOT apply, found by cross-
+ * checking against independently-known chemistry (a named relative's own
+ * published structure, not just internal self-consistency) rather than
+ * guessed at or assumed by default:
  *  1. A ketose anomeric center (two exocyclic heavy neighbors -- an OH and
  *     an exocyclic carbon chain, e.g. sialic acids) instead of the usual
  *     aldose pattern (one exocyclic O plus an H). Validated against
  *     Neu5Ac's well-documented 2C5 conformation (equatorial C4/C5/C6,
- *     axial anomeric COOH) -- this does NOT reduce to the next rule below:
+ *     axial anomeric COOH) -- this does NOT reduce to exception 2 below:
  *     sialic acid's own C5-equivalent position (ring position 5 here) has
  *     a *branching* exocyclic chain (C7-C8-C9), the same shape as a plain
  *     hexose's CH2OH, yet still needs no flip, so the ketose anomeric
  *     center is a genuinely separate reason, not the same one.
  *  2. Ring position 5's exocyclic substituent is a single terminal atom
  *     (a deoxyhexose's CH3) rather than something with further heavy-atom
- *     neighbors (CH2OH, COOH) or no exocyclic substituent at all (pentose).
+ *     neighbors (CH2OH, COOH).
+ *  3. Ring position 5 has no exocyclic substituent at all (a pentose --
+ *     the ring position 5 carbon is a plain CH2, nothing attached beyond
+ *     the two ring bonds). This one was wrongly assumed to need the flip
+ *     (the same as Hex/HexA/HexN/HexNAc) for a while, on no real evidence,
+ *     because every pentose actually tested happened to be D-series (m=1),
+ *     where this choice is invisible -- flip = needsFlip && m==='0' is
+ *     false either way when m=1. It only shows up once an L-series pentose
+ *     is checked: L-arabinose's own derived axial/equatorial pattern was
+ *     the exact inverse of D-arabinose's (fetched and identity-verified
+ *     independently), which ax/eq must not be, since it's invariant under
+ *     D/L mirroring. Turning the flip off for this case fixes it.
  *
- * Neither is claimed to be *the* universal invariant -- InChI's own choice
- * of which /t-string is "smaller" is an artifact of its canonicalization
- * algorithm (Technical Manual p.46-47), not something guaranteed to reduce
- * to a simple local graph feature. These two are what's been found and
- * validated so far; a future ring shape may need a third.
+ * None of these is claimed to be *the* universal invariant -- InChI's own
+ * choice of which /t-string is "smaller" is an artifact of its
+ * canonicalization algorithm (Technical Manual p.46-47), not something
+ * guaranteed to reduce to a simple local graph feature. These three are
+ * what's been found and validated so far; a future ring shape may need a
+ * fourth -- and per the pentose lesson above, an L-series (or otherwise
+ * /m0) example of that shape is what it takes to actually find out, not
+ * just checking a D-series one and assuming it generalizes.
  */
 function needsMirrorFlip(order, adj) {
   const ringSet = new Set(order);
@@ -229,7 +245,7 @@ function needsMirrorFlip(order, adj) {
 
   const c5Atom = order[order.length - 2];
   const exo = [...adj.get(c5Atom)].filter((a) => !ringSet.has(a));
-  if (exo.length === 0) return true; // e.g. pentose: no exocyclic group -> default
+  if (exo.length === 0) return false; // exception 3: no exocyclic group at all (pentose)
   const exoNeighbors = [...adj.get(exo[0])].filter((a) => a !== c5Atom);
   return exoNeighbors.length > 0; // exception 2: further atoms (CH2OH, COOH) vs a terminal CH3
 }

@@ -154,7 +154,18 @@ type:Pent
 # deriving straight from Xyl's own real InChI gives the same down/up/down
 # Haworth pattern as Glc -- see js/data/PUBCHEM_CID_CORRECTIONS.md section 6.
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
+
+# C2/C3 corrected from eq,eq to ax,ax on 2026-11-24, after two bugs were
+# fixed together: (1) the general ring-walk mirror-flip rule had an
+# unvalidated default for pentoses (no exocyclic group at C5) that was
+# backwards for the L-series -- only D-series pentoses had ever been
+# checked, where the bug is invisible; (2) C2 was hardcoded to eq and never
+# actually derived. Cross-checked against D-arabinose (CID 6902, confirmed
+# via D-arabinopyranose / CHEBI:46994 / GlyTouCan:G91625IP): its real
+# pattern is C2=ax, C3=ax, C4=eq, and ax/eq is invariant under D/L
+# mirroring, so L-arabinose must match it exactly. See
+# PUBCHEM_CID_CORRECTIONS.md section 11.
+terminii:r1:OH;2ax:OH;3ax:OH;4eq:OH;5eq:H
 name:Ara
 type:Pent
 

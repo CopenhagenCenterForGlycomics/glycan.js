@@ -324,13 +324,18 @@ function buildDideoxyhex(name, t, formula, isL, warnings, layers) {
 }
 
 function buildHexNAc(name, t, formula, warnings, layers) {
+  // Same ring shape as plain hexoses (C2 bears NHAc instead of OH, but it's
+  // still a real, derivable ring stereocentre -- cross-checked against
+  // GalNAc/GlcNAc matching their own parent hexose's C2 exactly, Gal and
+  // Glc respectively, both eq).
+  const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
   // ring C3 / ring C4: the differentiating gluco/galacto/manno/allo positions
   const c3 = resolveRingPosition(layers, t, 3, HEXNAC_4C1.ring_C3_from_t_pos, HEXNAC_4C1.C3);
   const c4 = resolveRingPosition(layers, t, 4, HEXNAC_4C1.ring_C4_from_t_pos, HEXNAC_4C1.C4);
 
   const parts = [
     `r1:OH`,
-    `2eq:NHAc`,
+    `2${c2}:NHAc`,
     `3${c3}:OH`,
     `4${c4}:OH`,
     `5eq:-`,
@@ -366,12 +371,15 @@ function buildHexN(name, t, formula, warnings, layers) {
 }
 
 function buildPentose(name, t, formula, isL, warnings, layers) {
+  // C2 is a real ring stereocentre too (D-arabinose's is ax, unlike
+  // D-ribose/xylose/lyxose's eq) -- derived now instead of hardcoded.
+  const c2 = resolveRingPosition(layers, t, 2, null, {});
   const c3 = resolveRingPosition(layers, t, 3, 3, D_PENTOSE_4C1.C3);
   const c4 = resolveRingPosition(layers, t, 4, 4, D_PENTOSE_4C1.C4);
 
   const parts = [
     `r1:OH`,
-    `2eq:OH`,
+    `2${c2}:OH`,
     `3${c3}:OH`,
     `4${c4}:OH`,
     `5eq:H`,
