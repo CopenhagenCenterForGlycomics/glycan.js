@@ -3,49 +3,44 @@
  * sticks + labels) for a single pyranose residue.
  *
  * Scope: the common 6-membered-ring terminii shape shared by Hex, HexA,
- * HexN, HexNAc and dHex (`r1:X;2{eq|ax}:X;3{eq|ax}:X;4{eq|ax}:X;5eq:-;6eq:X`)
+ * HexN, HexNAc and dHex (`r1:X;2{eq|ax}:X;3{eq|ax}:X;4{eq|ax}:X;5{eq|ax}:X;6eq:X`)
  * -- i.e. everything currently built by InChITerminii.js's buildHexose /
  * buildHexN / buildHexNAc / buildDeoxyhex. Furanoses (4-part terminii, a
  * 5-membered ring) and sialic acids (9-part terminii, a different ring
  * numbering and ketose topology) are a different shape each and are not
  * handled here yet.
  *
- * Orientation (up/down) is derived straight from the residue's real InChI,
- * via InChIRingGeometry.js's deriveHaworthOrientation(), not from the
- * terminii string's ax/eq labels. That distinction matters: a terminii
- * string's ax/eq labels are sometimes a hardcoded literal chosen to match a
- * historical reference (e.g. InChITerminii.js's buildDeoxyhex hardcodes
- * Fuc/Rha's labels outright rather than deriving them, with a code comment
- * explaining why), not a real geometric derivation -- so a position-parity
- * conversion rule applied to THOSE labels can be wrong even though the same
- * rule is correct when applied to genuinely-derived ax/eq. Going straight to
- * the InChI sidesteps that: it was validated against the textbook Haworth
- * pattern for D-glucose, D-galactose, D-mannose and L-fucose (16/16 ring
- * positions, including L-fucose read directly from its own InChI, not
- * through its terminii string) -- see js/InChIRingGeometry.js and
- * test/mass/test-inchi-ring-geometry.js.
+ * Orientation (up/down) for ring positions 2-5 comes straight from the
+ * terminii string's own ax/eq labels, via a fixed position-parity rule
+ * (orientationFromAxEq). This is safe because every builder that produces a
+ * live terminii string now derives every real ring stereocentre (including
+ * position 5, the ring-junction carbon bearing the exocyclic C6 group) from
+ * the residue's actual InChI -- none of them are hardcoded literals anymore
+ * (see js/data/PUBCHEM_CID_CORRECTIONS.md, especially section 13, which is
+ * the reason position 5 had to be fixed before this simplification was
+ * safe). The parity rule itself was validated by computing BOTH it and the
+ * direct from-InChI derivation (InChIRingGeometry.js's
+ * deriveHaworthOrientation) for every live non-sialic compound and
+ * confirming they agree -- see test/mass/test-inchi-ring-geometry.js.
  *
- * The terminii string is still used, but only for substituent *labels*
- * (which group is at each position -- OH, NHAc, CH2OH, ...), which is a
- * purely compositional fact unaffected by this issue.
- *
- * Position 1 (the anomeric carbon) is the one position deriveHaworthOrientation
- * can't resolve from the residue-type's own InChI: anomeric configuration is
- * set per Monosaccharide *instance* (alpha/beta), not per residue type, so
- * the type-level InChI leaves that stereocentre undefined ('?'). Its
- * orientation is instead computed from the anomer + D/L-series relationship --
- * but "alpha-D and beta-L share one ring face" is only true for ring shapes
- * where the /m-layer mirror flip actually applies (see
- * InChIRingGeometry.js's shapeNeedsMirrorFlip -- a deoxyhexose like Fuc does
- * NOT mirror the same way a plain hexose does, confirmed against real
- * anomer-specific InChI for alpha/beta-D-glucopyranose, where it applies,
- * and alpha/beta-L-fucopyranose, where it doesn't: alpha-L-Fuc's anomeric
- * OH is down, same face as alpha-D-Glc's, not up as a naive "L mirrors D"
- * rule would give).
+ * Position 1 (the anomeric carbon) is the one position no terminii string
+ * can give an orientation for: anomeric configuration is set per
+ * Monosaccharide *instance* (alpha/beta), not per residue type, so the
+ * type-level terminii leaves it as a bare label with no ax/eq at all. Its
+ * orientation is instead computed from the anomer + D/L-series relationship,
+ * which does require going to the InChI directly -- but "alpha-D and beta-L
+ * share one ring face" is only true for ring shapes where the /m-layer
+ * mirror flip actually applies (see InChIRingGeometry.js's
+ * shapeNeedsMirrorFlip -- a deoxyhexose like Fuc does NOT mirror the same
+ * way a plain hexose does, confirmed against real anomer-specific InChI for
+ * alpha/beta-D-glucopyranose, where it applies, and alpha/beta-L-
+ * fucopyranose, where it doesn't: alpha-L-Fuc's anomeric OH is down, same
+ * face as alpha-D-Glc's, not up as a naive "L mirrors D" rule would give),
+ * which is a per-shape-family fact a terminii string has no way to carry.
  */
 
-import { parseInChI, parseTLayer } from '../InChITerminii.js';
-import { deriveHaworthOrientation, shapeNeedsMirrorFlip } from '../InChIRingGeometry.js';
+import { parseInChI } from '../InChITerminii.js';
+import { shapeNeedsMirrorFlip } from '../InChIRingGeometry.js';
 
 const SUBSTITUENT_LABELS = {
   OH: 'OH',
@@ -109,19 +104,19 @@ function orientationFromAxEq(position, axEq) {
 export function layoutSubstituents(terminii, inchi, opts = {}) {
   const { anomer = 'b', isL = false } = opts;
   const { positions, c6Label } = parseTerminii(terminii);
-  const layers = parseInChI(inchi);
-  const tLayerMap = parseTLayer(layers.t);
   const substituents = [];
 
-  // C1 (anomeric): the type-level InChI leaves this stereocentre undefined
-  // ('?'), since anomeric configuration is set per instance -- orientation
-  // comes from anomer + series instead. "Alpha-D and beta-L share one ring
-  // face" only holds for ring shapes where the /m mirror flip actually
-  // applies (see InChIRingGeometry.js's shapeNeedsMirrorFlip); for a shape
-  // where it doesn't (e.g. a deoxyhexose), L-series behaves like D-series
-  // here, not its mirror.
+  // C1 (anomeric): the terminii string carries no ax/eq for this position
+  // at all (anomeric configuration is per-instance, not per residue type),
+  // so this is the one position that still needs the InChI directly --
+  // "alpha-D and beta-L share one ring face" only holds for ring shapes
+  // where the /m mirror flip actually applies (see
+  // InChIRingGeometry.js's shapeNeedsMirrorFlip); for a shape where it
+  // doesn't (e.g. a deoxyhexose), L-series behaves like D-series here, not
+  // its mirror.
   const c1 = positions.get(1);
   if (c1 && displayLabel(c1.label)) {
+    const layers = parseInChI(inchi);
     const mirrors = isL && (shapeNeedsMirrorFlip(layers) ?? true);
     const up = (anomer === 'b') !== mirrors;
     substituents.push({ position: 1, label: displayLabel(c1.label), orientation: up ? 'up' : 'down' });
@@ -132,20 +127,19 @@ export function layoutSubstituents(terminii, inchi, opts = {}) {
     if (!entry) continue;
     const label = displayLabel(entry.label);
     if (!label) continue;
-    const orientation = deriveHaworthOrientation(layers, tLayerMap, pos)
-      ?? orientationFromAxEq(pos, entry.axEq); // degraded fallback only
+    const orientation = orientationFromAxEq(pos, entry.axEq);
     if (orientation) substituents.push({ position: pos, label, orientation });
   }
 
-  // Exocyclic C6 group, attached at ring position 5 (C5's own substituent,
-  // "5eq:-", is a placeholder -- plain aldohexopyranose C5 has no separate
-  // OH to draw).
+  // Exocyclic C6 group, attached at ring position 5 -- oriented by ring
+  // position 5's own ax/eq label (the ring-junction carbon it hangs off),
+  // not a label of its own.
   if (c6Label) {
     const label = displayLabel(c6Label);
-    if (label) {
-      const orientation = deriveHaworthOrientation(layers, tLayerMap, 5)
-        ?? (isL ? 'down' : 'up'); // degraded fallback only
-      substituents.push({ position: 5, label, orientation });
+    const c5 = positions.get(5);
+    if (label && c5) {
+      const orientation = orientationFromAxEq(5, c5.axEq);
+      if (orientation) substituents.push({ position: 5, label, orientation });
     }
   }
 

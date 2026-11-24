@@ -238,6 +238,14 @@ function buildHexose(name, t, formula, isL, conformationOverride, warnings, laye
   // carb C4: determines galacto (ax) vs gluco (eq) configuration
   const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
 
+  // carb C5 (ring junction, bears the exocyclic C6 group): always eq for a
+  // plain D-hexose, but a real, derivable stereocentre, NOT always eq --
+  // it's the position that literally gets epimerised going from GlcA
+  // (D-series) to IdoA (L-series), which is otherwise unchanged at
+  // C2/C3/C4. A fixed "eq" placeholder here was silently wrong for IdoA
+  // (real answer: ax) until this was derived like every other position.
+  const c5 = resolveRingPosition(layers, t, 5, null, {});
+
   // C3 is always eq in 4C1 conformation
   const c2sub = inferC2Substituent(formula, isL ? 'L_hexose' : 'D_hexose');
 
@@ -246,7 +254,7 @@ function buildHexose(name, t, formula, isL, conformationOverride, warnings, laye
     `2${c2}:${c2sub}`,
     `3eq:OH`,
     `4${c4}:OH`,
-    `5eq:-`,
+    `5${c5}:-`,
     `6eq:${c6sub ?? 'HOH'}`,
   ];
 
@@ -273,13 +281,14 @@ function buildDeoxyhex(name, t, formula, isL, warnings, layers) {
   const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
   const c3 = resolveRingPosition(layers, t, 3, 3, { '+': 'eq', '-': 'eq' });
   const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
+  const c5 = resolveRingPosition(layers, t, 5, null, {}); // see buildHexose's comment on C5
 
   const parts = [
     `r1:OH`,
     `2${c2}:OH`,
     `3${c3}:OH`,
     `4${c4}:OH`,
-    `5eq:-`,
+    `5${c5}:-`,
     `6eq:HH`,
   ];
   return {
@@ -312,13 +321,14 @@ function buildDideoxyhex(name, t, formula, isL, warnings, layers) {
   // label), so it has no effect on mass calculation either way.
   const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
   const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
+  const c5 = resolveRingPosition(layers, t, 5, null, {}); // see buildHexose's comment on C5
 
   const parts = [
     `r1:OH`,
     `2${c2}:OH`,
     `3eq:H`,
     `4${c4}:OH`,
-    `5eq:-`,
+    `5${c5}:-`,
     `6eq:HH`,
   ];
   return {
@@ -338,13 +348,14 @@ function buildHexNAc(name, t, formula, warnings, layers) {
   // ring C3 / ring C4: the differentiating gluco/galacto/manno/allo positions
   const c3 = resolveRingPosition(layers, t, 3, HEXNAC_4C1.ring_C3_from_t_pos, HEXNAC_4C1.C3);
   const c4 = resolveRingPosition(layers, t, 4, HEXNAC_4C1.ring_C4_from_t_pos, HEXNAC_4C1.C4);
+  const c5 = resolveRingPosition(layers, t, 5, null, {}); // see buildHexose's comment on C5
 
   const parts = [
     `r1:OH`,
     `2${c2}:NHAc`,
     `3${c3}:OH`,
     `4${c4}:OH`,
-    `5eq:-`,
+    `5${c5}:-`,
     `6eq:HOH`,
   ];
   return {
@@ -363,13 +374,14 @@ function buildMurNAc(name, t, formula, warnings, layers) {
   const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
   const c3 = resolveRingPosition(layers, t, 3, HEXNAC_4C1.ring_C3_from_t_pos, HEXNAC_4C1.C3);
   const c4 = resolveRingPosition(layers, t, 4, HEXNAC_4C1.ring_C4_from_t_pos, HEXNAC_4C1.C4);
+  const c5 = resolveRingPosition(layers, t, 5, null, {}); // see buildHexose's comment on C5
 
   const parts = [
     `r1:OH`,
     `2${c2}:NHAc`,
     `3${c3}:OLac`,
     `4${c4}:OH`,
-    `5eq:-`,
+    `5${c5}:-`,
     `6eq:HOH`,
   ];
   return {
@@ -384,13 +396,14 @@ function buildHexN(name, t, formula, warnings, layers) {
   // GlcN has C6H13NO5 pyranose, same ring shape as plain hexoses
   const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
   const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
+  const c5 = resolveRingPosition(layers, t, 5, null, {}); // see buildHexose's comment on C5
 
   const parts = [
     `r1:OH`,
     `2${c2}:NH2`,
     `3eq:OH`,
     `4${c4}:OH`,
-    `5eq:-`,
+    `5${c5}:-`,
     `6eq:HOH`,
   ];
   return {

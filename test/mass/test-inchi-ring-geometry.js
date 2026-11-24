@@ -75,6 +75,22 @@ QUnit.test('IdoA: eq at C2/C3/C4', function(assert) {
   assert.equal(deriveAxialEquatorial(layers, t, 4), 'eq', 'C4 eq');
 });
 
+// IdoA is the C5 epimer of GlcA (same C2/C3/C4, deliberately different at
+// C5 -- that's what "C5 epimer" means), so unlike every other L/D pair in
+// this file, C5 here is the ONE position that must NOT match: GlcA is eq,
+// IdoA is ax. (This is the fact that exposed InChITerminii.js's position-5
+// bug: every builder hardcoded a fixed "5eq" placeholder, which happened
+// to be right for every other live compound but wrong for IdoA specifically
+// -- see PUBCHEM_CID_CORRECTIONS.md section 13.)
+QUnit.test('IdoA: ax at C5, unlike GlcA\'s eq -- the one position a C5-epimer pair must differ at', function(assert) {
+  const glcA = parseInChI('InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4-,6?/m0/s1');
+  const idoA = parseInChI('InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4+,6?/m0/s1');
+  const glcAT = parseTLayer(glcA.t);
+  const idoAT = parseTLayer(idoA.t);
+  assert.equal(deriveAxialEquatorial(glcA, glcAT, 5), 'eq', 'GlcA C5 eq');
+  assert.equal(deriveAxialEquatorial(idoA, idoAT, 5), 'ax', 'IdoA C5 ax (epimerised)');
+});
+
 QUnit.test('returns null for an undefined (not just unknown-sign) stereocentre', function(assert) {
   const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1');
   const t = parseTLayer(layers.t);

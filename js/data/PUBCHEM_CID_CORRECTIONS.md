@@ -401,3 +401,37 @@ historical hardcoded value was already chemically correct, now properly derived 
 asserted, same as every other case in this file. With this fix, the section 11 claim holds: no
 live compound's terminii are produced by a name-keyed override or a hardcoded literal for any
 position that's an actual stereocentre.
+
+## 13. Position 5 was never derived either -- found while simplifying the Haworth renderer
+
+Attempting to simplify `HaworthLayout.js` to read orientation straight from a residue's own
+terminii string instead of re-parsing its InChI (now that every real stereocentre the builders
+write is genuinely derived, not asserted -- sections 1-12) surfaced one more gap: **ring position 5
+-- the ring-junction carbon that bears the exocyclic C6 group (CH2OH, COOH, CH3...) -- was never
+derived by any builder at all.** Every one of `buildHexose`, `buildDeoxyhex`, `buildDideoxyhex`,
+`buildHexNAc`, `buildMurNAc` and `buildHexN` wrote a fixed `5eq:-` literal, unconditionally.
+
+This had been invisible because it happened to be *correct* for every live compound except one:
+GlcA and IdoA are C5 epimers of each other (that's the literal definition of their D/L
+relationship for uronic acids -- C2/C3/C4 stay exactly the same, only C5 flips), so while GlcA's
+real C5 is eq (matching the hardcoded literal by coincidence), IdoA's real C5 is ax -- and the
+hardcoded literal silently gave it eq anyway. `HaworthLayout.js` was never actually exposed to
+this bug because it deliberately bypassed the terminii string's ax/eq labels in favour of deriving
+orientation straight from the InChI for exactly this reason (not trusting the labels) -- but the
+*terminii themselves*, independent of rendering, were wrong for IdoA the whole time.
+
+Fixed by deriving C5 the same way every other real stereocentre is derived
+(`resolveRingPosition(layers, t, 5, null, {})`); confirmed against the C5-epimer relationship
+itself (GlcA eq / IdoA ax) as the cross-check, the same kind of independently-known-chemistry
+check used throughout this file. Every other live compound's C5 came out unchanged (eq), so this
+is purely additive except for IdoA, which goes from `5eq:-` to `5ax:-`.
+
+With this fix, the terminii-simplification of `HaworthLayout.js` (reading substituent orientation
+directly from each terminii string's own ax/eq label via a fixed position-parity rule, instead of
+a second independent derivation from the raw InChI) is safe to make: every real ring stereocentre
+in a live terminii string -- positions 2, 3, 4 and now 5 -- is a faithful derivation, so the
+parity rule applied to the string gives the identical answer to re-deriving from the InChI
+directly. Verified computationally across every live non-sialic compound before making the
+renderer change. Position 1 (anomeric, instance-level) still needs the InChI directly, since
+"does this ring shape's anomeric position mirror between D- and L-series" is a per-shape-family
+fact that isn't carried in a terminii string at all.

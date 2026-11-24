@@ -70,7 +70,16 @@ terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO
 name:GlcA
 type:HexA
 
-terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO
+
+# C5 corrected from eq to ax on 2026-11-24. Position 5 (the ring-junction
+# carbon bearing the exocyclic COOH) was never actually derived in any
+# builder -- every one hardcoded a "5eq" placeholder, which happened to be
+# right for every other live compound but is genuinely wrong for IdoA:
+# IdoA is IdoA because it's the C5-epimer of GlcA, so C2/C3/C4 stay
+# unchanged (still eq, matching GlcA) while C5 itself -- the position that
+# literally defines the epimerisation -- flips to ax. See
+# PUBCHEM_CID_CORRECTIONS.md section 13.
+terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5ax:-;6eq:OO
 name:IdoA
 type:HexA
 

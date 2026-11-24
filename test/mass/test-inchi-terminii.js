@@ -169,9 +169,11 @@ QUnit.test('GlcA round-trip', function(assert) {
   assert.equal(terminii, 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO', 'GlcA terminii (all-equatorial, matching Glc)');
 });
 
-// IdoA (L-iduronic acid): the C5 epimer of GlcA, /m0 (L-series).
+// IdoA (L-iduronic acid): the C5 epimer of GlcA, /m0 (L-series). C5 is the
+// one position that's genuinely NOT the same as GlcA -- that's what being
+// its C5-epimer means -- so unlike C2/C3/C4 it must come out 'ax', not 'eq'.
 const IDOA_INCHI = 'InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4+,6?/m0/s1';
 QUnit.test('IdoA round-trip', function(assert) {
   const { terminii } = inchiToTerminii('IdoA', IDOA_INCHI);
-  assert.equal(terminii, 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO', 'IdoA terminii');
+  assert.equal(terminii, 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5ax:-;6eq:OO', 'IdoA terminii (C5 ax, epimerised vs GlcA)');
 });
