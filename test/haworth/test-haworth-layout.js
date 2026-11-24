@@ -102,11 +102,17 @@ QUnit.test('anomer/series relationship: true enantiomers (D-/L-fucopyranose) ful
 
 QUnit.module('HaworthLayout - furanoseGeometry', {});
 
-QUnit.test('pentagon: 5 vertices (4 ring carbons + the ring oxygen, O4), 3 bold front edges', function(assert) {
+// Regression test for a tracing error caught by comparing against a
+// second, clearer published reference (alpha/beta-D-glucofuranose) after
+// the first one (alpha-D-ribofuranose) was misread as having a third bold
+// edge.
+QUnit.test('pentagon: 5 vertices (4 ring carbons + the ring oxygen, O4), 2 bold front edges (same as the hexose ring)', function(assert) {
   const { vertices, bonds } = furanoseGeometry();
   assert.deepEqual(Object.keys(vertices).sort(), ['C1', 'C2', 'C3', 'C4', 'O4'].sort());
-  const boldCount = bonds.filter((b) => b.bold).length;
-  assert.equal(boldCount, 3, 'C1-C2, C2-C3, C3-C4 all bold -- matches the published alpha-D-ribofuranose structure');
+  const bold = bonds.filter((b) => b.bold);
+  assert.equal(bold.length, 2, 'only C1-C2 and C2-C3 are bold -- matches published alpha/beta-D-ribofuranose and alpha/beta-D-glucofuranose structures');
+  assert.ok(bold.some((b) => b.from === 'C1' && b.to === 'C2'));
+  assert.ok(bold.some((b) => b.from === 'C2' && b.to === 'C3'));
   assert.equal(bonds.length, 5, '5 ring bonds total');
 });
 
@@ -135,6 +141,31 @@ QUnit.test('alpha-D-Galf: only C1 flips relative to beta', function(assert) {
   assert.equal(byPos[1], 'down');
   assert.equal(byPos[2], 'down');
   assert.equal(byPos[3], 'down');
+  assert.equal(byPos[4], 'up');
+});
+
+// Regression test matching published alpha/beta-D-glucofuranose Haworth
+// structures directly (a hexose in furanose form -- the same ring shape
+// and the same 2-carbon C5-C6 tail Galf/Glcf/Manf use, unlike
+// ribofuranose's plain CH2OH): C1 down for alpha / up for beta (only
+// position that changes), C2 down, C3 up, C4 (tail) up, for both anomers.
+const GLCF_TERMINII = 'r1:OH;2eq:OH;3eq:OH;4ax:CHOHCHHOH';
+
+QUnit.test('alpha-D-Glcf matches the published alpha-D-glucofuranose structure', function(assert) {
+  const { substituents } = layoutFuranoseSubstituents(GLCF_TERMINII, { anomer: 'a' });
+  const byPos = Object.fromEntries(substituents.map((s) => [s.position, s.orientation]));
+  assert.equal(byPos[1], 'down');
+  assert.equal(byPos[2], 'down');
+  assert.equal(byPos[3], 'up');
+  assert.equal(byPos[4], 'up');
+});
+
+QUnit.test('beta-D-Glcf matches the published beta-D-glucofuranose structure (only C1 flips)', function(assert) {
+  const { substituents } = layoutFuranoseSubstituents(GLCF_TERMINII, { anomer: 'b' });
+  const byPos = Object.fromEntries(substituents.map((s) => [s.position, s.orientation]));
+  assert.equal(byPos[1], 'up');
+  assert.equal(byPos[2], 'down');
+  assert.equal(byPos[3], 'up');
   assert.equal(byPos[4], 'up');
 });
 

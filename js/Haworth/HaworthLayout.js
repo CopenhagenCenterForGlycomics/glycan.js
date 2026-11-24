@@ -200,11 +200,16 @@ export function ringGeometry() {
  * Idealized 2D Haworth pentagon: 5 ring vertices (4 carbons + the ring
  * oxygen), for the furanose ring shape (Galf/Glcf/Manf's 4-part terminii:
  * `r1:OH;2{eq|ax}:OH;3{eq|ax}:OH;4{eq|ax}:<C5-C6 tail>`). Ring oxygen at
- * top, C1 (anomeric) adjacent on the right -- confirmed against the
- * published alpha-D-ribofuranose Haworth structure (Wikimedia Commons,
- * File:Alpha-D-Ribofuranose.svg): unlike the hexose ring, a furanose's
- * whole front arc (C1-C2-C3-C4) is conventionally drawn bold, not just two
- * of its five edges.
+ * top, C1 (anomeric) adjacent on the right, with the SAME two-bold-edges
+ * convention (C1-C2, C2-C3) as the hexose ring, not a third -- confirmed
+ * against published alpha/beta-D-ribofuranose and alpha/beta-D-
+ * glucofuranose Haworth structures (an earlier version of this wrongly had
+ * C3-C4 bold too, from mis-tracing which edges were actually bold in a
+ * first reference image; the glucofuranose pair -- a hexose in furanose
+ * form, the same shape Galf/Glcf/Manf use -- also independently confirmed
+ * every position's up/down orientation, including the anomeric flip
+ * between alpha and beta: layoutFuranoseSubstituents' plain even/odd
+ * parity rule needed no correction).
  */
 export function furanoseGeometry() {
   const cx = 0;
@@ -226,7 +231,7 @@ export function furanoseGeometry() {
     { from: 'O4', to: 'C1', bold: false },
     { from: 'C1', to: 'C2', bold: true },
     { from: 'C2', to: 'C3', bold: true },
-    { from: 'C3', to: 'C4', bold: true },
+    { from: 'C3', to: 'C4', bold: false },
     { from: 'C4', to: 'O4', bold: false },
   ];
   return { vertices, bonds };
