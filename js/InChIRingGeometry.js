@@ -15,10 +15,32 @@
  * how that particular molecule happened to get numbered.
  *
  * Validated against every InChI-derived ring stereocentre reachable from
- * js/data/monosaccharides.js (Hex, HexA, HexN, HexNAc ring shapes; D- and
- * L-series) with zero per-molecule tuning — the only free parameter is
- * whether the molecule's own /m layer is '0' (apply a mirror flip) or '1'
- * (don't), which is read off the InChI itself, not guessed.
+ * js/data/monosaccharides.js (Hex, HexA, HexN, HexNAc, pentose and
+ * deoxyhexose ring shapes; D- and L-series; 33/33 positions) with zero
+ * per-molecule tuning.
+ *
+ * The /m layer ('0' or '1', the InChI algorithm's choice of which of the two
+ * mirror-image /t sign-strings to literally print — see the Technical
+ * Manual p.46-47) does *not* by itself say whether this module's own
+ * idealized-chair convention needs a matching mirror flip: that depends on
+ * which enantiomer's /t-string InChI's own canonicalization happened to
+ * judge "smaller" for a *given ring shape*, which is an artifact of that
+ * algorithm, not a chemistry-level invariant — confirmed by cross-checking
+ * a deoxyhexose (Fuc = 6-deoxy-L-galactose, so it must share D-galactose's
+ * axial/equatorial pattern, since that classification is invariant under
+ * D/L mirroring) against the plain hexose shape: the same /m-driven flip
+ * that was correct for Hex/HexA/HexN/HexNAc/pentose gave Fuc's *exact
+ * inverse* of the correct answer.
+ *
+ * The real, general rule found by comparing ring shapes structurally:
+ * whether the flip applies depends on what's attached at ring position 5
+ * (the last ring carbon, the one bonded to the ring oxygen on the
+ * non-anomeric side) — if its exocyclic substituent has further heavy-atom
+ * neighbors (CH2OH, COOH: Hex/HexA/HexN/HexNAc), or there's no exocyclic
+ * substituent there at all (pentose), the /m-driven flip applies; if it's a
+ * single terminal atom (a deoxyhexose's CH3), it doesn't. This needs no
+ * external chemical classification — it's read directly off the same bond
+ * graph the ring-walk already parsed.
  */
 
 class Vec3 {
@@ -159,6 +181,37 @@ export function ringWalk(inchiLayers, ringSize = 6) {
   return { order, ringO, adj };
 }
 
+/**
+ * Whether the /m-layer mirror flip applies to this ring shape -- see the
+ * module docstring for why this isn't simply "always apply it". `order`
+ * ends with the ring oxygen (ringWalk's own convention), so `order` at
+ * index `length - 2` is the last ring *carbon* (ring position 5 for a
+ * pyranose): the one bonded to the ring oxygen on the non-anomeric side.
+ */
+function needsMirrorFlip(order, adj) {
+  const ringSet = new Set(order);
+  const c5Atom = order[order.length - 2];
+  const exo = [...adj.get(c5Atom)].filter((a) => !ringSet.has(a));
+  if (exo.length === 0) return true; // e.g. pentose: no exocyclic group -> default
+  const exoNeighbors = [...adj.get(exo[0])].filter((a) => a !== c5Atom);
+  return exoNeighbors.length > 0; // further atoms (CH2OH, COOH) vs a terminal CH3
+}
+
+/**
+ * Public wrapper: does this residue's ring shape need the /m-layer mirror
+ * flip at all? Exposed so callers computing their own D/L-dependent logic
+ * outside this module (e.g. HaworthLayout.js's anomeric-position-1
+ * orientation, which the type-level InChI leaves undefined and so can't go
+ * through deriveHaworthOrientation directly) stay consistent with it,
+ * rather than independently assuming every L-series residue mirrors a
+ * D-series one the same way. Returns null if the ring can't be identified.
+ */
+export function shapeNeedsMirrorFlip(layers, ringSize = 6) {
+  const walk = ringWalk(layers, ringSize);
+  if (!walk) return null;
+  return needsMirrorFlip(walk.order, walk.adj);
+}
+
 /** Idealized chair: ring atoms on a hexagon, alternating +/- z. */
 function buildChair(nRing) {
   const pos = [];
@@ -247,7 +300,7 @@ function resolveRingSubstituent(layers, tLayerMap, sugarPosition, ringSize) {
   ]);
 
   const mLayer = layers.m ?? '1';
-  const flip = mLayer === '0';
+  const flip = needsMirrorFlip(order, adj) && mLayer === '0';
   const applyFlip = (s) => (flip ? (s === '+' ? '-' : '+') : s);
 
   dirOf.set(exoAtom, axial);

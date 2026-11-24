@@ -1,6 +1,6 @@
 /*global QUnit*/
 
-import { deriveAxialEquatorial, deriveHaworthOrientation, parseCLayer, elementRanges, ringWalk } from '../../js/InChIRingGeometry.js';
+import { deriveAxialEquatorial, deriveHaworthOrientation, shapeNeedsMirrorFlip, parseCLayer, elementRanges, ringWalk } from '../../js/InChIRingGeometry.js';
 import { parseInChI, parseTLayer } from '../../js/InChITerminii.js';
 
 QUnit.module('InChIRingGeometry - parsing', {});
@@ -116,4 +116,46 @@ QUnit.test('Man: up, up, down, up (C2 flipped vs Glc)', function(assert) {
   assert.equal(deriveHaworthOrientation(layers, t, 3), 'up', 'C3 up');
   assert.equal(deriveHaworthOrientation(layers, t, 4), 'down', 'C4 down');
   assert.equal(deriveHaworthOrientation(layers, t, 5), 'up', 'C5 (CH2OH) up');
+});
+
+QUnit.module('InChIRingGeometry - shapeNeedsMirrorFlip', {});
+
+// The /m-layer mirror flip that's correct for a plain hexose (Gal/Glc/Man,
+// confirmed above) is NOT a universal rule -- it's specific to ring shapes
+// where ring position 5's exocyclic substituent has further heavy-atom
+// neighbors (CH2OH, COOH). A deoxyhexose's C5 bears a terminal CH3 instead,
+// and does not need the flip at all; applying it anyway gives the exact
+// inverse of the correct answer (caught by cross-checking Fuc, 6-deoxy-L-
+// galactose, against D-galactose's own axial/equatorial pattern, which must
+// match since that classification is invariant under D/L mirroring).
+QUnit.test('plain hexose (Gal): needs the mirror flip', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1');
+  assert.equal(shapeNeedsMirrorFlip(layers), true);
+});
+
+QUnit.test('deoxyhexose (Fuc): does NOT need the mirror flip', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+,4+,5-,6?/m0/s1');
+  assert.equal(shapeNeedsMirrorFlip(layers), false);
+});
+
+// Fuc and Rha (both 6-deoxyhexoses, both /m0) must derive DIFFERENT
+// patterns from each other (they're different compounds: fucose is
+// 6-deoxy-L-galactose, rhamnose is 6-deoxy-L-mannose), each matching its
+// D-series counterpart's axial/equatorial pattern exactly -- not sharing
+// one hardcoded string between them, and not inverted from it either.
+QUnit.test('Fuc matches Gal\'s pattern; Rha matches Man\'s -- not inverted, not identical to each other', function(assert) {
+  const fuc = parseInChI('InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+,4+,5-,6?/m0/s1');
+  const rha = parseInChI('InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3-,4+,5+,6?/m0/s1');
+  const fucT = parseTLayer(fuc.t);
+  const rhaT = parseTLayer(rha.t);
+
+  // Gal: eq, eq, ax (C2, C3, C4) -- Fuc must match.
+  assert.equal(deriveAxialEquatorial(fuc, fucT, 2), 'eq');
+  assert.equal(deriveAxialEquatorial(fuc, fucT, 3), 'eq');
+  assert.equal(deriveAxialEquatorial(fuc, fucT, 4), 'ax');
+
+  // Man: ax, eq, eq (C2, C3, C4) -- Rha must match.
+  assert.equal(deriveAxialEquatorial(rha, rhaT, 2), 'ax');
+  assert.equal(deriveAxialEquatorial(rha, rhaT, 3), 'eq');
+  assert.equal(deriveAxialEquatorial(rha, rhaT, 4), 'eq');
 });

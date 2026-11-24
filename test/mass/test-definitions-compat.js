@@ -102,7 +102,12 @@ terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH
 name:Fuc
 type:dHex
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH
+# Rha corrected from the original 4ax (a copy of Fuc's own line -- Fuc and
+# Rha used to share one hardcoded literal) to 2ax;3eq;4eq on 2026-11-24.
+# Rha is 6-deoxy-L-mannose, so it must share D-mannose's axial/equatorial
+# pattern (ax,eq,eq), not Fuc's (galactose's, eq,eq,ax) -- they're different
+# compounds. See js/data/PUBCHEM_CID_CORRECTIONS.md section 7.
+terminii:r1:OH;2ax:OH;3eq:OH;4eq:OH;5eq:-;6eq:HH
 name:Rha
 type:dHex
 

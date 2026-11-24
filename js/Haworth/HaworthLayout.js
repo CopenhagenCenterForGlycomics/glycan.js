@@ -33,14 +33,19 @@
  * can't resolve from the residue-type's own InChI: anomeric configuration is
  * set per Monosaccharide *instance* (alpha/beta), not per residue type, so
  * the type-level InChI leaves that stereocentre undefined ('?'). Its
- * orientation is instead computed from the anomer + D/L-series relationship
- * (alpha-D and beta-L share one ring face, beta-D and alpha-L the other),
- * validated against real anomer-specific InChI for alpha/beta-D-glucopyranose
- * and alpha/beta-L-fucopyranose (4/4).
+ * orientation is instead computed from the anomer + D/L-series relationship --
+ * but "alpha-D and beta-L share one ring face" is only true for ring shapes
+ * where the /m-layer mirror flip actually applies (see
+ * InChIRingGeometry.js's shapeNeedsMirrorFlip -- a deoxyhexose like Fuc does
+ * NOT mirror the same way a plain hexose does, confirmed against real
+ * anomer-specific InChI for alpha/beta-D-glucopyranose, where it applies,
+ * and alpha/beta-L-fucopyranose, where it doesn't: alpha-L-Fuc's anomeric
+ * OH is down, same face as alpha-D-Glc's, not up as a naive "L mirrors D"
+ * rule would give).
  */
 
 import { parseInChI, parseTLayer } from '../InChITerminii.js';
-import { deriveHaworthOrientation } from '../InChIRingGeometry.js';
+import { deriveHaworthOrientation, shapeNeedsMirrorFlip } from '../InChIRingGeometry.js';
 
 const SUBSTITUENT_LABELS = {
   OH: 'OH',
@@ -110,11 +115,15 @@ export function layoutSubstituents(terminii, inchi, opts = {}) {
 
   // C1 (anomeric): the type-level InChI leaves this stereocentre undefined
   // ('?'), since anomeric configuration is set per instance -- orientation
-  // comes from anomer + series instead. Alpha-D and beta-L share one ring
-  // face, beta-D and alpha-L the other.
+  // comes from anomer + series instead. "Alpha-D and beta-L share one ring
+  // face" only holds for ring shapes where the /m mirror flip actually
+  // applies (see InChIRingGeometry.js's shapeNeedsMirrorFlip); for a shape
+  // where it doesn't (e.g. a deoxyhexose), L-series behaves like D-series
+  // here, not its mirror.
   const c1 = positions.get(1);
   if (c1 && displayLabel(c1.label)) {
-    const up = (anomer === 'b') !== isL;
+    const mirrors = isL && (shapeNeedsMirrorFlip(layers) ?? true);
+    const up = (anomer === 'b') !== mirrors;
     substituents.push({ position: 1, label: displayLabel(c1.label), orientation: up ? 'up' : 'down' });
   }
 

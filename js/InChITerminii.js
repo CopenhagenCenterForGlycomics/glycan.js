@@ -254,48 +254,36 @@ function buildHexose(name, t, formula, isL, conformationOverride, warnings, laye
   };
 }
 
-function buildDeoxyhex(name, t, formula, isL, warnings) {
-  if (isL) {
-    // L-deoxyhex: 1C4 conformation (Fuc, Rha).
-    // DEFINITIONS encodes both Fuc and Rha as C4=ax (inherited from dHex).
-    // The InChI-based stereochemical derivation for 1C4 chair is ambiguous due
-    // to atom-number remapping in L-series. Hardcode to match DEFINITIONS.
-    const parts = [
-      `r1:OH`,
-      `2eq:OH`,
-      `3eq:OH`,
-      `4ax:OH`,
-      `5eq:-`,
-      `6eq:HH`,
-    ];
-    return {
-      terminii: parts.join(';'),
-      conformation: '1C4',
-      source: 'inchi',
-      warnings,
-    };
-  } else {
-    // D-deoxyhex: same /t→carbon mapping as D-hexose, with HH at C6
-    const tC2sign = t.get(D_HEXOSE_4C1.carb_C2_from_t_pos);
-    const tC4sign = t.get(D_HEXOSE_4C1.carb_C4_from_t_pos);
-    const c2 = tC2sign !== undefined ? (D_HEXOSE_4C1.C2[tC2sign] ?? 'eq') : 'eq';
-    const c4 = tC4sign !== undefined ? (D_HEXOSE_4C1.C4[tC4sign] ?? 'eq') : 'eq';
+function buildDeoxyhex(name, t, formula, isL, warnings, layers) {
+  // Deoxyhexose (Fuc, Rha): same ring shape for D- and L-series, both
+  // derived the same way now. This used to hardcode the L-series case
+  // outright (both Fuc and Rha to one shared literal, which was wrong for
+  // at least one of them), because applying the /m-layer mirror flip that's
+  // correct for a plain hexose gave this ring shape's *inverse* -- the real
+  // issue was that that flip doesn't apply to this shape at all (see
+  // InChIRingGeometry.js's shapeNeedsMirrorFlip), not that derivation was
+  // impossible. Validated against Fuc and Rha matching D-galactose's and
+  // D-mannose's own axial/equatorial patterns respectively (that
+  // classification is invariant under D/L mirroring) -- see
+  // PUBCHEM_CID_CORRECTIONS.md.
+  const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
+  const c3 = resolveRingPosition(layers, t, 3, 3, { '+': 'eq', '-': 'eq' });
+  const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
 
-    const parts = [
-      `r1:OH`,
-      `2${c2}:OH`,
-      `3eq:OH`,
-      `4${c4}:OH`,
-      `5eq:-`,
-      `6eq:HH`,
-    ];
-    return {
-      terminii: parts.join(';'),
-      conformation: '4C1',
-      source: 'inchi',
-      warnings,
-    };
-  }
+  const parts = [
+    `r1:OH`,
+    `2${c2}:OH`,
+    `3${c3}:OH`,
+    `4${c4}:OH`,
+    `5eq:-`,
+    `6eq:HH`,
+  ];
+  return {
+    terminii: parts.join(';'),
+    conformation: isL ? '1C4' : '4C1',
+    source: 'inchi',
+    warnings,
+  };
 }
 
 function buildDideoxyhex(name, t, formula, isL, warnings) {
@@ -531,9 +519,9 @@ export function inchiToTerminii(name, inchi, opts = {}) {
     case 'L_hexA':
       return buildHexose(name, t, formula, isL, opts.conformation, warnings, layers);
     case 'D_deoxyhex':
-      return buildDeoxyhex(name, t, formula, false, warnings);
+      return buildDeoxyhex(name, t, formula, false, warnings, layers);
     case 'L_deoxyhex':
-      return buildDeoxyhex(name, t, formula, true, warnings);
+      return buildDeoxyhex(name, t, formula, true, warnings, layers);
     case 'D_dideoxyhex':
     case 'L_dideoxyhex':
       return buildDideoxyhex(name, t, formula, isL, warnings);

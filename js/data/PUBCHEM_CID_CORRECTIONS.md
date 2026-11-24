@@ -157,39 +157,34 @@ separate call than the rendering work this investigation was for.
 (Update: this one *was* fixed -- see section 7's intro for why pentose was safe where
 deoxyhexose, below, was not.)
 
-## 7. Status of "can every residue just be a new InChI, no hardcoding": not yet, and here's why
+## 7. Status of "can every residue just be a new InChI, no hardcoding": resolved for deoxyhexoses (see section 8)
 
 Asked directly whether every hardcoded/special-cased spot catalogued in sections 5-6 (plus
 `PROKARYOTIC_OVERRIDES`, `buildDeoxyhex`'s L-series branch, `buildDideoxyhex`, `buildHeptose`,
 `buildSialic`, `buildKdo`) is safe to remove in favor of pure InChI derivation, so that adding
-a new monosaccharide is just adding its InChI. Short answer: **some yes, most not yet.**
+a new monosaccharide is just adding its InChI.
 
 **Converted to real derivation this session** (`resolveRingPosition`, falling back to the old
 heuristic only if the ring-walk can't resolve an InChI): `buildHexose` (Hex, HexA -- Gal, Glc,
-Man, GlcA, IdoA), `buildHexN` (GlcN), `buildHexNAc` (GalNAc, GlcNAc), `buildPentose` (Xyl, Ara).
-These four builders cover every currently-"live" Hex/HexA/HexN/HexNAc/pentose residue, and the
-ring shape in each case has been validated against independent ground truth (real anomer-specific
-InChI, or a same-stereocentre relative like Gal/Xyl's relationship to Glc).
+Man, GlcA, IdoA), `buildHexN` (GlcN), `buildHexNAc` (GalNAc, GlcNAc), `buildPentose` (Xyl, Ara),
+and -- after the fix in section 8 -- `buildDeoxyhex` (Fuc, Rha) too. These cover every
+currently-"live" Hex/HexA/HexN/HexNAc/pentose/deoxyhexose residue, each validated against
+independent ground truth (real anomer-specific InChI, or a same-stereocentre relative like
+Gal/Xyl's or Fuc/Gal's relationship).
 
-**Investigated and found NOT safe yet: `buildDeoxyhex`'s L-series branch (Fuc, Rha).** The
-natural next step -- apply the same `resolveRingPosition` treatment -- was tested and rejected.
-Real derivation gives Fuc = ax,ax,eq (C2/C3/C4) and Rha = eq,ax,ax: genuinely different from each
-other (correct -- they're different compounds) and both different from the current shared
-hardcoded string (`2eq,3eq,4ax` for both, which is wrong for at least one). But cross-checking
-Fuc against its own parent compound -- fucose is literally 6-deoxy-L-galactose, so its C2/C3/C4
-must carry the *same* axial/equatorial classification as galactose's (ax/eq is invariant under
-D/L mirroring; only R/S labels flip) -- exposed that the derivation was giving Fuc's pattern as
-the exact *inverse* of Gal's (ax,ax,eq vs Gal's eq,eq,ax), when it should match. Tracing it down:
-the `/m`-layer-driven mirror flip in `InChIRingGeometry.js` (`flip = mLayer === '0'`), which held
-up across every Hex/HexA/HexN/HexNAc/pentose case tested, does **not** hold for the deoxyhexose
-ring shape -- turning the flip off entirely reproduces Gal's pattern correctly for Fuc. In other
-words: **the `/m`-based flip is not actually the universal invariant it looked like from four
-ring shapes agreeing** -- it's something that happens to track `/m` for those shapes and doesn't
-for this one. I don't yet know the real general rule (likely something about how the local
-canonical-number ranking pattern around the ring shifts when the exocyclic C6 group changes from
-CH2OH to CH3, rather than `/m` itself). Shipping a shape-specific `flip=false` patch for dHex
-without understanding *why* would just be another hardcode wearing a geometry costume, so this
-was left alone -- `buildDeoxyhex`'s existing hardcode stays, Fuc/Rha are unchanged.
+**First attempt at `buildDeoxyhex` found a real problem, which section 8 then root-caused and
+fixed properly** -- the following paragraph is kept for the record of how that was found, since
+the method (cross-checking a derived result against an independent relative, not just trusting
+self-consistency) is the point, not just the answer:
+
+Applying the same `resolveRingPosition` treatment to `buildDeoxyhex` initially looked like it
+should just work, but cross-checking Fuc against its own parent compound -- fucose is literally
+6-deoxy-L-galactose, so its C2/C3/C4 must carry the *same* axial/equatorial classification as
+galactose's (ax/eq is invariant under D/L mirroring; only R/S labels flip) -- exposed that the
+derivation was giving Fuc's pattern as the exact *inverse* of Gal's. The `/m`-layer-driven mirror
+flip in `InChIRingGeometry.js`, which held up across every Hex/HexA/HexN/HexNAc/pentose case
+tested, does not hold for the deoxyhexose ring shape. See section 8 for the real, general fix
+(not a per-shape patch).
 
 **Not attempted (no live residue currently exercises these, so nothing to validate against):**
 `buildDideoxyhex`, `buildHeptose`, and the 16 `PROKARYOTIC_OVERRIDES` entries other than MurNAc
@@ -204,9 +199,49 @@ anomeric-carbon detection currently assumes the aldose pattern (ring-O neighbor 
 exocyclic *oxygen*, with an H), which doesn't fit a quaternary ketose center at all; that's a
 separate, deliberate scope boundary from the start of the Haworth work, not a new finding.
 
-**Bottom line for "just add a new InChI":** true today for Hex, HexA, HexN, HexNAc and pentose
-residues. For deoxyhexoses, dideoxyhexoses, heptoses, and anything with 2+ nitrogens or a ketose
-anomeric center, it isn't -- either the geometric method needs more per-shape validation work
-(deoxyhex, dideoxyhex, heptose), or the architecture needs extending first (multi-nitrogen
-classification, ketose anomeric detection). Removing those hardcodes now, rather than after that
-validation, would trade a known, documented approximation for a silent, undocumented one.
+**Bottom line for "just add a new InChI":** true today for Hex, HexA, HexN, HexNAc, pentose and
+deoxyhexose residues (see section 8 for why deoxyhexose needed one more real fix, not a
+shape-specific patch, to get there). For dideoxyhexoses, heptoses, and anything with 2+
+nitrogens or a ketose anomeric center, it isn't yet -- either the geometric method needs
+per-shape validation work extended to them (dideoxyhex, heptose), or the architecture needs
+extending first (multi-nitrogen classification, ketose anomeric detection).
+
+## 8. The real fix for deoxyhexoses: the `/m` flip isn't universal, but a structural rule is
+
+Section 7 left `buildDeoxyhex` unfixed because the `/m`-layer-driven mirror flip that worked for
+every other ring shape gave Fuc's exact inverse. Re-reading the InChI Technical Manual's actual
+definition of `/m` (p.46-47) explains why there's no contradiction to resolve by chemistry alone:
+
+> "InChI considers both enantiomers and selects the one that has the 'smaller' identifier. /m0
+> signifies that the selected one has exactly the same stereo arrangement as the input structure;
+> /m1 means that the selected one has the inverse arrangement."
+
+"Smaller" is chosen by InChI's own canonicalization algorithm, per molecular graph -- there is no
+reason that choice has to agree across different ring shapes, and empirically it doesn't. So
+`/m` alone can't tell you whether this module's own idealized-chair convention needs a matching
+flip; that's a property of the *shape*, not something `/m` encodes on its own.
+
+The fix: compare what's attached at ring position 5 (the last ring carbon, bonded to the ring
+oxygen on the non-anomeric side) -- if its exocyclic substituent has further heavy-atom
+neighbors (CH2OH for Hex/HexN/HexNAc, COOH for HexA), or there's no exocyclic substituent at all
+(pentose), the `/m`-driven flip applies. If it's a single terminal atom (a deoxyhexose's CH3),
+it doesn't. This is read directly off the same bond graph the ring-walk already parses --
+`InChIRingGeometry.js`'s `shapeNeedsMirrorFlip()` -- no external chemical classification needed.
+Re-validated against all 8 ring-shape/residue combinations tested so far (33/33 positions,
+including Fuc and Rha both now correct and correctly *different* from each other): Gal, Glc, Man,
+GalNAc, GlcNAc, GlcA, IdoA, GlcN, Xyl, Ara, Fuc, Rha, MurNAc.
+
+One more place this same shape-dependence showed up: `HaworthLayout.js`'s anomeric-position
+formula (`alpha-D and beta-L share a ring face`) was calibrated against the *old, buggy* Fuc
+Haworth output and needed re-deriving too -- it now calls `shapeNeedsMirrorFlip()` itself rather
+than assuming every L-series residue mirrors its D-series counterpart. Confirmed against real
+anomer-specific InChI for alpha/beta-D-glucopyranose and alpha/beta-L-fucopyranose: for the
+deoxyhexose shape, L-series does *not* mirror D-series at the anomeric centre either -- alpha-L-
+Fuc's anomeric OH matches alpha-D-Glc's face directly, not its mirror.
+
+`buildDeoxyhex` in `InChITerminii.js` now derives Fuc and Rha for real (same `resolveRingPosition`
+pattern as the other builders), and `DEFINITIONS` (`test/mass/test-definitions-compat.js`) was
+corrected: Rha's line used to be a copy of Fuc's (`4ax` for both), which was wrong for at least
+one of them since they're different compounds -- Rha now reads `2ax;3eq;4eq`, matching D-mannose's
+pattern as it must (Rha is 6-deoxy-L-mannose). Fuc's line was already correct (apparently by
+coincidence, since the old hardcode and the new real derivation agree) and didn't need to change.
