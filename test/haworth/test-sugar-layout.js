@@ -83,23 +83,64 @@ QUnit.test('the root (reducing end) is the rightmost residue', function(assert) 
 
 QUnit.test('an unresolvable or out-of-scope residue is reported and drawn as a placeholder, not crashed on', function(assert) {
   const root = new Monosaccharide('Gal');
-  const sialic = new Monosaccharide('NeuAc'); // real compound, but a ketose shape this renderer doesn't handle yet
-  sialic.anomer = 'a';
-  root.addChild(6, sialic);
+  const pentose = new Monosaccharide('Xyl'); // real compound, but a 5-part (no exocyclic C6) shape this renderer doesn't handle yet
+  pentose.anomer = 'a';
+  root.addChild(6, pentose);
   const unknown = new Monosaccharide('TotallyMadeUp');
   root.addChild(3, unknown);
 
   const { residues, unsupported } = sugarToHaworthInput(root);
-  assert.equal(unsupported.length, 2, 'both NeuAc (wrong ring shape) and the unknown identifier are flagged');
+  assert.equal(unsupported.length, 2, 'both Xyl (wrong ring shape) and the unknown identifier are flagged');
   const byNode = new Map(residues.map((r) => [r.id, r]));
-  assert.ok(byNode.get(sialic).placeholder, 'NeuAc drawn as placeholder');
+  assert.ok(byNode.get(pentose).placeholder, 'Xyl drawn as placeholder');
   assert.ok(byNode.get(unknown).placeholder, 'unknown identifier drawn as placeholder');
-  assert.equal(byNode.get(sialic).terminii, null, 'no terminii fed to the renderer for a placeholder');
+  assert.equal(byNode.get(pentose).terminii, null, 'no terminii fed to the renderer for a placeholder');
 
   // Must not throw despite the placeholders.
   const { svg } = renderSugarTreeSVG(root);
   assert.ok(svg.includes('<svg'), 'renders without error');
   assert.ok(svg.includes('stroke-dasharray'), 'placeholder residues drawn with a dashed circle');
+});
+
+// Sialyl-lactosamine-like structure: NeuAc(a2-6)Gal(b1-4)GlcNAc -- a real,
+// commonly-drawn motif, exercising a sialic-acid child (bonding via its own
+// anomeric hexagon-C1, same as any other shape's child) and a furanose
+// child in the same tree, both now real rings instead of placeholders.
+function sialylLacNAc() {
+  const glcNAc = new Monosaccharide('GlcNAc');
+  const gal = new Monosaccharide('Gal');
+  gal.anomer = 'b';
+  glcNAc.addChild(4, gal);
+  const neuAc = new Monosaccharide('NeuAc');
+  neuAc.anomer = 'a';
+  gal.addChild(6, neuAc);
+  const galf = new Monosaccharide('Galf');
+  galf.anomer = 'b';
+  gal.addChild(3, galf);
+  return { glcNAc, gal, neuAc, galf };
+}
+
+QUnit.test('NeuAc and Galf are real rings now, not placeholders, with the right shape tag', function(assert) {
+  const { glcNAc, neuAc, galf } = sialylLacNAc();
+  const { residues, unsupported, linkages } = sugarToHaworthInput(glcNAc);
+  assert.equal(unsupported.length, 0, 'nothing unsupported in this tree');
+  const byNode = new Map(residues.map((r) => [r.id, r]));
+  assert.equal(byNode.get(neuAc).shape, 'sialic');
+  assert.equal(byNode.get(galf).shape, 'furanose');
+  assert.notOk(byNode.get(neuAc).placeholder);
+  assert.notOk(byNode.get(galf).placeholder);
+  assert.ok(byNode.get(neuAc).terminii && byNode.get(neuAc).inchi);
+  assert.ok(byNode.get(galf).terminii && byNode.get(galf).inchi);
+
+  // NeuAc links via its own anomeric centre (hexagon C1), same as any
+  // other shape's child -- not sialic's native "C2" numbering.
+  const neuAcLink = linkages.find((l) => l.child === neuAc);
+  assert.ok(neuAcLink, 'NeuAc(a2-6)Gal recorded as a linkage');
+  assert.equal(neuAcLink.parentPosition, 6);
+
+  const { svg } = renderSugarTreeSVG(glcNAc);
+  assert.ok(svg.includes('<svg'), 'renders the whole tree without error');
+  assert.ok(!svg.includes('stroke-dasharray'), 'no placeholders left -- every residue is a real ring');
 });
 
 QUnit.module('HaworthSVG - renderSugarTreeSVG', {});

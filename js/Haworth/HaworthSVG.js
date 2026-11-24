@@ -15,20 +15,46 @@
  *                           included -- see SugarLayout.js.
  */
 
-import { layoutSubstituents, ringGeometry } from './HaworthLayout.js';
+import {
+  layoutSubstituents,
+  ringGeometry,
+  layoutFuranoseSubstituents,
+  furanoseGeometry,
+  layoutSialicSubstituents,
+} from './HaworthLayout.js';
 import { sugarToHaworthInput } from './SugarLayout.js';
 
 const STICK_LENGTH = 34;
 const PLACEHOLDER_RADIUS = 40;
+
+// Per-shape geometry + substituent-layout builder (see HaworthLayout.js).
+// Sialic reuses the hexose hexagon outright -- same 6-membered ring, only
+// the substituent-to-position mapping differs (handled inside
+// layoutSialicSubstituents itself).
+const SHAPE_BUILDERS = {
+  hexose: { geometry: ringGeometry, layout: (terminii, inchi, opts) => layoutSubstituents(terminii, inchi, opts) },
+  furanose: { geometry: furanoseGeometry, layout: (terminii, _inchi, opts) => layoutFuranoseSubstituents(terminii, opts) },
+  sialic: { geometry: ringGeometry, layout: (terminii, inchi, opts) => layoutSialicSubstituents(terminii, inchi, opts) },
+};
 
 function vertexForPosition(position, vertices) {
   // position 1-4 are ring carbons C1..C4; position 5 is C5, which carries
   // the exocyclic C6 group rather than its own ring substituent. A
   // glycosidic linkage at ring position 6 (e.g. Man(a1-6)Man, an N-glycan
   // core branch) has no separate ring vertex of its own -- it bonds where
-  // that exocyclic group already hangs, off C5.
+  // that exocyclic group already hangs, off C5. (A furanose ring never
+  // uses position 6 at all; a sialic ring's position 6 -- its own real C6 --
+  // already IS hexagon C5, so this remains correct there too.)
   if (position === 6) return vertices.C5;
   return vertices[`C${position}`];
+}
+
+// The ring oxygen vertex is named O5 for the hexose/sialic hexagon
+// (position 5's neighbor) but O4 for the furanose pentagon (position 4's
+// neighbor) -- found generically rather than hardcoding either name.
+function ringOxygenVertex(vertices) {
+  const key = Object.keys(vertices).find((k) => k[0] === 'O');
+  return key ? vertices[key] : null;
 }
 
 // The exocyclic C6 group (CH2OH, COOH, CH3...) is always reported by
@@ -45,15 +71,22 @@ function substituentPositionFor(ringPosition) {
  * coordinate frame (centered on (0,0)), without stringifying to SVG yet.
  * `suppressPositions` (a Set of ring positions) leaves out a substituent
  * stick at those positions -- used where a glycosidic bond takes its place.
+ * `shape` ('hexose' | 'furanose' | 'sialic', default 'hexose') picks which
+ * geometry + substituent layout to use -- see HaworthLayout.js.
  */
 function layoutResidue(terminii, inchi, opts = {}) {
-  const { anomer = 'b', suppressPositions = new Set() } = opts;
-  const { vertices, bonds } = ringGeometry();
-  const { substituents } = layoutSubstituents(terminii, inchi, { anomer });
+  const { anomer = 'b', suppressPositions = new Set(), shape = 'hexose' } = opts;
+  const builder = SHAPE_BUILDERS[shape] ?? SHAPE_BUILDERS.hexose;
+  const { vertices, bonds } = builder.geometry();
+  const { substituents } = builder.layout(terminii, inchi, { anomer });
   return {
     vertices,
     bonds,
-    substituents: substituents.filter((s) => !suppressPositions.has(s.position)),
+    // neverSuppress: some shapes (sialic) put two independent substituents
+    // on the same vertex (the anomeric OH a glycosidic bond replaces, and
+    // the COOH that's always there regardless) -- see
+    // layoutSialicSubstituents.
+    substituents: substituents.filter((s) => s.neverSuppress || !suppressPositions.has(s.position)),
   };
 }
 
@@ -70,9 +103,19 @@ function residueSVGParts(layout, offset) {
       `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round"/>`
     );
   }
-  const o5 = toScreen(vertices.O5);
+  const ringO = toScreen(ringOxygenVertex(vertices));
   parts.push(
-    `<text x="${o5.x.toFixed(1)}" y="${(o5.y - 6).toFixed(1)}" text-anchor="middle" font-size="13" fill="currentColor">O</text>`
+    `<text x="${ringO.x.toFixed(1)}" y="${(ringO.y - 6).toFixed(1)}" text-anchor="middle" font-size="13" fill="currentColor">O</text>`
+  );
+
+  // The ring-junction position bearing the exocyclic chain gets a longer,
+  // composite label (CH2OH, COOH, a furanose's 2-carbon tail, a sialic
+  // acid's 3-carbon tail...) that reads better anchored to one side than
+  // centered -- that's always the highest-numbered ring carbon (5 for the
+  // hexose/sialic hexagon, 4 for the furanose pentagon), found generically
+  // rather than hardcoding either number.
+  const lastRingPosition = Math.max(
+    ...Object.keys(vertices).filter((k) => k[0] === 'C').map((k) => parseInt(k.slice(1), 10))
   );
 
   for (const sub of substituents) {
@@ -80,20 +123,30 @@ function residueSVGParts(layout, offset) {
     if (!ring) continue;
     const screenRing = toScreen(ring);
     const dy = sub.orientation === 'up' ? -STICK_LENGTH : STICK_LENGTH;
+    // Nudge the stick outward (away from ring center) horizontally too, not
+    // just vertically -- a purely vertical stick from a corner vertex (C5,
+    // the one next to the ring oxygen) can cross back through the ring's
+    // own interior when its orientation points toward the opposite edge
+    // (e.g. IdoA's axial COOH at C5, or a sialic acid's glycerol tail),
+    // overlapping other labels. Real Haworth drawings usually angle these
+    // sticks outward instead of straight up/down; this approximates that
+    // generically from each vertex's own offset from ring center, rather
+    // than special-casing any one shape or position.
+    const stickEndX = screenRing.x + ring.x * 0.35;
     const labelY = screenRing.y + dy;
-    const textAnchor = sub.position === 5 ? (dy < 0 ? 'end' : 'start') : 'middle';
+    const textAnchor = sub.position === lastRingPosition ? (dy < 0 ? 'end' : 'start') : 'middle';
     parts.push(
-      `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${screenRing.x.toFixed(1)}" y2="${(labelY + (dy < 0 ? 8 : -8)).toFixed(1)}" stroke="currentColor" stroke-width="1.4"/>`
+      `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEndX.toFixed(1)}" y2="${(labelY + (dy < 0 ? 8 : -8)).toFixed(1)}" stroke="currentColor" stroke-width="1.4"/>`
     );
     parts.push(
-      `<text x="${screenRing.x.toFixed(1)}" y="${(labelY + (dy < 0 ? -2 : 10)).toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${sub.label}</text>`
+      `<text x="${stickEndX.toFixed(1)}" y="${(labelY + (dy < 0 ? -2 : 10)).toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${sub.label}</text>`
     );
   }
   return parts;
 }
 
 // A residue outside HaworthLayout.js's documented ring-shape scope (see
-// SugarLayout.js's isSupportedRingShape) is drawn as a plain labeled
+// SugarLayout.js's detectRingShape) is drawn as a plain labeled
 // placeholder instead of a real Haworth ring, so a whole real glycan tree
 // can still render without crashing or silently misreading its terminii.
 function placeholderSVGParts(label, offset) {
@@ -117,6 +170,7 @@ function anchorPoint(layout, position, offset) {
  *   orientation; see HaworthLayout.js)
  * @param {object} [opts]
  * @param {'a'|'b'} [opts.anomer='b']
+ * @param {'hexose'|'furanose'|'sialic'} [opts.shape='hexose']
  * @param {number} [opts.width=260]
  * @param {number} [opts.height=220]
  * @param {string} [opts.title] - optional <title> element for accessibility/tooltips
@@ -124,8 +178,8 @@ function anchorPoint(layout, position, offset) {
  *   `currentColor`, so wrap it in an element with the desired `color` set)
  */
 function renderResidueSVG(terminii, inchi, opts = {}) {
-  const { anomer = 'b', width = 260, height = 220, title } = opts;
-  const layout = layoutResidue(terminii, inchi, { anomer });
+  const { anomer = 'b', shape = 'hexose', width = 260, height = 220, title } = opts;
+  const layout = layoutResidue(terminii, inchi, { anomer, shape });
   const parts = [];
   parts.push(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" font-family="Georgia, 'Times New Roman', serif" color="currentColor">`
@@ -144,14 +198,15 @@ function renderResidueSVG(terminii, inchi, opts = {}) {
  * from a real residue tree, branches included).
  *
  * @param {Array<{id: object, terminii: string|null, inchi: string|null,
- *   anomer?: 'a'|'b', x: number, y: number, label?: string,
- *   placeholder?: boolean}>} residues
+ *   anomer?: 'a'|'b', shape?: 'hexose'|'furanose'|'sialic', x: number,
+ *   y: number, label?: string, placeholder?: boolean}>} residues
  *   `x`/`y` are this residue's ring-center position on the shared canvas.
  *   `id` just needs to be usable as a Map key and compared with `===` --
  *   an object reference (e.g. the Monosaccharide node itself) works fine.
- *   `placeholder: true` (with `terminii`/`inchi` left null) draws a plain
- *   labeled circle instead of a real Haworth ring, for a residue shape this
- *   renderer doesn't handle yet (see SugarLayout.js's isSupportedRingShape).
+ *   `shape` defaults to 'hexose' if omitted. `placeholder: true` (with
+ *   `terminii`/`inchi` left null) draws a plain labeled circle instead of a
+ *   real Haworth ring, for a residue shape this renderer doesn't handle yet
+ *   (see SugarLayout.js's detectRingShape).
  * @param {Array<{child: object, parent: object, parentPosition: number}>} linkages
  *   e.g. {child: gal, parent: glcNAc, parentPosition: 4} for a
  *   Gal-(1->4)-GlcNAc bond: the child's anomeric C1 connects to the
@@ -179,6 +234,7 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
         ? { placeholder: true }
         : layoutResidue(r.terminii, r.inchi, {
           anomer: r.anomer ?? 'b',
+          shape: r.shape ?? 'hexose',
           suppressPositions: suppressByResidue.get(r.id),
         }),
     ])

@@ -1,6 +1,12 @@
 /*global QUnit*/
 
-import { layoutSubstituents, parseTerminii } from '../../js/Haworth/HaworthLayout.js';
+import {
+  layoutSubstituents,
+  parseTerminii,
+  layoutFuranoseSubstituents,
+  furanoseGeometry,
+  layoutSialicSubstituents,
+} from '../../js/Haworth/HaworthLayout.js';
 
 QUnit.module('HaworthLayout - parseTerminii', {});
 
@@ -92,4 +98,88 @@ QUnit.test('anomer/series relationship: true enantiomers (D-/L-fucopyranose) ful
   assert.equal(c1(glcBeta), 'up');
   assert.equal(c1(fucAlpha), 'up', 'alpha-L-Fuc is the full inverse of alpha-D-Glc\'s face');
   assert.equal(c1(fucBeta), 'down', 'beta-L-Fuc is the full inverse of beta-D-Glc\'s face');
+});
+
+QUnit.module('HaworthLayout - furanoseGeometry', {});
+
+QUnit.test('pentagon: 5 vertices (4 ring carbons + the ring oxygen, O4), 3 bold front edges', function(assert) {
+  const { vertices, bonds } = furanoseGeometry();
+  assert.deepEqual(Object.keys(vertices).sort(), ['C1', 'C2', 'C3', 'C4', 'O4'].sort());
+  const boldCount = bonds.filter((b) => b.bold).length;
+  assert.equal(boldCount, 3, 'C1-C2, C2-C3, C3-C4 all bold -- matches the published alpha-D-ribofuranose structure');
+  assert.equal(bonds.length, 5, '5 ring bonds total');
+});
+
+QUnit.module('HaworthLayout - layoutFuranoseSubstituents (Galf/Glcf/Manf)', {});
+
+// Galf's terminii (r1:OH;2eq:OH;3ax:OH;4ax:CHOHCHHOH) are hand-authored
+// literals, not InChI-derived -- see InChITerminii.js. This uses the same
+// even/odd position-parity rule as the hexose shape; D-series only, so the
+// D/L correction isn't exercised here (see layoutFuranoseSubstituents'
+// own docstring).
+const GALF_TERMINII = 'r1:OH;2eq:OH;3ax:OH;4ax:CHOHCHHOH';
+
+QUnit.test('beta-D-Galf: up, down, down, up (C1-C4) -- the composite C5-C6 tail reads as one label', function(assert) {
+  const { substituents } = layoutFuranoseSubstituents(GALF_TERMINII, { anomer: 'b' });
+  const byPos = Object.fromEntries(substituents.map((s) => [s.position, s]));
+  assert.equal(byPos[1].orientation, 'up', 'C1 (beta) up');
+  assert.equal(byPos[2].orientation, 'down');
+  assert.equal(byPos[3].orientation, 'down');
+  assert.equal(byPos[4].orientation, 'up');
+  assert.equal(byPos[4].label, 'CH(OH)CH₂OH', 'the C5-C6 tail drawn as one composite label, like the hexose shape\'s C6 group');
+});
+
+QUnit.test('alpha-D-Galf: only C1 flips relative to beta', function(assert) {
+  const { substituents } = layoutFuranoseSubstituents(GALF_TERMINII, { anomer: 'a' });
+  const byPos = Object.fromEntries(substituents.map((s) => [s.position, s.orientation]));
+  assert.equal(byPos[1], 'down');
+  assert.equal(byPos[2], 'down');
+  assert.equal(byPos[3], 'down');
+  assert.equal(byPos[4], 'up');
+});
+
+QUnit.module('HaworthLayout - layoutSialicSubstituents (NeuAc/NeuGc/NeuAc9Ac)', {});
+
+// NeuAc's terminii (1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH)
+// use sialic's own numbering (see InChITerminii.js's buildSialic), remapped
+// internally onto the SAME hexagon the hexose shape uses: sialic C2
+// (anomeric) = hexagon C1, sialic C4/C5/C6 = hexagon C3/C4/C5. Sialic C3
+// (a plain CH2, not a stereocentre) has nothing to derive and is correctly
+// absent from the output; the C7-C8-C9 glycerol tail is one composite
+// label hanging off hexagon C5, the same position the hexose shape's own
+// C6 group hangs off.
+const NEUAC_INCHI = 'InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)21-9(7)8(17)6(16)3-13/h5-9,13,15-17,20H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8+,9+,11?/m0/s1';
+const NEUAC_TERMINII = '1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH';
+
+QUnit.test('alpha-NeuAc: the anomeric OH and the exocyclic COOH are a complementary pair at hexagon C1', function(assert) {
+  const { substituents } = layoutSialicSubstituents(NEUAC_TERMINII, NEUAC_INCHI, { anomer: 'a' });
+  const atC1 = substituents.filter((s) => s.position === 1);
+  assert.equal(atC1.length, 2, 'both the OH and the COOH are reported, both at hexagon C1');
+  const oh = atC1.find((s) => s.label === 'OH');
+  const cooh = atC1.find((s) => s.label === 'COOH');
+  assert.ok(oh && cooh, 'one is the anomeric OH, the other the exocyclic COOH');
+  assert.notEqual(oh.orientation, cooh.orientation, 'complementary faces -- never both up or both down');
+  assert.ok(cooh.neverSuppress, 'COOH must survive a glycosidic-bond suppression at position 1 (that only replaces the OH)');
+
+  assert.equal(substituents.find((s) => s.position === 2), undefined, 'sialic C3 (hexagon C2, a plain CH2) has nothing to derive, so nothing is drawn there');
+
+  // Sialic C4/C5/C6 (hexagon C3/C4/C5): real, InChI-derived stereocentres,
+  // matching the well-documented 2C5 conformation (equatorial C4/C5/C6).
+  const byPos = Object.fromEntries(substituents.map((s) => [s.position, s]));
+  assert.equal(byPos[3].orientation, 'down', 'sialic C4');
+  assert.equal(byPos[4].orientation, 'up', 'sialic C5');
+  assert.equal(byPos[5].orientation, 'down', 'sialic C6 (where the tail hangs)');
+  assert.equal(byPos[5].label, 'CH(OH)CH(OH)CH₂OH', 'the C7-C8-C9 tail drawn as one composite label');
+});
+
+QUnit.test('beta-NeuAc: only the anomeric OH/COOH pair flips relative to alpha; the real ring stereocentres do not', function(assert) {
+  const alpha = layoutSialicSubstituents(NEUAC_TERMINII, NEUAC_INCHI, { anomer: 'a' }).substituents;
+  const beta = layoutSialicSubstituents(NEUAC_TERMINII, NEUAC_INCHI, { anomer: 'b' }).substituents;
+  const at = (subs, pos, label) => subs.find((s) => s.position === pos && (!label || s.label === label));
+
+  assert.notEqual(at(alpha, 1, 'OH').orientation, at(beta, 1, 'OH').orientation);
+  assert.notEqual(at(alpha, 1, 'COOH').orientation, at(beta, 1, 'COOH').orientation);
+  for (const pos of [3, 4, 5]) {
+    assert.equal(at(alpha, pos).orientation, at(beta, pos).orientation, `position ${pos} unaffected by anomer`);
+  }
 });

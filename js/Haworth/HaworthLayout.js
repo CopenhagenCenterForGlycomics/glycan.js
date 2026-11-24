@@ -1,21 +1,23 @@
 /**
  * Builds a Haworth-projection layout (ring vertices, bonds, substituent
- * sticks + labels) for a single pyranose residue.
+ * sticks + labels) for a single residue, for three ring shapes:
  *
- * Scope: the common 6-membered-ring terminii shape shared by Hex, HexA,
- * HexN, HexNAc and dHex (`r1:X;2{eq|ax}:X;3{eq|ax}:X;4{eq|ax}:X;5{eq|ax}:X;6eq:X`)
- * -- i.e. everything currently built by InChITerminii.js's buildHexose /
- * buildHexN / buildHexNAc / buildDeoxyhex. Furanoses (4-part terminii, a
- * 5-membered ring) and sialic acids (9-part terminii, a different ring
- * numbering and ketose topology) are a different shape each and are not
- * handled here yet.
+ *  - layoutSubstituents() / ringGeometry(): the common 6-membered-ring
+ *    terminii shape shared by Hex, HexA, HexN, HexNAc and dHex
+ *    (`r1:X;2{eq|ax}:X;3{eq|ax}:X;4{eq|ax}:X;5{eq|ax}:X;6eq:X`).
+ *  - layoutFuranoseSubstituents() / furanoseGeometry(): the 4-part
+ *    terminii, 5-membered-ring shape (Galf/Glcf/Manf).
+ *  - layoutSialicSubstituents() / (reuses ringGeometry()): the 9-part
+ *    terminii ketose shape (NeuAc/NeuGc/NeuAc9Ac/NeuGc9Ac).
  *
- * Orientation (up/down) for ring positions 2-5 starts from the terminii
- * string's own ax/eq labels, via a fixed position-parity rule
- * (orientationFromAxEq) -- safe because every builder that produces a live
- * terminii string derives every real ring stereocentre (position 5
- * included) from the residue's actual InChI, none of them hardcoded (see
- * js/data/PUBCHEM_CID_CORRECTIONS.md, section 13).
+ * See each function's own docstring for its shape-specific details.
+ *
+ * For the hexose shape, orientation (up/down) for ring positions 2-5
+ * starts from the terminii string's own ax/eq labels, via a fixed
+ * position-parity rule (orientationFromAxEq) -- safe because every builder
+ * that produces a live terminii string derives every real ring
+ * stereocentre (position 5 included) from the residue's actual InChI, none
+ * of them hardcoded (see js/data/PUBCHEM_CID_CORRECTIONS.md, section 13).
  *
  * But that parity rule alone ISN'T enough: axial/equatorial is invariant
  * between true D/L enantiomers, while Haworth up/down genuinely is NOT --
@@ -38,19 +40,22 @@
  * before the same D/L correction is applied).
  */
 
-import { parseInChI } from '../InChITerminii.js';
-import { shapeNeedsMirrorFlip } from '../InChIRingGeometry.js';
+import { parseInChI, parseTLayer } from '../InChITerminii.js';
+import { shapeNeedsMirrorFlip, deriveHaworthOrientation } from '../InChIRingGeometry.js';
 
 const SUBSTITUENT_LABELS = {
   OH: 'OH',
+  O: 'OH',       // a ketose anomeric centre's reducing-end hydroxyl is written as a bare "O" in terminii (see InChITerminii.js's buildSialic) -- same chemistry as "OH" everywhere else, just a mass-accounting quirk of the "r"-prefixed reducing-end token
+
   NHAc: 'NHAc',
   NHGc: 'NHGc',
   NH2: 'NH₂',
   H: 'H',
   HOH: 'CH₂OH',   // C6 of a hexose: 2H + 1 OH on the exocyclic carbon
   HH: 'CH₃',      // C6 of a 6-deoxyhexose (Fuc, Rha): deoxygenated
-  OO: 'COOH',          // C6 of a uronic acid (GlcA, IdoA): oxidised
+  OO: 'COOH',          // C6 of a uronic acid (GlcA, IdoA), or sialic C1
   OLac: 'O-Lactyl',    // MurNAc's C3 ether substituent
+  CHOHCHHOH: 'CH(OH)CH₂OH', // furanose C5-C6 tail (Galf/Glcf/Manf)
   '-': null,
   x: null,
 };
@@ -189,4 +194,183 @@ export function ringGeometry() {
     { from: 'C5', to: 'O5', bold: false },
   ];
   return { vertices, bonds };
+}
+
+/**
+ * Idealized 2D Haworth pentagon: 5 ring vertices (4 carbons + the ring
+ * oxygen), for the furanose ring shape (Galf/Glcf/Manf's 4-part terminii:
+ * `r1:OH;2{eq|ax}:OH;3{eq|ax}:OH;4{eq|ax}:<C5-C6 tail>`). Ring oxygen at
+ * top, C1 (anomeric) adjacent on the right -- confirmed against the
+ * published alpha-D-ribofuranose Haworth structure (Wikimedia Commons,
+ * File:Alpha-D-Ribofuranose.svg): unlike the hexose ring, a furanose's
+ * whole front arc (C1-C2-C3-C4) is conventionally drawn bold, not just two
+ * of its five edges.
+ */
+export function furanoseGeometry() {
+  const cx = 0;
+  const cy = 0;
+  const r = 78;
+  const angles = {
+    O4: 270,
+    C1: 342,
+    C2: 54,
+    C3: 126,
+    C4: 198,
+  };
+  const vertices = {};
+  for (const [name, deg] of Object.entries(angles)) {
+    const rad = (deg * Math.PI) / 180;
+    vertices[name] = { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  const bonds = [
+    { from: 'O4', to: 'C1', bold: false },
+    { from: 'C1', to: 'C2', bold: true },
+    { from: 'C2', to: 'C3', bold: true },
+    { from: 'C3', to: 'C4', bold: true },
+    { from: 'C4', to: 'O4', bold: false },
+  ];
+  return { vertices, bonds };
+}
+
+/**
+ * Build layout for the furanose ring shape (Galf/Glcf/Manf). Its terminii
+ * are hand-authored literals (see InChITerminii.js), not InChI-derived the
+ * way the hexose shape's are -- every live furanose entry is D-series, so
+ * the D/L correction layoutSubstituents needs for the hexose shape isn't
+ * exercised here (nothing to cross-check against yet, the same situation
+ * hexose's own flip was in before an L-series example exposed its bug --
+ * see InChIRingGeometry.js). This uses the same even/odd position-parity
+ * rule as orientationFromAxEq, which hasn't been independently verified
+ * for a 5-membered ring the way it was for the hexagon: a reasonable first
+ * pass, not a verified one.
+ */
+export function layoutFuranoseSubstituents(terminii, opts = {}) {
+  const { anomer = 'b' } = opts;
+  const { positions } = parseTerminii(terminii);
+  const substituents = [];
+
+  const c1 = positions.get(1);
+  if (c1 && displayLabel(c1.label)) {
+    const orientation = anomer === 'b' ? 'up' : 'down';
+    substituents.push({ position: 1, label: displayLabel(c1.label), orientation });
+  }
+
+  for (const pos of [2, 3, 4]) {
+    const entry = positions.get(pos);
+    if (!entry) continue;
+    const label = displayLabel(entry.label);
+    if (!label) continue;
+    const orientation = orientationFromAxEq(pos, entry.axEq);
+    if (orientation) substituents.push({ position: pos, label, orientation });
+  }
+
+  return { substituents };
+}
+
+/** Parse a sialic-acid terminii string (9-part, using sialic's own
+ * numbering 1-9 directly) -- unlike parseTerminii, no position number is
+ * special-cased: sialic's own position 6 is a real ring stereocentre, not
+ * an exocyclic-group marker the way hexose's position 6 is. */
+function parseSialicTerminii(terminii) {
+  const positions = new Map();
+  for (const token of terminii.split(';')) {
+    const m = token.match(/^r?(\d+)(eq|ax)?:(.+)$/);
+    if (!m) continue;
+    const [, posStr, axEq, label] = m;
+    positions.set(parseInt(posStr, 10), { label, axEq: axEq ?? null });
+  }
+  return positions;
+}
+
+function sialicTailLabel(c7, c8, c9) {
+  if (!c7 || !c8 || !c9) return null;
+  const tailEnd = c9.label === 'HOHAc' ? 'CH₂OAc' : 'CH₂OH';
+  return `CH(OH)CH(OH)${tailEnd}`;
+}
+
+/**
+ * Build layout for the sialic-acid ring shape (NeuAc/NeuGc/NeuAc9Ac/
+ * NeuGc9Ac) -- a ketose: the anomeric centre (sialic C2) is quaternary,
+ * bearing BOTH an exocyclic OH and an exocyclic COOH chain (sialic C1),
+ * not the usual aldose's OH+H. Reuses the hexose ring's own hexagon
+ * (ringGeometry()) -- same 6-membered ring, just different numbering (see
+ * InChITerminii.js's buildSialic): sialic C2 (anomeric) = hexagon C1,
+ * sialic C3 (a plain CH2, not a stereocentre) = hexagon C2, sialic
+ * C4/C5/C6 = hexagon C3/C4/C5, with the C7-C8-C9 glycerol tail hanging off
+ * hexagon C5 (the same position hexose's own C6 group hangs off).
+ *
+ * Positions 4/5/6 (sialic numbering) are real, InChI-derived stereocentres
+ * (ring-walk positions 3/4/5), handled exactly like any hexose position
+ * via deriveHaworthOrientation, D/L correction included -- though that
+ * correction has only been independently verified (against a published
+ * reference structure) for the hexose/deoxyhexose/HexA shapes so far, not
+ * for a ketose: no live sialic compound has a real counter-enantiomer to
+ * cross-check against the way Fuc has Gal, so this is the system's own
+ * consistent convention here, not independently confirmed -- worth
+ * revisiting if a published sialic acid Haworth reference ever turns up.
+ *
+ * The anomeric OH and the exocyclic COOH are NOT independently derived
+ * (same anomer/instance-level situation as every other family's position
+ * 1) -- they're a complementary pair on the same quaternary carbon (one
+ * up, one down, always), so only the OH's orientation is computed (the
+ * same anomer-based rule as every other shape's C1), and COOH is simply
+ * its opposite face.
+ */
+export function layoutSialicSubstituents(terminii, inchi, opts = {}) {
+  const { anomer = 'b' } = opts;
+  const positions = parseSialicTerminii(terminii);
+  const substituents = [];
+
+  const layers = parseInChI(inchi);
+  const mLayer = layers.m ?? '1';
+  const shapeFlip = shapeNeedsMirrorFlip(layers) ?? false;
+  const extraInvert = (mLayer === '0') !== shapeFlip;
+  const flip = (o) => (o && extraInvert ? (o === 'up' ? 'down' : 'up') : o);
+
+  // Anomeric OH ("r2") + exocyclic COOH (sialic C1), both at hexagon C1.
+  const ohEntry = positions.get(2);
+  const ohLabel = ohEntry && displayLabel(ohEntry.label);
+  if (ohLabel) {
+    const ohOrientation = flip(anomer === 'b' ? 'up' : 'down');
+    substituents.push({ position: 1, label: ohLabel, orientation: ohOrientation });
+    const coohEntry = positions.get(1);
+    const coohLabel = coohEntry && displayLabel(coohEntry.label);
+    if (coohLabel) {
+      // neverSuppress: this COOH isn't the reducing-end substituent a
+      // glycosidic bond at position 1 replaces (the anomeric OH above is)
+      // -- it's always there regardless of linkage, so a suppression keyed
+      // on "position 1" (see HaworthSVG.js) must not hide it too, even
+      // though it shares the OH's vertex.
+      substituents.push({
+        position: 1,
+        label: coohLabel,
+        orientation: ohOrientation === 'up' ? 'down' : 'up',
+        neverSuppress: true,
+      });
+    }
+  }
+
+  // Sialic C4/C5/C6 = ring-walk / hexagon positions 3/4/5 -- real,
+  // InChI-derived stereocentres.
+  const tLayerMap = parseTLayer(layers.t);
+  const SIALIC_TO_HEXAGON = { 4: 3, 5: 4, 6: 5 };
+  for (const sialicPos of [4, 5, 6]) {
+    const entry = positions.get(sialicPos);
+    const label = entry && displayLabel(entry.label);
+    if (!label) continue;
+    const hexagonPos = SIALIC_TO_HEXAGON[sialicPos];
+    const orientation = deriveHaworthOrientation(layers, tLayerMap, hexagonPos);
+    if (orientation) substituents.push({ position: hexagonPos, label, orientation });
+  }
+
+  // C7-C8-C9 glycerol tail, hanging off hexagon C5 (sialic C6) -- drawn as
+  // one composite label, the same simplification hexose's own C6 (CH2OH)
+  // gets rather than a fully separate per-atom drawing.
+  const tailLabel = sialicTailLabel(positions.get(7), positions.get(8), positions.get(9));
+  if (tailLabel) {
+    const orientation = deriveHaworthOrientation(layers, tLayerMap, 5);
+    if (orientation) substituents.push({ position: 5, label: tailLabel, orientation });
+  }
+
+  return { substituents };
 }

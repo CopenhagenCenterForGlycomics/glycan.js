@@ -16,6 +16,14 @@ import { ringGeometry } from './HaworthLayout.js';
 // linking to a "lower" vertex -- otherwise their bond lines cross (two
 // residues can easily end up sorted the other way around purely by
 // traversal order, with nothing to do with where they actually attach).
+// Known simplification: this assumes the hexose hexagon's own vertex
+// y-positions, which is also correct for a sialic parent (same hexagon,
+// see HaworthLayout.js's layoutSialicSubstituents) but not for a furanose
+// parent (a differently-shaped pentagon) -- a furanose parent with more
+// than one child could still get its siblings ordered by the wrong
+// geometry. Narrow enough to leave for a future pass: fixing it means
+// threading each node's own resolved shape into layoutTree, which doesn't
+// otherwise need residue-type data at all (pure tree structure).
 const RING_VERTEX_Y = (() => {
   const { vertices } = ringGeometry();
   const y = {};
@@ -44,16 +52,25 @@ function resolveResidueData(identifier) {
 }
 
 /**
- * HaworthLayout.js only handles the common 6-membered-ring shape
- * (r1;2;3;4;5;6 -- Hex/HexA/HexN/HexNAc/dHex/dideoxyhex/MurNAc). Furanoses
- * (4-part), pentoses (5-part, no exocyclic C6), sialic acids (9-part,
- * different ring numbering) and non-ring residues (ions, sulfate, methyl)
- * are a different shape each, not handled here yet -- rendered as a
- * placeholder instead of silently misreading their terminii onto this
- * module's hexagon vertices.
+ * Which ring shape (if any) a terminii string matches -- HaworthLayout.js
+ * has a geometry + substituent layout for each of these three:
+ *   'hexose'   -- the 6-part r1;2;3;4;5;6 shape (Hex/HexA/HexN/HexNAc/dHex/
+ *                 dideoxyhex/MurNAc).
+ *   'furanose' -- the 4-part r1;2;3;4 shape, a 5-membered ring (Galf/Glcf/Manf).
+ *   'sialic'   -- the 9-part shape, a ketose (NeuAc/NeuGc/NeuAc9Ac/NeuGc9Ac).
+ * Anything else (pentoses -- a 5-part shape with no exocyclic C6 and no
+ * HaworthLayout.js support yet -- or non-ring residues like ions/sulfate/
+ * methyl, or a residue this registry doesn't know at all) returns null and
+ * is rendered as a placeholder instead of silently misreading its terminii
+ * onto the wrong vertices.
  */
-function isSupportedRingShape(terminii) {
-  return typeof terminii === 'string' && terminii.startsWith('r1:') && terminii.split(';').length === 6;
+function detectRingShape(terminii) {
+  if (typeof terminii !== 'string') return null;
+  const parts = terminii.split(';').length;
+  if (terminii.startsWith('r1:') && parts === 6) return 'hexose';
+  if (terminii.startsWith('r1:') && parts === 4) return 'furanose';
+  if (terminii.includes('r2:') && parts === 9) return 'sialic';
+  return null;
 }
 
 const DEFAULT_SPACING_X = 260;
@@ -139,12 +156,13 @@ export function sugarToHaworthInput(root, opts = {}) {
 
   for (const [node, pos] of rawPositions) {
     const data = resolveResidueData(node.identifier);
-    const supported = data && isSupportedRingShape(data.terminii);
+    const shape = data && detectRingShape(data.terminii);
+    const supported = Boolean(shape);
     if (!supported) {
       unsupported.push({
         node,
         identifier: node.identifier,
-        reason: data ? 'unsupported ring shape (not a 6-position pyranose)' : 'not found in monosaccharide data',
+        reason: data ? 'unsupported ring shape (not hexose/furanose/sialic)' : 'not found in monosaccharide data',
       });
     }
 
@@ -152,6 +170,7 @@ export function sugarToHaworthInput(root, opts = {}) {
       id: node,
       terminii: supported ? data.terminii : null,
       inchi: supported ? data.inchi : null,
+      shape: shape ?? undefined,
       anomer: node.anomer === 'a' ? 'a' : 'b',
       x: pos.x,
       y: pos.y * spacingY,
