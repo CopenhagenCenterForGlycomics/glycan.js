@@ -412,9 +412,23 @@ function buildHeptose(name, t, formula, isL, warnings) {
   };
 }
 
-function buildSialic(name, t, formula, warnings) {
-  // NeuAc-like: fixed topology.
-  // terminii: 1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH
+function buildSialic(name, t, formula, warnings, layers) {
+  // NeuAc-like: a ketose. The anomeric centre (sialic C2) is quaternary --
+  // bonded to the ring O, the ring, an exocyclic OH, AND an exocyclic COOH
+  // carbon, with no H -- unlike every aldose family above. Ring positions
+  // 4/5/6 (sialic numbering) ARE real, derivable stereocentres though, and
+  // deriveAxialEquatorial's ring-walk finds them fine (position N in its
+  // own numbering = sialic position N+1, since its position 1 is this
+  // ketose anomeric carbon). Validated against Neu5Ac's well-documented 2C5
+  // conformation (equatorial C4/C5/C6, axial anomeric COOH) -- see
+  // InChIRingGeometry.js's needsMirrorFlip and PUBCHEM_CID_CORRECTIONS.md.
+  //
+  // Position 1 (the exocyclic COOH's own orientation, ax for the common
+  // alpha anomer) and position 3 (C3, a plain CH2 -- not a stereocentre,
+  // same situation as a dideoxyhexose's deoxy position, see buildDideoxyhex)
+  // are NOT derived: the former is anomer/instance-level information this
+  // residue-type InChI doesn't carry (same as every other family's anomeric
+  // position), the latter has nothing to derive.
   //
   // C/O matrix:
   //   NeuAc    C11 O9  → C5=NHAc, C9=HOH
@@ -428,13 +442,17 @@ function buildSialic(name, t, formula, warnings) {
   const c5sub = isGlycolyl ? 'NHGc' : 'NHAc';
   const c9sub = is9Ac ? 'HOHAc' : 'HOH';
 
+  const c4 = resolveRingPosition(layers, t, 3, null, {}); // ring-walk pos 3 = sialic C4
+  const c5 = resolveRingPosition(layers, t, 4, null, {}); // ring-walk pos 4 = sialic C5
+  const c6 = resolveRingPosition(layers, t, 5, null, {}); // ring-walk pos 5 = sialic C6
+
   const parts = [
     `1ax:OO`,
     `r2:O`,
     `3ax:H`,
-    `4eq:OH`,
-    `5eq:${c5sub}`,
-    `6eq:-`,
+    `4${c4}:OH`,
+    `5${c5}:${c5sub}`,
+    `6${c6}:-`,
     `7:OH`,
     `8:OH`,
     `9:${c9sub}`,
@@ -518,7 +536,7 @@ export function inchiToTerminii(name, inchi, opts = {}) {
   // 4. Dispatch to per-class builder
   switch (cls) {
     case 'sialic':
-      return buildSialic(name, t, formula, warnings);
+      return buildSialic(name, t, formula, warnings, layers);
     case 'kdo':
       return buildKdo(name, t, warnings);
     case 'D_hexose':

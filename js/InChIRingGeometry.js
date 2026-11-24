@@ -66,9 +66,15 @@ class Vec3 {
 /**
  * Parse an InChI /c (connection table) layer into an adjacency map
  * Map<atomNumber, Set<atomNumber>>.
+ *
+ * A parenthesized group can hold several comma-separated branches off the
+ * SAME atom (e.g. "11(20,10(18)19)" -- atom 11 bonded to 20 AND, separately,
+ * to 10, not atom 20 bonded to 10). A comma resets the current chain back
+ * to that group's branch point rather than continuing from whatever atom
+ * the previous branch ended on.
  */
 export function parseCLayer(c) {
-  const tokens = c.match(/\d+|\(|\)/g) || [];
+  const tokens = c.match(/\d+|\(|\)|,/g) || [];
   const adj = new Map();
   const bond = (a, b) => {
     if (!adj.has(a)) adj.set(a, new Set());
@@ -77,11 +83,16 @@ export function parseCLayer(c) {
     adj.get(b).add(a);
   };
   let pos = 0;
-  const parseChain = (prevAtom) => {
-    let last = prevAtom;
+  const parseChain = (branchPoint) => {
+    let last = branchPoint;
     while (pos < tokens.length) {
       const tok = tokens[pos];
       if (tok === ')') return last;
+      if (tok === ',') {
+        pos += 1;
+        last = branchPoint; // new parallel branch off the same atom
+        continue;
+      }
       if (tok === '(') {
         pos += 1;
         parseChain(last);
@@ -187,14 +198,40 @@ export function ringWalk(inchiLayers, ringSize = 6) {
  * ends with the ring oxygen (ringWalk's own convention), so `order` at
  * index `length - 2` is the last ring *carbon* (ring position 5 for a
  * pyranose): the one bonded to the ring oxygen on the non-anomeric side.
+ *
+ * Two known exceptions where the flip does NOT apply, found by cross-
+ * checking against independently-known chemistry rather than guessed at:
+ *  1. A ketose anomeric center (two exocyclic heavy neighbors -- an OH and
+ *     an exocyclic carbon chain, e.g. sialic acids) instead of the usual
+ *     aldose pattern (one exocyclic O plus an H). Validated against
+ *     Neu5Ac's well-documented 2C5 conformation (equatorial C4/C5/C6,
+ *     axial anomeric COOH) -- this does NOT reduce to the next rule below:
+ *     sialic acid's own C5-equivalent position (ring position 5 here) has
+ *     a *branching* exocyclic chain (C7-C8-C9), the same shape as a plain
+ *     hexose's CH2OH, yet still needs no flip, so the ketose anomeric
+ *     center is a genuinely separate reason, not the same one.
+ *  2. Ring position 5's exocyclic substituent is a single terminal atom
+ *     (a deoxyhexose's CH3) rather than something with further heavy-atom
+ *     neighbors (CH2OH, COOH) or no exocyclic substituent at all (pentose).
+ *
+ * Neither is claimed to be *the* universal invariant -- InChI's own choice
+ * of which /t-string is "smaller" is an artifact of its canonicalization
+ * algorithm (Technical Manual p.46-47), not something guaranteed to reduce
+ * to a simple local graph feature. These two are what's been found and
+ * validated so far; a future ring shape may need a third.
  */
 function needsMirrorFlip(order, adj) {
   const ringSet = new Set(order);
+
+  const anomericAtom = order[0];
+  const anomericExo = [...adj.get(anomericAtom)].filter((a) => !ringSet.has(a));
+  if (anomericExo.length > 1) return false; // exception 1: ketose anomeric center
+
   const c5Atom = order[order.length - 2];
   const exo = [...adj.get(c5Atom)].filter((a) => !ringSet.has(a));
   if (exo.length === 0) return true; // e.g. pentose: no exocyclic group -> default
   const exoNeighbors = [...adj.get(exo[0])].filter((a) => a !== c5Atom);
-  return exoNeighbors.length > 0; // further atoms (CH2OH, COOH) vs a terminal CH3
+  return exoNeighbors.length > 0; // exception 2: further atoms (CH2OH, COOH) vs a terminal CH3
 }
 
 /**

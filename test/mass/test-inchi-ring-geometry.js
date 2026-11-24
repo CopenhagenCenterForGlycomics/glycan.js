@@ -202,3 +202,54 @@ QUnit.test('ring position 3 (the deoxy CH2) is not a stereocentre: null, not a g
   const t = parseTLayer(layers.t);
   assert.equal(deriveAxialEquatorial(layers, t, 3), null, 'no /t entry exists for a plain CH2, so nothing to derive');
 });
+
+QUnit.module('InChIRingGeometry - parseCLayer comma-separated branches', {});
+
+// "atom(branchA,branchB)" is two separate branches off the SAME atom, not a
+// chain (atom -> branchA -> branchB). This matters for any molecule with a
+// branching group like a carboxylate -- e.g. a ketose's exocyclic COOH.
+QUnit.test('a comma inside parens resets to the branch point, not the previous branch', function(assert) {
+  const adj = parseCLayer('11(20,10(18)19)21');
+  assert.ok(adj.get(11).has(20), '11-20 bonded (first branch)');
+  assert.ok(adj.get(11).has(10), '11-10 bonded (second branch, off 11 -- not 20)');
+  assert.notOk(adj.get(20).has(10), '20 and 10 are NOT bonded to each other');
+  assert.ok(adj.get(10).has(18), '10-18 bonded (sub-branch of the second branch)');
+  assert.ok(adj.get(10).has(19), '10-19 bonded (continuation after the sub-branch)');
+  assert.ok(adj.get(11).has(21), '11-21 bonded (chain continues from 11 after the group closes)');
+});
+
+QUnit.module('InChIRingGeometry - sialic acids (ketose ring shape)', {});
+
+// NeuAc's anomeric centre (sialic C2) is a ketose: quaternary, bonded to
+// the ring O, the ring, an exocyclic OH, AND an exocyclic COOH carbon --
+// two exocyclic heavy neighbors, not the usual aldose one-O-plus-H pattern.
+// This module's ring-walk numbers it as position 1 anyway (sialic position
+// N = this module's position N+1), and ring positions 4/5/6 (sialic
+// numbering) ARE real, derivable stereocentres -- validated against
+// Neu5Ac's well-documented 2C5 conformation (equatorial C4/C5/C6, axial
+// anomeric COOH).
+const NEUAC_INCHI = 'InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)21-9(7)8(17)6(16)3-13/h5-9,13,15-17,20H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8+,9+,11?/m0/s1';
+
+QUnit.test('the anomeric centre is correctly identified despite having two exocyclic neighbors (ketose, not aldose)', function(assert) {
+  const layers = parseInChI(NEUAC_INCHI);
+  const walk = ringWalk(layers);
+  assert.equal(walk.order.length, 6, 'six ring atoms (5 ring carbons + O)');
+  const anomeric = walk.order[0];
+  const ringSet = new Set(walk.order);
+  const exo = [...walk.adj.get(anomeric)].filter((a) => !ringSet.has(a));
+  assert.equal(exo.length, 2, 'anomeric carbon has two exocyclic neighbors (OH and the COOH carbon)');
+});
+
+QUnit.test('a ketose anomeric centre does not need the /m mirror flip (unlike every aldose shape tested)', function(assert) {
+  const layers = parseInChI(NEUAC_INCHI);
+  assert.equal(shapeNeedsMirrorFlip(layers), false);
+});
+
+QUnit.test('NeuAc: equatorial at sialic C4/C5/C6 -- matches the well-documented 2C5 conformation', function(assert) {
+  const layers = parseInChI(NEUAC_INCHI);
+  const t = parseTLayer(layers.t);
+  // this module's ring-walk position N = sialic position N+1
+  assert.equal(deriveAxialEquatorial(layers, t, 3), 'eq', 'sialic C4 eq');
+  assert.equal(deriveAxialEquatorial(layers, t, 4), 'eq', 'sialic C5 eq');
+  assert.equal(deriveAxialEquatorial(layers, t, 5), 'eq', 'sialic C6 eq');
+});

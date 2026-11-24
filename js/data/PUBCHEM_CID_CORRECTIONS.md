@@ -286,3 +286,44 @@ Given that, position 3's historical `ax`/`eq` label (even disregarding the wrong
 going to correspond to real geometry -- there's no second observable state to distinguish at a true
 CH2. It's kept as a fixed, honestly-documented placeholder (`3eq:H`, matching what the historical
 literals already used) rather than guessed at or silently dropped.
+
+## 10. Sialic acids: a real parser bug found, then a second genuine exception to the /m rule
+
+Attempting the same treatment for `buildSialic` (NeuAc, NeuGc, NeuAc9Ac, all already live with
+real InChI) surfaced two separate things, in order.
+
+**A real bug in `parseCLayer` itself.** `InChIRingGeometry.js`'s connection-table parser didn't
+handle a parenthesized group holding *several comma-separated branches off the same atom* (e.g.
+`"11(20,10(18)19)"` -- atom 11 bonded to 20 AND, separately, to 10 -- not atom 20 chained on to
+atom 10). It silently mis-parsed this as a chain, producing a wrong bond. This had never been hit
+by any live code path before (`buildSialic` never called `ringWalk` at all, so nothing was
+affected in production), but it's exactly the shape a branching carboxylate group produces, which
+sialic acids have. Fixed: a comma now resets the current chain back to that group's branch point.
+Covered by a direct unit test (`test/mass/test-inchi-ring-geometry.js`), and re-ran every existing
+test afterward to confirm no earlier result depended on the old (broken) behaviour -- none of them
+had a comma in their `/c` layer at all, so this was purely additive.
+
+**A second genuine exception to `shapeNeedsMirrorFlip`, found the same way as the first (section
+8): cross-check the derived answer against independently-known chemistry, don't trust internal
+self-consistency alone.** Neu5Ac's anomeric centre (sialic C2) is a ketose -- quaternary, bonded to
+the ring O, the ring, an exocyclic OH, AND an exocyclic COOH carbon, not the aldose's one-O-plus-H
+pattern every other shape so far has had. Deriving sialic C4/C5/C6 (the module's own ring-walk
+positions 3/4/5, since its position 1 is this ketose anomeric carbon) with the existing rule gave
+ax/ax/ax; well-documented Neu5Ac chemistry (the preferred 2C5 conformation: C4/C5/C6 equatorial,
+only the anomeric COOH axial) says eq/eq/eq. Turning the `/m` flip off entirely gives the correct
+answer -- but **this is not the same exception as the deoxyhexose one.** Sialic acid's own
+C5-equivalent ring position (ring-walk position 5) has a *branching* exocyclic chain (C7-C8-C9),
+structurally the same shape as a plain hexose's CH2OH (which DOES need the flip), not a terminal
+CH3 like a deoxyhexose. So "does ring position 5 branch further" doesn't predict this case; what
+does is the anomeric centre's own ketose-vs-aldose shape, a genuinely separate structural
+condition. `needsMirrorFlip` now checks both, explicitly, as two labeled exceptions rather than one
+heuristic stretched to cover both -- see its comment for why neither is claimed to be *the*
+universal rule (InChI's own "smaller identifier" choice is an algorithm artifact per the Technical
+Manual, section 8), just what's been validated so far.
+
+`buildSialic` now derives sialic C4/C5/C6 for real; output is byte-identical to the old hardcoded
+values for all three live compounds (NeuAc, NeuGc, NeuAc9Ac) -- the historical values were already
+chemically correct, now properly derived instead of asserted. Position 1 (the COOH's own
+orientation -- anomer/instance-level, same situation as every other family's anomeric position)
+and position 3 (C3, a plain CH2, same non-stereocentre situation as a dideoxyhexose's deoxy
+position) are left as documented fixed values, same reasoning as section 9.
