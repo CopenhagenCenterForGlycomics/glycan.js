@@ -110,9 +110,13 @@ terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
 name:Pent
 composition:C:5;H:8;O:4
 
-terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
+terminii:r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:H
 name:Xyl
 type:Pent
+# C4 corrected from the original 4ax to 4eq on 2026-11-24.
+# D-xylose is D-glucose with C6 removed, same C2/C3/C4 stereocentres, and
+# deriving straight from Xyl's own real InChI gives the same down/up/down
+# Haworth pattern as Glc -- see js/data/PUBCHEM_CID_CORRECTIONS.md section 6.
 
 terminii:r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H
 name:Ara

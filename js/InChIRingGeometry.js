@@ -201,12 +201,16 @@ function clockwiseSign(hDir, orderedDirs) {
 }
 
 /**
- * Derive 'ax' | 'eq' | null for a given 1-based sugar ring position
- * (2=C2, 3=C3, 4=C4, ...) from a parsed InChI (layers from parseInChI) and
- * its /t map (from parseTLayer). Returns null if the ring/anomeric center
- * can't be identified, or the position isn't a defined stereocentre.
+ * Core derivation shared by deriveAxialEquatorial and deriveHaworthOrientation:
+ * identifies whether the real exocyclic substituent at a ring position sits
+ * at the idealized chair's axial or equatorial direction, and that
+ * direction's z-component (sign of height above/below the idealized ring
+ * plane) in this module's own chair-building convention.
+ *
+ * Returns null if the ring/anomeric center can't be identified, or the
+ * position isn't a defined stereocentre.
  */
-export function deriveAxialEquatorial(layers, tLayerMap, sugarPosition, ringSize = 6) {
+function resolveRingSubstituent(layers, tLayerMap, sugarPosition, ringSize) {
   const walk = ringWalk(layers, ringSize);
   if (!walk) return null;
   const { order, ringO, adj } = walk;
@@ -248,12 +252,48 @@ export function deriveAxialEquatorial(layers, tLayerMap, sugarPosition, ringSize
 
   dirOf.set(exoAtom, axial);
   const predictedAxial = applyFlip(clockwiseSign(equatorial, heavy.map((a) => dirOf.get(a))));
-
-  if (predictedAxial === sign) return 'ax';
+  if (predictedAxial === sign) return { axEq: 'ax', z: axial.z };
 
   dirOf.set(exoAtom, equatorial);
   const predictedEquatorial = applyFlip(clockwiseSign(axial, heavy.map((a) => dirOf.get(a))));
-  if (predictedEquatorial === sign) return 'eq';
+  if (predictedEquatorial === sign) return { axEq: 'eq', z: equatorial.z };
 
   return null;
+}
+
+/**
+ * Derive 'ax' | 'eq' | null for a given 1-based sugar ring position
+ * (2=C2, 3=C3, 4=C4, ...) from a parsed InChI (layers from parseInChI) and
+ * its /t map (from parseTLayer). Returns null if the ring/anomeric center
+ * can't be identified, or the position isn't a defined stereocentre.
+ */
+export function deriveAxialEquatorial(layers, tLayerMap, sugarPosition, ringSize = 6) {
+  const r = resolveRingSubstituent(layers, tLayerMap, sugarPosition, ringSize);
+  return r ? r.axEq : null;
+}
+
+/**
+ * Derive 'up' | 'down' | null: which face of the ring the real exocyclic
+ * substituent sits on in a standard Haworth projection, for a given 1-based
+ * sugar ring position. Unlike axial/equatorial (which alternates with
+ * conformation), Haworth orientation is the conformation-independent fact
+ * of which ring face a substituent occupies -- but it is NOT the same
+ * partition as axial/equatorial either (e.g. all-equatorial D-glucose still
+ * alternates down/up/down/up around its ring in a Haworth projection).
+ *
+ * This reads the z-component of this module's own idealized chair (the
+ * same one deriveAxialEquatorial uses) for whichever direction (axial or
+ * equatorial) matches the real substituent, then negates it: validated
+ * against the textbook Haworth pattern for D-glucose, D-galactose and
+ * D-mannose (12/12 ring positions, including the C5-CH2OH position), this
+ * module's chair-walk convention runs opposite to the standard
+ * reader-facing Haworth view, so the single negation is this module's own
+ * fixed viewing-convention constant -- not a per-molecule or per-series
+ * (D/L) correction, since the /m-layer mirror flip above is already baked
+ * into which substituent (axial vs equatorial) was identified as correct.
+ */
+export function deriveHaworthOrientation(layers, tLayerMap, sugarPosition, ringSize = 6) {
+  const r = resolveRingSubstituent(layers, tLayerMap, sugarPosition, ringSize);
+  if (!r) return null;
+  return -r.z > 0 ? 'up' : 'down';
 }

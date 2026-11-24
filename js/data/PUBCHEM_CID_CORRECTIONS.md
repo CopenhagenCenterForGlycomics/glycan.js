@@ -116,3 +116,97 @@ turned up and were fixed:
   left as-is).
 
 `test/mass/test-inchi-terminii.js`'s `XYL_INCHI` fixture was updated to match.
+
+## 5. MurNAc's InChI was the open-chain form, not the cyclic pyranose (2026-11-24)
+
+Found while auditing every builder in `InChITerminii.js` for hardcoded/non-derived output
+(prompted by a question about whether Haworth rendering still had special-casing left in
+it). `js/InChIRingGeometry.js`'s ring-walk returned `null` for every position on MurNAc's
+stored InChI — tracing it down, the connectivity graph parsed from its `/c` layer has zero
+cycles at all (19 atoms, 19 bonds minus... actually 20 atoms, 19 bonds = a tree). The old
+CID (82756)'s own IUPAC name confirms it: `"...1-oxohexan-3-yl..."` is open-chain aldehyde
+naming, not the `"...oxan-3-yl..."` pattern every other cyclic residue in this file has.
+Re-checking all 19 IUPAC names from the section 4 quality pass for this same "oxan(e)/
+oxolane vs oxohexan(e)" distinction, MurNAc was the only one affected.
+
+Corrected to CID 5462244 (confirmed via synonyms: `SNFG:MurNAc`), a real cyclic pyranose
+InChI. Re-running the ring-walk on it resolves correctly and gives C2/C3/C4 = down/up/down,
+matching GlcNAc exactly (as expected: muramic acid is GlcNAc with the C3-OH etherified to
+lactate, same stereocentre, not a different configuration).
+
+## 6. A likely pre-existing error in DEFINITIONS itself: Xyl's C4 (flagged, not fixed)
+
+`buildPentose` in `InChITerminii.js` doesn't derive C4 from InChI at all — it's a literal
+`const c4 = 'ax'; // always ax per DEFINITIONS`, and C3's lookup table maps both `+` and
+`-` to `'eq'`, which is a derivation in name only. Running Xyl's real InChI through
+`deriveAxialEquatorial`/`deriveHaworthOrientation` directly (bypassing this hardcode)
+gives **C4 = eq**, not ax. Cross-checked against Glc's own independently-derived C2/C3/C4
+pattern (down/up/down): Xyl gives the identical down/up/down pattern, which is exactly what
+real chemistry requires (D-xylose's C2/C3/C4 stereocentres are the same as D-glucose's --
+xylose is glucose with C6 removed). Ara's hardcoded `4ax` does match its own real
+derivation, so this looks specific to Xyl.
+
+This means the historical `DEFINITIONS` reference in `test/mass/test-definitions-compat.js`
+(line ~109-115, `Pent`/`Xyl`/`Ara` all share the literal `"...4ax:OH;5eq:H"`) is itself
+likely wrong for Xyl, not just under-derived in `InChITerminii.js`. Changing this affects
+`Mass.js`'s mass-calculation output for xylose-containing glycans, not just rendering, so
+it was **not changed here** -- flagging for a decision rather than fixing silently, since
+`DEFINITIONS` is documented as "the historical reference" and correcting it is a bigger,
+separate call than the rendering work this investigation was for.
+
+(Update: this one *was* fixed -- see section 7's intro for why pentose was safe where
+deoxyhexose, below, was not.)
+
+## 7. Status of "can every residue just be a new InChI, no hardcoding": not yet, and here's why
+
+Asked directly whether every hardcoded/special-cased spot catalogued in sections 5-6 (plus
+`PROKARYOTIC_OVERRIDES`, `buildDeoxyhex`'s L-series branch, `buildDideoxyhex`, `buildHeptose`,
+`buildSialic`, `buildKdo`) is safe to remove in favor of pure InChI derivation, so that adding
+a new monosaccharide is just adding its InChI. Short answer: **some yes, most not yet.**
+
+**Converted to real derivation this session** (`resolveRingPosition`, falling back to the old
+heuristic only if the ring-walk can't resolve an InChI): `buildHexose` (Hex, HexA -- Gal, Glc,
+Man, GlcA, IdoA), `buildHexN` (GlcN), `buildHexNAc` (GalNAc, GlcNAc), `buildPentose` (Xyl, Ara).
+These four builders cover every currently-"live" Hex/HexA/HexN/HexNAc/pentose residue, and the
+ring shape in each case has been validated against independent ground truth (real anomer-specific
+InChI, or a same-stereocentre relative like Gal/Xyl's relationship to Glc).
+
+**Investigated and found NOT safe yet: `buildDeoxyhex`'s L-series branch (Fuc, Rha).** The
+natural next step -- apply the same `resolveRingPosition` treatment -- was tested and rejected.
+Real derivation gives Fuc = ax,ax,eq (C2/C3/C4) and Rha = eq,ax,ax: genuinely different from each
+other (correct -- they're different compounds) and both different from the current shared
+hardcoded string (`2eq,3eq,4ax` for both, which is wrong for at least one). But cross-checking
+Fuc against its own parent compound -- fucose is literally 6-deoxy-L-galactose, so its C2/C3/C4
+must carry the *same* axial/equatorial classification as galactose's (ax/eq is invariant under
+D/L mirroring; only R/S labels flip) -- exposed that the derivation was giving Fuc's pattern as
+the exact *inverse* of Gal's (ax,ax,eq vs Gal's eq,eq,ax), when it should match. Tracing it down:
+the `/m`-layer-driven mirror flip in `InChIRingGeometry.js` (`flip = mLayer === '0'`), which held
+up across every Hex/HexA/HexN/HexNAc/pentose case tested, does **not** hold for the deoxyhexose
+ring shape -- turning the flip off entirely reproduces Gal's pattern correctly for Fuc. In other
+words: **the `/m`-based flip is not actually the universal invariant it looked like from four
+ring shapes agreeing** -- it's something that happens to track `/m` for those shapes and doesn't
+for this one. I don't yet know the real general rule (likely something about how the local
+canonical-number ranking pattern around the ring shifts when the exocyclic C6 group changes from
+CH2OH to CH3, rather than `/m` itself). Shipping a shape-specific `flip=false` patch for dHex
+without understanding *why* would just be another hardcode wearing a geometry costume, so this
+was left alone -- `buildDeoxyhex`'s existing hardcode stays, Fuc/Rha are unchanged.
+
+**Not attempted (no live residue currently exercises these, so nothing to validate against):**
+`buildDideoxyhex`, `buildHeptose`, and the 16 `PROKARYOTIC_OVERRIDES` entries other than MurNAc
+(Tyv/Abe/Par/Col, Kdo/Kdx, HepI/HepII, FucNAc/QuiNAc/RhaNAc/ManNAc/AllNAc, Leg/Pse, Bac). Several
+of these have a deeper architectural obstacle beyond "needs validating": `classifyMonosaccharide`
+buckets purely by formula (C/N/O counts), and Leg/Pse/Bac all carry **two** nitrogens, which
+doesn't match any existing bucket (`hexnac`/`hexn` both assume exactly one) -- they'd fall
+through to the formula-only fallback, not a wrong derivation but no derivation at all. Kdo/Kdx
+and the sialic acids (`buildSialic`) are ketoses (the anomeric carbon is a hemiketal with no H,
+bonded to ring-O + an exocyclic COOH-carbon + an exocyclic OH), not aldoses -- `InChIRingGeometry.js`'s
+anomeric-carbon detection currently assumes the aldose pattern (ring-O neighbor bearing a single
+exocyclic *oxygen*, with an H), which doesn't fit a quaternary ketose center at all; that's a
+separate, deliberate scope boundary from the start of the Haworth work, not a new finding.
+
+**Bottom line for "just add a new InChI":** true today for Hex, HexA, HexN, HexNAc and pentose
+residues. For deoxyhexoses, dideoxyhexoses, heptoses, and anything with 2+ nitrogens or a ketose
+anomeric center, it isn't -- either the geometric method needs more per-shape validation work
+(deoxyhex, dideoxyhex, heptose), or the architecture needs extending first (multi-nitrogen
+classification, ketose anomeric detection). Removing those hardcodes now, rather than after that
+validation, would trade a known, documented approximation for a silent, undocumented one.

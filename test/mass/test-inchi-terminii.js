@@ -113,9 +113,13 @@ QUnit.test('Fuc round-trip', function(assert) {
 });
 
 // Xylose (D-pentose)
+// C4 corrected from 4ax to 4eq: D-xylose is D-glucose with C6 removed, same
+// C2/C3/C4 stereocentres, and deriving straight from Xyl's own real InChI
+// gives the same down/up/down Haworth pattern as Glc -- see
+// js/data/PUBCHEM_CID_CORRECTIONS.md section 6.
 QUnit.test('Xyl round-trip', function(assert) {
   const { terminii } = inchiToTerminii('Xyl', XYL_INCHI);
-  assert.equal(terminii, 'r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:H', 'Xyl terminii');
+  assert.equal(terminii, 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:H', 'Xyl terminii');
 });
 
 // NeuAc (sialic)

@@ -122,7 +122,10 @@ export const HEXNAC_4C1 = {
   C4: { '+': 'eq', '-': 'ax' },
 };
 
-// D-pentose
+// D-pentose. Degenerate by construction (every sign maps to the same
+// label) -- this was never a real derivation, just a historical default.
+// Kept only as resolveRingPosition's last-resort fallback for an InChI the
+// general ring-walk can't parse; buildPentose derives for real otherwise.
 export const D_PENTOSE_4C1 = {
   C3: { '+': 'eq', '-': 'eq' },
   C4: { '-': 'ax', '+': 'ax' },
@@ -366,13 +369,9 @@ function buildHexN(name, t, formula, warnings, layers) {
   };
 }
 
-function buildPentose(name, t, formula, isL, warnings) {
-  const tC3sign = t.get(3);
-  const tC4sign = t.get(4);
-  // C3: always eq for common pentoses in DEFINITIONS
-  // C4: always ax in DEFINITIONS for Xyl and Ara
-  const c3 = tC3sign !== undefined ? (D_PENTOSE_4C1.C3[tC3sign] ?? 'eq') : 'eq';
-  const c4 = 'ax';  // always ax per DEFINITIONS
+function buildPentose(name, t, formula, isL, warnings, layers) {
+  const c3 = resolveRingPosition(layers, t, 3, 3, D_PENTOSE_4C1.C3);
+  const c4 = resolveRingPosition(layers, t, 4, 4, D_PENTOSE_4C1.C4);
 
   const parts = [
     `r1:OH`,
@@ -544,7 +543,7 @@ export function inchiToTerminii(name, inchi, opts = {}) {
       return buildHexN(name, t, formula, warnings, layers);
     case 'D_pentose':
     case 'L_pentose':
-      return buildPentose(name, t, formula, isL, warnings);
+      return buildPentose(name, t, formula, isL, warnings, layers);
     case 'heptose':
       return buildHeptose(name, t, formula, isL, warnings);
     default:

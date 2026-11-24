@@ -1,6 +1,6 @@
 /*global QUnit*/
 
-import { deriveAxialEquatorial, parseCLayer, elementRanges, ringWalk } from '../../js/InChIRingGeometry.js';
+import { deriveAxialEquatorial, deriveHaworthOrientation, parseCLayer, elementRanges, ringWalk } from '../../js/InChIRingGeometry.js';
 import { parseInChI, parseTLayer } from '../../js/InChITerminii.js';
 
 QUnit.module('InChIRingGeometry - parsing', {});
@@ -79,4 +79,41 @@ QUnit.test('returns null for an undefined (not just unknown-sign) stereocentre',
   const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1');
   const t = parseTLayer(layers.t);
   assert.equal(deriveAxialEquatorial(layers, t, 1), null, 'anomeric center (6?) is undefined, not derivable');
+});
+
+QUnit.module('InChIRingGeometry - deriveHaworthOrientation', {});
+
+// Textbook Haworth facts (standard reference orientation, ring O at back
+// right, numbered clockwise): D-glucose is down/up/down at C2/C3/C4 with
+// CH2OH up at C5 -- note this is NOT the same alternation as "all
+// equatorial" would naively suggest; Haworth up/down is a different
+// partition from axial/equatorial, flattening out the chair's alternating
+// pucker.
+QUnit.test('Glc: down, up, down, up (C2, C3, C4, C5/CH2OH)', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveHaworthOrientation(layers, t, 2), 'down', 'C2 down');
+  assert.equal(deriveHaworthOrientation(layers, t, 3), 'up', 'C3 up');
+  assert.equal(deriveHaworthOrientation(layers, t, 4), 'down', 'C4 down');
+  assert.equal(deriveHaworthOrientation(layers, t, 5), 'up', 'C5 (CH2OH) up');
+});
+
+// Gal is the C4 epimer of Glc: only C4 flips (down -> up).
+QUnit.test('Gal: down, up, up, up (C4 flipped vs Glc)', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveHaworthOrientation(layers, t, 2), 'down', 'C2 down');
+  assert.equal(deriveHaworthOrientation(layers, t, 3), 'up', 'C3 up');
+  assert.equal(deriveHaworthOrientation(layers, t, 4), 'up', 'C4 up (epimerised)');
+  assert.equal(deriveHaworthOrientation(layers, t, 5), 'up', 'C5 (CH2OH) up');
+});
+
+// Man is the C2 epimer of Glc: only C2 flips (down -> up).
+QUnit.test('Man: up, up, down, up (C2 flipped vs Glc)', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5+,6?/m1/s1');
+  const t = parseTLayer(layers.t);
+  assert.equal(deriveHaworthOrientation(layers, t, 2), 'up', 'C2 up (epimerised)');
+  assert.equal(deriveHaworthOrientation(layers, t, 3), 'up', 'C3 up');
+  assert.equal(deriveHaworthOrientation(layers, t, 4), 'down', 'C4 down');
+  assert.equal(deriveHaworthOrientation(layers, t, 5), 'up', 'C5 (CH2OH) up');
 });
