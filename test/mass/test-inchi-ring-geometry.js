@@ -134,24 +134,95 @@ QUnit.test('Man: up, up, down, up (C2 flipped vs Glc)', function(assert) {
   assert.equal(deriveHaworthOrientation(layers, t, 5), 'up', 'C5 (CH2OH) up');
 });
 
-QUnit.module('InChIRingGeometry - shapeNeedsMirrorFlip', {});
+QUnit.module('InChIRingGeometry - deriveHaworthOrientation: true enantiomers invert at EVERY position', {});
 
-// The /m-layer mirror flip that's correct for a plain hexose (Gal/Glc/Man,
-// confirmed above) is NOT a universal rule -- it's specific to ring shapes
-// where ring position 5's exocyclic substituent has further heavy-atom
-// neighbors (CH2OH, COOH). A deoxyhexose's C5 bears a terminal CH3 instead,
-// and does not need the flip at all; applying it anyway gives the exact
-// inverse of the correct answer (caught by cross-checking Fuc, 6-deoxy-L-
-// galactose, against D-galactose's own axial/equatorial pattern, which must
-// match since that classification is invariant under D/L mirroring).
-QUnit.test('plain hexose (Gal): needs the mirror flip', function(assert) {
-  const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1');
-  assert.equal(shapeNeedsMirrorFlip(layers), true);
+// Regression tests for a bug caught visually (a user comparing a rendered
+// Fuc ring against the published beta-L-fucopyranose Haworth structure):
+// axial/equatorial is correctly invariant between true enantiomers (see the
+// shapeNeedsMirrorFlip tests above), but Haworth up/down is an ABSOLUTE
+// orientation fact -- two true enantiomers, drawn in the SAME fixed ring
+// frame this module and standard Haworth drawings both use (ring-O at the
+// same corner for D and L alike), must invert at EVERY position, not share
+// any. An earlier version of this module conflated the two correction
+// needs and got this backwards for every D/L pair tested. L-glucose's real
+// InChI (CID 2724488, confirmed via PubChem) shares D-glucose's exact /t
+// string, only /m differs -- exactly how PubChem represents every D/L pair
+// checked here.
+QUnit.test('L-glucose is the full Haworth inverse of D-glucose (same /t, only /m differs)', function(assert) {
+  const dGlc = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1');
+  const lGlc = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m0/s1');
+  const dT = parseTLayer(dGlc.t);
+  const lT = parseTLayer(lGlc.t);
+  for (const pos of [2, 3, 4, 5]) {
+    assert.equal(deriveAxialEquatorial(dGlc, dT, pos), deriveAxialEquatorial(lGlc, lT, pos), `pos ${pos} ax/eq matches (invariant)`);
+    assert.notEqual(deriveHaworthOrientation(dGlc, dT, pos), deriveHaworthOrientation(lGlc, lT, pos), `pos ${pos} Haworth inverted`);
+  }
 });
 
-QUnit.test('deoxyhexose (Fuc): does NOT need the mirror flip', function(assert) {
+// Same check for deoxyhexose (Fuc), the shape actually caught wrong by eye:
+// D-fucopyranose (CID 19466) and L-fucopyranose (CID 17106) also share one
+// /t string with only /m differing.
+QUnit.test('L-fucopyranose is the full Haworth inverse of D-fucopyranose', function(assert) {
+  const dFuc = parseInChI('InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+,4+,5-,6?/m1/s1');
+  const lFuc = parseInChI('InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+,4+,5-,6?/m0/s1');
+  const dT = parseTLayer(dFuc.t);
+  const lT = parseTLayer(lFuc.t);
+  for (const pos of [2, 3, 4, 5]) {
+    assert.equal(deriveAxialEquatorial(dFuc, dT, pos), deriveAxialEquatorial(lFuc, lT, pos), `pos ${pos} ax/eq matches (invariant)`);
+    assert.notEqual(deriveHaworthOrientation(dFuc, dT, pos), deriveHaworthOrientation(lFuc, lT, pos), `pos ${pos} Haworth inverted`);
+  }
+  // And matches the published beta-L-fucopyranose Haworth structure
+  // directly (Wikimedia Commons, File:Beta-L-Fucopyranose.svg): C2 up,
+  // C3 down, C4 down, C5 (CH3) down.
+  assert.equal(deriveHaworthOrientation(lFuc, lT, 2), 'up');
+  assert.equal(deriveHaworthOrientation(lFuc, lT, 3), 'down');
+  assert.equal(deriveHaworthOrientation(lFuc, lT, 4), 'down');
+  assert.equal(deriveHaworthOrientation(lFuc, lT, 5), 'down');
+});
+
+// GlcA and IdoA are NOT an InChI same-/t-flip-/m enantiomer pair -- they're
+// C5 epimers of each other (both /m0), so unlike the pairs above, they must
+// NOT invert at every position: only at C5, the actual epimerised one.
+QUnit.test('GlcA vs IdoA: NOT a full-enantiomer pair, so Haworth matches except at the epimerised C5', function(assert) {
+  const glcA = parseInChI('InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4-,6?/m0/s1');
+  const idoA = parseInChI('InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4+,6?/m0/s1');
+  const glcAT = parseTLayer(glcA.t);
+  const idoAT = parseTLayer(idoA.t);
+  for (const pos of [2, 3, 4]) {
+    assert.equal(deriveHaworthOrientation(glcA, glcAT, pos), deriveHaworthOrientation(idoA, idoAT, pos), `pos ${pos} unchanged`);
+  }
+  assert.notEqual(deriveHaworthOrientation(glcA, glcAT, 5), deriveHaworthOrientation(idoA, idoAT, 5), 'pos 5 (the epimerised one) differs');
+});
+
+QUnit.module('InChIRingGeometry - shapeNeedsMirrorFlip (the fixed per-shape ax/eq correction)', {});
+
+// This is NOT a D/L or /m-driven thing (see the module docstring for the
+// full story of how an earlier version of this got that conflated and
+// wrong) -- it's a fixed structural fact about a ring shape's own exocyclic
+// branching, found by cross-checking ax/eq (invariant under true D/L
+// mirroring) against real independently-fetched enantiomer pairs. A plain
+// hexose's C5 bears CH2OH (one further oxygen, not branching): no
+// correction needed, confirmed against real D-glucose vs L-glucose and
+// D-galactose vs L-galactose (same /t, only /m differs, per PubChem) both
+// coming out ax/eq-identical only when this returns false here.
+QUnit.test('plain hexose (Gal): does NOT need the shape correction', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1');
+  assert.equal(shapeNeedsMirrorFlip(layers), false);
+});
+
+QUnit.test('deoxyhexose (Fuc): does NOT need the shape correction', function(assert) {
   const layers = parseInChI('InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+,4+,5-,6?/m0/s1');
   assert.equal(shapeNeedsMirrorFlip(layers), false);
+});
+
+// HexA's C5 bears a COOH -- a carbon branching into TWO further oxygens,
+// unlike a plain hexose's CH2OH (one further oxygen) -- genuinely needs the
+// correction, confirmed by GlcA otherwise coming out ax,ax,ax at C2/C3/C4
+// instead of the eq,eq,eq it must share with D-glucose (GlcA is just
+// C6-oxidised D-glucose, same ring stereocentres).
+QUnit.test('HexA (GlcA): DOES need the shape correction (branching COOH vs. a plain hexose\'s CH2OH)', function(assert) {
+  const layers = parseInChI('InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4-,6?/m0/s1');
+  assert.equal(shapeNeedsMirrorFlip(layers), true);
 });
 
 // Fuc and Rha (both 6-deoxyhexoses, both /m0) must derive DIFFERENT
@@ -256,7 +327,7 @@ QUnit.test('the anomeric centre is correctly identified despite having two exocy
   assert.equal(exo.length, 2, 'anomeric carbon has two exocyclic neighbors (OH and the COOH carbon)');
 });
 
-QUnit.test('a ketose anomeric centre does not need the /m mirror flip (unlike every aldose shape tested)', function(assert) {
+QUnit.test('a ketose anomeric centre does not need the shape correction', function(assert) {
   const layers = parseInChI(NEUAC_INCHI);
   assert.equal(shapeNeedsMirrorFlip(layers), false);
 });
@@ -274,15 +345,8 @@ QUnit.module('InChIRingGeometry - pentoses (no exocyclic group at ring position 
 
 // A pentose's ring position 5 (sugar C5) has NO exocyclic substituent at
 // all (it's the "H" terminus, not a CH2OH/COOH/CH3) -- a third distinct
-// shape from the hexose/deoxyhexose/ketose cases above, and the one
-// shapeNeedsMirrorFlip's default branch had never actually been validated
-// against: only D-series pentoses (Xyl) had been tested, where getting the
-// flip decision backwards is invisible (the wrong default produces
-// flip=false either way once combined with D-series's /m). The bug only
-// showed up on an L-series pentose (Ara), where it inverted C2/C3 relative
-// to the known-correct D-arabinose reference -- caught by the same ax/eq-
-// invariant-under-mirroring check used throughout this file.
-QUnit.test('pentose ring shape does NOT need the mirror flip', function(assert) {
+// shape from the hexose/deoxyhexose/ketose cases above.
+QUnit.test('pentose ring shape does NOT need the shape correction', function(assert) {
   const layers = parseInChI('InChI=1S/C5H10O5/c6-2-1-10-5(9)4(8)3(2)7/h2-9H,1H2/t2-,3+,4-,5?/m1/s1'); // Xyl
   assert.equal(shapeNeedsMirrorFlip(layers), false);
 });

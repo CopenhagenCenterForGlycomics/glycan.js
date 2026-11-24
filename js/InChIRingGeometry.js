@@ -1,7 +1,8 @@
 /**
- * Derives real axial/equatorial stereochemistry for pyranose ring positions
- * directly from an InChI string's connectivity (/c) and stereo (/t, /m)
- * layers, using the rule given in the InChI Technical Manual v1.04 (p.39-40):
+ * Derives real axial/equatorial stereochemistry, AND real Haworth-projection
+ * up/down orientation, for pyranose ring positions directly from an InChI
+ * string's connectivity (/c) and stereo (/t, /m) layers, using the rule
+ * given in the InChI Technical Manual v1.04 (p.39-40):
  *
  *   "Tetrahedral parity is '+' if the canonical numbers of neighbors
  *    increase clockwise when observed from a hydrogen atom or an atom that
@@ -14,33 +15,40 @@
  * walk — so it works for any standard InChI of a pyranose, regardless of
  * how that particular molecule happened to get numbered.
  *
- * Validated against every InChI-derived ring stereocentre reachable from
- * js/data/monosaccharides.js (Hex, HexA, HexN, HexNAc, pentose and
- * deoxyhexose ring shapes; D- and L-series; 33/33 positions) with zero
- * per-molecule tuning.
+ * Two genuinely different things are derived here, and they need two
+ * genuinely different corrections for a ring shape's own numbering quirks
+ * and for D/L series — conflating them (as an earlier version of this
+ * module did) silently breaks one of them:
  *
- * The /m layer ('0' or '1', the InChI algorithm's choice of which of the two
- * mirror-image /t sign-strings to literally print — see the Technical
- * Manual p.46-47) does *not* by itself say whether this module's own
- * idealized-chair convention needs a matching mirror flip: that depends on
- * which enantiomer's /t-string InChI's own canonicalization happened to
- * judge "smaller" for a *given ring shape*, which is an artifact of that
- * algorithm, not a chemistry-level invariant — confirmed by cross-checking
- * a deoxyhexose (Fuc = 6-deoxy-L-galactose, so it must share D-galactose's
- * axial/equatorial pattern, since that classification is invariant under
- * D/L mirroring) against the plain hexose shape: the same /m-driven flip
- * that was correct for Hex/HexA/HexN/HexNAc/pentose gave Fuc's *exact
- * inverse* of the correct answer.
+ *  - Axial/equatorial is a LOCAL, chair-relative descriptor, invariant under
+ *    full D/L mirroring (confirmed repeatedly below) — D-glucose and its
+ *    true mirror image, L-glucose, are BOTH all-equatorial; GlcA and its C5
+ *    epimer IdoA share the same C2/C3/C4 classification and differ only at
+ *    the epimerised C5. The only correction this needs is a FIXED, per-ring-
+ *    shape one (see needsShapeCorrection below) having nothing to do with
+ *    D/L at all — it compensates for how a given shape's own exocyclic
+ *    branching happens to interact with InChI's canonical atom numbering.
+ *  - Haworth up/down is an ABSOLUTE-ORIENTATION fact: true enantiomers drawn
+ *    in the SAME fixed ring frame (ring-O at the same corner for D and L
+ *    alike, as both this module and standard textbook/Wikipedia Haworth
+ *    drawings do) must have EVERY position inverted, not just some —
+ *    confirmed against real alpha/beta-D- and alpha/beta-L-fucopyranose
+ *    (independently fetched InChI for both, AND cross-checked against the
+ *    published beta-L-fucopyranose Haworth structure) and against
+ *    synthetic/real D-glucose vs L-glucose (same /t, only /m differs, per
+ *    PubChem). This needs its own correction, independent of the ax/eq one:
+ *    negate whenever being the "other" enantiomer (mLayer==='0') doesn't
+ *    already coincide with the shape correction having been applied — see
+ *    deriveHaworthOrientation.
  *
- * The real, general rule found by comparing ring shapes structurally:
- * whether the flip applies depends on what's attached at ring position 5
- * (the last ring carbon, the one bonded to the ring oxygen on the
- * non-anomeric side) — if its exocyclic substituent has further heavy-atom
- * neighbors (CH2OH, COOH: Hex/HexA/HexN/HexNAc), or there's no exocyclic
- * substituent there at all (pentose), the /m-driven flip applies; if it's a
- * single terminal atom (a deoxyhexose's CH3), it doesn't. This needs no
- * external chemical classification — it's read directly off the same bond
- * graph the ring-walk already parsed.
+ * A seemingly obvious shortcut — "just flip whenever mLayer==='0'", applied
+ * to ax/eq instead of (or in addition to) Haworth — was tried first and is
+ * WRONG: GlcA and IdoA are both /m0 (they're C5 epimers of each other, NOT
+ * an InChI same-/t-flip-/m enantiomer pair), so gating the shape correction
+ * on /m there would have been a no-op either way — nothing exposed the bug
+ * until a true full-enantiomer pair of the SAME skeleton (D-glucose vs
+ * L-glucose, or D- vs L-fucopyranose) was checked, which an earlier version
+ * of this module never did.
  */
 
 class Vec3 {
@@ -193,67 +201,74 @@ export function ringWalk(inchiLayers, ringSize = 6) {
 }
 
 /**
- * Whether the /m-layer mirror flip applies to this ring shape -- see the
- * module docstring for why this isn't simply "always apply it". `order`
- * ends with the ring oxygen (ringWalk's own convention), so `order` at
- * index `length - 2` is the last ring *carbon* (ring position 5 for a
- * pyranose): the one bonded to the ring oxygen on the non-anomeric side.
+ * Whether this ring shape's own InChI canonical numbering needs a fixed
+ * correction when matching a predicted tetrahedral parity against the real
+ * one -- see the module docstring: this is NOT about D/L series at all
+ * (deriveHaworthOrientation handles that separately), it's a per-shape
+ * structural constant. `order` ends with the ring oxygen (ringWalk's own
+ * convention), so `order` at index `length - 2` is the last ring *carbon*
+ * (ring position 5 for a pyranose): the one bonded to the ring oxygen on
+ * the non-anomeric side.
  *
- * Three known exceptions where the flip does NOT apply, found by cross-
- * checking against independently-known chemistry (a named relative's own
- * published structure, not just internal self-consistency) rather than
- * guessed at or assumed by default:
+ * Found by cross-checking ax/eq (which must be IDENTICAL between true
+ * enantiomers -- confirmed repeatedly: D/L-glucose, D/L-galactose, D/L-
+ * fucopyranose, D/L-gulose, D/L-arabinose, all independently fetched from
+ * PubChem) rather than guessed at or assumed by default:
  *  1. A ketose anomeric center (two exocyclic heavy neighbors -- an OH and
  *     an exocyclic carbon chain, e.g. sialic acids) instead of the usual
- *     aldose pattern (one exocyclic O plus an H). Validated against
- *     Neu5Ac's well-documented 2C5 conformation (equatorial C4/C5/C6,
- *     axial anomeric COOH) -- this does NOT reduce to exception 2 below:
- *     sialic acid's own C5-equivalent position (ring position 5 here) has
- *     a *branching* exocyclic chain (C7-C8-C9), the same shape as a plain
- *     hexose's CH2OH, yet still needs no flip, so the ketose anomeric
- *     center is a genuinely separate reason, not the same one.
- *  2. Ring position 5's exocyclic substituent is a single terminal atom
- *     (a deoxyhexose's CH3) rather than something with further heavy-atom
- *     neighbors (CH2OH, COOH).
- *  3. Ring position 5 has no exocyclic substituent at all (a pentose --
- *     the ring position 5 carbon is a plain CH2, nothing attached beyond
- *     the two ring bonds). This one was wrongly assumed to need the flip
- *     (the same as Hex/HexA/HexN/HexNAc) for a while, on no real evidence,
- *     because every pentose actually tested happened to be D-series (m=1),
- *     where this choice is invisible -- flip = needsFlip && m==='0' is
- *     false either way when m=1. It only shows up once an L-series pentose
- *     is checked: L-arabinose's own derived axial/equatorial pattern was
- *     the exact inverse of D-arabinose's (fetched and identity-verified
- *     independently), which ax/eq must not be, since it's invariant under
- *     D/L mirroring. Turning the flip off for this case fixes it.
+ *     aldose pattern (one exocyclic O plus an H): no correction needed.
+ *     Validated against Neu5Ac's well-documented 2C5 conformation
+ *     (equatorial C4/C5/C6, axial anomeric COOH) -- this does NOT reduce to
+ *     case 2 below: sialic acid's own C5-equivalent position (ring position
+ *     5 here) has a *branching* exocyclic chain (C7-C8-C9), the same shape
+ *     as a plain hexose's CH2OH, yet still needs no correction, so the
+ *     ketose anomeric center is a genuinely separate reason, not the same
+ *     one.
+ *  2. Ring position 5's exocyclic substituent BRANCHES into two or more
+ *     further heavy-atom neighbors (a uronic acid's COOH, bonded to two
+ *     oxygens) -- needs the correction. A single terminal atom (a
+ *     deoxyhexose's CH3), a simple unbranched chain (a plain hexose's
+ *     CH2OH, one further oxygen), or no exocyclic group at all (a pentose):
+ *     no correction needed. This distinction -- branching vs. not -- is
+ *     what actually separates HexA from Hex/HexN/HexNAc/dHex/pentose; an
+ *     earlier version of this function only checked "any further atom at
+ *     all" (`length > 0`), which put HexA and plain Hex/HexN/HexNAc in the
+ *     same bucket. That bucketing was never actually wrong for the ax/eq
+ *     values it was checked against (D-series Hex/HexN/HexNAc, and HexA's
+ *     own D/L-labeled-but-not-enantiomeric GlcA/IdoA pair, both /m0) --
+ *     it just happened to coincide with gating this per-shape correction on
+ *     `mLayer==='0'`, which was ALSO never exercised for Hex/HexN/HexNAc
+ *     with a genuine m=0 case until a true full-enantiomer pair (L-glucose)
+ *     was checked, and was wrong.
  *
- * None of these is claimed to be *the* universal invariant -- InChI's own
- * choice of which /t-string is "smaller" is an artifact of its
- * canonicalization algorithm (Technical Manual p.46-47), not something
- * guaranteed to reduce to a simple local graph feature. These three are
- * what's been found and validated so far; a future ring shape may need a
- * fourth -- and per the pentose lesson above, an L-series (or otherwise
- * /m0) example of that shape is what it takes to actually find out, not
- * just checking a D-series one and assuming it generalizes.
+ * None of this is claimed to be *the* universal invariant -- InChI's own
+ * canonical atom numbering is an artifact of its algorithm (Technical
+ * Manual), not something guaranteed to reduce to a simple local graph
+ * feature in general. This is what's been found and validated so far; a
+ * future ring shape may need a different rule, and per the lessons above,
+ * what it takes to find out is an independently-fetched, identity-verified
+ * TRUE FULL ENANTIOMER of an already-validated shape (same /t, opposite
+ * /m) -- not a related-but-different compound (an epimer, a deoxygenated
+ * relative), and not just assuming a D-series example generalizes.
  */
-function needsMirrorFlip(order, adj) {
+function needsShapeCorrection(order, adj) {
   const ringSet = new Set(order);
 
   const anomericAtom = order[0];
   const anomericExo = [...adj.get(anomericAtom)].filter((a) => !ringSet.has(a));
-  if (anomericExo.length > 1) return false; // exception 1: ketose anomeric center
+  if (anomericExo.length > 1) return false; // case 1: ketose anomeric center
 
   const c5Atom = order[order.length - 2];
   const exo = [...adj.get(c5Atom)].filter((a) => !ringSet.has(a));
-  if (exo.length === 0) return false; // exception 3: no exocyclic group at all (pentose)
+  if (exo.length === 0) return false; // no exocyclic group at all (pentose)
   const exoNeighbors = [...adj.get(exo[0])].filter((a) => a !== c5Atom);
-  return exoNeighbors.length > 0; // exception 2: further atoms (CH2OH, COOH) vs a terminal CH3
+  return exoNeighbors.length > 1; // case 2: a BRANCHING group (COOH) vs. a terminal atom or simple chain (CH3/CH2OH)
 }
 
 /**
- * Public wrapper: does this residue's ring shape need the /m-layer mirror
- * flip at all? Exposed so callers computing their own D/L-dependent logic
- * outside this module (e.g. HaworthLayout.js's anomeric-position-1
+ * Public wrapper: does this residue's ring shape need the fixed per-shape
+ * correction at all? Exposed so callers computing their own D/L-dependent
+ * logic outside this module (e.g. HaworthLayout.js's anomeric-position-1
  * orientation, which the type-level InChI leaves undefined and so can't go
  * through deriveHaworthOrientation directly) stay consistent with it,
  * rather than independently assuming every L-series residue mirrors a
@@ -262,7 +277,7 @@ function needsMirrorFlip(order, adj) {
 export function shapeNeedsMirrorFlip(layers, ringSize = 6) {
   const walk = ringWalk(layers, ringSize);
   if (!walk) return null;
-  return needsMirrorFlip(walk.order, walk.adj);
+  return needsShapeCorrection(walk.order, walk.adj);
 }
 
 /** Idealized chair: ring atoms on a hexagon, alternating +/- z. */
@@ -352,8 +367,10 @@ function resolveRingSubstituent(layers, tLayerMap, sugarPosition, ringSize) {
     [nextAtom, nextP.sub(center).unit()],
   ]);
 
-  const mLayer = layers.m ?? '1';
-  const flip = needsMirrorFlip(order, adj) && mLayer === '0';
+  // Fixed per-shape correction (see needsShapeCorrection) -- NOT gated by
+  // /m. Only deriveHaworthOrientation needs an /m-based correction, and it
+  // needs its own, separate one (see its own docstring).
+  const flip = needsShapeCorrection(order, adj);
   const applyFlip = (s) => (flip ? (s === '+' ? '-' : '+') : s);
 
   dirOf.set(exoAtom, axial);
@@ -389,17 +406,37 @@ export function deriveAxialEquatorial(layers, tLayerMap, sugarPosition, ringSize
  *
  * This reads the z-component of this module's own idealized chair (the
  * same one deriveAxialEquatorial uses) for whichever direction (axial or
- * equatorial) matches the real substituent, then negates it: validated
- * against the textbook Haworth pattern for D-glucose, D-galactose and
- * D-mannose (12/12 ring positions, including the C5-CH2OH position), this
- * module's chair-walk convention runs opposite to the standard
- * reader-facing Haworth view, so the single negation is this module's own
- * fixed viewing-convention constant -- not a per-molecule or per-series
- * (D/L) correction, since the /m-layer mirror flip above is already baked
- * into which substituent (axial vs equatorial) was identified as correct.
+ * equatorial) matches the real substituent, then negates it -- that single
+ * negation is this module's own fixed viewing-convention constant, and is
+ * NOT a per-molecule or D/L correction.
+ *
+ * The D/L correction IS still needed here, separately from ax/eq's fixed
+ * per-shape one: axial/equatorial is a local, chair-relative descriptor
+ * (invariant between true enantiomers, confirmed repeatedly -- see the
+ * module docstring), but Haworth up/down is an absolute-orientation fact,
+ * and true enantiomers drawn in the SAME fixed ring frame (ring-O at the
+ * same corner for D and L, as both this module and standard Haworth
+ * drawings do) genuinely must have EVERY position inverted. Since this
+ * module's chair is built identically regardless of /m, that inversion has
+ * to be applied explicitly -- but only when it hasn't ALREADY happened as a
+ * side effect of ax/eq's own shape correction (which, when it applies,
+ * swaps which direction -- axial vs equatorial -- counts as "the real
+ * substituent", and that swap already changes the resulting z sign on its
+ * own). Hence the XOR: negate when being the "other" enantiomer
+ * (mLayer==='0') doesn't already coincide with the shape correction having
+ * fired. Confirmed against independently-fetched real InChI for D/L pairs
+ * across every ring shape tested (D/L-glucose, D/L-galactose, D/L-
+ * fucopyranose -- the latter cross-checked against the published
+ * beta-L-fucopyranose Haworth structure too -- and GlcA/IdoA, which are
+ * NOT such a pair -- both /m0 -- and correctly need no extra negation).
  */
 export function deriveHaworthOrientation(layers, tLayerMap, sugarPosition, ringSize = 6) {
   const r = resolveRingSubstituent(layers, tLayerMap, sugarPosition, ringSize);
   if (!r) return null;
-  return -r.z > 0 ? 'up' : 'down';
+  const walk = ringWalk(layers, ringSize);
+  const shapeFlip = walk ? needsShapeCorrection(walk.order, walk.adj) : false;
+  const mLayer = layers.m ?? '1';
+  const extraNegate = (mLayer === '0') !== shapeFlip;
+  const z = extraNegate ? -r.z : r.z;
+  return -z > 0 ? 'up' : 'down';
 }

@@ -435,3 +435,73 @@ directly. Verified computationally across every live non-sialic compound before 
 renderer change. Position 1 (anomeric, instance-level) still needs the InChI directly, since
 "does this ring shape's anomeric position mirror between D- and L-series" is a per-shape-family
 fact that isn't carried in a terminii string at all.
+
+## 14. The `/m`-flip rule was conflating two genuinely different corrections -- found by comparing a render against a published reference structure
+
+A user compared a rendered beta-L-fucopyranose against the published Wikimedia Commons structure
+(`File:Beta-L-Fucopyranose.svg`) and every single position was inverted. This led to the deepest
+correctness bug found this session, in `InChIRingGeometry.js` itself -- not a per-residue data
+issue, a bug in the shared derivation machinery every live residue goes through.
+
+**The root cause.** Axial/equatorial is a LOCAL, chair-relative descriptor, genuinely invariant
+under full D/L mirroring (confirmed repeatedly all session: Fuc matches Gal, Tyv matches Man,
+L-arabinose matches D-arabinose). Haworth up/down is NOT invariant -- it's an ABSOLUTE-ORIENTATION
+fact, and two true enantiomers, drawn in the SAME fixed ring frame (ring-O at the same corner for
+D and L alike, which both this module and every standard Haworth drawing use), must invert at
+EVERY position. `InChIRingGeometry.js` conflated these: it had exactly one `/m`-gated "mirror
+flip," applied to the ax/eq-matching step, and `deriveHaworthOrientation` just read off whatever
+z-value that same step produced, with no separate correction of its own. This happened to give
+right answers for ax/eq in every case tested (see below for why), but never for Haworth up/down
+whenever a shape's ax/eq genuinely didn't need a flip (every shape except HexA) -- which is
+exactly the deoxyhexose case that got caught.
+
+**Why ax/eq looked right anyway.** Cross-checking `needsMirrorFlip`'s old condition
+(`exoNeighbors.length > 0`, "any further atom at ring position 5's substituent") against real
+cross-enantiomer pairs -- independently fetched D-glucose vs L-glucose (CID 2724488), D- vs
+L-galactopyranose, D- vs L-gulose, all sharing one `/t` string with only `/m` differing, exactly
+how PubChem represents true enantiomers -- showed hexose needed NO flip at all for ax/eq (L-glucose
+came out `ax,ax,ax,ax` under the old rule, when it must be `eq,eq,eq,eq` like D-glucose: a bug that
+was simply never exercised, since no live L-series hexose exists and no earlier test constructed a
+synthetic one). HexA (GlcA/IdoA) genuinely does need a flip for ax/eq -- but GlcA and IdoA are C5
+epimers of each other, NOT an `/m`-flip pair (both are `/m0`), so gating that need on
+`mLayer==='0'` was a complete coincidence that happened to produce the right GlcA/IdoA answer
+without ever being a real test of whether `/m` was the right signal. The actual structural
+differentiator, found by direct inspection of the parsed connection table: a plain hexose's C6
+(CH2OH) has exactly one further heavy-atom neighbor past the ring; HexA's C6 (COOH) has two
+(`exoNeighbors.length`: 1 vs 2). Fixed the condition to `> 1`, and REMOVED the `/m` gating from
+ax/eq's flip entirely -- it's now a fixed, per-ring-shape structural fact (true only for HexA
+among everything live), nothing to do with `/m` or D/L at all.
+
+**The Haworth-specific fix.** `deriveHaworthOrientation` now applies its own, separate correction:
+negate the z-sign whenever being the "other" enantiomer (`mLayer==='0'`) does NOT already coincide
+with the (now-fixed, HexA-only) ax/eq shape correction having fired -- an XOR of the two. Verified
+against every independently-fetched real D/L pair available: D-/L-glucose, D-/L-galactopyranose,
+D-/L-fucopyranose (the last cross-checked against the actual published beta-L-fucopyranose
+structure too, not just internal consistency), and confirmed GlcA/IdoA -- correctly NOT a full
+enantiomer pair -- need no extra negation (matching at C2/C3/C4, differing only at the genuinely
+epimerised C5).
+
+**The same bug, independently, in the anomeric (C1) formula.** `HaworthLayout.js`'s own C1 formula
+(`mirrors = isL && shapeNeedsMirrorFlip(...)`) had the identical conflation, reached independently
+(C1 is never derived through `resolveRingSubstituent` at all, since the type-level InChI leaves it
+undefined). Re-derived from scratch against real anomer-specific InChI -- alpha/beta-D-glucose,
+alpha/beta-D-/L-fucopyranose, alpha/beta-D-glucuronic acid, all independently fetched from PubChem,
+where the anomeric stereocentre IS defined -- confirming the same XOR correction applies there too:
+alpha-D=down/beta-D=up is the baseline, and a true full enantiomer (L-fucopyranose) swaps it
+(alpha-L=up/beta-L=down), while HexA's GlcA (same `/m0` as IdoA, not a real enantiomer of anything
+D-labeled) correctly does NOT swap.
+
+**A knock-on fix in `HaworthLayout.js`'s positions 2-5.** The section-13 "terminii simplification"
+(reading orientation straight from the terminii string's own ax/eq via a fixed position-parity
+rule, no InChI needed) was valid only because, at the time, `deriveHaworthOrientation` had the
+exact same missing D/L correction -- so the parity rule and the (buggy) direct derivation agreed,
+for the wrong reason. Now that `deriveHaworthOrientation` is fixed, the parity rule alone is
+insufficient for any live L-series shape that doesn't need HexA's ax/eq correction (deoxyhexose,
+dideoxyhexose-L, pentose-L). Fixed by having `layoutSubstituents` compute the same
+`mLayer`/`shapeNeedsMirrorFlip` XOR once per residue and apply it uniformly to every position,
+C1 included, rather than reading ax/eq in isolation.
+
+Every live compound's Haworth rendering was re-verified after these fixes (`npm test`, 417/417);
+the only behavioural change for any live D-series residue was none -- the bug was invisible for
+every D-series compound tested all session, which is exactly why it took an L-series compound,
+checked against its own real published structure, to surface it.
