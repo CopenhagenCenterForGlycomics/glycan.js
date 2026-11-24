@@ -17,8 +17,10 @@ QUnit.test('Gal-(1->4)-GlcNAc: exactly one glycosidic bond, no stray OH at the l
   const linkages = [{ child: 'gal', parent: 'glcnac', parentPosition: 4 }];
   const svg = renderGlycanSVG(residues, linkages, { width: 560, height: 280 });
 
-  // Exactly one bridging bond line (stroke-width 1.8) and its O label.
-  assert.equal((svg.match(/stroke-width="1\.8"/g) || []).length, 1, 'one glycosidic bond line');
+  // Exactly one bridging bond, drawn as two line segments (stroke-width
+  // 1.8) either side of the inline "O" label's gap -- see HaworthSVG.js's
+  // LINKAGE_LABEL_GAP.
+  assert.equal((svg.match(/stroke-width="1\.8"/g) || []).length, 2, 'one glycosidic bond, drawn as two segments either side of its inline O');
 
   // GlcNAc keeps its free reducing-end C1 substituent (an OH stick+label)
   // since it isn't linked at that position.

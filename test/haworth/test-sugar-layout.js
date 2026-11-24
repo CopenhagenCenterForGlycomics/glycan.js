@@ -150,6 +150,8 @@ QUnit.test('renders the N-glycan core: 5 rings, 4 bonds, no overlap-induced self
   const { svg, unsupported } = renderSugarTreeSVG(root);
   assert.equal(unsupported.length, 0);
   assert.ok(svg.includes('<svg'));
-  // One bridging-bond line (stroke-width 1.8) per linkage.
-  assert.equal((svg.match(/stroke-width="1\.8"/g) || []).length, 4, 'one glycosidic bond per linkage');
+  // Each linkage draws as two bridging-bond segments (stroke-width 1.8),
+  // either side of its inline "O" label's gap -- see HaworthSVG.js's
+  // LINKAGE_LABEL_GAP.
+  assert.equal((svg.match(/stroke-width="1\.8"/g) || []).length, 8, 'two glycosidic bond segments per linkage');
 });

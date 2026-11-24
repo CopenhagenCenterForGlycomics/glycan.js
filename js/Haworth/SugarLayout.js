@@ -73,9 +73,14 @@ function detectRingShape(terminii) {
   return null;
 }
 
-const DEFAULT_SPACING_X = 260;
-const DEFAULT_SPACING_Y = 170;
-const PLACEHOLDER_SPACING_X = 160;
+// Scaled down along with the ring size itself (HaworthLayout.js's
+// ringGeometry/furanoseGeometry), so linkage bonds between residues don't
+// read as disproportionately long now that the rings they connect are
+// smaller -- same ~0.55 factor as the ring shrink from its own original
+// (rx=95/ry=38) size.
+const DEFAULT_SPACING_X = 145;
+const DEFAULT_SPACING_Y = 95;
+const PLACEHOLDER_SPACING_X = 90;
 
 /**
  * Tidy-tree layout: each leaf gets its own row (assigned left-to-right in

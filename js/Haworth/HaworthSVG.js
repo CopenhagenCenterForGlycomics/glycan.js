@@ -93,6 +93,8 @@ function layoutResidue(terminii, inchi, opts = {}) {
 const BOLD_STROKE_WIDTH = 4.2;
 const THIN_STROKE_WIDTH = 1.3;
 const RING_LABEL_GAP = 11; // how far a ring bond stops short of a vertex that carries a letter label (the ring oxygen)
+const LINKAGE_INSET = 10; // how far a glycosidic bond's line is pulled in from each residue's own ring vertex, shortening the overall connector
+const LINKAGE_LABEL_GAP = 9; // how far each half of a glycosidic bond stops short of its own midpoint, for the inline bridging "O"
 
 // Pull a line's endpoint back by `gap` along its own direction, so it stops
 // just short of a labeled atom instead of running underneath its glyph --
@@ -110,16 +112,39 @@ function shortenToward(from, to, gap) {
 
 // When a label's text extends to the LEFT of its stick (text-anchor
 // 'end'), the atom actually bonded to the ring needs to stay the character
-// nearest the stick -- i.e. nearest the END of the string, not the start.
-// Every label except a plain hydroxyl already has its bonded atom written
-// first (CH2OH, COOH, NHAc, O-Lactyl...); only "OH" needs reversing to
-// "HO" for a left-extending stick, matching how real structural drawings
-// write it (confirmed in the published glucofuranose and NeuAc/NeuGc
-// reference images used elsewhere in this renderer's own validation).
+// nearest the stick -- i.e. the LAST character of the printed string, not
+// the first (every one of these labels is written bonded-atom-first in its
+// normal, right-extending form). This is the standard structural-drawing
+// convention for a group written in reverse (e.g. "HO-" for a hydroxyl,
+// "H3C-" for a methyl, "HOOC-" for a carboxyl, "AcHN-" for an acetamido --
+// confirmed in the published glucofuranose and NeuAc/NeuGc reference images
+// used elsewhere in this renderer's own validation). Composite tail labels
+// (CH(OH)CH2OH and the like) aren't covered here -- not yet seen landing on
+// a left-extending stick in practice, so left as a known gap rather than
+// guessed at.
+const REVERSED_LABELS = {
+  OH: 'HO',
+  'CH₂OH': 'HOH₂C',
+  'CH₃': 'H₃C',
+  COOH: 'HOOC',
+  'NH₂': 'H₂N',
+  NHAc: 'AcHN',
+  NHGc: 'GcHN',
+};
+
 function orientLabel(label, anchor) {
-  if (anchor === 'end' && label === 'OH') return 'HO';
+  if (anchor === 'end' && REVERSED_LABELS[label]) return REVERSED_LABELS[label];
   return label;
 }
+
+// A label's first character is always the atom actually bonded to the
+// ring (and, after orientLabel's reversal above, its LAST character is
+// too, for a left-extending stick) -- but text-anchor 'start'/'end' pins
+// that character's EDGE to the stick's endpoint, not its center, leaving
+// it visibly offset to one side. This nudges the anchor point inward by
+// roughly half a character's advance width (Georgia, 13px) so the bonded
+// atom's glyph centers on the stick instead.
+const LABEL_ANCHOR_NUDGE = 4.5;
 
 const BOND_WIDTH = { thin: THIN_STROKE_WIDTH, bold: BOLD_STROKE_WIDTH };
 
@@ -190,11 +215,13 @@ function residueSVGParts(layout, offset) {
     // over the ring.
     const textAnchor = ring.x > 1 ? 'start' : ring.x < -1 ? 'end' : 'middle';
     const textY = stickEnd.y + (dy < 0 ? -3 : 12);
+    const textX =
+      stickEnd.x + (textAnchor === 'start' ? -LABEL_ANCHOR_NUDGE : textAnchor === 'end' ? LABEL_ANCHOR_NUDGE : 0);
     parts.push(
       `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEnd.x.toFixed(1)}" y2="${stickEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="${THIN_STROKE_WIDTH}"/>`
     );
     parts.push(
-      `<text x="${stickEnd.x.toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${orientLabel(sub.label, textAnchor)}</text>`
+      `<text x="${textX.toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${orientLabel(sub.label, textAnchor)}</text>`
     );
   }
   return parts;
@@ -314,23 +341,34 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
     }
   }
 
-  // Glycosidic bonds: a straight line from the child's anomeric (C1) point
-  // to the parent's linkage-position point, with the bridging oxygen
-  // labelled at its midpoint. Either end may be a placeholder (see above),
-  // in which case the bond just touches its center.
+  // Glycosidic bonds: a shortened line from the child's anomeric (C1)
+  // point to the parent's linkage-position point (LINKAGE_INSET off each
+  // end, so the connector doesn't run the full residue-to-residue
+  // distance), with the bridging oxygen sitting inline in the gap at its
+  // midpoint -- the same label-gap convention the ring oxygen itself uses
+  // (see RING_LABEL_GAP/shortenToward above) -- rather than floating above
+  // the line. Either end may be a placeholder (see above), in which case
+  // the bond just touches its center.
   for (const link of linkages) {
     const child = residues.find((r) => r.id === link.child);
     const parent = residues.find((r) => r.id === link.parent);
     if (!child || !parent) continue;
-    const a = anchorPoint(layouts.get(child.id), 1, { x: child.x, y: child.y });
-    const b = anchorPoint(layouts.get(parent.id), link.parentPosition, { x: parent.x, y: parent.y });
-    if (!a || !b) continue;
+    const rawA = anchorPoint(layouts.get(child.id), 1, { x: child.x, y: child.y });
+    const rawB = anchorPoint(layouts.get(parent.id), link.parentPosition, { x: parent.x, y: parent.y });
+    if (!rawA || !rawB) continue;
+    const a = shortenToward(rawB, rawA, LINKAGE_INSET);
+    const b = shortenToward(rawA, rawB, LINKAGE_INSET);
     const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    const aEnd = shortenToward(a, mid, LINKAGE_LABEL_GAP);
+    const bEnd = shortenToward(b, mid, LINKAGE_LABEL_GAP);
     parts.push(
-      `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="currentColor" stroke-width="1.8"/>`
+      `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${aEnd.x.toFixed(1)}" y2="${aEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="1.8"/>`
     );
     parts.push(
-      `<text x="${mid.x.toFixed(1)}" y="${(mid.y - 5).toFixed(1)}" text-anchor="middle" font-size="12" fill="currentColor">O</text>`
+      `<line x1="${b.x.toFixed(1)}" y1="${b.y.toFixed(1)}" x2="${bEnd.x.toFixed(1)}" y2="${bEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="1.8"/>`
+    );
+    parts.push(
+      `<text x="${mid.x.toFixed(1)}" y="${(mid.y + 4.2).toFixed(1)}" text-anchor="middle" font-size="12" fill="currentColor">O</text>`
     );
   }
 
