@@ -68,15 +68,17 @@ QUnit.test('classifies uronic acid', function(assert) {
 
 QUnit.module('InChITerminii - inchiToTerminii round-trips', {});
 
-// Use verified PubChem InChI strings
-const GLC_INCHI = 'InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-/m1/s1';
-const GAL_INCHI = 'InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4-,5+/m1/s1';
-const MAN_INCHI = 'InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-/m1/s1';
-const GLCNAC_INCHI = 'InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5+,6+,7-/m1/s1';
-const FUC_INCHI = 'InChI=1S/C6H12O5/c1-3-4(7)5(8)6(9)2-10-3/h3-9H,2H2,1H3/t3-,4+,5+,6-/m0/s1';
-const XYL_INCHI = 'InChI=1S/C5H10O5/c6-1-2-3(7)4(8)5(9)10-2/h2-9H,1H2/t2-,3+,4-,5+/m1/s1';
-const NEUAC_INCHI = 'InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)9(17)8(7)16-6(3-13)21-11/h5-10,13,15-17H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8-,9-,10+,11-/m0/s1';
-const GLCN_INCHI = 'InChI=1S/C6H13NO5/c7-3-5(10)4(9)2(1-8)12-6(3)11/h2-6,8-11H,1,7H2/t2-,3+,4+,5-/m1/s1';
+// Verified PubChem InChI strings (standard InChI, including the '?'
+// undefined-anomeric-center marker; see js/data/PUBCHEM_CID_CORRECTIONS.md
+// for why these replaced an earlier set of non-standard hand-authored ones).
+const GLC_INCHI = 'InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1';
+const GAL_INCHI = 'InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1';
+const MAN_INCHI = 'InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5+,6?/m1/s1';
+const GLCNAC_INCHI = 'InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5-,6-,7-,8?/m1/s1';
+const FUC_INCHI = 'InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+,4+,5-,6?/m0/s1';
+const XYL_INCHI = 'InChI=1S/C5H10O5/c6-2-1-10-5(9)4(8)3(2)7/h2-9H,1H2/t2-,3+,4-,5?/m1/s1';
+const NEUAC_INCHI = 'InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)21-9(7)8(17)6(16)3-13/h5-9,13,15-17,20H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8+,9+,11?/m0/s1';
+const GLCN_INCHI = 'InChI=1S/C6H13NO5/c7-3-5(10)4(9)2(1-8)12-6(3)11/h2-6,8-11H,1,7H2/t2-,3-,4-,5-,6?/m1/s1';
 
 // Glucose: D-hexose, C2/C3/C4 all eq in 4C1
 QUnit.test('Glc round-trip', function(assert) {
@@ -140,4 +142,23 @@ QUnit.test('Kdo uses override', function(assert) {
 QUnit.test('GlcN round-trip', function(assert) {
   const { terminii } = inchiToTerminii('GlcN', GLCN_INCHI);
   assert.equal(terminii, 'r1:OH;2eq:NH2;3eq:OH;4eq:OH;5eq:-;6eq:HOH', 'GlcN terminii');
+});
+
+// GlcA (D-glucuronic acid): same ring stereochemistry as Glc at C2/C3/C4
+// (only C6 differs, oxidised to COOH), so should be all-equatorial just like
+// Glc. Regression test: a real PubChem InChI for this residue has a
+// different canonical atom-numbering layout than plain hexoses (the
+// exocyclic COOH shifts which atom is which ring carbon), which used to
+// trip up a fixed-/t-position heuristic — see InChIRingGeometry.js.
+const GLCA_INCHI = 'InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4-,6?/m0/s1';
+QUnit.test('GlcA round-trip', function(assert) {
+  const { terminii } = inchiToTerminii('GlcA', GLCA_INCHI);
+  assert.equal(terminii, 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO', 'GlcA terminii (all-equatorial, matching Glc)');
+});
+
+// IdoA (L-iduronic acid): the C5 epimer of GlcA, /m0 (L-series).
+const IDOA_INCHI = 'InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4+,6?/m0/s1';
+QUnit.test('IdoA round-trip', function(assert) {
+  const { terminii } = inchiToTerminii('IdoA', IDOA_INCHI);
+  assert.equal(terminii, 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:OO', 'IdoA terminii');
 });

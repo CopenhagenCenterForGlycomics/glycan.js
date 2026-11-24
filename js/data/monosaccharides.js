@@ -20,19 +20,19 @@ export default [
     "name": "Gal",
     "type": "Hex",
     "pubchemCid": 6036,
-    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4-,5+/m1/s1"
+    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-,6?/m1/s1"
   },
   {
     "name": "Glc",
     "type": "Hex",
     "pubchemCid": 5793,
-    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3+,4+,5-/m1/s1"
+    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-,6?/m1/s1"
   },
   {
     "name": "Man",
     "type": "Hex",
     "pubchemCid": 18950,
-    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5-/m1/s1"
+    "inchi": "InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-,3-,4+,5+,6?/m1/s1"
   },
   {
     "name": "Galf",
@@ -63,14 +63,14 @@ export default [
   {
     "name": "GalNAc",
     "type": "HexNAc",
-    "pubchemCid": 10137,
-    "inchi": "InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5+,6-,7-/m1/s1"
+    "pubchemCid": 35717,
+    "inchi": "InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5-,6+,7-,8?/m1/s1"
   },
   {
     "name": "GlcNAc",
     "type": "HexNAc",
     "pubchemCid": 439174,
-    "inchi": "InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5+,6+,7-/m1/s1"
+    "inchi": "InChI=1S/C8H15NO6/c1-3(11)9-5-7(13)6(12)4(2-10)15-8(5)14/h4-8,10,12-14H,2H2,1H3,(H,9,11)/t4-,5-,6-,7-,8?/m1/s1"
   },
   {
     "name": "HexA",
@@ -80,8 +80,8 @@ export default [
   {
     "name": "GlcA",
     "type": "HexA",
-    "pubchemCid": 65533,
-    "inchi": "InChI=1S/C6H10O7/c7-2-3(8)4(9)5(10)6(11,12)13-2/h2-5,7-10H,(H,11,12)/t2-,3+,4+,5-/m1/s1"
+    "pubchemCid": 94715,
+    "inchi": "InChI=1S/C6H10O7/c7-1-2(8)4(5(10)11)13-6(12)3(1)9/h1-4,6-9,12H,(H,10,11)/t1-,2-,3+,4-,6?/m0/s1"
   },
   {
     "name": "IdoA",
@@ -92,8 +92,8 @@ export default [
   {
     "name": "NeuAc",
     "type": "NeuAc",
-    "pubchemCid": 65309,
-    "inchi": "InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)9(17)8(7)16-6(3-13)21-11/h5-10,13,15-17H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8-,9-,10+,11-/m0/s1"
+    "pubchemCid": 439197,
+    "inchi": "InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)21-9(7)8(17)6(16)3-13/h5-9,13,15-17,20H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8+,9+,11?/m0/s1"
   },
   {
     "name": "NeuAc9Ac",
@@ -121,8 +121,8 @@ export default [
   {
     "name": "Fuc",
     "type": "dHex",
-    "pubchemCid": 2723808,
-    "inchi": "InChI=1S/C6H12O5/c1-3-4(7)5(8)6(9)2-10-3/h3-9H,2H2,1H3/t3-,4+,5+,6-/m0/s1"
+    "pubchemCid": 17106,
+    "inchi": "InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+,4+,5-,6?/m0/s1"
   },
   {
     "name": "Rha",
@@ -139,7 +139,7 @@ export default [
     "name": "Xyl",
     "type": "Pent",
     "pubchemCid": 135191,
-    "inchi": "InChI=1S/C5H10O5/c6-1-2-3(7)4(8)5(9)10-2/h2-9H,1H2/t2-,3+,4-,5+/m1/s1"
+    "inchi": "InChI=1S/C5H10O5/c6-2-1-10-5(9)4(8)3(2)7/h2-9H,1H2/t2-,3+,4-,5?/m1/s1"
   },
   {
     "name": "Ara",
@@ -155,8 +155,8 @@ export default [
   {
     "name": "GlcN",
     "type": "HexN",
-    "pubchemCid": 439234,
-    "inchi": "InChI=1S/C6H13NO5/c7-3-5(10)4(9)2(1-8)12-6(3)11/h2-6,8-11H,1,7H2/t2-,3+,4+,5-/m1/s1"
+    "pubchemCid": 439213,
+    "inchi": "InChI=1S/C6H13NO5/c7-3-5(10)4(9)2(1-8)12-6(3)11/h2-6,8-11H,1,7H2/t2-,3-,4-,5-,6?/m1/s1"
   },
   {
     "name": "MurNAc",

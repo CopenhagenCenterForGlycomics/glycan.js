@@ -5,6 +5,8 @@
  * terminii string format used by Mass.js (e.g. "r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH").
  */
 
+import { deriveAxialEquatorial } from './InChIRingGeometry.js';
+
 // ---------------------------------------------------------------------------
 // InChI parser
 // ---------------------------------------------------------------------------
@@ -205,16 +207,29 @@ export const PROKARYOTIC_OVERRIDES = {
 // Per-class terminii builders
 // ---------------------------------------------------------------------------
 
-function buildHexose(name, t, formula, isL, conformationOverride, warnings) {
+// Resolve a ring position's axial/equatorial label from genuine InChI
+// connectivity + idealized chair geometry (InChIRingGeometry.js), which
+// works for any standard InChI regardless of its particular canonical
+// atom-numbering. Falls back to the legacy fixed-/t-position heuristic
+// (valid only for the specific numbering convention it was fit to) when the
+// general method can't identify the ring or anomeric center -- e.g. for a
+// non-standard or incomplete InChI -- so unusual input degrades instead of
+// throwing.
+function resolveRingPosition(layers, t, sugarPosition, legacyTPos, legacySignTable) {
+  const derived = deriveAxialEquatorial(layers, t, sugarPosition);
+  if (derived) return derived;
+  const legacySign = t.get(legacyTPos);
+  return legacySign !== undefined ? (legacySignTable[legacySign] ?? 'eq') : 'eq';
+}
+
+function buildHexose(name, t, formula, isL, conformationOverride, warnings, layers) {
   const c6sub = inferC6Substituent(formula);
 
-  // /t3 → carb C2: determines mannose (ax) vs gluco (eq) configuration
-  const tC2sign = t.get(D_HEXOSE_4C1.carb_C2_from_t_pos);
-  const c2 = tC2sign !== undefined ? (D_HEXOSE_4C1.C2[tC2sign] ?? 'eq') : 'eq';
+  // carb C2: determines mannose (ax) vs gluco (eq) configuration
+  const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
 
-  // /t4 → carb C4: determines galacto (ax) vs gluco (eq) configuration
-  const tC4sign = t.get(D_HEXOSE_4C1.carb_C4_from_t_pos);
-  const c4 = tC4sign !== undefined ? (D_HEXOSE_4C1.C4[tC4sign] ?? 'eq') : 'eq';
+  // carb C4: determines galacto (ax) vs gluco (eq) configuration
+  const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
 
   // C3 is always eq in 4C1 conformation
   const c2sub = inferC2Substituent(formula, isL ? 'L_hexose' : 'D_hexose');
@@ -309,13 +324,10 @@ function buildDideoxyhex(name, t, formula, isL, warnings) {
   };
 }
 
-function buildHexNAc(name, t, formula, warnings) {
-  // HexNAc: ring C3 from /t pos 3, ring C4 from /t pos 7
-  const tC3sign = t.get(HEXNAC_4C1.ring_C3_from_t_pos);
-  const tC4sign = t.get(HEXNAC_4C1.ring_C4_from_t_pos);
-
-  const c3 = tC3sign !== undefined ? (HEXNAC_4C1.C3[tC3sign] ?? 'eq') : 'eq';
-  const c4 = tC4sign !== undefined ? (HEXNAC_4C1.C4[tC4sign] ?? 'eq') : 'eq';
+function buildHexNAc(name, t, formula, warnings, layers) {
+  // ring C3 / ring C4: the differentiating gluco/galacto/manno/allo positions
+  const c3 = resolveRingPosition(layers, t, 3, HEXNAC_4C1.ring_C3_from_t_pos, HEXNAC_4C1.C3);
+  const c4 = resolveRingPosition(layers, t, 4, HEXNAC_4C1.ring_C4_from_t_pos, HEXNAC_4C1.C4);
 
   const parts = [
     `r1:OH`,
@@ -333,12 +345,10 @@ function buildHexNAc(name, t, formula, warnings) {
   };
 }
 
-function buildHexN(name, t, formula, warnings) {
-  // GlcN has C6H13NO5 pyranose, same /t→carbon mapping as hexoses
-  const tC2sign = t.get(D_HEXOSE_4C1.carb_C2_from_t_pos);
-  const tC4sign = t.get(D_HEXOSE_4C1.carb_C4_from_t_pos);
-  const c2 = tC2sign !== undefined ? (D_HEXOSE_4C1.C2[tC2sign] ?? 'eq') : 'eq';
-  const c4 = tC4sign !== undefined ? (D_HEXOSE_4C1.C4[tC4sign] ?? 'eq') : 'eq';
+function buildHexN(name, t, formula, warnings, layers) {
+  // GlcN has C6H13NO5 pyranose, same ring shape as plain hexoses
+  const c2 = resolveRingPosition(layers, t, 2, D_HEXOSE_4C1.carb_C2_from_t_pos, D_HEXOSE_4C1.C2);
+  const c4 = resolveRingPosition(layers, t, 4, D_HEXOSE_4C1.carb_C4_from_t_pos, D_HEXOSE_4C1.C4);
 
   const parts = [
     `r1:OH`,
@@ -520,7 +530,7 @@ export function inchiToTerminii(name, inchi, opts = {}) {
     case 'L_hexose':
     case 'D_hexA':
     case 'L_hexA':
-      return buildHexose(name, t, formula, isL, opts.conformation, warnings);
+      return buildHexose(name, t, formula, isL, opts.conformation, warnings, layers);
     case 'D_deoxyhex':
       return buildDeoxyhex(name, t, formula, false, warnings);
     case 'L_deoxyhex':
@@ -529,9 +539,9 @@ export function inchiToTerminii(name, inchi, opts = {}) {
     case 'L_dideoxyhex':
       return buildDideoxyhex(name, t, formula, isL, warnings);
     case 'hexnac':
-      return buildHexNAc(name, t, formula, warnings);
+      return buildHexNAc(name, t, formula, warnings, layers);
     case 'hexn':
-      return buildHexN(name, t, formula, warnings);
+      return buildHexN(name, t, formula, warnings, layers);
     case 'D_pentose':
     case 'L_pentose':
       return buildPentose(name, t, formula, isL, warnings);
