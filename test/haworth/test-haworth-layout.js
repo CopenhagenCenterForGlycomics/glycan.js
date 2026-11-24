@@ -18,7 +18,7 @@ const GLC_INCHI = 'InChI=1S/C6H12O6/c7-1-2-3(8)4(9)5(10)6(11)12-2/h2-11H,1H2/t2-
 const GLC_TERMINII = 'r1:OH;2eq:OH;3eq:OH;4eq:OH;5eq:-;6eq:HOH';
 
 QUnit.test('beta-D-Glc: down, up, down, up (C2,C3,C4,C5) -- textbook Haworth pattern', function(assert) {
-  const { substituents } = layoutSubstituents(GLC_TERMINII, GLC_INCHI, { anomer: 'b', isL: false });
+  const { substituents } = layoutSubstituents(GLC_TERMINII, GLC_INCHI, { anomer: 'b' });
   const byPos = Object.fromEntries(substituents.map((s) => [s.position, s.orientation]));
   assert.equal(byPos[1], 'up', 'C1 (beta) up');
   assert.equal(byPos[2], 'down', 'C2 down');
@@ -46,7 +46,7 @@ const FUC_INCHI = 'InChI=1S/C6H12O5/c1-2-3(7)4(8)5(9)6(10)11-2/h2-10H,1H3/t2-,3+
 const FUC_TERMINII = 'r1:OH;2eq:OH;3eq:OH;4ax:OH;5eq:-;6eq:HH';
 
 QUnit.test('alpha-L-Fuc: down, down, up, up, up (C1,C2,C3,C4,C5/CH3) -- matches Gal at C2/C3/C4', function(assert) {
-  const { substituents } = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'a', isL: true });
+  const { substituents } = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'a' });
   const byPos = Object.fromEntries(substituents.map((s) => [s.position, s.orientation]));
   assert.equal(byPos[1], 'down', 'C1 (alpha-L) down -- matches alpha-D, not its mirror');
   assert.equal(byPos[2], 'down', 'C2 down');
@@ -56,7 +56,7 @@ QUnit.test('alpha-L-Fuc: down, down, up, up, up (C1,C2,C3,C4,C5/CH3) -- matches 
 });
 
 QUnit.test('beta-L-Fuc: only C1 flips relative to alpha-L', function(assert) {
-  const { substituents } = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'b', isL: true });
+  const { substituents } = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'b' });
   const byPos = Object.fromEntries(substituents.map((s) => [s.position, s.orientation]));
   assert.equal(byPos[1], 'up', 'C1 (beta-L) up');
   assert.equal(byPos[2], 'down', 'C2 down');
@@ -74,10 +74,10 @@ QUnit.test('beta-L-Fuc: only C1 flips relative to alpha-L', function(assert) {
 // and beta-L-Fuc matches beta-D-Glc's -- same as if Fuc's "L" label didn't
 // flip anything at all for this particular ring shape.
 QUnit.test('anomer/series relationship: for the deoxyhexose shape, L behaves like D (its /m mirror flip does not apply)', function(assert) {
-  const glcAlpha = layoutSubstituents(GLC_TERMINII, GLC_INCHI, { anomer: 'a', isL: false });
-  const glcBeta = layoutSubstituents(GLC_TERMINII, GLC_INCHI, { anomer: 'b', isL: false });
-  const fucAlpha = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'a', isL: true });
-  const fucBeta = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'b', isL: true });
+  const glcAlpha = layoutSubstituents(GLC_TERMINII, GLC_INCHI, { anomer: 'a' });
+  const glcBeta = layoutSubstituents(GLC_TERMINII, GLC_INCHI, { anomer: 'b' });
+  const fucAlpha = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'a' });
+  const fucBeta = layoutSubstituents(FUC_TERMINII, FUC_INCHI, { anomer: 'b' });
 
   const c1 = (r) => r.substituents.find((s) => s.position === 1).orientation;
   assert.equal(c1(glcAlpha), 'down');

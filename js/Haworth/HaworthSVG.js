@@ -29,9 +29,9 @@ function vertexForPosition(position, vertices) {
  * stick at those positions -- used where a glycosidic bond takes its place.
  */
 function layoutResidue(terminii, inchi, opts = {}) {
-  const { anomer = 'b', isL = false, suppressPositions = new Set() } = opts;
+  const { anomer = 'b', suppressPositions = new Set() } = opts;
   const { vertices, bonds } = ringGeometry();
-  const { substituents } = layoutSubstituents(terminii, inchi, { anomer, isL });
+  const { substituents } = layoutSubstituents(terminii, inchi, { anomer });
   return {
     vertices,
     bonds,
@@ -80,7 +80,6 @@ function residueSVGParts(layout, offset) {
  *   orientation; see HaworthLayout.js)
  * @param {object} [opts]
  * @param {'a'|'b'} [opts.anomer='b']
- * @param {boolean} [opts.isL=false]
  * @param {number} [opts.width=260]
  * @param {number} [opts.height=220]
  * @param {string} [opts.title] - optional <title> element for accessibility/tooltips
@@ -88,8 +87,8 @@ function residueSVGParts(layout, offset) {
  *   `currentColor`, so wrap it in an element with the desired `color` set)
  */
 function renderResidueSVG(terminii, inchi, opts = {}) {
-  const { anomer = 'b', isL = false, width = 260, height = 220, title } = opts;
-  const layout = layoutResidue(terminii, inchi, { anomer, isL });
+  const { anomer = 'b', width = 260, height = 220, title } = opts;
+  const layout = layoutResidue(terminii, inchi, { anomer });
   const parts = [];
   parts.push(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" font-family="Georgia, 'Times New Roman', serif" color="currentColor">`
@@ -104,7 +103,7 @@ function renderResidueSVG(terminii, inchi, opts = {}) {
  * Render several residues connected by real glycosidic bonds.
  *
  * @param {Array<{id: string|number, terminii: string, inchi: string,
- *   anomer?: 'a'|'b', isL?: boolean, x: number, y: number, label?: string}>} residues
+ *   anomer?: 'a'|'b', x: number, y: number, label?: string}>} residues
  *   `x`/`y` are this residue's ring-center position on the shared canvas.
  * @param {Array<{child: string|number, parent: string|number, parentPosition: number}>} linkages
  *   e.g. {child: 'Gal', parent: 'GlcNAc', parentPosition: 4} for a
@@ -129,7 +128,6 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
       r.id,
       layoutResidue(r.terminii, r.inchi, {
         anomer: r.anomer ?? 'b',
-        isL: r.isL ?? false,
         suppressPositions: suppressByResidue.get(r.id),
       }),
     ])

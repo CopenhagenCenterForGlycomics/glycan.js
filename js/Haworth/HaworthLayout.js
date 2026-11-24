@@ -96,13 +96,12 @@ function orientationFromAxEq(position, axEq) {
  *   with a different convention -- see PUBCHEM_CID_CORRECTIONS.md)
  * @param {object} opts
  * @param {'a'|'b'} [opts.anomer='b'] - alpha or beta anomeric configuration
- * @param {boolean} [opts.isL=false] - L-series (vs D-series) residue
  * @returns {{ substituents: Array<{position: number, label: string, orientation: 'up'|'down'}> }}
  *   position 1-5 are ring carbons (C1=anomeric .. C5); the exocyclic C6
  *   group is reported attached at position 5.
  */
 export function layoutSubstituents(terminii, inchi, opts = {}) {
-  const { anomer = 'b', isL = false } = opts;
+  const { anomer = 'b' } = opts;
   const { positions, c6Label } = parseTerminii(terminii);
   const substituents = [];
 
@@ -113,10 +112,13 @@ export function layoutSubstituents(terminii, inchi, opts = {}) {
   // where the /m mirror flip actually applies (see
   // InChIRingGeometry.js's shapeNeedsMirrorFlip); for a shape where it
   // doesn't (e.g. a deoxyhexose), L-series behaves like D-series here, not
-  // its mirror.
+  // its mirror. D/L-series itself is read straight off the InChI's own /m
+  // layer (same convention InChITerminii.js's classifyMonosaccharide uses),
+  // not a separate flag the caller has to track and keep in sync.
   const c1 = positions.get(1);
   if (c1 && displayLabel(c1.label)) {
     const layers = parseInChI(inchi);
+    const isL = (layers.m ?? '1') === '0';
     const mirrors = isL && (shapeNeedsMirrorFlip(layers) ?? true);
     const up = (anomer === 'b') !== mirrors;
     substituents.push({ position: 1, label: displayLabel(c1.label), orientation: up ? 'up' : 'down' });
