@@ -436,4 +436,27 @@ function renderSugarTreeSVG(root, opts = {}) {
   return { svg, unsupported };
 }
 
-export { renderResidueSVG, renderGlycanSVG, renderSugarTreeSVG };
+// Exported in addition to the three entry points above for HaworthRenderer.js
+// (sviewer's icon-based renderer framework, a different architecture from
+// this file's own string-building one -- it needs these pieces individually:
+// a residue's own layout + raw SVG markup (layoutResidue/residueSVGParts),
+// a linkage's anchor point including the child's own anomeric stick
+// (anchorPoint/substituentStickEnd/vertexForPosition), the position-6-onto-
+// C5 remapping (substituentPositionFor), and the bond-shortening/inline-
+// label-gap math (shortenToward) -- rather than this file's own
+// string-concatenation render path.
+export {
+  renderResidueSVG,
+  renderGlycanSVG,
+  renderSugarTreeSVG,
+  layoutResidue,
+  residueSVGParts,
+  anchorPoint,
+  vertexForPosition,
+  substituentPositionFor,
+  substituentStickEnd,
+  shortenToward,
+  placeholderSVGParts,
+  LINKAGE_INSET,
+  LINKAGE_LABEL_GAP,
+};

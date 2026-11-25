@@ -42,7 +42,7 @@ const BY_NAME = new Map(monosaccharideData.map((entry) => [entry.name, entry]));
  * from `inchi`. Returns null if this identifier isn't in the data file at
  * all (e.g. a typo, or a residue this registry doesn't know).
  */
-function resolveResidueData(identifier) {
+export function resolveResidueData(identifier) {
   const entry = BY_NAME.get(identifier);
   if (!entry) return null;
   if (entry.inchi && !entry.terminii) {
@@ -64,7 +64,7 @@ function resolveResidueData(identifier) {
  * is rendered as a placeholder instead of silently misreading its terminii
  * onto the wrong vertices.
  */
-function detectRingShape(terminii) {
+export function detectRingShape(terminii) {
   if (typeof terminii !== 'string') return null;
   const parts = terminii.split(';').length;
   if (terminii.startsWith('r1:') && parts === 6) return 'hexose';

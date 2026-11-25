@@ -34,6 +34,8 @@
     "./renderers/haeckel.js": "./js/Haeckel/HaeckelRenderer.js",
     "./renderers/neon": "./js/Neon/NeonRenderer.js",
     "./renderers/neon.js": "./js/Neon/NeonRenderer.js",
+    "./renderers/haworth": "./js/Haworth/HaworthRenderer.js",
+    "./renderers/haworth.js": "./js/Haworth/HaworthRenderer.js",
     "./svgcanvas": "./js/SVGCanvas.js"
   },
   "dependencies": {
