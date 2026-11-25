@@ -1,6 +1,6 @@
 /*global QUnit*/
 
-import { renderGlycanSVG } from '../../js/Haworth/HaworthSVG.js';
+import { renderGlycanSVG, layoutResidue, anchorPoint } from '../../js/Haworth/HaworthSVG.js';
 import { ringGeometry, layoutSubstituents } from '../../js/Haworth/HaworthLayout.js';
 
 QUnit.module('HaworthSVG - renderGlycanSVG', {});
@@ -71,5 +71,35 @@ QUnit.test('the glycosidic bond starts from the child\'s own (unlabeled) anomeri
     assert.ok(dy < 0, 'an "up" anomeric stick extends upward (negative dy) before the bond continues');
   } else {
     assert.ok(dy > 0, 'a "down" anomeric stick extends downward (positive dy) before the bond continues');
+  }
+});
+
+QUnit.test('anchorPoint: the parent\'s own linked position (C4) resolves to its stick\'s endpoint, not the bare ring vertex', function(assert) {
+  // Direct, unambiguous check on anchorPoint itself -- renderGlycanSVG's
+  // own glycosidic-bond loop immediately pulls this raw point in by
+  // LINKAGE_INSET *toward the child* afterward (see its `b =
+  // shortenToward(rawA, rawB, LINKAGE_INSET)`), which moves it diagonally
+  // rather than along GlcNAc's own local vertical stick direction -- not a
+  // useful thing to assert on the rendered line coordinates themselves.
+  const { vertices } = ringGeometry();
+  const bareC4 = vertices.C4;
+
+  const { substituents } = layoutSubstituents(GLCNAC_TERMINII, GLCNAC_INCHI, { anomer: 'b' });
+  const c4 = substituents.find((s) => s.position === 4);
+  assert.ok(c4, 'GlcNAc has a real position-4 substituent entry to compare against');
+
+  const layout = layoutResidue(GLCNAC_TERMINII, GLCNAC_INCHI, {
+    anomer: 'b',
+    stickOnlyPositions: new Set([4]),
+  });
+  const point = anchorPoint(layout, 4, { x: 0, y: 0 });
+  const dy = point.y - bareC4.y;
+
+  assert.notEqual(dy, 0, 'anchorPoint does not return the bare ring vertex once C4 is stick-only');
+  assert.equal(point.x, bareC4.x, 'the stick (and the bond continuing from it) stays vertical, same x as the ring vertex');
+  if (c4.orientation === 'up') {
+    assert.ok(dy < 0, 'an "up" C4 stick extends upward (negative dy) before the bond continues');
+  } else {
+    assert.ok(dy > 0, 'a "down" C4 stick extends downward (positive dy) before the bond continues');
   }
 });

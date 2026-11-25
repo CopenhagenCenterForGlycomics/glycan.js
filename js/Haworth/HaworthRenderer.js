@@ -48,7 +48,6 @@ import {
   substituentPositionFor,
   shortenToward,
   placeholderSVGParts,
-  LINKAGE_INSET,
   LINKAGE_LABEL_GAP,
 } from './HaworthSVG.js';
 
@@ -281,11 +280,12 @@ class HaworthRenderer extends SVGRenderer {
       return group;
     }
 
-    // The child side connects straight on from its own anomeric stick (no
-    // further inset -- see renderGlycanSVG's identical treatment); only
-    // the parent side is pulled in, same as every other glycosidic bond.
+    // Both ends connect straight on from their own stick -- no further
+    // inset needed (a residue shape with no real ring/stick at all was
+    // already bailed out to the plain-line fallback above, see
+    // renderGlycanSVG's identical treatment of its own placeholder case).
     const a = rawA;
-    const b = shortenToward(rawA, rawB, LINKAGE_INSET);
+    const b = rawB;
     const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
     const aEnd = shortenToward(a, mid, LINKAGE_LABEL_GAP);
     const bEnd = shortenToward(b, mid, LINKAGE_LABEL_GAP);

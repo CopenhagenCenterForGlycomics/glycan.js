@@ -375,27 +375,28 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
   }
 
   // Glycosidic bonds: a line from the child's own anomeric stick (its
-  // alpha/beta configuration) to the parent's own linked-position stick
-  // (that position's own real up/down stereochemistry -- see
-  // anchorPoint/layoutResidue's stickOnlyPositions, now applied
-  // symmetrically to both ends), the parent side still pulled in by
-  // LINKAGE_INSET so it doesn't run the full residue-to-residue distance,
-  // with the bridging oxygen sitting inline in the gap at its midpoint --
-  // the same label-gap convention the ring oxygen itself uses (see
+  // alpha/beta configuration) straight on to the parent's own
+  // linked-position stick (that position's own real up/down
+  // stereochemistry -- see anchorPoint/layoutResidue's stickOnlyPositions,
+  // now applied symmetrically to both ends), with the bridging oxygen
+  // sitting inline in a gap at the midpoint -- the same label-gap
+  // convention the ring oxygen itself uses (see
   // RING_LABEL_GAP/shortenToward above) -- rather than floating above the
-  // line. Either end may be a placeholder (no ring positions, and so no
-  // stick of its own), in which case the bond just touches its center,
-  // inset like the parent side.
+  // line. Either end may instead be a placeholder (no ring positions, and
+  // so no stick of its own) -- only then is that end pulled in by
+  // LINKAGE_INSET first, same idea as RING_LABEL_GAP, so the bond doesn't
+  // run all the way into the placeholder's own center.
   for (const link of linkages) {
     const child = residues.find((r) => r.id === link.child);
     const parent = residues.find((r) => r.id === link.parent);
     if (!child || !parent) continue;
     const childLayout = layouts.get(child.id);
+    const parentLayout = layouts.get(parent.id);
     const rawA = anchorPoint(childLayout, 1, { x: child.x, y: child.y });
-    const rawB = anchorPoint(layouts.get(parent.id), link.parentPosition, { x: parent.x, y: parent.y });
+    const rawB = anchorPoint(parentLayout, link.parentPosition, { x: parent.x, y: parent.y });
     if (!rawA || !rawB) continue;
     const a = childLayout.placeholder ? shortenToward(rawB, rawA, LINKAGE_INSET) : rawA;
-    const b = shortenToward(rawA, rawB, LINKAGE_INSET);
+    const b = parentLayout.placeholder ? shortenToward(rawA, rawB, LINKAGE_INSET) : rawB;
     const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
     const aEnd = shortenToward(a, mid, LINKAGE_LABEL_GAP);
     const bEnd = shortenToward(b, mid, LINKAGE_LABEL_GAP);
