@@ -3,6 +3,7 @@
 import Sugar from '../../js/Sugar.js';
 import { IO as Iupac } from '../../js/CondensedIupac.js';
 import SugarAwareLayout from '../../js/SugarAwareLayout.js';
+import LinkageLayout from '../../js/LinkageLayout.js';
 import HaworthRenderer from '../../js/Haworth/HaworthRenderer.js';
 
 class IupacSugar extends Iupac(Sugar) {}
@@ -79,6 +80,35 @@ QUnit.test('renders the N-glycan trimannosyl core, horizontal, as 6 real ring ic
       && icon.getAttributeNS('https://glycocode.com/glycanjs', 'identifier') !== 'Fuc')
     .map((icon) => Number(icon.getAttribute('transform').match(/translate\(([-\d.]+),/)[1]));
   assert.ok(mainChainX.every((x) => x < 0), 'every main-chain residue sits left of the reducing end');
+});
+
+QUnit.test('reassigning LayoutEngine after construction (sviewer\'s own linkangles-toggle pattern) keeps spacing stretched', function(assert) {
+  // sviewer never hands a renderer the base layout class itself -- always a
+  // fresh `class extends layout_class {}` per (class, element) pair (see
+  // lite.js's get_layout_engine()), so DELTA_X/DELTA_Y overrides can't leak
+  // across elements or renderers sharing the same base class. Mirrored here
+  // with our own throwaway subclasses, rather than mutating
+  // SugarAwareLayout/LinkageLayout themselves, which would leak into every
+  // other test in this same suite.
+  class SugarAwareLayoutInstance extends SugarAwareLayout {}
+  class LinkageLayoutInstance extends LinkageLayout {}
+
+  const renderer = new HaworthRenderer(document.body, SugarAwareLayoutInstance);
+  assert.equal(SugarAwareLayoutInstance.DELTA_X, 145 / 100, 'the layout engine given at construction time is stretched to this renderer\'s own spacing');
+
+  // e.g. lite.js's `linkangles` attribute handler: `this.renderer.LayoutEngine = this.LayoutEngine` with a different base class.
+  renderer.LayoutEngine = LinkageLayoutInstance;
+  assert.equal(LinkageLayoutInstance.DELTA_X, 145 / 100, 'a layout engine swapped in later is stretched too, not left at its own default spacing');
+  assert.notOk(
+    Object.getOwnPropertyDescriptor(SugarAwareLayoutInstance, 'DELTA_X'),
+    'the previous layout engine\'s own stretch override is cleaned up once replaced'
+  );
+
+  renderer.disconnect();
+  assert.notOk(
+    Object.getOwnPropertyDescriptor(LinkageLayoutInstance, 'DELTA_X'),
+    'disconnect() cleans up whichever layout engine is current, not just the one given at construction'
+  );
 });
 
 QUnit.test('an unsupported residue shape falls back to a plain line, not a crash', function(assert) {

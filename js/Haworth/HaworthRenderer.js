@@ -139,11 +139,12 @@ function parseSVGFragment(doc, markup) {
 
 class HaworthRenderer extends SVGRenderer {
   constructor(container, layout) {
+    // The base Renderer constructor itself does `this.LayoutEngine = layout`
+    // (only when both container and layout are given) -- `this` already has
+    // this subclass's full prototype chain at that point, so it runs
+    // through the overridden setter below, which does the actual
+    // stretching. Nothing further needed here.
     super(container, layout);
-    this._stretchedLayout = layout || null;
-    if (this._stretchedLayout) {
-      stretchForHaworth(this._stretchedLayout);
-    }
   }
 
   // Called by sviewer (lite.js's initialise_renderer_object) before
@@ -154,6 +155,31 @@ class HaworthRenderer extends SVGRenderer {
       delete this._stretchedLayout.DELTA_Y;
       this._stretchedLayout = null;
     }
+  }
+
+  // sviewer can swap in an entirely different layout-engine instance after
+  // construction (lite.js's `linkangles` attribute handler reassigns
+  // `renderer.LayoutEngine` to switch between SugarAwareLayout's and
+  // LinkageLayout's own fresh per-element subclass) -- without this
+  // override, that swap would silently drop back to the layout's own
+  // default (tiny, icon-sized) DELTA_X/DELTA_Y, crowding every ring+stick
+  // together. Re-stretches whichever instance is current, and un-stretches
+  // the one being replaced first so it's left clean for whatever renderer
+  // (or this one, re-assigned later) uses it next.
+  set LayoutEngine(engine) {
+    if (this._stretchedLayout && this._stretchedLayout !== engine) {
+      delete this._stretchedLayout.DELTA_X;
+      delete this._stretchedLayout.DELTA_Y;
+    }
+    this._stretchedLayout = engine || null;
+    if (this._stretchedLayout) {
+      stretchForHaworth(this._stretchedLayout);
+    }
+    super.LayoutEngine = engine;
+  }
+
+  get LayoutEngine() {
+    return super.LayoutEngine;
   }
 
   // This renderer draws its own geometry outright (residueSVGParts), not
@@ -255,4 +281,4 @@ class HaworthRenderer extends SVGRenderer {
   }
 }
 
-export { HaworthRenderer as default };
+export { HaworthRenderer, HaworthRenderer as default };
