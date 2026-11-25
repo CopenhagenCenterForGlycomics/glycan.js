@@ -7,7 +7,7 @@
 
 import monosaccharideData from '../data/monosaccharides.js';
 import { inchiToTerminii } from '../InChITerminii.js';
-import { ringGeometry } from './HaworthLayout.js';
+import { ringGeometry, MODIFICATION_LABELS } from './HaworthLayout.js';
 
 // Where each ring position's vertex actually sits, vertically, on its own
 // parent's hexagon (see HaworthLayout.js's ringGeometry -- position 6 bonds
@@ -107,9 +107,14 @@ function layoutTree(root, opts = {}) {
     // branch off the same parent: position 3's vertex sits below the
     // parent's center, position 6's sits above, so the 1-6 child must be
     // placed above the 1-3 child, whichever order they were added in).
-    const children = [...(node.children ?? [])].sort(
-      (a, b) => (RING_VERTEX_Y[node.linkageOf(a)] ?? 0) - (RING_VERTEX_Y[node.linkageOf(b)] ?? 0)
-    );
+    // A modification child (e.g. HSO3 -- see MODIFICATION_LABELS) isn't
+    // drawn as its own residue at all (see this function's own callers,
+    // which fold it into its parent's own substituents instead), so it
+    // doesn't get a row/position here either -- same tree, just excluded
+    // from layout the same way it's excluded from rendering.
+    const children = [...(node.children ?? [])]
+      .filter((c) => !MODIFICATION_LABELS[c.identifier])
+      .sort((a, b) => (RING_VERTEX_Y[node.linkageOf(a)] ?? 0) - (RING_VERTEX_Y[node.linkageOf(b)] ?? 0));
     let row;
     if (children.length === 0) {
       row = nextRow++;
@@ -171,6 +176,20 @@ export function sugarToHaworthInput(root, opts = {}) {
       });
     }
 
+    // A modification child (e.g. HSO3) was already excluded from
+    // `rawPositions` (see layoutTree's own filter), but is still a real
+    // child of THIS node -- its real chemistry replaces the hydroxyl it's
+    // linked to, so it's folded in here as a label swap on this residue's
+    // own stick (renderGlycanSVG's own `modifications` field) rather than
+    // drawn as a separate residue.
+    const modifications = [];
+    for (const child of node.children ?? []) {
+      const label = MODIFICATION_LABELS[child.identifier];
+      if (!label) continue;
+      const position = node.linkageOf(child);
+      if (Number.isInteger(position)) modifications.push({ position, label });
+    }
+
     residues.push({
       id: node,
       terminii: supported ? data.terminii : null,
@@ -181,6 +200,7 @@ export function sugarToHaworthInput(root, opts = {}) {
       y: pos.y * spacingY,
       label: node.identifier,
       placeholder: !supported,
+      modifications,
     });
 
     if (node.parent) {

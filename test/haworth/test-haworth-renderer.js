@@ -202,3 +202,36 @@ QUnit.test('a sialic-acid child\'s glycosidic bond donates from its own real ano
   const galExpected = point(vertices.C5, galTail.orientation, offsetOf('Gal'));
   assert.ok(findLineNear(galExpected), 'the same glycosidic bond\'s other end sits exactly on Gal\'s own hexagon-C5 (its real C6) stick -- flush, no gap');
 });
+
+QUnit.test('HSO3 (sulfation) draws as a label swap on its parent\'s own ring, not its own icon or bond', function(assert) {
+  // "GlcNAc6S" is condensed-IUPAC shorthand, normalized at parse time into
+  // a real GlcNAc residue with an HSO3 child at position 6 (same tree
+  // shape as writing it out as GlcNAc(?)[HSO3(u?-6)] directly).
+  const sugar = new IupacSugar();
+  sugar.sequence = 'GlcNAc6S(b1-4)GlcNAc';
+
+  const renderer = new HaworthRenderer(document.body, SugarAwareLayout);
+  renderer.addSugar(sugar);
+  renderer.refresh();
+
+  const svg = renderer.element.canvas;
+
+  const hso3Icon = svg.querySelector('g[glycanjs\\:identifier="HSO3"]');
+  assert.ok(hso3Icon, 'HSO3 still gets a located group (same bookkeeping as any residue)');
+  assert.equal(hso3Icon.querySelectorAll('*').length, 0, 'but nothing is drawn inside it -- no separate ring/icon');
+
+  assert.equal(svg.querySelectorAll('line[stroke-width="1.8"]').length, 2, 'only the GlcNAc-GlcNAc glycosidic bond is drawn (one bond, two segments) -- none to HSO3');
+
+  // Both residues are identifier "GlcNAc" ("GlcNAc6S" normalizes to a plain
+  // GlcNAc with an HSO3 child, not a distinct identifier -- see
+  // CondensedIupac.js) -- the sulfated one is whichever HAS a parent (the
+  // donor/child side of the b1-4 bond); the root (reducing end) is its own
+  // unrelated, un-sulfated GlcNAc and legitimately still shows its own
+  // real "HOH₂C".
+  const sulfatedGlcNAc = [...svg.querySelectorAll('g[glycanjs\\:identifier="GlcNAc"]')].find(
+    (g) => g.getAttributeNS('https://glycocode.com/glycanjs', 'parent') !== ''
+  );
+  const sulfatedTexts = [...sulfatedGlcNAc.querySelectorAll('text')].map((t) => t.textContent);
+  assert.ok(sulfatedTexts.includes('HO3SO'), 'the sulfate label (mirrored spelling -- hexagon C6 is left-extending) replaces the C6 hydroxyl on GlcNAc\'s own ring');
+  assert.notOk(sulfatedTexts.includes('HOH₂C'), 'the default C6 hydroxyl label is gone from THIS residue, not drawn alongside it');
+});

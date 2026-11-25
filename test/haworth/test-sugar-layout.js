@@ -143,6 +143,25 @@ QUnit.test('NeuAc and Galf are real rings now, not placeholders, with the right 
   assert.ok(!svg.includes('stroke-dasharray'), 'no placeholders left -- every residue is a real ring');
 });
 
+QUnit.test('HSO3 is excluded from tree layout/positioning and folded into its parent as a label override instead', function(assert) {
+  // A sulfation child's real chemistry REPLACES the hydroxyl it esterifies
+  // rather than sitting beside it as its own residue -- see
+  // HaworthLayout.js's MODIFICATION_LABELS.
+  const root = new Monosaccharide('GlcNAc');
+  const hso3 = new Monosaccharide('HSO3');
+  root.addChild(6, hso3);
+
+  const { residues, linkages, unsupported } = sugarToHaworthInput(root);
+  assert.equal(residues.length, 1, 'HSO3 does not get its own residue/position -- just GlcNAc itself');
+  assert.equal(linkages.length, 0, 'no glycosidic bond recorded for it');
+  assert.equal(unsupported.length, 0, 'not reported as unsupported either -- deliberately excluded, not a shape this renderer failed to draw');
+
+  const [r] = residues;
+  assert.equal(r.modifications.length, 1);
+  assert.equal(r.modifications[0].position, 6, 'raw ring position, same convention as linkages\' own parentPosition');
+  assert.equal(r.modifications[0].label, 'OSO3H');
+});
+
 QUnit.module('HaworthSVG - renderSugarTreeSVG', {});
 
 QUnit.test('renders the N-glycan core: 5 rings, 4 bonds, no overlap-induced self-intersection markers', function(assert) {
@@ -154,4 +173,21 @@ QUnit.test('renders the N-glycan core: 5 rings, 4 bonds, no overlap-induced self
   // either side of its inline "O" label's gap -- see HaworthSVG.js's
   // LINKAGE_LABEL_GAP.
   assert.equal((svg.match(/stroke-width="1\.8"/g) || []).length, 8, 'two glycosidic bond segments per linkage');
+});
+
+QUnit.test('a whole real tree with an HSO3 child renders it as a label swap, not a placeholder or a bond', function(assert) {
+  const root = new Monosaccharide('GlcNAc');
+  const hso3 = new Monosaccharide('HSO3');
+  root.addChild(6, hso3);
+
+  const { svg, unsupported } = renderSugarTreeSVG(root);
+  assert.equal(unsupported.length, 0);
+  assert.ok(!svg.includes('stroke-dasharray'), 'no placeholder circle for HSO3');
+  assert.equal((svg.match(/stroke-width="1\.8"/g) || []).length, 0, 'no glycosidic bond drawn to it');
+  // Hexagon position 6 (the C6 group) sits on the LEFT of this fixed ring
+  // frame (vertexForPosition maps it onto C5 -- see HaworthSVG.js), so its
+  // label reads in the mirrored (left-extending) spelling -- same
+  // REVERSED_LABELS convention as HOH₂C/HO/etc, not the forward "OSO3H".
+  assert.ok(svg.includes('>HO3SO<'), 'the sulfate label replaces the C6 hydroxyl, in its left-extending spelling');
+  assert.ok(!svg.includes('CH₂OH') && !svg.includes('HOH₂C'), 'the default C6 hydroxyl label is gone, not drawn alongside it');
 });

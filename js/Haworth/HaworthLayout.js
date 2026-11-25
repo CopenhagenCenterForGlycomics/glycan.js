@@ -48,6 +48,32 @@
 import { parseInChI, parseTLayer } from '../InChITerminii.js';
 import { shapeNeedsMirrorFlip, deriveHaworthOrientation } from '../InChIRingGeometry.js';
 
+// A small set of residues that glycan.js's tree models as a separate child
+// Monosaccharide node (e.g. `GlcNAc(b1-4)[HSO3(u?-6)]...`, same as Fuc/
+// NeuAc/P/EtNP -- see SugarAwareLayout.js's own identical treatment of
+// these as small satellite icons rather than full residues), but that this
+// renderer draws differently: not as an icon/ring of its own at all, just
+// as a label swapped onto the PARENT's own substituent stick at the
+// position it's linked to (its real chemistry -- a sulfate ester REPLACES
+// the hydroxyl it esterifies, it doesn't sit beside it). See SugarLayout.js
+// (which excludes these from tree layout/positioning entirely) and
+// HaworthSVG.js/HaworthRenderer.js (which apply the label swap and skip
+// drawing the child's own icon/bond).
+//
+// Label text is the standard forward (ring-bonded-atom-first) spelling;
+// HaworthSVG.js's own REVERSED_LABELS has the mirrored form for a
+// left-extending stick. Scoped to HSO3 only for now (what was actually
+// asked for) -- P/EtNP/Me get the same "small satellite, not a full
+// residue" treatment elsewhere in glycan.js and could be added here the
+// same way if ever needed for this renderer.
+//
+// Unlike every other label in this file, "OSO3H" isn't independently
+// confirmed against a published Haworth reference image (attempted but
+// the reference couldn't be fetched) -- worth a visual sanity check.
+export const MODIFICATION_LABELS = {
+  HSO3: 'OSO3H',
+};
+
 const SUBSTITUENT_LABELS = {
   OH: 'OH',
   O: 'OH',       // a ketose anomeric centre's reducing-end hydroxyl is written as a bare "O" in terminii (see InChITerminii.js's buildSialic) -- same chemistry as "OH" everywhere else, just a mass-accounting quirk of the "r"-prefixed reducing-end token

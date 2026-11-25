@@ -50,6 +50,7 @@ import {
   placeholderSVGParts,
   LINKAGE_LABEL_GAP,
 } from './HaworthSVG.js';
+import { MODIFICATION_LABELS } from './HaworthLayout.js';
 
 import { resolveResidueData, detectRingShape } from './SugarLayout.js';
 import { MONOSACCHARIDE } from '../reference_monosaccharides.js';
@@ -131,16 +132,26 @@ function residueHaworthLayout(residue) {
   if (!shape) return null;
 
   const stickOnlyPositions = new Set();
+  const labelOverrides = new Map();
 
   // Every position where one of this residue's OWN children attaches keeps
   // its stick but drops the label -- that position's own real up/down
   // stereochemistry is what the glycosidic bond continues on from (see
   // anchorPoint), not the bare ring vertex (substituentPositionFor remaps
   // ring position 6 onto the hexagon's actual C5 vertex, same as
-  // HaworthSVG.js's own substituentPositionFor usage).
+  // HaworthSVG.js's own substituentPositionFor usage). A MODIFICATION
+  // child (e.g. HSO3) is the odd one out: it isn't drawn as a separate
+  // residue at all (see renderIcon/renderLinkage below), so instead of a
+  // glycosidic-bond stick it swaps this position's own label for the
+  // modification's real chemistry (a sulfate ester REPLACES the hydroxyl
+  // it esterifies, rather than sitting beside it).
   for (const child of residue.children ?? []) {
     const parentPosition = residue.linkageOf(child);
-    if (Number.isInteger(parentPosition)) {
+    if (!Number.isInteger(parentPosition)) continue;
+    const modLabel = MODIFICATION_LABELS[child.identifier];
+    if (modLabel) {
+      labelOverrides.set(substituentPositionFor(parentPosition), modLabel);
+    } else {
       stickOnlyPositions.add(substituentPositionFor(parentPosition));
     }
   }
@@ -168,6 +179,7 @@ function residueHaworthLayout(residue) {
     anomer: residue.anomer === 'a' ? 'a' : 'b',
     shape,
     stickOnlyPositions,
+    labelOverrides,
   });
 }
 
@@ -225,11 +237,18 @@ class HaworthRenderer extends SVGRenderer {
     );
     group.setAttribute('part', `residue_location_${location}`);
 
-    const layout = residueHaworthLayout(residue);
-    const markup = layout
-      ? residueSVGParts(layout, { x: 0, y: 0 }).join('')
-      : placeholderSVGParts(residue.identifier, { x: 0, y: 0 }).join('');
-    group.appendChild(parseSVGFragment(group.element.ownerDocument, markup));
+    // A modification (e.g. HSO3 -- see MODIFICATION_LABELS) draws as a
+    // label swap on its PARENT's own ring instead (residueHaworthLayout's
+    // labelOverrides, applied when the parent's own icon is rendered) --
+    // nothing of its own to draw here. Still a real, located group (same
+    // bookkeeping as any other residue), just an empty one.
+    if (!MODIFICATION_LABELS[residue.identifier]) {
+      const layout = residueHaworthLayout(residue);
+      const markup = layout
+        ? residueSVGParts(layout, { x: 0, y: 0 }).join('')
+        : placeholderSVGParts(residue.identifier, { x: 0, y: 0 }).join('');
+      group.appendChild(parseSVGFragment(group.element.ownerDocument, markup));
+    }
 
     return { element: group.element };
   }
@@ -259,6 +278,9 @@ class HaworthRenderer extends SVGRenderer {
   // per-residue x/y.
   renderLinkage(child_pos, parent_pos, child, parent, sugar, canvas) {
     if (!parent_pos) return null;
+    // A modification (e.g. HSO3) draws as a label swap on its parent's own
+    // ring (see residueHaworthLayout/renderIcon) -- no bond to draw to it.
+    if (MODIFICATION_LABELS[child.identifier]) return null;
 
     const group = this.renderLinkageGroup(canvas, sugar, child);
     canvas.sendToBack(group);

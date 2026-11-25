@@ -21,6 +21,7 @@ import {
   layoutFuranoseSubstituents,
   furanoseGeometry,
   layoutSialicSubstituents,
+  MODIFICATION_LABELS,
 } from './HaworthLayout.js';
 import { sugarToHaworthInput } from './SugarLayout.js';
 
@@ -95,9 +96,23 @@ function substituentPositionFor(ringPosition) {
  * vertex.
  * `shape` ('hexose' | 'furanose' | 'sialic', default 'hexose') picks which
  * geometry + substituent layout to use -- see HaworthLayout.js.
+ * `labelOverrides` (a Map<ring position, label>) swaps in a different
+ * label at that position -- e.g. a sulfation (HSO3) child modeled
+ * elsewhere in the tree as its own residue (see HaworthLayout.js's
+ * MODIFICATION_LABELS) real chemistry REPLACES the hydroxyl it
+ * esterifies, rather than sitting beside it, so it's drawn here as a
+ * label swap on the parent's own stick (keeping that position's own real
+ * orientation), not as a separate ring/icon of its own. Checked before
+ * stickOnlyPositions, so the two are mutually exclusive per position (a
+ * caller shouldn't mark the same position both ways).
  */
 function layoutResidue(terminii, inchi, opts = {}) {
-  const { anomer = 'b', stickOnlyPositions = new Set(), shape = 'hexose' } = opts;
+  const {
+    anomer = 'b',
+    stickOnlyPositions = new Set(),
+    labelOverrides = new Map(),
+    shape = 'hexose',
+  } = opts;
   const builder = SHAPE_BUILDERS[shape] ?? SHAPE_BUILDERS.hexose;
   const { vertices, bonds } = builder.geometry();
   const { substituents } = builder.layout(terminii, inchi, { anomer });
@@ -108,10 +123,14 @@ function layoutResidue(terminii, inchi, opts = {}) {
     // on the same vertex (the anomeric OH a glycosidic bond replaces, and
     // the COOH that's always there regardless) -- see
     // layoutSialicSubstituents. The COOH must keep its own label even when
-    // its shared vertex goes stick-only for the OTHER substituent there.
-    substituents: substituents.map((s) =>
-      stickOnlyPositions.has(s.position) && !s.neverSuppress ? { ...s, label: null } : s
-    ),
+    // its shared vertex goes stick-only (or label-overridden) for the
+    // OTHER substituent there.
+    substituents: substituents.map((s) => {
+      if (s.neverSuppress) return s;
+      if (labelOverrides.has(s.position)) return { ...s, label: labelOverrides.get(s.position) };
+      if (stickOnlyPositions.has(s.position)) return { ...s, label: null };
+      return s;
+    }),
   };
 }
 
@@ -155,6 +174,11 @@ const REVERSED_LABELS = {
   'NH₂': 'H₂N',
   NHAc: 'AcHN',
   NHGc: 'GcHN',
+  // Unlike the entries above, not independently confirmed against a
+  // published reference image (see HaworthLayout.js's MODIFICATION_LABELS)
+  // -- derived from the same group-reversal pattern as every other entry
+  // here (O | S | O3 | H -> H | O3 | S | O), worth a visual sanity check.
+  OSO3H: 'HO3SO',
 };
 
 function orientLabel(label, anchor) {
@@ -327,14 +351,22 @@ function renderResidueSVG(terminii, inchi, opts = {}) {
  *
  * @param {Array<{id: object, terminii: string|null, inchi: string|null,
  *   anomer?: 'a'|'b', shape?: 'hexose'|'furanose'|'sialic', x: number,
- *   y: number, label?: string, placeholder?: boolean}>} residues
+ *   y: number, label?: string, placeholder?: boolean,
+ *   modifications?: Array<{position: number, label: string}>}>} residues
  *   `x`/`y` are this residue's ring-center position on the shared canvas.
  *   `id` just needs to be usable as a Map key and compared with `===` --
  *   an object reference (e.g. the Monosaccharide node itself) works fine.
  *   `shape` defaults to 'hexose' if omitted. `placeholder: true` (with
  *   `terminii`/`inchi` left null) draws a plain labeled circle instead of a
  *   real Haworth ring, for a residue shape this renderer doesn't handle yet
- *   (see SugarLayout.js's detectRingShape).
+ *   (see SugarLayout.js's detectRingShape). `modifications` swaps a
+ *   different label onto this residue's own stick at `position` (e.g. a
+ *   sulfation -- see HaworthLayout.js's MODIFICATION_LABELS) -- for a
+ *   residue modeled elsewhere as its own small child node, not drawn here
+ *   as a ring/icon of its own at all (its real chemistry replaces the
+ *   hydroxyl it's linked to, rather than sitting beside it); `position`
+ *   follows the same raw ring-position convention as `linkages`' own
+ *   `parentPosition` below (6 bonds at C5, same remap).
  * @param {Array<{child: object, parent: object, parentPosition: number}>} linkages
  *   e.g. {child: gal, parent: glcNAc, parentPosition: 4} for a
  *   Gal-(1->4)-GlcNAc bond: the child's anomeric C1 connects to the
@@ -355,6 +387,13 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
     stickOnlyByResidue.get(link.parent)?.add(substituentPositionFor(link.parentPosition));
   }
 
+  const labelOverridesByResidue = new Map(residues.map((r) => [r.id, new Map()]));
+  for (const r of residues) {
+    for (const mod of r.modifications ?? []) {
+      labelOverridesByResidue.get(r.id)?.set(substituentPositionFor(mod.position), mod.label);
+    }
+  }
+
   const layouts = new Map(
     residues.map((r) => [
       r.id,
@@ -364,6 +403,7 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
           anomer: r.anomer ?? 'b',
           shape: r.shape ?? 'hexose',
           stickOnlyPositions: stickOnlyByResidue.get(r.id),
+          labelOverrides: labelOverridesByResidue.get(r.id),
         }),
     ])
   );

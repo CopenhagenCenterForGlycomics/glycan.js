@@ -1,6 +1,6 @@
 /*global QUnit*/
 
-import { renderGlycanSVG, layoutResidue, anchorPoint } from '../../js/Haworth/HaworthSVG.js';
+import { renderGlycanSVG, layoutResidue, anchorPoint, residueSVGParts } from '../../js/Haworth/HaworthSVG.js';
 import { ringGeometry, layoutSubstituents } from '../../js/Haworth/HaworthLayout.js';
 
 QUnit.module('HaworthSVG - renderGlycanSVG', {});
@@ -135,4 +135,24 @@ QUnit.test('anchorPoint: a linkage at position 6 also resolves to its stick\'s e
   } else {
     assert.ok(dy > 0, 'a "down" C6-group stick extends downward (positive dy) before the bond continues');
   }
+});
+
+QUnit.test('layoutResidue: labelOverrides swaps a position\'s label (e.g. a sulfate) without touching its real stick/orientation', function(assert) {
+  // Hexagon position 2 sits on the right of this fixed ring frame (see
+  // ringGeometry/substituentStickEnd's own text-anchor logic), so its
+  // label reads in the forward (ring-bonded-atom-first) spelling, unlike
+  // the left-extending C6/position-6 case (see the N-glycan-core-with-
+  // HSO3 test in test-sugar-layout.js, which exercises the mirrored form).
+  const labelOverrides = new Map([[2, 'OSO3H']]);
+  const overridden = layoutResidue(GLCNAC_TERMINII, GLCNAC_INCHI, { anomer: 'b', labelOverrides });
+  const plain = layoutResidue(GLCNAC_TERMINII, GLCNAC_INCHI, { anomer: 'b' });
+
+  const overriddenSub = overridden.substituents.find((s) => s.position === 2);
+  const plainSub = plain.substituents.find((s) => s.position === 2);
+  assert.equal(overriddenSub.label, 'OSO3H', 'the label is swapped');
+  assert.equal(overriddenSub.orientation, plainSub.orientation, 'the real stereochemistry at that position is untouched');
+
+  const svg = residueSVGParts(overridden, { x: 0, y: 0 }).join('');
+  assert.ok(svg.includes('>OSO3H<'), 'rendered forward (not mirrored) on this right-extending position');
+  assert.ok(!svg.includes('>NHAc<'), 'the position\'s original label (NHAc, from GLCNAC_TERMINII) is gone, not drawn alongside the override');
 });
