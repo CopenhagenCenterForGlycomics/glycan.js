@@ -10,25 +10,26 @@
  *    text draws by hand (oxygen at the top right; C1-C2-C3-C4 the front/
  *    bold arc, C4-C5-O5-C1 the back/thin arc -- C1 and C4 are the ring's
  *    two "flap" vertices where front meets back, the same 1,4 pair that's
- *    always the flap pair in any real chair).
+ *    always the flap pair in any real chair). Built as a genuine (if
+ *    idealized) 3D chair -- 6 ring atoms on a circle, alternating +/-z
+ *    pucker, same idea as InChIRingGeometry.js's own buildChair -- viewed
+ *    from a fixed oblique angle (ROTATION below) and projected to 2D,
+ *    rather than hand-placed: a hand-placed attempt, tuned purely by eye
+ *    against a published reference image, kept crowding adjacent
+ *    substituents together (their outward lean had no real geometric
+ *    relationship to each other); a genuine rotated-3D projection gives
+ *    every position's own lean a real geometric reason not to converge on
+ *    its neighbour's.
  *  - A substituent stick that isn't always vertical: AXIAL is vertical
  *    (exactly Haworth's own up/down direction -- a Haworth projection is a
  *    simplification of the chair that specifically preserves this).
- *    EQUATORIAL points outward from the ring instead, at the angle real
- *    tetrahedral geometry actually gives it -- found by feeding this
- *    drawing's own ring-vertex positions, PLUS a small synthetic
- *    alternating z (the real chair's pucker: a perfectly flat, z=0 ring
- *    can't distinguish axial from equatorial direction at all -- tried
- *    first, and tetrahedralOtherTwo returned the SAME in-plane direction
- *    for both, only differing in a z-component this 2D drawing doesn't
- *    use), into InChIRingGeometry.js's own tetrahedralOtherTwo (the exact
- *    function deriveAxialEquatorial/deriveHaworthOrientation already
- *    resolve every position's real chemistry against). This is what
- *    actually keeps adjacent equatorial substituents from converging
- *    toward each other the way a naive "outward from ring center"
- *    approximation does (also tried first) -- confirmed by comparing
- *    adjacent positions' stick endpoints are clearly separated, not just
- *    by eye.
+ *    EQUATORIAL points outward from the ring at the angle real tetrahedral
+ *    geometry gives it -- InChIRingGeometry.js's own tetrahedralOtherTwo
+ *    (the same function deriveAxialEquatorial/deriveHaworthOrientation
+ *    already resolve every position's real chemistry against), fed this
+ *    SAME idealized 3D ring's own real (not synthetic) pucker, then
+ *    projected through the SAME rotation as the ring itself so a stick
+ *    always reads as a continuation of its own ring vertex.
  *
  * Scoped to the hexose/sialic shapes only (both reuse this same hexagon) --
  * a real chair conformation doesn't meaningfully apply to a 5-membered
@@ -38,22 +39,58 @@
 
 import { Vec3, tetrahedralOtherTwo } from '../InChIRingGeometry.js';
 
-const STICK_LENGTH = 24;
+const STICK_LENGTH = 26;
 
-// Ring-bond order (matches chairGeometry's own bonds array, going around
-// once) -- used both for the equatorial-angle computation below and (via
-// RING_Z) to give each vertex a synthetic out-of-plane pucker for that
-// computation only (never used for anything actually drawn -- the ring
-// itself stays flat 2D, same as every other shape this renderer draws).
+// The idealized 3D chair: 6 ring atoms (sugar-position order, then the
+// ring oxygen last -- same convention InChIRingGeometry.js's own
+// resolveRingSubstituent uses for its own buildChair positions) on a
+// circle, alternating +/-PUCKER. PHASE picks which atom sits at angle 0
+// (purely a drawing choice -- rotating the whole ring in 3D before it's
+// even projected); found by visual check against a published chair
+// diagram (chemistrysteps.com's "Converting Haworth to a Chair of
+// glucose") for the clearest, least-crowded zigzag, not derived from a
+// formula -- there isn't one, any phase traces the same real ring, just
+// facing a different way.
 const RING_ORDER = ['O5', 'C1', 'C2', 'C3', 'C4', 'C5'];
-const RING_Z = Object.fromEntries(RING_ORDER.map((key, i) => [key, i % 2 === 0 ? 0.3 : -0.3]));
+const PHASE = (-135 * Math.PI) / 180;
+const PUCKER = 0.4;
+const RADIUS = 1;
+
+// The viewing transform: tilt the ring by ROTATION_X (a rotation about the
+// screen's own horizontal axis, bringing some of the ring's own "depth"
+// extent and its z-pucker together into the screen's vertical axis -- a
+// real oblique view, not an arbitrary additive fudge), then MIRROR
+// (horizontal flip) so the ring oxygen lands top-right, matching the
+// conventional orientation (same reference as above) rather than top-left,
+// which the chosen PHASE/ROTATION_X pair happens to produce before
+// mirroring. SCALE is this drawing's own overall size (same ballpark as
+// HaworthLayout.js's own ringGeometry rx/ry).
+const ROTATION_X = (45 * Math.PI) / 180;
+const MIRROR = true;
+const SCALE = 60;
+
+function ring3D() {
+  const points = {};
+  RING_ORDER.forEach((key, i) => {
+    const angle = PHASE + i * (Math.PI / 3);
+    points[key] = new Vec3(RADIUS * Math.cos(angle), RADIUS * Math.sin(angle), i % 2 === 0 ? PUCKER : -PUCKER);
+  });
+  return points;
+}
+
+// Projects either a 3D ring POINT or a 3D direction VECTOR (same linear
+// map works for both -- no translation involved) down to this drawing's
+// 2D plane.
+function project(v, scale = SCALE) {
+  const y = v.y * Math.cos(ROTATION_X) - v.z * Math.sin(ROTATION_X);
+  return { x: v.x * scale * (MIRROR ? -1 : 1), y: y * scale };
+}
 
 /**
  * The classic hand-drawn chair silhouette: 6 ring vertices (5 carbons + the
  * ring oxygen), centered on (0,0). Matches HaworthLayout.js's own
- * ringGeometry() in overall scale (same ballpark rx/ry) and vertex naming
- * (C1..C5, O5), so the two are drop-in alternatives from a caller's
- * perspective.
+ * ringGeometry() in overall scale and vertex naming (C1..C5, O5), so the
+ * two are drop-in alternatives from a caller's perspective.
  *
  * Unlike ringGeometry()'s tapered front-face wedge (a plain SVG stroke
  * can't vary width along its own length, so Haworth fakes the perspective
@@ -63,18 +100,9 @@ const RING_Z = Object.fromEntries(RING_ORDER.map((key, i) => [key, i % 2 === 0 ?
  * polygon.
  */
 export function chairGeometry() {
-  // Found by visual check against a published chair diagram
-  // (chemistrysteps.com's "Converting Haworth to a Chair of glucose"), not
-  // derived from any formula -- there isn't one, this is just the
-  // conventional hand-drawn shape. Centered on the hexagon's own centroid.
-  const vertices = {
-    O5: { x: 22, y: -42 },
-    C1: { x: 64, y: 3 },
-    C2: { x: 33, y: 53 },
-    C3: { x: -25, y: 39 },
-    C4: { x: -65, y: -4 },
-    C5: { x: -31, y: -48 },
-  };
+  const points3d = ring3D();
+  const vertices = {};
+  for (const key of RING_ORDER) vertices[key] = project(points3d[key]);
   const bonds = [
     { from: 'O5', to: 'C1', width: 'thin' },
     { from: 'C1', to: 'C2', width: 'bold' },
@@ -100,20 +128,20 @@ function vertexKeyForPosition(position) {
 /**
  * A substituent stick's own far endpoint -- the chair-specific counterpart
  * to HaworthSVG.js's substituentStickEnd (which is always vertical; this
- * is only vertical for an axial substituent).
+ * is only vertical for an axial substituent). `vertices` must be the SAME
+ * object chairGeometry() just returned for this residue.
  *
  * `axEq` picks the direction family: 'ax' is a pure vertical stick (same
  * up/down convention as Haworth -- up is negative y). 'eq' takes
- * InChIRingGeometry.js's own tetrahedralOtherTwo, fed this ring's actual
- * 2D vertex positions (plus the synthetic pucker in RING_Z, needed only so
- * axial and equatorial come out as genuinely different directions -- see
- * this module's own docstring), and uses that real tetrahedral
- * equatorial direction's own in-plane (x,y) lean -- not a hand-tuned
- * approximation. Either way, the SIGN (which of the two up/down
- * possibilities to use) is fixed by matching `orientation` -- same
- * "up stays up" rule for axial and equatorial alike. `axEq` missing/null
- * (shouldn't normally happen -- see HaworthLayout.js's own axEq docs)
- * falls back to equatorial, the more common case.
+ * InChIRingGeometry.js's own tetrahedralOtherTwo, fed this SAME idealized
+ * 3D ring's own real neighbour positions (ring3D/PUCKER above -- a real
+ * tetrahedral angle, not a hand-tuned approximation), and projects its
+ * equatorial direction through the SAME viewing transform as the ring
+ * itself. Either way, the SIGN (which of the two up/down possibilities to
+ * use) is fixed by matching `orientation` -- same "up stays up" rule for
+ * axial and equatorial alike. `axEq` missing/null (shouldn't normally
+ * happen -- see HaworthLayout.js's own axEq docs) falls back to
+ * equatorial, the more common case.
  */
 export function chairStickEnd(vertices, position, orientation, axEq) {
   const key = vertexKeyForPosition(position);
@@ -125,9 +153,14 @@ export function chairStickEnd(vertices, position, orientation, axEq) {
 
   const n = RING_ORDER.length;
   const i = RING_ORDER.indexOf(key);
-  const toVec3 = (k) => new Vec3(vertices[k].x, vertices[k].y, RING_Z[k]);
-  const { equatorial } = tetrahedralOtherTwo(toVec3(key), toVec3(RING_ORDER[(i - 1 + n) % n]), toVec3(RING_ORDER[(i + 1) % n]));
-  let dir = normalize(equatorial.x, equatorial.y);
+  const points3d = ring3D();
+  const { equatorial } = tetrahedralOtherTwo(
+    points3d[key],
+    points3d[RING_ORDER[(i - 1 + n) % n]],
+    points3d[RING_ORDER[(i + 1) % n]]
+  );
+  const projected = project(equatorial, 1); // a unit direction, not a point -- scaled separately below
+  let dir = normalize(projected.x, projected.y);
   if (dir.y * verticalSign < 0) dir = { x: -dir.x, y: -dir.y };
   return { x: vertex.x + dir.x * STICK_LENGTH, y: vertex.y + dir.y * STICK_LENGTH };
 }

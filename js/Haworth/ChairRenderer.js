@@ -40,8 +40,8 @@ const SCALE = SVGRenderer.GLOBAL_SCALE; // 100
 // size; ChairLayout.js's own chairGeometry spans a similar range), found by
 // visual check against an N-glycan-core-style render, same way that file's
 // own constant was tuned.
-const CHAIR_DELTA_X = 150 / SCALE;
-const CHAIR_DELTA_Y = 105 / SCALE;
+const CHAIR_DELTA_X = 230 / SCALE;
+const CHAIR_DELTA_Y = 170 / SCALE;
 
 // Same fix as HaworthRenderer.js's own FUC_STUB_DELTA_X_RATIO/
 // FUC_STUB_SPACING pair (see that file's own comment for the full
@@ -49,7 +49,7 @@ const CHAIR_DELTA_Y = 105 / SCALE;
 // fixed 0.75-unit offset sized for ~1-unit-square SNFG icons, overlapping
 // this renderer's own much larger ring+stick footprint unless widened.
 const FUC_STUB_DELTA_X_RATIO = 0.75;
-const FUC_STUB_SPACING = 0.95;
+const FUC_STUB_SPACING = 1.5;
 
 function chairLayoutEngine(BaseLayout) {
   return class extends BaseLayout {
