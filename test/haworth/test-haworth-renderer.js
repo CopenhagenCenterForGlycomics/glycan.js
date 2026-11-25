@@ -5,6 +5,9 @@ import { IO as Iupac } from '../../js/CondensedIupac.js';
 import SugarAwareLayout from '../../js/SugarAwareLayout.js';
 import LinkageLayout from '../../js/LinkageLayout.js';
 import HaworthRenderer from '../../js/Haworth/HaworthRenderer.js';
+import { ringGeometry, layoutSubstituents, layoutSialicSubstituents } from '../../js/Haworth/HaworthLayout.js';
+import { substituentStickEnd } from '../../js/Haworth/HaworthSVG.js';
+import { resolveResidueData } from '../../js/Haworth/SugarLayout.js';
 
 class IupacSugar extends Iupac(Sugar) {}
 
@@ -145,4 +148,57 @@ QUnit.test('an unsupported residue shape falls back to a plain line, not a crash
   renderer.addSugar(sugar);
   renderer.refresh();
   assert.ok(true, 'does not throw on a residue shape this renderer cannot draw as a real ring');
+});
+
+QUnit.test('a sialic-acid child\'s glycosidic bond donates from its own real anomeric carbon (hexagon C1), not hexagon C2', function(assert) {
+  // NeuAc(a2-6)Gal: NeuAc's own `parent_linkage` is sialic's REAL native
+  // numbering (2, its own anomeric carbon) -- this renderer's hexagon
+  // frame maps that to hexagon C1 (see HaworthLayout.js's own sialic
+  // C2-equals-hexagon-C1 convention), not hexagon C2 (sialic's real C3, a
+  // plain non-stereocentre CH2 with nothing drawn there). Using the raw
+  // "2" directly as a hexagon position -- the bug this guards against --
+  // anchored the bond at that bare, wrong vertex instead.
+  const sugar = new IupacSugar();
+  sugar.sequence = 'NeuAc(a2-6)Gal(b1-4)GlcNAc';
+
+  const renderer = new HaworthRenderer(document.body, SugarAwareLayout);
+  renderer.addSugar(sugar);
+  renderer.refresh();
+
+  const svg = renderer.element.canvas;
+  const { vertices } = ringGeometry();
+
+  const offsetOf = (identifier) => {
+    const icon = svg.querySelector(`g[glycanjs\\:identifier="${identifier}"]`);
+    const [, tx, ty] = icon.getAttribute('transform').match(/translate\(([-\d.]+),([-\d.]+)\)/);
+    return { x: Number(tx), y: Number(ty) };
+  };
+  const point = (vertex, orientation, offset) => {
+    const local = substituentStickEnd(vertex, orientation);
+    return { x: local.x + offset.x, y: local.y + offset.y };
+  };
+  const findLineNear = (p) =>
+    [...svg.querySelectorAll('line[stroke-width="1.8"]')].find(
+      (l) => Math.hypot(Number(l.getAttribute('x1')) - p.x, Number(l.getAttribute('y1')) - p.y) < 0.5
+    );
+
+  // NeuAc's own side: real sialic C2 (anomeric), hexagon C1, alpha -> 'down'
+  // (see HaworthLayout.js's layoutSialicSubstituents / its own regression
+  // test) -- NOT hexagon C2 (sialic's real C3, a plain CH2, the bug this
+  // guards against).
+  const neuacData = resolveResidueData('NeuAc');
+  const { substituents: neuacSubs } = layoutSialicSubstituents(neuacData.terminii, neuacData.inchi, { anomer: 'a' });
+  const neuacOh = neuacSubs.find((s) => s.position === 1 && s.label === 'OH');
+  const neuacExpected = point(vertices.C1, neuacOh.orientation, offsetOf('NeuAc'));
+  assert.ok(findLineNear(neuacExpected), 'the glycosidic bond starts exactly on NeuAc\'s own hexagon-C1 (real anomeric, sialic C2) stick -- flush, not near hexagon C2');
+
+  // Gal's own side: acceptor position 6 (sialic links to Gal's own C6)
+  // remaps to hexagon C5 (substituentPositionFor) -- its real up/down
+  // orientation comes from Gal's own real InChI-derived data, same as the
+  // renderer itself resolves.
+  const galData = resolveResidueData('Gal');
+  const { substituents: galSubs } = layoutSubstituents(galData.terminii, galData.inchi, { anomer: 'b' });
+  const galTail = galSubs.find((s) => s.position === 5);
+  const galExpected = point(vertices.C5, galTail.orientation, offsetOf('Gal'));
+  assert.ok(findLineNear(galExpected), 'the same glycosidic bond\'s other end sits exactly on Gal\'s own hexagon-C5 (its real C6) stick -- flush, no gap');
 });

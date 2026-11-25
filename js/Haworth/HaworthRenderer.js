@@ -145,12 +145,23 @@ function residueHaworthLayout(residue) {
     }
   }
 
-  // This residue's own donor position on ITS parent (almost always 1, the
-  // anomeric carbon) gets the same treatment -- see anchorPoint, used the
-  // same way in renderLinkage below.
+  // This residue's own donor position on ITS parent gets the same
+  // treatment -- see anchorPoint, used the same way in renderLinkage
+  // below. Always hexagon position 1: a glycosidic bond only ever donates
+  // from a residue's own anomeric carbon, and hexagon position 1 IS this
+  // renderer's fixed "anomeric slot" for every shape by convention (see
+  // HaworthLayout.js), regardless of that shape's own real/native
+  // numbering -- hexose/furanose's real anomeric carbon already happens to
+  // be numbered "1" (residue.parent_linkage agrees trivially), but
+  // sialic's real anomeric carbon is C2 (residue.parent_linkage is 2
+  // there, e.g. NeuAc(a2-6)Gal) -- using that raw number directly here
+  // would anchor at hexagon C2 (sialic's real C3, a plain non-stereocentre
+  // CH2 with nothing drawn there) instead of hexagon C1 (sialic's real
+  // C2, where the OH/COOH pair actually live). renderGlycanSVG's own
+  // identical glycosidic-bond loop already hardcodes this same "1" for
+  // exactly this reason.
   if (residue.parent) {
-    const donorPosition = Number.isInteger(residue.parent_linkage) ? residue.parent_linkage : 1;
-    stickOnlyPositions.add(donorPosition);
+    stickOnlyPositions.add(1);
   }
 
   return layoutResidue(data.terminii, data.inchi, {
@@ -263,10 +274,12 @@ class HaworthRenderer extends SVGRenderer {
 
     const childLayout = residueHaworthLayout(child);
     const parentLayout = residueHaworthLayout(parent);
-    const donorPosition = Number.isInteger(child.parent_linkage) ? child.parent_linkage : 1;
+    // Always hexagon position 1 -- see residueHaworthLayout's identical
+    // donor-side comment (child.parent_linkage is sialic's real C2 for a
+    // sialic child, not this renderer's own hexagon numbering).
     const acceptorPosition = parent.linkageOf(child);
 
-    const rawA = childLayout ? anchorPoint(childLayout, donorPosition, childCenter) : null;
+    const rawA = childLayout ? anchorPoint(childLayout, 1, childCenter) : null;
     const rawB = parentLayout ? anchorPoint(parentLayout, acceptorPosition, parentCenter) : null;
 
     if (!rawA || !rawB) {

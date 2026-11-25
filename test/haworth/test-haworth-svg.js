@@ -103,3 +103,36 @@ QUnit.test('anchorPoint: the parent\'s own linked position (C4) resolves to its 
     assert.ok(dy > 0, 'a "down" C4 stick extends downward (positive dy) before the bond continues');
   }
 });
+
+QUnit.test('anchorPoint: a linkage at position 6 also resolves to its stick\'s endpoint, not the bare C5 vertex (e.g. Fuc(a1-6)/Man(a1-6) core branches)', function(assert) {
+  // A linkage recorded at ring position 6 (there's no separate ring vertex
+  // for it -- vertexForPosition already maps it onto hexagon C5, where the
+  // exocyclic C6 group actually hangs) must resolve its STICK the same
+  // way: layoutSubstituents always reports that group at position 5, not
+  // 6 (see substituentPositionFor), so a caller passing the raw "6" --
+  // exactly what renderGlycanSVG's own `link.parentPosition` is for a
+  // "(a1-6)" linkage (see test-sugar-layout.js's own
+  // `neuAcLink.parentPosition === 6`) -- must still find that position-5
+  // stick, not silently miss it and fall back to the bare vertex.
+  const { vertices } = ringGeometry();
+  const bareC5 = vertices.C5;
+
+  const { substituents } = layoutSubstituents(GLCNAC_TERMINII, GLCNAC_INCHI, { anomer: 'b' });
+  const c6Group = substituents.find((s) => s.position === 5);
+  assert.ok(c6Group, 'GlcNAc has a real position-5 (the exocyclic C6 group) substituent entry to compare against');
+
+  const layout = layoutResidue(GLCNAC_TERMINII, GLCNAC_INCHI, {
+    anomer: 'b',
+    stickOnlyPositions: new Set([5]), // already remapped, same as renderGlycanSVG's own stickOnlyByResidue
+  });
+  const point = anchorPoint(layout, 6, { x: 0, y: 0 }); // raw, UN-remapped -- same as a caller's link.parentPosition
+  const dy = point.y - bareC5.y;
+
+  assert.notEqual(dy, 0, 'anchorPoint does not return the bare C5 vertex once its position-5 stick is stick-only');
+  assert.equal(point.x, bareC5.x, 'the stick stays vertical, same x as the C5 ring vertex');
+  if (c6Group.orientation === 'up') {
+    assert.ok(dy < 0, 'an "up" C6-group stick extends upward (negative dy) before the bond continues');
+  } else {
+    assert.ok(dy > 0, 'a "down" C6-group stick extends downward (positive dy) before the bond continues');
+  }
+});

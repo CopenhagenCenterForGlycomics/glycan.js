@@ -270,11 +270,24 @@ function placeholderSVGParts(label, offset) {
 // configuration -- the bond continues on from that stick's own far end
 // instead of the bare ring vertex, so the two visually read as one
 // continuous line (ring -> anomeric stick -> glycosidic bond -> parent).
+//
+// `position` is a caller-supplied RING position (e.g. link.parentPosition
+// -- a linkage at literal position 6), which may not be where the
+// substituent itself is actually recorded: layoutSubstituents always
+// reports the exocyclic C6 group at hexagon position 5, the same remap
+// vertexForPosition already applies for the vertex itself
+// (substituentPositionFor). Without applying that same remap here too,
+// the stick lookup below would silently miss it (position 6 is never a
+// real substituent's own position) and fall back to the bare vertex `v`
+// for every "6" (or a2-6/a2-8-style) linkage -- caught by comparing
+// against the actual rendered stick endpoint, not just "does this not
+// crash".
 function anchorPoint(layout, position, offset) {
   if (layout.placeholder) return { x: offset.x, y: offset.y };
   const v = vertexForPosition(position, layout.vertices);
   if (!v) return null;
-  const stickSub = layout.substituents.find((s) => s.position === position && !s.label);
+  const stickPosition = substituentPositionFor(position);
+  const stickSub = layout.substituents.find((s) => s.position === stickPosition && !s.label);
   const local = stickSub ? substituentStickEnd(v, stickSub.orientation) : v;
   return { x: local.x + offset.x, y: local.y + offset.y };
 }
