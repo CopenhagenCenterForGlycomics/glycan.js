@@ -1,6 +1,7 @@
 /*global QUnit*/
 
 import { renderGlycanSVG } from '../../js/Haworth/HaworthSVG.js';
+import { ringGeometry, layoutSubstituents } from '../../js/Haworth/HaworthLayout.js';
 
 QUnit.module('HaworthSVG - renderGlycanSVG', {});
 
@@ -36,4 +37,39 @@ QUnit.test('Gal-(1->4)-GlcNAc: exactly one glycosidic bond, no stray OH at the l
   // matches inside "CH2OH" or "NHAc".
   const ohCount = (svg.match(/>OH<|>HO</g) || []).length;
   assert.equal(ohCount, 5, 'no extra OH label at either suppressed linkage position');
+});
+
+QUnit.test('the glycosidic bond starts from the child\'s own (unlabeled) anomeric stick, not the bare ring vertex', function(assert) {
+  const residues = [
+    { id: 'glcnac', terminii: GLCNAC_TERMINII, inchi: GLCNAC_INCHI, anomer: 'b', x: 400, y: 150 },
+    { id: 'gal', terminii: GAL_TERMINII, inchi: GAL_INCHI, anomer: 'b', x: 140, y: 130 },
+  ];
+  const linkages = [{ child: 'gal', parent: 'glcnac', parentPosition: 4 }];
+  const svg = renderGlycanSVG(residues, linkages, { width: 560, height: 280 });
+
+  // Gal's own bare C1 vertex, in the same screen coordinates renderGlycanSVG
+  // itself uses (local ring coordinates + the residue's own x/y offset).
+  const { vertices } = ringGeometry();
+  const bareC1 = { x: vertices.C1.x + 140, y: vertices.C1.y + 130 };
+
+  // Gal's real anomeric (position 1) orientation, straight from the same
+  // layout function the renderer itself uses -- confirms the direction the
+  // stick should run, without hardcoding alpha/beta's up/down mapping here.
+  const { substituents } = layoutSubstituents(GAL_TERMINII, GAL_INCHI, { anomer: 'b' });
+  const c1 = substituents.find((s) => s.position === 1);
+  assert.ok(c1, 'Gal has a real position-1 (anomeric) substituent entry to compare against');
+
+  const bondLines = [...svg.matchAll(/<line x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"[^>]*stroke-width="1\.8"/g)];
+  assert.equal(bondLines.length, 2, 'two glycosidic bond segments (either side of the inline O)');
+  const nearGal = bondLines.find(([, x1, y1]) => Math.hypot(Number(x1) - bareC1.x, Number(y1) - bareC1.y) < 25);
+  assert.ok(nearGal, 'one bond segment starts near Gal\'s own C1 corner');
+  const [, x1, y1] = nearGal;
+  const dy = Number(y1) - bareC1.y;
+  assert.notEqual(Math.hypot(Number(x1) - bareC1.x, dy), 0, 'the bond does not start exactly on the bare ring vertex');
+  assert.equal(Number(x1), bareC1.x, 'the stick (and the bond continuing from it) stays vertical, same x as the ring vertex');
+  if (c1.orientation === 'up') {
+    assert.ok(dy < 0, 'an "up" anomeric stick extends upward (negative dy) before the bond continues');
+  } else {
+    assert.ok(dy > 0, 'a "down" anomeric stick extends downward (positive dy) before the bond continues');
+  }
 });

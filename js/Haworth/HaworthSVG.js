@@ -57,6 +57,19 @@ function ringOxygenVertex(vertices) {
   return key ? vertices[key] : null;
 }
 
+// A substituent stick's own far endpoint (same local coordinate frame as
+// `ring`) -- vertical, per preference, even though a purely vertical stick
+// from a corner vertex (C5, next to the ring oxygen) can cross back through
+// the ring's own interior when its orientation points toward the opposite
+// edge (e.g. IdoA's axial COOH at C5, or a sialic acid's glycerol tail).
+// Known, not fixed here. Shared by residueSVGParts (for a labeled stick)
+// and anchorPoint (a linkage child's own unlabeled anomeric stick -- see
+// layoutResidue's stickOnlyPositions).
+function substituentStickEnd(ring, orientation) {
+  const dy = orientation === 'up' ? -STICK_LENGTH : STICK_LENGTH;
+  return { x: ring.x, y: ring.y + dy };
+}
+
 // The exocyclic C6 group (CH2OH, COOH, CH3...) is always reported by
 // layoutSubstituents as attached AT ring position 5 (there is no separate
 // "position 6" substituent -- see HaworthLayout.js), so a linkage recorded
@@ -70,12 +83,27 @@ function substituentPositionFor(ringPosition) {
  * Compute one residue's ring + substituent geometry, in its own local
  * coordinate frame (centered on (0,0)), without stringifying to SVG yet.
  * `suppressPositions` (a Set of ring positions) leaves out a substituent
- * stick at those positions -- used where a glycosidic bond takes its place.
+ * stick at those positions entirely -- used where a glycosidic bond takes
+ * its place on the PARENT side of a linkage (e.g. the C4 a child's C1
+ * bonds to): the bond line takes over that vertex completely, same as if
+ * it had never had a substituent at all.
+ * `stickOnlyPositions` keeps the stick but drops its label -- used for a
+ * linkage CHILD's own anomeric position (1): it still has a real
+ * configuration (alpha/beta) worth drawing as a short stick, but what
+ * used to be its free "OH" is now the glycosidic bond itself, so the
+ * stick carries no label of its own (see anchorPoint, which extends the
+ * glycosidic line out to this stick's own endpoint instead of the bare
+ * ring vertex).
  * `shape` ('hexose' | 'furanose' | 'sialic', default 'hexose') picks which
  * geometry + substituent layout to use -- see HaworthLayout.js.
  */
 function layoutResidue(terminii, inchi, opts = {}) {
-  const { anomer = 'b', suppressPositions = new Set(), shape = 'hexose' } = opts;
+  const {
+    anomer = 'b',
+    suppressPositions = new Set(),
+    stickOnlyPositions = new Set(),
+    shape = 'hexose',
+  } = opts;
   const builder = SHAPE_BUILDERS[shape] ?? SHAPE_BUILDERS.hexose;
   const { vertices, bonds } = builder.geometry();
   const { substituents } = builder.layout(terminii, inchi, { anomer });
@@ -86,7 +114,9 @@ function layoutResidue(terminii, inchi, opts = {}) {
     // on the same vertex (the anomeric OH a glycosidic bond replaces, and
     // the COOH that's always there regardless) -- see
     // layoutSialicSubstituents.
-    substituents: substituents.filter((s) => s.neverSuppress || !suppressPositions.has(s.position)),
+    substituents: substituents
+      .filter((s) => s.neverSuppress || !suppressPositions.has(s.position))
+      .map((s) => (stickOnlyPositions.has(s.position) ? { ...s, label: null } : s)),
   };
 }
 
@@ -201,25 +231,25 @@ function residueSVGParts(layout, offset) {
     const ring = vertexForPosition(sub.position, vertices);
     if (!ring) continue;
     const screenRing = toScreen(ring);
-    const dy = sub.orientation === 'up' ? -STICK_LENGTH : STICK_LENGTH;
-    // Vertical wherever possible, per preference -- even though a purely
-    // vertical stick from a corner vertex (C5, next to the ring oxygen) can
-    // cross back through the ring's own interior when its orientation
-    // points toward the opposite edge (e.g. IdoA's axial COOH at C5, or a
-    // sialic acid's glycerol tail). Known, not fixed here.
-    const stickEnd = { x: screenRing.x, y: screenRing.y + dy };
+    const localStickEnd = substituentStickEnd(ring, sub.orientation);
+    const stickEnd = toScreen(localStickEnd);
+    parts.push(
+      `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEnd.x.toFixed(1)}" y2="${stickEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="${THIN_STROKE_WIDTH}"/>`
+    );
+    // A linkage child's own anomeric stick (see layoutResidue's
+    // stickOnlyPositions) carries no label -- the glycosidic bond line
+    // itself continues on from here instead (see anchorPoint).
+    if (!sub.label) continue;
     // The label's own first character sits right where its stick ends (a
     // small vertical clearance only, not a separate floating gap), anchored
     // toward whichever side of the ring this vertex is on (not the stick's
     // own, now-vertical, direction) so it reads outward rather than back
     // over the ring.
+    const dy = localStickEnd.y - ring.y;
     const textAnchor = ring.x > 1 ? 'start' : ring.x < -1 ? 'end' : 'middle';
     const textY = stickEnd.y + (dy < 0 ? -3 : 12);
     const textX =
       stickEnd.x + (textAnchor === 'start' ? -LABEL_ANCHOR_NUDGE : textAnchor === 'end' ? LABEL_ANCHOR_NUDGE : 0);
-    parts.push(
-      `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEnd.x.toFixed(1)}" y2="${stickEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="${THIN_STROKE_WIDTH}"/>`
-    );
     parts.push(
       `<text x="${textX.toFixed(1)}" y="${textY.toFixed(1)}" text-anchor="${textAnchor}" font-size="13" fill="currentColor">${orientLabel(sub.label, textAnchor)}</text>`
     );
@@ -240,10 +270,18 @@ function placeholderSVGParts(label, offset) {
 
 // Where a glycosidic bond should touch this residue: a real ring vertex, or
 // just the placeholder's own center (it has no ring positions of its own).
+// A linkage child's own anomeric position (1) keeps an unlabeled stick
+// (see layoutResidue's stickOnlyPositions) showing its alpha/beta
+// configuration -- the bond continues on from that stick's own far end
+// instead of the bare ring vertex, so the two visually read as one
+// continuous line (ring -> anomeric stick -> glycosidic bond -> parent).
 function anchorPoint(layout, position, offset) {
   if (layout.placeholder) return { x: offset.x, y: offset.y };
   const v = vertexForPosition(position, layout.vertices);
-  return v ? { x: v.x + offset.x, y: v.y + offset.y } : null;
+  if (!v) return null;
+  const stickSub = layout.substituents.find((s) => s.position === position && !s.label);
+  const local = stickSub ? substituentStickEnd(v, stickSub.orientation) : v;
+  return { x: local.x + offset.x, y: local.y + offset.y };
 }
 
 /**
@@ -304,8 +342,9 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
   const { width = 600, height = 260 } = opts;
 
   const suppressByResidue = new Map(residues.map((r) => [r.id, new Set()]));
+  const stickOnlyByResidue = new Map(residues.map((r) => [r.id, new Set()]));
   for (const link of linkages) {
-    suppressByResidue.get(link.child)?.add(1);
+    stickOnlyByResidue.get(link.child)?.add(1);
     suppressByResidue.get(link.parent)?.add(substituentPositionFor(link.parentPosition));
   }
 
@@ -318,6 +357,7 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
           anomer: r.anomer ?? 'b',
           shape: r.shape ?? 'hexose',
           suppressPositions: suppressByResidue.get(r.id),
+          stickOnlyPositions: stickOnlyByResidue.get(r.id),
         }),
     ])
   );
@@ -341,22 +381,25 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
     }
   }
 
-  // Glycosidic bonds: a shortened line from the child's anomeric (C1)
-  // point to the parent's linkage-position point (LINKAGE_INSET off each
-  // end, so the connector doesn't run the full residue-to-residue
-  // distance), with the bridging oxygen sitting inline in the gap at its
-  // midpoint -- the same label-gap convention the ring oxygen itself uses
-  // (see RING_LABEL_GAP/shortenToward above) -- rather than floating above
-  // the line. Either end may be a placeholder (see above), in which case
-  // the bond just touches its center.
+  // Glycosidic bonds: a line from the child's own anomeric stick (its
+  // alpha/beta configuration -- see anchorPoint/layoutResidue's
+  // stickOnlyPositions) to the parent's linkage-position point (the parent
+  // side still pulled in by LINKAGE_INSET, so it doesn't run the full
+  // residue-to-residue distance), with the bridging oxygen sitting inline
+  // in the gap at its midpoint -- the same label-gap convention the ring
+  // oxygen itself uses (see RING_LABEL_GAP/shortenToward above) -- rather
+  // than floating above the line. Either end may be a placeholder (no
+  // ring positions, and so no anomeric stick of its own), in which case
+  // the bond just touches its center, inset like the parent side.
   for (const link of linkages) {
     const child = residues.find((r) => r.id === link.child);
     const parent = residues.find((r) => r.id === link.parent);
     if (!child || !parent) continue;
-    const rawA = anchorPoint(layouts.get(child.id), 1, { x: child.x, y: child.y });
+    const childLayout = layouts.get(child.id);
+    const rawA = anchorPoint(childLayout, 1, { x: child.x, y: child.y });
     const rawB = anchorPoint(layouts.get(parent.id), link.parentPosition, { x: parent.x, y: parent.y });
     if (!rawA || !rawB) continue;
-    const a = shortenToward(rawB, rawA, LINKAGE_INSET);
+    const a = childLayout.placeholder ? shortenToward(rawB, rawA, LINKAGE_INSET) : rawA;
     const b = shortenToward(rawA, rawB, LINKAGE_INSET);
     const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
     const aEnd = shortenToward(a, mid, LINKAGE_LABEL_GAP);
