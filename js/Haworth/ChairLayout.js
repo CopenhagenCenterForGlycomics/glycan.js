@@ -13,13 +13,11 @@
  *    always the flap pair in any real chair). Built as a genuine (if
  *    idealized) 3D chair -- 6 ring atoms on a circle, alternating +/-z
  *    pucker, same idea as InChIRingGeometry.js's own buildChair -- viewed
- *    from a fixed oblique angle (ROTATION below) and projected to 2D,
- *    rather than hand-placed: a hand-placed attempt, tuned purely by eye
- *    against a published reference image, kept crowding adjacent
- *    substituents together (their outward lean had no real geometric
- *    relationship to each other); a genuine rotated-3D projection gives
- *    every position's own lean a real geometric reason not to converge on
- *    its neighbour's.
+ *    from a fixed oblique angle (ROTATION_X below) and projected to 2D,
+ *    rather than hand-placed. The DRAWN ring is always this same shape,
+ *    regardless of which real residue it's for -- see ringZSign below for
+ *    why the drawing itself doesn't flip per residue even though the
+ *    chemistry it carries does.
  *  - A substituent stick that isn't always vertical: AXIAL is vertical
  *    (exactly Haworth's own up/down direction -- a Haworth projection is a
  *    simplification of the chair that specifically preserves this).
@@ -53,8 +51,16 @@ const STICK_LENGTH = 26;
 // facing a different way.
 const RING_ORDER = ['O5', 'C1', 'C2', 'C3', 'C4', 'C5'];
 const PHASE = (-135 * Math.PI) / 180;
-const PUCKER = 0.4;
-const RADIUS = 1;
+// RADIUS matches InChIRingGeometry.js's own buildChair (R=1.4); PUCKER is
+// a bit deeper than that function's own 0.25 (bumped up on request, for a
+// more pronounced zigzag) -- still well inside the non-degenerate range:
+// a flatter ratio (tried first, z=0.4 at R=1, i.e. ratio 0.4) makes
+// tetrahedralOtherTwo degenerate, giving axial and equatorial the SAME
+// raw z sign instead of opposite (checked numerically, not assumed).
+// This ring's own ratio (0.32/1.4 = 0.229) stays well under that, checked
+// the same way.
+const PUCKER = 0.32;
+const RADIUS = 1.4;
 
 // The viewing transform: tilt the ring by ROTATION_X (a rotation about the
 // screen's own horizontal axis, bringing some of the ring's own "depth"
@@ -67,13 +73,17 @@ const RADIUS = 1;
 // HaworthLayout.js's own ringGeometry rx/ry).
 const ROTATION_X = (45 * Math.PI) / 180;
 const MIRROR = true;
-const SCALE = 60;
+const SCALE = 43; // 60 / 1.4 -- keeps the same overall rendered ring size now that RADIUS itself is 1.4 instead of 1
 
-function ring3D() {
+// `zSign` flips the pucker's own handedness (every z negated) -- see
+// substituentZSignFor's own docstring for why this exists and why it's
+// applied here, at the INPUT to the ring build, rather than by negating a
+// computed direction afterwards.
+function ring3D(zSign = 1) {
   const points = {};
   RING_ORDER.forEach((key, i) => {
     const angle = PHASE + i * (Math.PI / 3);
-    points[key] = new Vec3(RADIUS * Math.cos(angle), RADIUS * Math.sin(angle), i % 2 === 0 ? PUCKER : -PUCKER);
+    points[key] = new Vec3(RADIUS * Math.cos(angle), RADIUS * Math.sin(angle), zSign * (i % 2 === 0 ? PUCKER : -PUCKER));
   });
   return points;
 }
@@ -94,19 +104,29 @@ function project(v, scale = SCALE) {
  *
  * Unlike ringGeometry()'s tapered front-face wedge (a plain SVG stroke
  * can't vary width along its own length, so Haworth fakes the perspective
- * with a filled polygon), a chair's front/back distinction is a real,
- * uniform bold-vs-thin split per EDGE -- every edge drawn here has the same
- * width at both ends, so a renderer can always draw a plain line, never a
- * polygon.
+ * with a filled polygon), every edge here is uniform-width along its own
+ * length -- a renderer can always draw a plain line, never a polygon --
+ * just not all the SAME width: the front face (bold) tapers very slightly
+ * through its own middle edge (see the bonds array's own comment).
+ *
+ * Always built at zSign=1 (see ring3D) -- the DRAWN ring looks the same
+ * regardless of which real residue it's for; only substituentStickEnd's
+ * own direction varies by residue (see substituentZSignFor).
  */
 export function chairGeometry() {
   const points3d = ring3D();
   const vertices = {};
   for (const key of RING_ORDER) vertices[key] = project(points3d[key]);
+  // Front face (nearer the viewer): bold at both ends (C1-C2, C3-C4), very
+  // slightly lighter through the middle (C2-C3) -- a subtle taper (not
+  // Haworth's own thin-to-bold wedge, just bold-to-slightly-less-bold)
+  // conveying that C2-C3 recedes a little relative to the two corners
+  // either side of it. Back face (O5-C1, C4-C5, C5-O5) stays plain/thin
+  // throughout.
   const bonds = [
     { from: 'O5', to: 'C1', width: 'thin' },
     { from: 'C1', to: 'C2', width: 'bold' },
-    { from: 'C2', to: 'C3', width: 'bold' },
+    { from: 'C2', to: 'C3', width: 'medium' },
     { from: 'C3', to: 'C4', width: 'bold' },
     { from: 'C4', to: 'C5', width: 'thin' },
     { from: 'C5', to: 'O5', width: 'thin' },
@@ -125,43 +145,93 @@ function vertexKeyForPosition(position) {
   return position === 6 ? 'C5' : `C${position}`;
 }
 
-/**
- * A substituent stick's own far endpoint -- the chair-specific counterpart
- * to HaworthSVG.js's substituentStickEnd (which is always vertical; this
- * is only vertical for an axial substituent). `vertices` must be the SAME
- * object chairGeometry() just returned for this residue.
- *
- * `axEq` picks the direction family: 'ax' is a pure vertical stick (same
- * up/down convention as Haworth -- up is negative y). 'eq' takes
- * InChIRingGeometry.js's own tetrahedralOtherTwo, fed this SAME idealized
- * 3D ring's own real neighbour positions (ring3D/PUCKER above -- a real
- * tetrahedral angle, not a hand-tuned approximation), and projects its
- * equatorial direction through the SAME viewing transform as the ring
- * itself. Either way, the SIGN (which of the two up/down possibilities to
- * use) is fixed by matching `orientation` -- same "up stays up" rule for
- * axial and equatorial alike. `axEq` missing/null (shouldn't normally
- * happen -- see HaworthLayout.js's own axEq docs) falls back to
- * equatorial, the more common case.
- */
-export function chairStickEnd(vertices, position, orientation, axEq) {
-  const key = vertexKeyForPosition(position);
-  const vertex = vertices[key];
-  const verticalSign = orientation === 'up' ? -1 : 1;
-  if (axEq === 'ax') {
-    return { x: vertex.x, y: vertex.y + verticalSign * STICK_LENGTH };
-  }
-
+function tetrahedralDirectionsAt(key, zSign) {
   const n = RING_ORDER.length;
   const i = RING_ORDER.indexOf(key);
-  const points3d = ring3D();
-  const { equatorial } = tetrahedralOtherTwo(
+  const points3d = ring3D(zSign);
+  return tetrahedralOtherTwo(
     points3d[key],
     points3d[RING_ORDER[(i - 1 + n) % n]],
     points3d[RING_ORDER[(i + 1) % n]]
   );
+}
+
+/**
+ * Which pucker handedness (ring3D's own `zSign`) this RESIDUE's real
+ * chemistry needs -- the one real degree of freedom tetrahedralOtherTwo
+ * doesn't resolve on its own (its axial/equatorial pair, at a single
+ * position, is already fully fixed by that position's two ring-bond
+ * neighbours -- see chairStickEnd's own docstring). A chair ring is rigid:
+ * every position shares the SAME handedness, so this is computed ONCE per
+ * residue, from any one position's own real (axEq, orientation) -- the
+ * anomeric position (1) always exists and is as good a reference as any.
+ *
+ * Checked at zSign=1 (chairGeometry's own default): if that position's own
+ * tetrahedral direction (whichever slot its real axEq names) already
+ * projects to the real `orientation`'s face, zSign=1 is right for this
+ * residue; otherwise it needs the other handedness, zSign=-1.
+ *
+ * An earlier version tried to resolve this per SUBSTITUENT instead, by
+ * negating the computed direction outright whenever its sign didn't
+ * match: wrong, found by checking the actual rendered angle, not just the
+ * reasoning -- negating a real tetrahedral direction flips its outward
+ * lean along with its up/down face (they aren't independent components of
+ * one vector), so on a position where the default handedness gave the
+ * wrong face, the "fix" pointed the stick into the ring instead of away
+ * from it. Flipping the ring's own INPUT pucker instead (what this
+ * function feeds tetrahedralDirectionsAt) recomputes a fresh, still
+ * genuinely tetrahedral (and still outward) direction, confirmed
+ * numerically: same projected x (still outward), flipped y (now the
+ * right face) -- not assumed, checked.
+ */
+export function substituentZSignFor(referencePosition, referenceOrientation, referenceAxEq) {
+  const key = vertexKeyForPosition(referencePosition);
+  const { axial, equatorial } = tetrahedralDirectionsAt(key, 1);
+  const dir = referenceAxEq === 'ax' ? axial : equatorial;
+  // Raw z, not this module's own rotated/projected screen-y -- same
+  // up/down convention InChIRingGeometry.js's own deriveHaworthOrientation
+  // uses (z<0 means up), and confirmed (not assumed) to alternate cleanly
+  // by position parity for BOTH axial and equatorial, across every
+  // position -- unlike the projected screen-y, which mixes in the ring's
+  // own x/y extent and does NOT reliably alternate the same simple way
+  // (checked numerically; an earlier version compared the projected value
+  // here instead, and got a per-position-inconsistent answer: right at
+  // the one reference position by construction, wrong at others).
+  const isUp = dir.z < 0;
+  return isUp === (referenceOrientation === 'up') ? 1 : -1;
+}
+
+/**
+ * A substituent stick's own far endpoint -- the chair-specific counterpart
+ * to HaworthSVG.js's substituentStickEnd (which is always vertical; this
+ * is only vertical for an axial substituent). `vertices` must be the SAME
+ * object chairGeometry() just returned for this residue; `zSign` must be
+ * the SAME residue's own substituentZSignFor result (computed once, from
+ * any one of its real substituents -- see that function's own docstring),
+ * reused here for every position of that residue.
+ *
+ * `axEq` picks the direction family: 'ax' is a pure vertical stick (same
+ * up/down convention as Haworth -- up is negative y, via `orientation`
+ * directly -- `zSign` plays no part here, Haworth's own up/down already
+ * fully determines it). 'eq' takes InChIRingGeometry.js's own
+ * tetrahedralOtherTwo, fed this SAME idealized 3D ring's own real
+ * neighbour positions at the given `zSign`, projected through the SAME
+ * viewing transform as the ring itself -- a real tetrahedral angle,
+ * genuinely outward, not a hand-tuned approximation and not a post-hoc
+ * flip of a computed vector (see substituentZSignFor's own docstring for
+ * why that was wrong).
+ */
+export function chairStickEnd(vertices, position, orientation, axEq, zSign) {
+  const key = vertexKeyForPosition(position);
+  const vertex = vertices[key];
+  if (axEq === 'ax') {
+    const verticalSign = orientation === 'up' ? -1 : 1;
+    return { x: vertex.x, y: vertex.y + verticalSign * STICK_LENGTH };
+  }
+
+  const { equatorial } = tetrahedralDirectionsAt(key, zSign);
   const projected = project(equatorial, 1); // a unit direction, not a point -- scaled separately below
-  let dir = normalize(projected.x, projected.y);
-  if (dir.y * verticalSign < 0) dir = { x: -dir.x, y: -dir.y };
+  const dir = normalize(projected.x, projected.y);
   return { x: vertex.x + dir.x * STICK_LENGTH, y: vertex.y + dir.y * STICK_LENGTH };
 }
 

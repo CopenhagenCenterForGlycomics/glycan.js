@@ -6,6 +6,9 @@ import {
   layoutChairResidue,
   chairAnchorPoint,
 } from '../../js/Haworth/ChairSVG.js';
+import { chairStickEnd } from '../../js/Haworth/ChairLayout.js';
+import monosaccharideData from '../../js/data/monosaccharides.js';
+import { inchiToTerminii } from '../../js/InChITerminii.js';
 
 QUnit.module('ChairSVG - layoutChairResidue', {});
 
@@ -44,6 +47,28 @@ QUnit.test('stickOnlyPositions/labelOverrides work exactly like layoutResidue (r
   assert.equal(tail.label, 'OSO3H');
 });
 
+QUnit.test('every substituent on a real residue (Fuc -- mixed axial/equatorial) points outward from the ring, not into it, using the SAME zSign throughout', function(assert) {
+  // The actual bug report this guards against: deriving each position's
+  // "which way is outward" independently (tried first) could satisfy a
+  // position's required up/down face only by pointing its equatorial
+  // stick INTO the ring instead of away from it. layoutChairResidue
+  // resolves one zSign per residue (from position 1) and this confirms
+  // every OTHER real position, not just that one, still points outward
+  // once it's applied.
+  const entry = monosaccharideData.find((e) => e.name === 'Fuc');
+  const { terminii } = inchiToTerminii(entry.name, entry.inchi);
+  const layout = layoutChairResidue(terminii, entry.inchi, { anomer: 'a', shape: 'hexose' });
+  assert.ok(layout.substituents.some((s) => s.axEq === 'ax') && layout.substituents.some((s) => s.axEq === 'eq'), 'Fuc has a real mix of both, not all one or the other');
+
+  for (const sub of layout.substituents) {
+    const vertex = layout.vertices[`C${sub.position === 6 ? 5 : sub.position}`];
+    const end = chairStickEnd(layout.vertices, sub.position, sub.orientation, sub.axEq, layout.zSign);
+    const vertexDist = Math.hypot(vertex.x, vertex.y);
+    const endDist = Math.hypot(end.x, end.y);
+    assert.ok(endDist > vertexDist, `position ${sub.position} (${sub.axEq}, ${sub.orientation}) points outward`);
+  }
+});
+
 QUnit.module('ChairSVG - chairResidueSVGParts / renderResidueChairSVG', {});
 
 QUnit.test('draws a real ring (uniform-width bonds + sticks), not a placeholder, for a supported shape', function(assert) {
@@ -51,7 +76,12 @@ QUnit.test('draws a real ring (uniform-width bonds + sticks), not a placeholder,
   assert.ok(svg.includes('<svg'));
   assert.ok(!svg.includes('stroke-dasharray'), 'a real ring, not the dashed placeholder circle');
   assert.ok(svg.includes('stroke-width="4.2"'), 'the front arc is drawn bold');
-  assert.ok(svg.includes('NHAc') && svg.includes('HOH₂C'));
+  // Either spelling counts -- which side of the ring a position's stick
+  // lands on (and so whether its label reads forward or mirrored, see
+  // HaworthSVG.js's own REVERSED_LABELS) depends on this ring's own
+  // geometry, not on anything these tests should pin down.
+  assert.ok(svg.includes('NHAc') || svg.includes('AcHN'));
+  assert.ok(svg.includes('HOH₂C') || svg.includes('CH₂OH'));
 });
 
 QUnit.test('falls back to a placeholder for an unsupported shape (e.g. furanose) rather than guessing at a ring', function(assert) {

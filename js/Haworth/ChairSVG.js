@@ -17,7 +17,7 @@
  */
 
 import { layoutSubstituents, layoutSialicSubstituents } from './HaworthLayout.js';
-import { chairGeometry, chairStickEnd } from './ChairLayout.js';
+import { chairGeometry, chairStickEnd, substituentZSignFor } from './ChairLayout.js';
 import {
   applySubstituentOverrides,
   vertexForPosition,
@@ -34,6 +34,7 @@ import { sugarToHaworthInput } from './SugarLayout.js';
 // enough to duplicate rather than widen that file's export surface for two
 // numbers).
 const BOLD_STROKE_WIDTH = 4.2;
+const MEDIUM_STROKE_WIDTH = 3.2; // C2-C3's own slight taper -- see ChairLayout.js's own chairGeometry comment
 const THIN_STROKE_WIDTH = 1.3;
 const RING_LABEL_GAP = 11;
 const LABEL_ANCHOR_NUDGE = 4.5;
@@ -58,15 +59,26 @@ function layoutChairResidue(terminii, inchi, opts = {}) {
   if (!builder) return null;
   const { vertices, bonds } = builder.geometry();
   const { substituents } = builder.layout(terminii, inchi, { anomer });
+  // A chair ring is rigid -- every position shares the same pucker
+  // handedness (see ChairLayout.js's own substituentZSignFor docstring),
+  // so this is resolved ONCE per residue here (from the anomeric
+  // position's own real data, always present) and reused for every
+  // equatorial stick on this residue, rather than re-derived per
+  // substituent.
+  const reference = substituents.find((s) => s.position === 1 && !s.neverSuppress) ?? substituents[0];
+  const zSign = reference ? substituentZSignFor(reference.position, reference.orientation, reference.axEq) : 1;
   return {
     vertices,
     bonds,
+    zSign,
     substituents: applySubstituentOverrides(substituents, { stickOnlyPositions, labelOverrides }),
   };
 }
 
 function bondWidth(w) {
-  return w === 'bold' ? BOLD_STROKE_WIDTH : THIN_STROKE_WIDTH;
+  if (w === 'bold') return BOLD_STROKE_WIDTH;
+  if (w === 'medium') return MEDIUM_STROKE_WIDTH;
+  return THIN_STROKE_WIDTH;
 }
 
 function chairResidueSVGParts(layout, offset) {
@@ -97,7 +109,7 @@ function chairResidueSVGParts(layout, offset) {
     const ring = vertexForPosition(sub.position, vertices);
     if (!ring) continue;
     const screenRing = toScreen(ring);
-    const localStickEnd = chairStickEnd(vertices, sub.position, sub.orientation, sub.axEq);
+    const localStickEnd = chairStickEnd(vertices, sub.position, sub.orientation, sub.axEq, layout.zSign);
     const stickEnd = toScreen(localStickEnd);
     parts.push(
       `<line x1="${screenRing.x.toFixed(1)}" y1="${screenRing.y.toFixed(1)}" x2="${stickEnd.x.toFixed(1)}" y2="${stickEnd.y.toFixed(1)}" stroke="currentColor" stroke-width="${THIN_STROKE_WIDTH}"/>`
@@ -132,7 +144,7 @@ function chairAnchorPoint(layout, position, offset) {
   if (!v) return null;
   const stickPosition = substituentPositionFor(position);
   const stickSub = layout.substituents.find((s) => s.position === stickPosition && !s.label);
-  const local = stickSub ? chairStickEnd(layout.vertices, stickSub.position, stickSub.orientation, stickSub.axEq) : v;
+  const local = stickSub ? chairStickEnd(layout.vertices, stickSub.position, stickSub.orientation, stickSub.axEq, layout.zSign) : v;
   return { x: local.x + offset.x, y: local.y + offset.y };
 }
 
