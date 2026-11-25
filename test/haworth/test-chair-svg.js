@@ -69,6 +69,34 @@ QUnit.test('every substituent on a real residue (Fuc -- mixed axial/equatorial) 
   }
 });
 
+const NEUAC_INCHI = 'InChI=1S/C11H19NO9/c1-4(14)12-7-5(15)2-11(20,10(18)19)21-9(7)8(17)6(16)3-13/h5-9,13,15-17,20H,2-3H2,1H3,(H,12,14)(H,18,19)/t5-,6+,7+,8+,9+,11?/m0/s1';
+const NEUAC_TERMINII = '1ax:OO;r2:O;3ax:H;4eq:OH;5eq:NHAc;6eq:-;7:OH;8:OH;9:HOH';
+
+QUnit.test('switching anomer (a<->b) only moves the anomeric position\'s own stick, not every other substituent\'s -- for both hexose and sialic', function(assert) {
+  // The actual bug report this guards against: the ring's own pucker
+  // handedness (zSign) was being resolved from the ANOMERIC position's own
+  // data, which flips with anomer by real chemistry (alpha/beta) -- so
+  // switching anomer flipped the whole residue's handedness, moving every
+  // OTHER substituent's drawn stick too, not just the anomeric one's.
+  for (const [terminii, inchi, shape] of [
+    [GLCNAC_TERMINII, GLCNAC_INCHI, 'hexose'],
+    [NEUAC_TERMINII, NEUAC_INCHI, 'sialic'],
+  ]) {
+    const layoutA = layoutChairResidue(terminii, inchi, { anomer: 'a', shape });
+    const layoutB = layoutChairResidue(terminii, inchi, { anomer: 'b', shape });
+    assert.equal(layoutA.zSign, layoutB.zSign, `${shape}: the ring's own handedness doesn't depend on anomer`);
+
+    for (const subA of layoutA.substituents) {
+      if (subA.position === 1) continue; // the anomeric position itself is SUPPOSED to move
+      const subB = layoutB.substituents.find((s) => s.position === subA.position && s.label === subA.label);
+      if (!subB) continue;
+      const endA = chairStickEnd(layoutA.vertices, subA.position, subA.orientation, subA.axEq, layoutA.zSign);
+      const endB = chairStickEnd(layoutB.vertices, subB.position, subB.orientation, subB.axEq, layoutB.zSign);
+      assert.deepEqual(endA, endB, `${shape}: position ${subA.position}'s own stick is unaffected by the OTHER anomer`);
+    }
+  }
+});
+
 QUnit.module('ChairSVG - chairResidueSVGParts / renderResidueChairSVG', {});
 
 QUnit.test('draws a real ring (uniform-width bonds + sticks), not a placeholder, for a supported shape', function(assert) {

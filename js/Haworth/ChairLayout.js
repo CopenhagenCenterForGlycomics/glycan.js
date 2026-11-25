@@ -7,10 +7,11 @@
  *
  *  - A different ring OUTLINE: not the flattened Haworth ellipse, but the
  *    standard "two offset zigzag rails" silhouette every organic chemistry
- *    text draws by hand (oxygen at the top right; C1-C2-C3-C4 the front/
- *    bold arc, C4-C5-O5-C1 the back/thin arc -- C1 and C4 are the ring's
- *    two "flap" vertices where front meets back, the same 1,4 pair that's
- *    always the flap pair in any real chair). Built as a genuine (if
+ *    text draws by hand (oxygen at the top right; C2-C3-C4-C5 the front/
+ *    bold arc, C5-O5-C1-C2 the back/thin arc -- C2 and C5 are the ring's
+ *    two "flap" vertices where front meets back, the same 2,5 pair that's
+ *    always the flap pair in any real chair drawn at this phase/rotation).
+ *    Built as a genuine (if
  *    idealized) 3D chair -- 6 ring atoms on a circle, alternating +/-z
  *    pucker, same idea as InChIRingGeometry.js's own buildChair -- viewed
  *    from a fixed oblique angle (ROTATION_X below) and projected to 2D,
@@ -52,14 +53,21 @@ const STICK_LENGTH = 26;
 const RING_ORDER = ['O5', 'C1', 'C2', 'C3', 'C4', 'C5'];
 const PHASE = (-135 * Math.PI) / 180;
 // RADIUS matches InChIRingGeometry.js's own buildChair (R=1.4); PUCKER is
-// a bit deeper than that function's own 0.25 (bumped up on request, for a
-// more pronounced zigzag) -- still well inside the non-degenerate range:
-// a flatter ratio (tried first, z=0.4 at R=1, i.e. ratio 0.4) makes
-// tetrahedralOtherTwo degenerate, giving axial and equatorial the SAME
-// raw z sign instead of opposite (checked numerically, not assumed).
-// This ring's own ratio (0.32/1.4 = 0.229) stays well under that, checked
-// the same way.
-const PUCKER = 0.32;
+// well beyond that function's own 0.25 (bumped up substantially on
+// request, for a much more pronounced zigzag). At this ratio (0.7/1.4 =
+// 0.5) tetrahedralOtherTwo's own axial/equatorial pair stops being cleanly
+// opposite in raw z (checked numerically -- both end up the same sign,
+// unlike the shallower ratio this module started with), so the
+// axial/equatorial LABELS it returns are less chemically clean here.
+// Checked (both numerically, against every test in this file, and
+// visually) that this doesn't actually matter for what gets drawn: the
+// equatorial stick's own direction never consults that z-sign distinction
+// directly (only its outward projected x/y), and the one place z-sign IS
+// consulted (substituentZSignFor, once per residue) still gives a
+// consistent, correct answer. If PUCKER is tuned further, re-check
+// test-chair-layout.js's own "points outward"/"anomer-independent" tests
+// still pass -- they're what would actually catch a real break here.
+const PUCKER = 0.7;
 const RADIUS = 1.4;
 
 // The viewing transform: tilt the ring by ROTATION_X (a rotation about the
@@ -117,18 +125,18 @@ export function chairGeometry() {
   const points3d = ring3D();
   const vertices = {};
   for (const key of RING_ORDER) vertices[key] = project(points3d[key]);
-  // Front face (nearer the viewer): bold at both ends (C1-C2, C3-C4), very
-  // slightly lighter through the middle (C2-C3) -- a subtle taper (not
+  // Front face (nearer the viewer): bold at both ends (C2-C3, C4-C5), very
+  // slightly lighter through the middle (C3-C4) -- a subtle taper (not
   // Haworth's own thin-to-bold wedge, just bold-to-slightly-less-bold)
-  // conveying that C2-C3 recedes a little relative to the two corners
-  // either side of it. Back face (O5-C1, C4-C5, C5-O5) stays plain/thin
+  // conveying that C3-C4 recedes a little relative to the two corners
+  // either side of it. Back face (O5-C1, C1-C2, C5-O5) stays plain/thin
   // throughout.
   const bonds = [
     { from: 'O5', to: 'C1', width: 'thin' },
-    { from: 'C1', to: 'C2', width: 'bold' },
-    { from: 'C2', to: 'C3', width: 'medium' },
-    { from: 'C3', to: 'C4', width: 'bold' },
-    { from: 'C4', to: 'C5', width: 'thin' },
+    { from: 'C1', to: 'C2', width: 'thin' },
+    { from: 'C2', to: 'C3', width: 'bold' },
+    { from: 'C3', to: 'C4', width: 'medium' },
+    { from: 'C4', to: 'C5', width: 'bold' },
     { from: 'C5', to: 'O5', width: 'thin' },
   ];
   return { vertices, bonds };
@@ -163,8 +171,18 @@ function tetrahedralDirectionsAt(key, zSign) {
  * position, is already fully fixed by that position's two ring-bond
  * neighbours -- see chairStickEnd's own docstring). A chair ring is rigid:
  * every position shares the SAME handedness, so this is computed ONCE per
- * residue, from any one position's own real (axEq, orientation) -- the
- * anomeric position (1) always exists and is as good a reference as any.
+ * residue, from any one position's own real (axEq, orientation).
+ *
+ * The reference must NOT be the anomeric position (1): its own orientation
+ * AND axEq are set directly from the anomer label (alpha/beta), by real
+ * chemistry, independently of the rest of the ring's own fixed handedness
+ * (see HaworthLayout.js's own layoutSubstituents, position-1 branch) --
+ * using it here as the reference confused "which anomer this is" with
+ * "which handedness the ring itself has", so switching anomer flipped
+ * every OTHER substituent's drawn direction too, not just the anomeric
+ * one's (an actual reported bug, not a hypothetical). Positions 2-5 don't
+ * depend on anomer at all, so any of those is a safe reference -- see
+ * ChairSVG.js's own layoutChairResidue for which one it actually picks.
  *
  * Checked at zSign=1 (chairGeometry's own default): if that position's own
  * tetrahedral direction (whichever slot its real axEq names) already

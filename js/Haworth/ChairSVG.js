@@ -61,11 +61,20 @@ function layoutChairResidue(terminii, inchi, opts = {}) {
   const { substituents } = builder.layout(terminii, inchi, { anomer });
   // A chair ring is rigid -- every position shares the same pucker
   // handedness (see ChairLayout.js's own substituentZSignFor docstring),
-  // so this is resolved ONCE per residue here (from the anomeric
-  // position's own real data, always present) and reused for every
+  // so this is resolved ONCE per residue here and reused for every
   // equatorial stick on this residue, rather than re-derived per
-  // substituent.
-  const reference = substituents.find((s) => s.position === 1 && !s.neverSuppress) ?? substituents[0];
+  // substituent. The reference must be a NON-anomeric position (2-5):
+  // position 1's own orientation/axEq flips with anomer by real chemistry
+  // (alpha vs beta), which isn't the same thing as the ring's own fixed
+  // handedness -- using it as the reference made switching anomer flip
+  // every OTHER substituent's drawn direction too (a real reported bug).
+  // Positions 2-5 don't depend on anomer at all, so any present one is
+  // safe; falls back to position 1 only if a residue genuinely has
+  // nothing else (shouldn't happen for a real sugar).
+  const reference =
+    substituents.find((s) => s.position !== 1 && !s.neverSuppress) ??
+    substituents.find((s) => s.position === 1 && !s.neverSuppress) ??
+    substituents[0];
   const zSign = reference ? substituentZSignFor(reference.position, reference.orientation, reference.axEq) : 1;
   return {
     vertices,

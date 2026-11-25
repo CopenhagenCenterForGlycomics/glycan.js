@@ -9,14 +9,14 @@ QUnit.test('6 ring vertices (5 carbons + the ring oxygen), front arc bold, back 
   assert.deepEqual(Object.keys(vertices).sort(), ['C1', 'C2', 'C3', 'C4', 'C5', 'O5'].sort());
 
   const widthOf = (from, to) => bonds.find((b) => b.from === from && b.to === to)?.width;
-  // C1-C2-C3-C4 (front, nearer the viewer) bold; C4-C5-O5-C1 (back) thin --
-  // C1 and C4 are the ring's own "flap" vertices, shared between both arcs.
-  assert.equal(widthOf('C1', 'C2'), 'bold');
-  assert.equal(widthOf('C2', 'C3'), 'medium', 'C2-C3 tapers very slightly relative to the two bold corners either side of it');
-  assert.equal(widthOf('C3', 'C4'), 'bold');
-  assert.equal(widthOf('C4', 'C5'), 'thin');
-  assert.equal(widthOf('C5', 'O5'), 'thin');
+  // C2-C3-C4-C5 (front, nearer the viewer) bold; C5-O5-C1-C2 (back) thin --
+  // C2 and C5 are the ring's own "flap" vertices, shared between both arcs.
   assert.equal(widthOf('O5', 'C1'), 'thin');
+  assert.equal(widthOf('C1', 'C2'), 'thin');
+  assert.equal(widthOf('C2', 'C3'), 'bold');
+  assert.equal(widthOf('C3', 'C4'), 'medium', 'C3-C4 tapers very slightly relative to the two bold corners either side of it');
+  assert.equal(widthOf('C4', 'C5'), 'bold');
+  assert.equal(widthOf('C5', 'O5'), 'thin');
 
   // Every bond is uniform-width (never tapered the way ringGeometry's own
   // hexose front face is) -- a chair's front/back split is a real,
