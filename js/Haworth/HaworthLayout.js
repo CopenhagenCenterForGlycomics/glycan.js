@@ -37,7 +37,12 @@
  * terminii string to start from (anomeric configuration is set per
  * Monosaccharide *instance*, not per residue type) -- its un-corrected
  * orientation comes from the anomer label instead (alpha=down, beta=up,
- * before the same D/L correction is applied).
+ * before the same D/L correction is applied). This alpha=axial-like/
+ * beta=equatorial-like correlation holds for an ALDOSE anomeric carbon
+ * (one H, one OH) -- the sialic-acid ketose anomeric carbon (layoutSialic
+ * Substituents, position 1 = sialic C2) inverts it instead (alpha=
+ * equatorial-like, beta=axial-like), per real Neu5Ac stereochemistry; see
+ * that function's own docstring.
  */
 
 import { parseInChI, parseTLayer } from '../InChITerminii.js';
@@ -338,9 +343,23 @@ function sialicTailLabel(c7, c8, c9) {
  * The anomeric OH and the exocyclic COOH are NOT independently derived
  * (same anomer/instance-level situation as every other family's position
  * 1) -- they're a complementary pair on the same quaternary carbon (one
- * up, one down, always), so only the OH's orientation is computed (the
- * same anomer-based rule as every other shape's C1), and COOH is simply
- * its opposite face.
+ * up, one down, always), so only the OH's orientation is computed, and
+ * COOH is simply its opposite face.
+ *
+ * Unlike every other shape's C1, though, the anomer-to-orientation
+ * correlation here is INVERTED from the generic aldose rule (alpha=
+ * axial-like, beta=equatorial-like -- see this file's own module
+ * docstring): real Neu5Ac chemistry has it the other way round for its
+ * ketose anomeric centre -- alpha-Neu5Ac is the form with the C1
+ * carboxylate AXIAL (hence its anomeric OH/OR is EQUATORIAL), beta has
+ * the carboxylate equatorial (anomeric OH/OR axial) -- confirmed e.g. by
+ * Wikipedia's "Sialic acid" article ("The configuration that places the
+ * carboxylate in the axial position is the alpha-anomer"), and
+ * cross-checked against this file's own already-validated eq/eq/eq
+ * derivation for sialic C4/C5/C6 on the same molecule (same ring, same
+ * fixed frame, same odd/even position parity -- see that derivation
+ * above): an odd position's "equatorial" renders 'down' here, so
+ * alpha's equatorial OH must be 'down', not 'up'.
  */
 export function layoutSialicSubstituents(terminii, inchi, opts = {}) {
   const { anomer = 'b' } = opts;
@@ -357,7 +376,7 @@ export function layoutSialicSubstituents(terminii, inchi, opts = {}) {
   const ohEntry = positions.get(2);
   const ohLabel = ohEntry && displayLabel(ohEntry.label);
   if (ohLabel) {
-    const ohOrientation = flip(anomer === 'b' ? 'up' : 'down');
+    const ohOrientation = flip(anomer === 'b' ? 'down' : 'up');
     substituents.push({ position: 1, label: ohLabel, orientation: ohOrientation });
     const coohEntry = positions.get(1);
     const coohLabel = coohEntry && displayLabel(coohEntry.label);

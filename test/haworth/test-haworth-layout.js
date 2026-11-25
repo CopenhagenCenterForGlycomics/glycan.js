@@ -225,6 +225,18 @@ QUnit.test('alpha-NeuAc: the anomeric OH and the exocyclic COOH are a complement
   assert.equal(byPos[4].orientation, 'up', 'sialic C5');
   assert.equal(byPos[5].orientation, 'down', 'sialic C6 (where the tail hangs)');
   assert.equal(byPos[5].label, 'CH(OH)CH(OH)CH₂OH', 'the C7-C8-C9 tail drawn as one composite label');
+
+  // Absolute direction, not just "complementary" -- real Neu5Ac chemistry:
+  // alpha has the C1 carboxylate AXIAL (e.g. Wikipedia's "Sialic acid"
+  // article: "The configuration that places the carboxylate in the axial
+  // position is the alpha-anomer"). Cross-checked against this exact
+  // molecule's own already-validated sialic C4/C5/C6 (asserted equatorial
+  // above): hexagon C1 is an ODD position, same parity as C4 (hexagon 3)
+  // and C6 (hexagon 5), both confirmed 'down' for equatorial here -- so
+  // alpha's equatorial substituent (the anomeric OH, NOT the COOH) must
+  // also be 'down', and the axial COOH 'up'.
+  assert.equal(oh.orientation, 'down', 'alpha-NeuAc: anomeric OH is equatorial');
+  assert.equal(cooh.orientation, 'up', 'alpha-NeuAc: C1 carboxylate is axial');
 });
 
 QUnit.test('beta-NeuAc: only the anomeric OH/COOH pair flips relative to alpha; the real ring stereocentres do not', function(assert) {
