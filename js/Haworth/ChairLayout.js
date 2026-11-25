@@ -7,11 +7,9 @@
  *
  *  - A different ring OUTLINE: not the flattened Haworth ellipse, but the
  *    standard "two offset zigzag rails" silhouette every organic chemistry
- *    text draws by hand (oxygen at the top right; C2-C3-C4-C5 the front/
- *    bold arc, C5-O5-C1-C2 the back/thin arc -- C2 and C5 are the ring's
- *    two "flap" vertices where front meets back, the same 2,5 pair that's
- *    always the flap pair in any real chair drawn at this phase/rotation).
- *    Built as a genuine (if
+ *    text draws by hand (oxygen at the top right; C1-C2-C3-C4 the front/
+ *    bold arc, C4-C5-O5-C1 the back/thin arc -- C1 and C4 are shared
+ *    between the two arcs). Built as a genuine (if
  *    idealized) 3D chair -- 6 ring atoms on a circle, alternating +/-z
  *    pucker, same idea as InChIRingGeometry.js's own buildChair -- viewed
  *    from a fixed oblique angle (ROTATION_X below) and projected to 2D,
@@ -82,6 +80,13 @@ const RADIUS = 1.4;
 const ROTATION_X = (45 * Math.PI) / 180;
 const MIRROR = true;
 const SCALE = 43; // 60 / 1.4 -- keeps the same overall rendered ring size now that RADIUS itself is 1.4 instead of 1
+// A separate, purely-2D squash on top of SCALE -- shrinks the drawing's own
+// vertical extent (height) without touching width, or any of the real 3D
+// geometry ROTATION_X/PUCKER/RADIUS feed into tetrahedralOtherTwo (that
+// math runs on the RAW 3D points, well before this). 1 = no squash; a bit
+// under 1 makes each residue a bit less tall, as drawn, without changing
+// its width or re-opening the pucker/degeneracy tradeoff above.
+const ASPECT_Y = 0.85;
 
 // `zSign` flips the pucker's own handedness (every z negated) -- see
 // substituentZSignFor's own docstring for why this exists and why it's
@@ -106,7 +111,7 @@ function ring3D(zSign = 1) {
 // 2D plane.
 function project(v, scale = SCALE) {
   const y = v.y * Math.cos(ROTATION_X) - v.z * Math.sin(ROTATION_X);
-  return { x: v.x * scale * (MIRROR ? -1 : 1), y: y * scale };
+  return { x: v.x * scale * (MIRROR ? -1 : 1), y: y * scale * ASPECT_Y };
 }
 
 /**
@@ -130,18 +135,18 @@ export function chairGeometry() {
   const points3d = ring3D();
   const vertices = {};
   for (const key of RING_ORDER) vertices[key] = project(points3d[key]);
-  // Front face (nearer the viewer): bold at both ends (C2-C3, C4-C5), very
-  // slightly lighter through the middle (C3-C4) -- a subtle taper (not
+  // Front face (nearer the viewer): bold at both ends (C1-C2, C3-C4), very
+  // slightly lighter through the middle (C2-C3) -- a subtle taper (not
   // Haworth's own thin-to-bold wedge, just bold-to-slightly-less-bold)
-  // conveying that C3-C4 recedes a little relative to the two corners
-  // either side of it. Back face (O5-C1, C1-C2, C5-O5) stays plain/thin
+  // conveying that C2-C3 recedes a little relative to the two corners
+  // either side of it. Back face (C4-C5, C5-O5, O5-C1) stays plain/thin
   // throughout.
   const bonds = [
     { from: 'O5', to: 'C1', width: 'thin' },
-    { from: 'C1', to: 'C2', width: 'thin' },
-    { from: 'C2', to: 'C3', width: 'bold' },
-    { from: 'C3', to: 'C4', width: 'medium' },
-    { from: 'C4', to: 'C5', width: 'bold' },
+    { from: 'C1', to: 'C2', width: 'bold' },
+    { from: 'C2', to: 'C3', width: 'medium' },
+    { from: 'C3', to: 'C4', width: 'bold' },
+    { from: 'C4', to: 'C5', width: 'thin' },
     { from: 'C5', to: 'O5', width: 'thin' },
   ];
   return { vertices, bonds };
