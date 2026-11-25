@@ -109,32 +109,27 @@ QUnit.test('a lone Fuc stub sits far enough from its parent for its own OH label
   assert.ok(fucX > 110, `Fuc sits clear of its parent ring's own ~86px width plus stick/label room (got ${fucX}px)`);
 });
 
-QUnit.test('reassigning LayoutEngine after construction (sviewer\'s own linkangles-toggle pattern) keeps spacing stretched', function(assert) {
+QUnit.test('LayoutEngine assignment decorates whatever is given, never mutating it (sviewer\'s own linkangles-toggle pattern)', function(assert) {
   // sviewer never hands a renderer the base layout class itself -- always a
   // fresh `class extends layout_class {}` per (class, element) pair (see
-  // lite.js's get_layout_engine()), so DELTA_X/DELTA_Y overrides can't leak
-  // across elements or renderers sharing the same base class. Mirrored here
-  // with our own throwaway subclasses, rather than mutating
-  // SugarAwareLayout/LinkageLayout themselves, which would leak into every
-  // other test in this same suite.
+  // lite.js's get_layout_engine()). Mirrored here with our own throwaway
+  // subclasses, standing in for that.
   class SugarAwareLayoutInstance extends SugarAwareLayout {}
   class LinkageLayoutInstance extends LinkageLayout {}
 
   const renderer = new HaworthRenderer(document.body, SugarAwareLayoutInstance);
-  assert.equal(SugarAwareLayoutInstance.DELTA_X, 145 / 100, 'the layout engine given at construction time is stretched to this renderer\'s own spacing');
+  assert.equal(renderer.LayoutEngine.DELTA_X, 145 / 100, 'the layout engine given at construction time is wrapped with this renderer\'s own spacing');
+  assert.notOk(
+    Object.getOwnPropertyDescriptor(SugarAwareLayoutInstance, 'DELTA_X'),
+    'the engine the caller gave us is never mutated -- the override lives only on the wrapper this renderer uses internally'
+  );
 
   // e.g. lite.js's `linkangles` attribute handler: `this.renderer.LayoutEngine = this.LayoutEngine` with a different base class.
   renderer.LayoutEngine = LinkageLayoutInstance;
-  assert.equal(LinkageLayoutInstance.DELTA_X, 145 / 100, 'a layout engine swapped in later is stretched too, not left at its own default spacing');
-  assert.notOk(
-    Object.getOwnPropertyDescriptor(SugarAwareLayoutInstance, 'DELTA_X'),
-    'the previous layout engine\'s own stretch override is cleaned up once replaced'
-  );
-
-  renderer.disconnect();
+  assert.equal(renderer.LayoutEngine.DELTA_X, 145 / 100, 'a layout engine swapped in later is wrapped too, not left at its own default spacing');
   assert.notOk(
     Object.getOwnPropertyDescriptor(LinkageLayoutInstance, 'DELTA_X'),
-    'disconnect() cleans up whichever layout engine is current, not just the one given at construction'
+    'the newly assigned engine isn\'t mutated either'
   );
 });
 

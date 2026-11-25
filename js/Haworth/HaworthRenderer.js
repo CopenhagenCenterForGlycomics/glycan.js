@@ -30,10 +30,13 @@
  *    with DELTA_X/DELTA_Y controlling only the GAP between residue centers,
  *    not their own footprint -- this renderer's ring+substituent-stick
  *    footprint is drawn at a fixed real pixel size regardless (same
- *    geometry HaworthLayout.js's standalone renderers use), so only
- *    DELTA_X/DELTA_Y need stretching to match it (stretchForHaworth, below)
- *    -- same technique SugarTextRenderer.js's stretchLayoutSpacing uses for
- *    its own much-wider-than-a-unit-square text labels.
+ *    geometry HaworthLayout.js's standalone renderers use), so whatever
+ *    layout engine this renderer is given gets wrapped in its own
+ *    anonymous subclass with DELTA_X/DELTA_Y overridden to match
+ *    (haworthLayoutEngine, below) -- similar in spirit to
+ *    SugarTextRenderer.js's stretchLayoutSpacing, which does the same job
+ *    for its own much-wider-than-a-unit-square text labels by mutating the
+ *    engine it's given instead.
  */
 
 import SVGRenderer from '../SVGRenderer.js';
@@ -74,64 +77,44 @@ const HAWORTH_DELTA_Y = 95 / SCALE;
 // not the stub -- the actual bug report this constant fixes). 0.75 is
 // SugarAwareLayout's own sentinel for exactly this one case (every other
 // branch scales with DELTA_X/DELTA_Y already, even its OTHER Fuc-rotation
-// branch just below it), so overrideStubSpacing below targets that precise
-// value -- a magic-number coupling to SugarAwareLayout.js's own source,
-// worth re-checking if that file's own constant ever changes.
+// branch just below it), so haworthLayoutEngine's own LayoutMonosaccharide
+// override below targets that precise value -- a magic-number coupling to
+// SugarAwareLayout.js's own source, worth re-checking if that file's own
+// constant ever changes.
 const FUC_STUB_DELTA_X_RATIO = 0.75;
 // Enough room for the stub's own OH stick+label to clearly read as its
 // own, without pushing it so far out it stops looking attached -- found by
 // visual check against a core-fucosylated N-glycan render.
 const FUC_STUB_SPACING = 0.95;
 
-function overrideStubSpacing(layout) {
-  // A plain property read, not Object.getPrototypeOf(layout) -- `layout`
-  // here is sometimes the real SugarAwareLayout class itself (not always a
-  // fresh `class extends SugarAwareLayout {}`, e.g. a caller following
-  // test-basicRender.js's own precedent of passing the base class
-  // directly). Object.getPrototypeOf(layout) in that exact case would
-  // reach past SugarAwareLayout to ITS OWN superclass (CondensedLayout),
-  // silently skipping every one of SugarAwareLayout's own special cases
-  // (this stub logic included) -- a plain `layout.LayoutMonosaccharide`
-  // read instead resolves correctly either way, through the real
-  // prototype chain, whether `layout` owns this method itself or inherits
-  // it.
-  const original = layout.LayoutMonosaccharide;
-  Object.defineProperty(layout, 'LayoutMonosaccharide', {
-    configurable: true,
-    value(...args) {
-      const result = original.apply(this, args);
+// This renderer's own spacing/stub-placement tweaks are its own concern,
+// not something the layout engine itself should need to know about -- so
+// rather than reaching into whatever engine sviewer hands this renderer
+// and mutating it in place (which would leak into any OTHER renderer or
+// element still holding a reference to that same engine), this wraps it in
+// a fresh, throwaway anonymous subclass every time LayoutEngine is
+// assigned (set LayoutEngine, below) and uses that instead -- the engine
+// the caller gave us is never touched, so there's nothing to clean up on
+// disconnect either. `BaseLayout` is sometimes the real SugarAwareLayout
+// class itself (not always a fresh `class extends SugarAwareLayout {}`,
+// e.g. a caller following test-basicRender.js's own precedent of passing
+// the base class directly) -- real `extends`/`super` here resolves
+// correctly either way, through the real prototype chain, unlike reaching
+// past it with Object.getPrototypeOf.
+function haworthLayoutEngine(BaseLayout) {
+  return class extends BaseLayout {
+    static get DELTA_X() { return HAWORTH_DELTA_X; }
+    static get DELTA_Y() { return HAWORTH_DELTA_Y; }
+
+    static LayoutMonosaccharide(...args) {
+      const result = super.LayoutMonosaccharide(...args);
       const monosaccharide = args[1];
       if (monosaccharide.monosaccharide === MONOSACCHARIDE.Fuc && Math.abs(result.dx) === FUC_STUB_DELTA_X_RATIO) {
         result.dx = Math.sign(result.dx) * FUC_STUB_SPACING * this.DELTA_X;
       }
       return result;
-    },
-  });
-}
-
-// Same technique as SugarTextRenderer.js's stretchLayoutSpacing -- sviewer
-// hands every renderer an instance-private layout-engine subclass (a fresh
-// `class extends layout_class {}` per (base layout class, <ccg-sviewer>
-// element) pair -- see lite.js's get_layout_engine()), so overriding
-// DELTA_X/DELTA_Y (and LayoutMonosaccharide, for the Fuc-stub fix above)
-// directly on this particular instance can't leak into a different
-// renderer sharing the same element. unstretchHaworth (used by disconnect()
-// and the LayoutEngine setter below) restores it so switching to an icon
-// renderer afterward gets its own normal spacing back, not this renderer's.
-function stretchForHaworth(layout) {
-  for (const [prop, value] of [['DELTA_X', HAWORTH_DELTA_X], ['DELTA_Y', HAWORTH_DELTA_Y]]) {
-    Object.defineProperty(layout, prop, {
-      configurable: true,
-      get() { return value; },
-    });
-  }
-  overrideStubSpacing(layout);
-}
-
-function unstretchHaworth(layout) {
-  delete layout.DELTA_X;
-  delete layout.DELTA_Y;
-  delete layout.LayoutMonosaccharide;
+    }
+  };
 }
 
 /**
@@ -197,37 +180,20 @@ class HaworthRenderer extends SVGRenderer {
     // (only when both container and layout are given) -- `this` already has
     // this subclass's full prototype chain at that point, so it runs
     // through the overridden setter below, which does the actual
-    // stretching. Nothing further needed here.
+    // decoration. Nothing further needed here.
     super(container, layout);
-  }
-
-  // Called by sviewer (lite.js's initialise_renderer_object) before
-  // swapping to a different renderer -- see stretchForHaworth's own comment.
-  disconnect() {
-    if (this._stretchedLayout) {
-      unstretchHaworth(this._stretchedLayout);
-      this._stretchedLayout = null;
-    }
   }
 
   // sviewer can swap in an entirely different layout-engine instance after
   // construction (lite.js's `linkangles` attribute handler reassigns
   // `renderer.LayoutEngine` to switch between SugarAwareLayout's and
-  // LinkageLayout's own fresh per-element subclass) -- without this
-  // override, that swap would silently drop back to the layout's own
-  // default (tiny, icon-sized) DELTA_X/DELTA_Y, crowding every ring+stick
-  // together. Re-stretches whichever instance is current, and un-stretches
-  // the one being replaced first so it's left clean for whatever renderer
-  // (or this one, re-assigned later) uses it next.
+  // LinkageLayout's own fresh per-element subclass). Wrapping whatever's
+  // given in a fresh haworthLayoutEngine() each time this setter runs
+  // means every assignment gets this renderer's own spacing, with nothing
+  // to undo later (no disconnect() override needed -- see
+  // haworthLayoutEngine's own comment).
   set LayoutEngine(engine) {
-    if (this._stretchedLayout && this._stretchedLayout !== engine) {
-      unstretchHaworth(this._stretchedLayout);
-    }
-    this._stretchedLayout = engine || null;
-    if (this._stretchedLayout) {
-      stretchForHaworth(this._stretchedLayout);
-    }
-    super.LayoutEngine = engine;
+    super.LayoutEngine = engine ? haworthLayoutEngine(engine) : engine;
   }
 
   get LayoutEngine() {
