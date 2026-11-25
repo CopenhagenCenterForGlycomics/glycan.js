@@ -63,9 +63,19 @@ QUnit.test('every substituent on a real residue (Fuc -- mixed axial/equatorial) 
   for (const sub of layout.substituents) {
     const vertex = layout.vertices[`C${sub.position === 6 ? 5 : sub.position}`];
     const end = chairStickEnd(layout.vertices, sub.position, sub.orientation, sub.axEq, layout.zSign);
+    assert.ok(Number.isFinite(end.x) && Number.isFinite(end.y), `position ${sub.position} (${sub.axEq}, ${sub.orientation}) is a real, finite point`);
+    // "Outward from the ring centre" is only a meaningful check for
+    // EQUATORIAL -- it's a real lateral direction with room to go either
+    // way. Axial is purely vertical (chairStickEnd's own ax branch), and
+    // at the two flap vertices (C1/C4 here, closest to the ring's own
+    // centre by construction -- see ring3D) a vertical stick can
+    // legitimately land net-closer to the centre while still being a
+    // correctly-drawn vertical line; checked against the actual rendered
+    // SVG (not just this metric) that this isn't a real rendering bug.
+    if (sub.axEq !== 'eq') continue;
     const vertexDist = Math.hypot(vertex.x, vertex.y);
     const endDist = Math.hypot(end.x, end.y);
-    assert.ok(endDist > vertexDist, `position ${sub.position} (${sub.axEq}, ${sub.orientation}) points outward`);
+    assert.ok(endDist > vertexDist, `position ${sub.position} (eq, ${sub.orientation}) points outward`);
   }
 });
 

@@ -90,7 +90,12 @@ const SCALE = 43; // 60 / 1.4 -- keeps the same overall rendered ring size now t
 function ring3D(zSign = 1) {
   const points = {};
   RING_ORDER.forEach((key, i) => {
-    const angle = PHASE + i * (Math.PI / 3);
+    // Negative step: going around RING_ORDER (O5, C1, C2, ...) must trace
+    // the ring CLOCKWISE on screen -- i.e. starting from O5, the very next
+    // atom clockwise is C1 (confirmed by a direct shoelace check in screen
+    // coords; the `+i` version traced counter-clockwise instead, putting
+    // C5, not C1, immediately clockwise of the ring oxygen).
+    const angle = PHASE - i * (Math.PI / 3);
     points[key] = new Vec3(RADIUS * Math.cos(angle), RADIUS * Math.sin(angle), zSign * (i % 2 === 0 ? PUCKER : -PUCKER));
   });
   return points;
