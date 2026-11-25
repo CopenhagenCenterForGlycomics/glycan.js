@@ -82,6 +82,33 @@ QUnit.test('renders the N-glycan trimannosyl core, horizontal, as 6 real ring ic
   assert.ok(mainChainX.every((x) => x < 0), 'every main-chain residue sits left of the reducing end');
 });
 
+QUnit.test('a lone Fuc stub sits far enough from its parent for its own OH label to read as its own', function(assert) {
+  // SugarAwareLayout.js's own "stub along a chain" case (a single Fuc
+  // sibling) places it at a fixed, absolute 0.75-DELTA_X offset -- sized
+  // for that framework's own small icons, not this renderer's much wider
+  // ring+stick footprint. Checked here in the DEFAULT (non-rotated,
+  // non-horizontal) orientation, where position.dx maps directly onto the
+  // icon's own x-translate, so the offset can be read straight off it.
+  const sugar = new IupacSugar();
+  sugar.sequence = 'Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc';
+
+  const renderer = new HaworthRenderer(document.body, SugarAwareLayout);
+  renderer.addSugar(sugar);
+  renderer.refresh();
+
+  const svg = renderer.element.canvas;
+  const fuc = svg.querySelector('g[glycanjs\\:identifier="Fuc"]');
+  const fucX = Math.abs(Number(fuc.getAttribute('transform').match(/translate\(([-\d.]+),/)[1]));
+
+  // The ring alone is ~86px wide (rx=43 each side -- HaworthLayout.js's
+  // ringGeometry), before any stick/label -- SugarAwareLayout's own
+  // un-adjusted 0.75*DELTA_X (~105px here) already overlaps that once the
+  // stub's own substituent sticks/labels are added on top; this renderer's
+  // own FUC_STUB_SPACING (0.95*DELTA_X, ~138px) should clear it with room
+  // to spare.
+  assert.ok(fucX > 110, `Fuc sits clear of its parent ring's own ~86px width plus stick/label room (got ${fucX}px)`);
+});
+
 QUnit.test('reassigning LayoutEngine after construction (sviewer\'s own linkangles-toggle pattern) keeps spacing stretched', function(assert) {
   // sviewer never hands a renderer the base layout class itself -- always a
   // fresh `class extends layout_class {}` per (class, element) pair (see

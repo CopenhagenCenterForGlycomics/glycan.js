@@ -50,6 +50,7 @@ import {
 } from './HaworthSVG.js';
 
 import { resolveResidueData, detectRingShape } from './SugarLayout.js';
+import { MONOSACCHARIDE } from '../reference_monosaccharides.js';
 
 const SVGNS = 'http://www.w3.org/2000/svg';
 const GLYCANJSNS = 'https://glycocode.com/glycanjs';
@@ -63,14 +64,60 @@ const SCALE = SVGRenderer.GLOBAL_SCALE; // 100
 const HAWORTH_DELTA_X = 145 / SCALE;
 const HAWORTH_DELTA_Y = 95 / SCALE;
 
+// SugarAwareLayout.js's own LayoutMonosaccharide places a single Fuc
+// sibling (its "stub along a chain" case) at a FIXED, absolute 0.75-unit
+// offset, bypassing DELTA_X entirely -- sized for that framework's own
+// ~1-unit-square icons, not this renderer's much larger ring+stick
+// footprint (a ring alone is already ~0.86 units wide at this renderer's
+// own DELTA_X), so the stub's ring ends up overlapping its parent's own
+// substituent labels (its OH stick reads as if it belongs to the parent,
+// not the stub -- the actual bug report this constant fixes). 0.75 is
+// SugarAwareLayout's own sentinel for exactly this one case (every other
+// branch scales with DELTA_X/DELTA_Y already, even its OTHER Fuc-rotation
+// branch just below it), so overrideStubSpacing below targets that precise
+// value -- a magic-number coupling to SugarAwareLayout.js's own source,
+// worth re-checking if that file's own constant ever changes.
+const FUC_STUB_DELTA_X_RATIO = 0.75;
+// Enough room for the stub's own OH stick+label to clearly read as its
+// own, without pushing it so far out it stops looking attached -- found by
+// visual check against a core-fucosylated N-glycan render.
+const FUC_STUB_SPACING = 0.95;
+
+function overrideStubSpacing(layout) {
+  // A plain property read, not Object.getPrototypeOf(layout) -- `layout`
+  // here is sometimes the real SugarAwareLayout class itself (not always a
+  // fresh `class extends SugarAwareLayout {}`, e.g. a caller following
+  // test-basicRender.js's own precedent of passing the base class
+  // directly). Object.getPrototypeOf(layout) in that exact case would
+  // reach past SugarAwareLayout to ITS OWN superclass (CondensedLayout),
+  // silently skipping every one of SugarAwareLayout's own special cases
+  // (this stub logic included) -- a plain `layout.LayoutMonosaccharide`
+  // read instead resolves correctly either way, through the real
+  // prototype chain, whether `layout` owns this method itself or inherits
+  // it.
+  const original = layout.LayoutMonosaccharide;
+  Object.defineProperty(layout, 'LayoutMonosaccharide', {
+    configurable: true,
+    value(...args) {
+      const result = original.apply(this, args);
+      const monosaccharide = args[1];
+      if (monosaccharide.monosaccharide === MONOSACCHARIDE.Fuc && Math.abs(result.dx) === FUC_STUB_DELTA_X_RATIO) {
+        result.dx = Math.sign(result.dx) * FUC_STUB_SPACING * this.DELTA_X;
+      }
+      return result;
+    },
+  });
+}
+
 // Same technique as SugarTextRenderer.js's stretchLayoutSpacing -- sviewer
 // hands every renderer an instance-private layout-engine subclass (a fresh
 // `class extends layout_class {}` per (base layout class, <ccg-sviewer>
 // element) pair -- see lite.js's get_layout_engine()), so overriding
-// DELTA_X/DELTA_Y directly on this particular instance can't leak into a
-// different renderer sharing the same element. disconnect() below restores
-// it so switching to an icon renderer afterward gets its own normal
-// spacing back, not this renderer's.
+// DELTA_X/DELTA_Y (and LayoutMonosaccharide, for the Fuc-stub fix above)
+// directly on this particular instance can't leak into a different
+// renderer sharing the same element. unstretchHaworth (used by disconnect()
+// and the LayoutEngine setter below) restores it so switching to an icon
+// renderer afterward gets its own normal spacing back, not this renderer's.
 function stretchForHaworth(layout) {
   for (const [prop, value] of [['DELTA_X', HAWORTH_DELTA_X], ['DELTA_Y', HAWORTH_DELTA_Y]]) {
     Object.defineProperty(layout, prop, {
@@ -78,6 +125,13 @@ function stretchForHaworth(layout) {
       get() { return value; },
     });
   }
+  overrideStubSpacing(layout);
+}
+
+function unstretchHaworth(layout) {
+  delete layout.DELTA_X;
+  delete layout.DELTA_Y;
+  delete layout.LayoutMonosaccharide;
 }
 
 /**
@@ -151,8 +205,7 @@ class HaworthRenderer extends SVGRenderer {
   // swapping to a different renderer -- see stretchForHaworth's own comment.
   disconnect() {
     if (this._stretchedLayout) {
-      delete this._stretchedLayout.DELTA_X;
-      delete this._stretchedLayout.DELTA_Y;
+      unstretchHaworth(this._stretchedLayout);
       this._stretchedLayout = null;
     }
   }
@@ -168,8 +221,7 @@ class HaworthRenderer extends SVGRenderer {
   // (or this one, re-assigned later) uses it next.
   set LayoutEngine(engine) {
     if (this._stretchedLayout && this._stretchedLayout !== engine) {
-      delete this._stretchedLayout.DELTA_X;
-      delete this._stretchedLayout.DELTA_Y;
+      unstretchHaworth(this._stretchedLayout);
     }
     this._stretchedLayout = engine || null;
     if (this._stretchedLayout) {
