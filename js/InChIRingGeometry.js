@@ -51,7 +51,7 @@
  * of this module never did.
  */
 
-class Vec3 {
+export class Vec3 {
   constructor(x, y, z) {
     this.x = x; this.y = y; this.z = z;
   }
@@ -280,8 +280,11 @@ export function shapeNeedsMirrorFlip(layers, ringSize = 6) {
   return needsShapeCorrection(walk.order, walk.adj);
 }
 
-/** Idealized chair: ring atoms on a hexagon, alternating +/- z. */
-function buildChair(nRing) {
+/** Idealized chair: ring atoms on a hexagon, alternating +/- z. Exported
+ * for ChairLayout.js's own reuse (the same idealized 3D positions,
+ * projected to 2D for an actual chair drawing, rather than just used
+ * internally here to resolve ax/eq and up/down). */
+export function buildChair(nRing) {
   const pos = [];
   const R = 1.4;
   for (let i = 0; i < nRing; i++) {
@@ -293,8 +296,12 @@ function buildChair(nRing) {
 }
 
 /** Given a tetrahedral center and its two ring-bond directions, construct
- * the other two (axial, equatorial) idealized bond directions. */
-function tetrahedralOtherTwo(center, prevPos, nextPos) {
+ * the other two (axial, equatorial) idealized bond directions. Exported for
+ * ChairLayout.js's own reuse: applied there to a chair drawing's OWN real
+ * (hand-drawn) ring-vertex positions, rather than this module's own
+ * ring-on-a-flat-circle approximation (see buildChair) -- the same pure
+ * tetrahedral-geometry step, just fed different ring-bond vectors. */
+export function tetrahedralOtherTwo(center, prevPos, nextPos) {
   const u1 = prevPos.sub(center).unit();
   const u2 = nextPos.sub(center).unit();
   let bis = u1.add(u2);

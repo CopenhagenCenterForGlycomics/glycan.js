@@ -36,6 +36,8 @@
     "./renderers/neon.js": "./js/Neon/NeonRenderer.js",
     "./renderers/haworth": "./js/Haworth/HaworthRenderer.js",
     "./renderers/haworth.js": "./js/Haworth/HaworthRenderer.js",
+    "./renderers/chair": "./js/Haworth/ChairRenderer.js",
+    "./renderers/chair.js": "./js/Haworth/ChairRenderer.js",
     "./svgcanvas": "./js/SVGCanvas.js"
   },
   "dependencies": {

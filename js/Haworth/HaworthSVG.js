@@ -80,6 +80,26 @@ function substituentPositionFor(ringPosition) {
   return ringPosition === 6 ? 5 : ringPosition;
 }
 
+// Applies stickOnlyPositions/labelOverrides to a raw substituents array (see
+// layoutResidue's own docstring below for what each means) -- pure
+// substituent-list bookkeeping, nothing geometry-specific, so a
+// chair-conformation renderer reuses this verbatim instead of
+// re-implementing the same suppression/override rules (see ChairSVG.js).
+//
+// neverSuppress: some shapes (sialic) put two independent substituents on
+// the same vertex (the anomeric OH a glycosidic bond replaces, and the
+// COOH that's always there regardless) -- see layoutSialicSubstituents. The
+// COOH must keep its own label even when its shared vertex goes stick-only
+// (or label-overridden) for the OTHER substituent there.
+function applySubstituentOverrides(substituents, { stickOnlyPositions = new Set(), labelOverrides = new Map() } = {}) {
+  return substituents.map((s) => {
+    if (s.neverSuppress) return s;
+    if (labelOverrides.has(s.position)) return { ...s, label: labelOverrides.get(s.position) };
+    if (stickOnlyPositions.has(s.position)) return { ...s, label: null };
+    return s;
+  });
+}
+
 /**
  * Compute one residue's ring + substituent geometry, in its own local
  * coordinate frame (centered on (0,0)), without stringifying to SVG yet.
@@ -119,18 +139,7 @@ function layoutResidue(terminii, inchi, opts = {}) {
   return {
     vertices,
     bonds,
-    // neverSuppress: some shapes (sialic) put two independent substituents
-    // on the same vertex (the anomeric OH a glycosidic bond replaces, and
-    // the COOH that's always there regardless) -- see
-    // layoutSialicSubstituents. The COOH must keep its own label even when
-    // its shared vertex goes stick-only (or label-overridden) for the
-    // OTHER substituent there.
-    substituents: substituents.map((s) => {
-      if (s.neverSuppress) return s;
-      if (labelOverrides.has(s.position)) return { ...s, label: labelOverrides.get(s.position) };
-      if (stickOnlyPositions.has(s.position)) return { ...s, label: null };
-      return s;
-    }),
+    substituents: applySubstituentOverrides(substituents, { stickOnlyPositions, labelOverrides }),
   };
 }
 
@@ -499,6 +508,7 @@ export {
   renderGlycanSVG,
   renderSugarTreeSVG,
   layoutResidue,
+  applySubstituentOverrides,
   residueSVGParts,
   anchorPoint,
   vertexForPosition,
@@ -506,6 +516,7 @@ export {
   substituentStickEnd,
   shortenToward,
   placeholderSVGParts,
+  orientLabel,
   LINKAGE_INSET,
   LINKAGE_LABEL_GAP,
 };

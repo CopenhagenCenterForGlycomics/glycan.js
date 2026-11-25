@@ -46,7 +46,7 @@
  */
 
 import { parseInChI, parseTLayer } from '../InChITerminii.js';
-import { shapeNeedsMirrorFlip, deriveHaworthOrientation } from '../InChIRingGeometry.js';
+import { shapeNeedsMirrorFlip, deriveHaworthOrientation, deriveAxialEquatorial } from '../InChIRingGeometry.js';
 
 // A small set of residues that glycan.js's tree models as a separate child
 // Monosaccharide node (e.g. `GlcNAc(b1-4)[HSO3(u?-6)]...`, same as Fuc/
@@ -158,11 +158,21 @@ export function layoutSubstituents(terminii, inchi, opts = {}) {
   // so its un-corrected orientation comes from the anomer label directly
   // (alpha=down, beta=up -- the D-series pattern, confirmed against real
   // alpha/beta-D-glucopyranose), before the same D/L correction as every
-  // other position.
+  // other position. Its axEq follows the anomer directly too (alpha=axial,
+  // beta=equatorial, the standard aldose anomeric correlation -- see e.g.
+  // alpha/beta-D-glucopyranose's own well-known 4C1 chair) -- UNLIKE
+  // orientation, this is NOT D/L-corrected: axial/equatorial is invariant
+  // between true enantiomers (see this file's own module docstring), the
+  // same reasoning InChIRingGeometry.js's own deriveAxialEquatorial
+  // already relies on for every OTHER position. Only used by a chair-
+  // conformation renderer (see ChairLayout.js) -- Haworth itself ignores
+  // it, since a Haworth projection doesn't distinguish axial/equatorial at
+  // all (that's the whole simplification it makes).
   const c1 = positions.get(1);
   if (c1 && displayLabel(c1.label)) {
     const orientation = flip(anomer === 'b' ? 'up' : 'down');
-    substituents.push({ position: 1, label: displayLabel(c1.label), orientation });
+    const axEq = anomer === 'a' ? 'ax' : 'eq';
+    substituents.push({ position: 1, label: displayLabel(c1.label), orientation, axEq });
   }
 
   for (const pos of [2, 3, 4]) {
@@ -171,7 +181,7 @@ export function layoutSubstituents(terminii, inchi, opts = {}) {
     const label = displayLabel(entry.label);
     if (!label) continue;
     const orientation = flip(orientationFromAxEq(pos, entry.axEq));
-    if (orientation) substituents.push({ position: pos, label, orientation });
+    if (orientation) substituents.push({ position: pos, label, orientation, axEq: entry.axEq });
   }
 
   // Exocyclic C6 group, attached at ring position 5 -- oriented by ring
@@ -182,7 +192,7 @@ export function layoutSubstituents(terminii, inchi, opts = {}) {
     const c5 = positions.get(5);
     if (label && c5) {
       const orientation = flip(orientationFromAxEq(5, c5.axEq));
-      if (orientation) substituents.push({ position: 5, label, orientation });
+      if (orientation) substituents.push({ position: 5, label, orientation, axEq: c5.axEq });
     }
   }
 
@@ -399,11 +409,17 @@ export function layoutSialicSubstituents(terminii, inchi, opts = {}) {
   const flip = (o) => (o && extraInvert ? (o === 'up' ? 'down' : 'up') : o);
 
   // Anomeric OH ("r2") + exocyclic COOH (sialic C1), both at hexagon C1.
+  // axEq follows the anomer directly (alpha=COOH axial, beta=COOH
+  // equatorial -- see this function's own docstring above), same
+  // D/L-invariance reasoning as layoutSubstituents' own C1 -- only used by
+  // a chair-conformation renderer, Haworth itself ignores it.
   const ohEntry = positions.get(2);
   const ohLabel = ohEntry && displayLabel(ohEntry.label);
   if (ohLabel) {
     const ohOrientation = flip(anomer === 'b' ? 'down' : 'up');
-    substituents.push({ position: 1, label: ohLabel, orientation: ohOrientation });
+    const coohAxEq = anomer === 'a' ? 'ax' : 'eq';
+    const ohAxEq = coohAxEq === 'ax' ? 'eq' : 'ax';
+    substituents.push({ position: 1, label: ohLabel, orientation: ohOrientation, axEq: ohAxEq });
     const coohEntry = positions.get(1);
     const coohLabel = coohEntry && displayLabel(coohEntry.label);
     if (coohLabel) {
@@ -416,13 +432,18 @@ export function layoutSialicSubstituents(terminii, inchi, opts = {}) {
         position: 1,
         label: coohLabel,
         orientation: ohOrientation === 'up' ? 'down' : 'up',
+        axEq: coohAxEq,
         neverSuppress: true,
       });
     }
   }
 
   // Sialic C4/C5/C6 = ring-walk / hexagon positions 3/4/5 -- real,
-  // InChI-derived stereocentres.
+  // InChI-derived stereocentres. axEq comes straight from
+  // InChIRingGeometry.js's own deriveAxialEquatorial (the same real
+  // stereocentre data deriveHaworthOrientation already uses here, just its
+  // ax/eq sibling instead of its up/down one) -- no extra D/L correction
+  // needed for axEq, same as everywhere else in this file.
   const tLayerMap = parseTLayer(layers.t);
   const SIALIC_TO_HEXAGON = { 4: 3, 5: 4, 6: 5 };
   for (const sialicPos of [4, 5, 6]) {
@@ -431,7 +452,8 @@ export function layoutSialicSubstituents(terminii, inchi, opts = {}) {
     if (!label) continue;
     const hexagonPos = SIALIC_TO_HEXAGON[sialicPos];
     const orientation = deriveHaworthOrientation(layers, tLayerMap, hexagonPos);
-    if (orientation) substituents.push({ position: hexagonPos, label, orientation });
+    const axEq = deriveAxialEquatorial(layers, tLayerMap, hexagonPos);
+    if (orientation) substituents.push({ position: hexagonPos, label, orientation, axEq });
   }
 
   // C7-C8-C9 glycerol tail, hanging off hexagon C5 (sialic C6) -- drawn as
@@ -440,7 +462,8 @@ export function layoutSialicSubstituents(terminii, inchi, opts = {}) {
   const tailLabel = sialicTailLabel(positions.get(7), positions.get(8), positions.get(9));
   if (tailLabel) {
     const orientation = deriveHaworthOrientation(layers, tLayerMap, 5);
-    if (orientation) substituents.push({ position: 5, label: tailLabel, orientation });
+    const axEq = deriveAxialEquatorial(layers, tLayerMap, 5);
+    if (orientation) substituents.push({ position: 5, label: tailLabel, orientation, axEq });
   }
 
   return { substituents };
