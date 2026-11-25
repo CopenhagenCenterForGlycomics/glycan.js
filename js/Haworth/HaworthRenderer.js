@@ -17,14 +17,14 @@
  *    built as a string (reusing residueSVGParts/placeholderSVGParts
  *    unchanged) and then parsed into real nodes once, the same technique
  *    SVGRenderer.js's own AppendSymbols uses for sugars.svg.
- *  - HaworthSVG.js's renderGlycanSVG resolves suppressed/stick-only
- *    positions once for a whole pre-built residues+linkages array (see its
- *    own suppressByResidue/stickOnlyByResidue maps); here renderIcon is
- *    called once per residue with no such whole-sugar pass, so
- *    residueHaworthLayout below derives the same two sets from a single
- *    residue's own tree relationships instead (its children's attachment
- *    positions, and its own donor position on its parent) -- equivalent
- *    result, just computed locally rather than globally.
+ *  - HaworthSVG.js's renderGlycanSVG resolves stick-only positions once for
+ *    a whole pre-built residues+linkages array (see its own
+ *    stickOnlyByResidue map); here renderIcon is called once per residue
+ *    with no such whole-sugar pass, so residueHaworthLayout below derives
+ *    the same set from a single residue's own tree relationships instead
+ *    (its children's attachment positions, and its own donor position on
+ *    its parent) -- equivalent result, just computed locally rather than
+ *    globally.
  *  - The icon framework's layout engines (CondensedLayout/SugarAwareLayout)
  *    size every icon as a ~1x1 "unit" square by default (position.r = 0.5),
  *    with DELTA_X/DELTA_Y controlling only the GAP between residue centers,
@@ -131,24 +131,24 @@ function residueHaworthLayout(residue) {
   const shape = data && detectRingShape(data.terminii);
   if (!shape) return null;
 
-  // Every position where one of this residue's OWN children attaches is
-  // fully suppressed -- that child's own bond takes the vertex over
-  // completely (substituentPositionFor remaps ring position 6 onto the
-  // hexagon's actual C5 vertex, same as HaworthSVG.js's own
-  // substituentPositionFor usage).
-  const suppressPositions = new Set();
+  const stickOnlyPositions = new Set();
+
+  // Every position where one of this residue's OWN children attaches keeps
+  // its stick but drops the label -- that position's own real up/down
+  // stereochemistry is what the glycosidic bond continues on from (see
+  // anchorPoint), not the bare ring vertex (substituentPositionFor remaps
+  // ring position 6 onto the hexagon's actual C5 vertex, same as
+  // HaworthSVG.js's own substituentPositionFor usage).
   for (const child of residue.children ?? []) {
     const parentPosition = residue.linkageOf(child);
     if (Number.isInteger(parentPosition)) {
-      suppressPositions.add(substituentPositionFor(parentPosition));
+      stickOnlyPositions.add(substituentPositionFor(parentPosition));
     }
   }
 
   // This residue's own donor position on ITS parent (almost always 1, the
-  // anomeric carbon) keeps its stick but drops the label -- the glycosidic
-  // bond continues on from there instead (see anchorPoint, used the same
-  // way in renderLinkage below).
-  const stickOnlyPositions = new Set();
+  // anomeric carbon) gets the same treatment -- see anchorPoint, used the
+  // same way in renderLinkage below.
   if (residue.parent) {
     const donorPosition = Number.isInteger(residue.parent_linkage) ? residue.parent_linkage : 1;
     stickOnlyPositions.add(donorPosition);
@@ -157,7 +157,6 @@ function residueHaworthLayout(residue) {
   return layoutResidue(data.terminii, data.inchi, {
     anomer: residue.anomer === 'a' ? 'a' : 'b',
     shape,
-    suppressPositions,
     stickOnlyPositions,
   });
 }
@@ -239,13 +238,15 @@ class HaworthRenderer extends SVGRenderer {
   }
 
   // Draws the bond from the child's own anomeric stick (its alpha/beta
-  // configuration -- see residueHaworthLayout's stickOnlyPositions and
-  // HaworthSVG.js's anchorPoint) to the parent's own linkage-position
-  // vertex, with the bridging oxygen sitting inline in a gap at the
-  // midpoint -- the same convention renderGlycanSVG's own glycosidic-bond
-  // loop uses, just reading positions from the icon framework's own
-  // position objects (icon-unit x/y/width/height, pre-SCALE) instead of
-  // renderGlycanSVG's plain per-residue x/y.
+  // configuration) to the parent's own linked-position stick (that
+  // position's own real up/down stereochemistry -- see
+  // residueHaworthLayout's stickOnlyPositions and HaworthSVG.js's
+  // anchorPoint, applied symmetrically to both ends), with the bridging
+  // oxygen sitting inline in a gap at the midpoint -- the same convention
+  // renderGlycanSVG's own glycosidic-bond loop uses, just reading
+  // positions from the icon framework's own position objects (icon-unit
+  // x/y/width/height, pre-SCALE) instead of renderGlycanSVG's plain
+  // per-residue x/y.
   renderLinkage(child_pos, parent_pos, child, parent, sugar, canvas) {
     if (!parent_pos) return null;
 

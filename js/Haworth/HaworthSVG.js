@@ -82,28 +82,22 @@ function substituentPositionFor(ringPosition) {
 /**
  * Compute one residue's ring + substituent geometry, in its own local
  * coordinate frame (centered on (0,0)), without stringifying to SVG yet.
- * `suppressPositions` (a Set of ring positions) leaves out a substituent
- * stick at those positions entirely -- used where a glycosidic bond takes
- * its place on the PARENT side of a linkage (e.g. the C4 a child's C1
- * bonds to): the bond line takes over that vertex completely, same as if
- * it had never had a substituent at all.
- * `stickOnlyPositions` keeps the stick but drops its label -- used for a
- * linkage CHILD's own anomeric position (1): it still has a real
- * configuration (alpha/beta) worth drawing as a short stick, but what
- * used to be its free "OH" is now the glycosidic bond itself, so the
- * stick carries no label of its own (see anchorPoint, which extends the
- * glycosidic line out to this stick's own endpoint instead of the bare
- * ring vertex).
+ * `stickOnlyPositions` (a Set of ring positions) keeps a substituent's
+ * stick but drops its label -- used at BOTH ends of a glycosidic bond: a
+ * linkage CHILD's own anomeric position (1), and the PARENT's own linked
+ * position (e.g. the C4 a child's C1 bonds to). Either way the position
+ * still has a real substituent with its own real orientation (up/down --
+ * the actual stereochemistry at that ring position) worth drawing as a
+ * short stick, but what used to be its free "OH" is now the glycosidic
+ * bond itself, so the stick carries no label of its own -- see
+ * anchorPoint, which extends the glycosidic line out to this stick's own
+ * endpoint, in that position's real direction, instead of the bare ring
+ * vertex.
  * `shape` ('hexose' | 'furanose' | 'sialic', default 'hexose') picks which
  * geometry + substituent layout to use -- see HaworthLayout.js.
  */
 function layoutResidue(terminii, inchi, opts = {}) {
-  const {
-    anomer = 'b',
-    suppressPositions = new Set(),
-    stickOnlyPositions = new Set(),
-    shape = 'hexose',
-  } = opts;
+  const { anomer = 'b', stickOnlyPositions = new Set(), shape = 'hexose' } = opts;
   const builder = SHAPE_BUILDERS[shape] ?? SHAPE_BUILDERS.hexose;
   const { vertices, bonds } = builder.geometry();
   const { substituents } = builder.layout(terminii, inchi, { anomer });
@@ -113,10 +107,11 @@ function layoutResidue(terminii, inchi, opts = {}) {
     // neverSuppress: some shapes (sialic) put two independent substituents
     // on the same vertex (the anomeric OH a glycosidic bond replaces, and
     // the COOH that's always there regardless) -- see
-    // layoutSialicSubstituents.
-    substituents: substituents
-      .filter((s) => s.neverSuppress || !suppressPositions.has(s.position))
-      .map((s) => (stickOnlyPositions.has(s.position) ? { ...s, label: null } : s)),
+    // layoutSialicSubstituents. The COOH must keep its own label even when
+    // its shared vertex goes stick-only for the OTHER substituent there.
+    substituents: substituents.map((s) =>
+      stickOnlyPositions.has(s.position) && !s.neverSuppress ? { ...s, label: null } : s
+    ),
   };
 }
 
@@ -341,11 +336,10 @@ function renderResidueSVG(terminii, inchi, opts = {}) {
 function renderGlycanSVG(residues, linkages, opts = {}) {
   const { width = 600, height = 260 } = opts;
 
-  const suppressByResidue = new Map(residues.map((r) => [r.id, new Set()]));
   const stickOnlyByResidue = new Map(residues.map((r) => [r.id, new Set()]));
   for (const link of linkages) {
     stickOnlyByResidue.get(link.child)?.add(1);
-    suppressByResidue.get(link.parent)?.add(substituentPositionFor(link.parentPosition));
+    stickOnlyByResidue.get(link.parent)?.add(substituentPositionFor(link.parentPosition));
   }
 
   const layouts = new Map(
@@ -356,7 +350,6 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
         : layoutResidue(r.terminii, r.inchi, {
           anomer: r.anomer ?? 'b',
           shape: r.shape ?? 'hexose',
-          suppressPositions: suppressByResidue.get(r.id),
           stickOnlyPositions: stickOnlyByResidue.get(r.id),
         }),
     ])
@@ -382,15 +375,17 @@ function renderGlycanSVG(residues, linkages, opts = {}) {
   }
 
   // Glycosidic bonds: a line from the child's own anomeric stick (its
-  // alpha/beta configuration -- see anchorPoint/layoutResidue's
-  // stickOnlyPositions) to the parent's linkage-position point (the parent
-  // side still pulled in by LINKAGE_INSET, so it doesn't run the full
-  // residue-to-residue distance), with the bridging oxygen sitting inline
-  // in the gap at its midpoint -- the same label-gap convention the ring
-  // oxygen itself uses (see RING_LABEL_GAP/shortenToward above) -- rather
-  // than floating above the line. Either end may be a placeholder (no
-  // ring positions, and so no anomeric stick of its own), in which case
-  // the bond just touches its center, inset like the parent side.
+  // alpha/beta configuration) to the parent's own linked-position stick
+  // (that position's own real up/down stereochemistry -- see
+  // anchorPoint/layoutResidue's stickOnlyPositions, now applied
+  // symmetrically to both ends), the parent side still pulled in by
+  // LINKAGE_INSET so it doesn't run the full residue-to-residue distance,
+  // with the bridging oxygen sitting inline in the gap at its midpoint --
+  // the same label-gap convention the ring oxygen itself uses (see
+  // RING_LABEL_GAP/shortenToward above) -- rather than floating above the
+  // line. Either end may be a placeholder (no ring positions, and so no
+  // stick of its own), in which case the bond just touches its center,
+  // inset like the parent side.
   for (const link of linkages) {
     const child = residues.find((r) => r.id === link.child);
     const parent = residues.find((r) => r.id === link.parent);
